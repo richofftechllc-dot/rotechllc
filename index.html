@@ -34,8 +34,8 @@
 
     /* NAV */
     nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; padding: 14px 5%; background: rgba(3,6,8,0.92); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
-    .nav-logo { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; color: #fff; text-decoration: none; }
-    .nav-logo span { color: var(--green); }
+    .nav-logo { display: inline-flex; align-items: center; text-decoration: none; }
+    .nav-logo img { height: 48px; width: auto; display: block; }
     .nav-links { display: flex; gap: 28px; list-style: none; }
     .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.88rem; font-weight: 500; transition: color 0.2s; }
     .nav-links a:hover { color: var(--green); }
@@ -178,7 +178,7 @@
 
 <!-- NAV -->
 <nav>
-  <a href="#" class="nav-logo">Rich<span>Off</span>Tech</a>
+  <a href="#" class="nav-logo"><img src="rot-logo.png" alt="Rich Off Tech Logo" style="height:48px;width:auto;display:block;"></a>
   <ul class="nav-links">
     <li><a href="#services">Services</a></li>
     <li><a href="#about">About</a></li>
