@@ -123,6 +123,19 @@
     .form-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 40px; }
     .form-card iframe { display: block; width: 100%; height: 540px; border: none; border-radius: 10px; }
 
+    /* INTAKE FORM MODAL */
+    .intake-modal-overlay { position:fixed; inset:0; z-index:600; background:rgba(0,0,0,0.88); backdrop-filter:blur(10px); display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+    .intake-modal-overlay.open { opacity:1; pointer-events:all; }
+    .intake-modal { background:var(--card2); border:1px solid var(--border); border-radius:20px; width:100%; max-width:680px; max-height:90vh; display:flex; flex-direction:column; transform:translateY(20px); transition:transform 0.3s; overflow:hidden; }
+    .intake-modal-overlay.open .intake-modal { transform:translateY(0); }
+    .intake-modal-header { display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-bottom:1px solid var(--border2); flex-shrink:0; }
+    .intake-modal-header .step-badge { background:rgba(0,255,136,0.1); color:var(--green); font-size:0.72rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:4px 12px; border-radius:50px; }
+    .intake-modal-header .modal-title { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; }
+    .intake-modal-close { background:none; border:none; color:var(--muted); font-size:1.5rem; cursor:pointer; line-height:1; transition:color 0.2s; padding:0 4px; }
+    .intake-modal-close:hover { color:#fff; }
+    .intake-modal-body { flex:1; overflow:hidden; }
+    .intake-modal-body iframe { display:block; width:100%; height:560px; border:none; }
+
     /* SERVICE DETAIL MODAL */
     .modal-overlay { position:fixed; inset:0; z-index:500; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity 0.3s; }
     .modal-overlay.open { opacity:1; pointer-events:all; }
@@ -295,14 +308,11 @@
       <h2 class="section-title">Tell Us About Yourself</h2>
       <p class="section-sub">Fill out this quick form so we can prepare for your session. Takes about 60 seconds.</p>
     </div>
-    <div class="form-card">
-      <iframe
-        aria-label="RichOffTech Consultation Form"
-        src="https://forms.zohopublic.com/richofftechllcgm1/form/ROTechConsultation/formperma/3Y-J7r3hiEiTJ8YmdWd-RTMuDzj7X83bNPLof3GnCtM"
-        frameborder="0"
-        allowtransparency="true"
-        scrolling="yes">
-      </iframe>
+    <div class="form-card" style="text-align:center; padding: 60px 40px;">
+      <div style="font-size:2.5rem; margin-bottom:16px;">📋</div>
+      <h3 style="font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:700; margin-bottom:10px;">Quick Intake Form</h3>
+      <p style="color:var(--muted); font-size:0.9rem; line-height:1.6; max-width:400px; margin:0 auto 28px;">Takes about 60 seconds. This helps us prepare for your session so you get the most value.</p>
+      <button class="btn-primary" onclick="openIntakeForm()">📋 Open Intake Form</button>
     </div>
   </div>
 </section>
@@ -361,6 +371,20 @@
     <p><a href="#book">Book a Consultation →</a></p>
   </div>
 </footer>
+
+<!-- INTAKE FORM MODAL -->
+<div class="intake-modal-overlay" id="intake-modal-overlay" onclick="closeIntakeFormOutside(event)">
+  <div class="intake-modal">
+    <div class="intake-modal-header">
+      <span class="step-badge">Step 1 of 2</span>
+      <span class="modal-title">Tell Us About Yourself</span>
+      <button class="intake-modal-close" onclick="closeIntakeForm()">×</button>
+    </div>
+    <div class="intake-modal-body" id="intake-modal-body">
+      <!-- iframe injected lazily on open -->
+    </div>
+  </div>
+</div>
 
 <!-- SERVICE DETAIL MODAL -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
@@ -468,7 +492,33 @@
     if (e.target === document.getElementById('modal-overlay')) closeModal();
   }
 
-  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closeModal(); closeIntakeForm(); } });
+
+  // ── INTAKE FORM MODAL ──
+  function openIntakeForm() {
+    var body = document.getElementById('intake-modal-body');
+    // Lazy-load iframe only on first open
+    if (!body.querySelector('iframe')) {
+      var f = document.createElement('iframe');
+      f.src = 'https://zfrmz.com/ghXfMa5pKbUFPtzaJX58';
+      f.setAttribute('aria-label', 'RichOffTech Intake Form');
+      f.setAttribute('frameborder', '0');
+      f.setAttribute('allowtransparency', 'true');
+      f.setAttribute('scrolling', 'yes');
+      body.appendChild(f);
+    }
+    document.getElementById('intake-modal-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeIntakeForm() {
+    document.getElementById('intake-modal-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closeIntakeFormOutside(e) {
+    if (e.target === document.getElementById('intake-modal-overlay')) closeIntakeForm();
+  }
 </script>
 
 </body>
