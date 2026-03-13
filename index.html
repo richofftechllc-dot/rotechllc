@@ -221,21 +221,21 @@
         <p>Navigate the clearance process with confidence. Get insider guidance from someone who's been through it.</p>
         <span class="service-link">Learn more →</span>
       
-        <button class="card-cta-btn" onclick="event.stopPropagation(); prefillService('Clearance Guidance')">Start Here →</button></div>
+        <button class="card-cta-btn" onclick="event.stopPropagation(); openIntakeForm('Clearance Guidance')">Start Here →</button></div>
       <div class="service-card" onclick="openModal('cert')">
         <div class="service-icon">🏆</div>
         <h3>Certification Roadmap</h3>
         <p>Build a strategic cert path that lands you in the roles you want. No wasted time or money.</p>
         <span class="service-link">Learn more →</span>
       
-        <button class="card-cta-btn" onclick="event.stopPropagation(); prefillService('Tech Certification Guidance')">Start Here →</button></div>
+        <button class="card-cta-btn" onclick="event.stopPropagation(); openIntakeForm('Tech Certification Guidance')">Start Here →</button></div>
       <div class="service-card" onclick="openModal('web')">
         <div class="service-icon">💻</div>
         <h3>Website Development</h3>
         <p>Professional websites built fast. Perfect for consultants, freelancers, and small businesses.</p>
         <span class="service-link">Learn more →</span>
       
-        <button class="card-cta-btn" onclick="event.stopPropagation(); prefillService('Website Development')">Start Here →</button></div>
+        <button class="card-cta-btn" onclick="event.stopPropagation(); openIntakeForm('Website Development')">Start Here →</button></div>
       <div class="service-card" onclick="openModal('ai')">
         <div class="service-icon">🤖</div>
         <h3>AI Tools Consulting</h3>
@@ -328,20 +328,6 @@
   </div>
 </section>
 
-<!-- BOOK SECTION -->
-<section id="book">
-  <div class="section-inner">
-    <div class="book-cta-box">
-      <div class="section-label" style="justify-content:center;display:flex;">Step 2</div>
-      <h2>Ready to Book Your Session?</h2>
-      <p>After filling out the intake form above, click below to pick your time slot. You'll get a Google Meet link and calendar invite instantly.</p>
-      <a class="book-cta-btn" href="https://richofftechllc.zohobookings.com/portal-embed#/4764802000000050082" target="_blank" rel="noopener noreferrer">
-        📅 Choose Your Appointment Time
-      </a>
-      <p class="book-note">Virtual sessions via Google Meet • Flexible scheduling</p>
-    </div>
-  </div>
-</section>
   <!-- TESTIMONIALS SECTION -->
   <section id="testimonials">
       <div class="section-inner">
@@ -494,7 +480,7 @@
       <ul class="modal-includes">
         ${s.includes.map(i => `<li><span class="check">✓</span>${i}</li>`).join('')}
       </ul>
-      <button class="modal-book-btn" onclick="closeModal(); prefillService('${s.formValue}')">📅 Get Started →</button>
+      <button class="modal-book-btn" onclick="closeModal(); openIntakeForm('${s.formValue}')">📅 Get Started →</button>
     `;
     document.getElementById('modal-overlay').classList.add('open');
     document.body.style.overflow = 'hidden';
