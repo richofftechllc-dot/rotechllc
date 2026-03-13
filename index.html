@@ -371,7 +371,7 @@
     <div class="footer-links">
       <h4>Contact</h4>
       <ul>
-        <li><a href="mailto:richofftechllc@gmail.com">richofftechllc@gmail.com</a></li>
+        <li><a href="/cdn-cgi/l/email-protection#cbb9a2a8a3a4adadbfaea8a3a7a7a88baca6aaa2a7e5a8a4a6"><span class="__cf_email__" data-cfemail="a7d5cec4cfc8c1c1d3c2c4cfcbcbc4e7c0cac6cecb89c4c8ca">[email&#160;protected]</span></a></li>
         <li><a href="https://www.instagram.com/richofftech_/" target="_blank">Instagram</a></li>
         <li><a href="#book">Schedule a Call</a></li>
       </ul>
@@ -405,7 +405,7 @@
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   // ── ZOHO BOOKINGS — original working method ──
   function openBooking() {
     var bookSection = document.getElementById('book');
@@ -510,6 +510,7 @@
       var existingFrame = body.querySelector('iframe');
       existingFrame.src = 'https://zfrmz.com/ghXfMa5pKbUFPtzaJX58' + (service ? '?Checkbox=' + encodeURIComponent(service) : '');
     }
+    document.getElementById('intake-modal-overlay').classList.add('open');
     document.body.style.overflow = 'hidden';
   }
 
@@ -524,16 +525,4 @@
 
   // -- URL PARAMS HANDLER (?service=...) --
   window.addEventListener('DOMContentLoaded', function () {
-    var params = new URLSearchParams(window.location.search);
-    var service = params.get('service');
-    if (service) { openIntakeForm(service); }
-  });
-</script>
-
-</body>
-</html>// -- PREFILL SERVICE & OPEN INTAKE FORM --
-  function prefillService(serviceName) {
-    openIntakeForm(serviceName);
-  }
-
-  
+    var params = new URLSearchParams(window.location.s
