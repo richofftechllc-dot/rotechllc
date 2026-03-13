@@ -515,7 +515,7 @@
   function openIntakeForm(service) {
     var body = document.getElementById('intake-modal-body');
     // Lazy-load iframe only on first open
-    if (!boif (!body.querySelector('iframe')) {
+    if (!body.querySelector('iframe')) {
       var f = document.createElement('iframe');
       f.src = 'https://zfrmz.com/ghXfMa5pKbUFPtzaJX58' + (service ? '?Checkbox=' + encodeURIComponent(service) : '');
       f.width = '100%'; f.height = '100%'; f.style.border = 'none'; f.title = 'Intake Form';
