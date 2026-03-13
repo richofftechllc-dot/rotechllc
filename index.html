@@ -14,9 +14,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Rich Off Tech | Tech Consulting</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <!-- Zoho Bookings embed script (original working method) -->
-  <script src="https://bookings.nimbuspop.com/assets/embed.js"></script>
-  <style>
+    <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --green: #00ff88; --green-dim: #00cc6a; --green-glow: rgba(0,255,136,0.15);
@@ -75,6 +73,8 @@
     .service-card h3 { font-family:'Syne',sans-serif; font-size:1.05rem; font-weight:700; margin-bottom:10px; }
     .service-card p { font-size:0.88rem; color:var(--muted); line-height:1.6; margin-bottom:20px; }
     .service-link { color:var(--green); font-size:0.83rem; font-weight:600; display:flex; align-items:center; gap:6px; }
+    .card-cta-btn { display:block; width:100%; margin-top:12px; padding:8px 16px; background:var(--green); color:#000; border:none; border-radius:8px; font-weight:700; font-size:0.85rem; cursor:pointer; text-align:center; transition:background 0.2s; }
+    .card-cta-btn:hover { background:var(--green-dim); }
 
     /* ABOUT */
     #about { background: var(--dark); }
@@ -201,7 +201,7 @@
   <h1>Tech Consulting<br/><span class="highlight">Built Different.</span></h1>
   <p>10+ years of real-world IT experience. Security clearances, certifications, AI tools, and web development — all in one place.</p>
   <div class="hero-ctas">
-    <button class="btn-primary" onclick="openBooking()">📅 Book a Consultation</button>
+    <button class="btn-primary" onclick="openIntakeForm()">📅 Book a Consultation</button>
     <a href="#services" class="btn-secondary">View Services</a>
   </div>
 </section>
@@ -220,25 +220,29 @@
         <h3>Security Clearance Guidance</h3>
         <p>Navigate the clearance process with confidence. Get insider guidance from someone who's been through it.</p>
         <span class="service-link">Learn more →</span>
-      </div>
+      
+        <button class="card-cta-btn" onclick="event.stopPropagation(); prefillService('Clearance Guidance')">Start Here →</button></div>
       <div class="service-card" onclick="openModal('cert')">
         <div class="service-icon">🏆</div>
         <h3>Certification Roadmap</h3>
         <p>Build a strategic cert path that lands you in the roles you want. No wasted time or money.</p>
         <span class="service-link">Learn more →</span>
-      </div>
+      
+        <button class="card-cta-btn" onclick="event.stopPropagation(); prefillService('Tech Certification Guidance')">Start Here →</button></div>
       <div class="service-card" onclick="openModal('web')">
         <div class="service-icon">💻</div>
         <h3>Website Development</h3>
         <p>Professional websites built fast. Perfect for consultants, freelancers, and small businesses.</p>
         <span class="service-link">Learn more →</span>
-      </div>
+      
+        <button class="card-cta-btn" onclick="event.stopPropagation(); prefillService('Website Development')">Start Here →</button></div>
       <div class="service-card" onclick="openModal('ai')">
         <div class="service-icon">🤖</div>
         <h3>AI Tools Consulting</h3>
         <p>Leverage the latest AI tools to automate your workflow, save time, and stay competitive.</p>
         <span class="service-link">Learn more →</span>
-      </div>
+      
+        <button class="card-cta-btn" onclick="event.stopPropagation(); openIntakeForm()">Start Here →</button></div>
     </div>
   </div>
 </section>
@@ -307,7 +311,8 @@
 </section>
 
 <!-- INTAKE FORM -->
-<section id="intake">
+<span id="contact-form" style="display:none"></span>
+    <section id="intake">
   <div class="intake-inner">
     <div class="intake-header">
       <div class="section-label">Step 1</div>
@@ -330,9 +335,9 @@
       <div class="section-label" style="justify-content:center;display:flex;">Step 2</div>
       <h2>Ready to Book Your Session?</h2>
       <p>After filling out the intake form above, click below to pick your time slot. You'll get a Google Meet link and calendar invite instantly.</p>
-      <button class="book-cta-btn" onclick="openBooking()">
+      <a class="book-cta-btn" href="https://richofftechllc.zohobookings.com/portal-embed#/4764802000000050082" target="_blank" rel="noopener noreferrer">
         📅 Choose Your Appointment Time
-      </button>
+      </a>
       <p class="book-note">Virtual sessions via Google Meet • Flexible scheduling</p>
     </div>
   </div>
@@ -417,24 +422,16 @@
 <script>
   // ── ZOHO BOOKINGS — original working method ──
   function openBooking() {
-    Bookings.buttonModal({
-      url: "https://richofftechllc.zohobookings.com/portal-embed#/4764802000000050082",
-      text: "Book now",
-      color: "#00ff88",
-      textColor: "#000000",
-      position: "bottom-right"
-    });
-    // Trigger click on the generated button
-    setTimeout(function() {
-      var btn = document.querySelector('.bookings-iframe-holder button, [class*="nimbuspop"] button, [class*="booking"] button');
-      if (btn) btn.click();
-    }, 200);
+    var bookSection = document.getElementById('book');
+    if (bookSection) {
+      bookSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
-  // ── SERVICE MODAL DATA ──
+  
   const services = {
     clearance: {
-      icon: '🔐', tag: 'Clearance Guidance',
+      icon: '🔐', tag: 'Clearance Guidance', formValue: 'Clearance Guidance',
       title: 'Security Clearance Guidance',
       desc: 'Navigate the federal security clearance process with someone who holds an active TS/SCI with Full Scope Poly. Avoid the mistakes that delay or kill clearances.',
       includes: [
@@ -447,7 +444,7 @@
       ]
     },
     cert: {
-      icon: '🏆', tag: 'Certification Roadmap',
+      icon: '🏆', tag: 'Certification Roadmap', formValue: 'Tech Certification Guidance',
       title: 'Certification Roadmap',
       desc: 'Stop guessing which certs to get. Get a personalized roadmap based on your current role, target role, and timeline — backed by real hiring experience.',
       includes: [
@@ -460,7 +457,7 @@
       ]
     },
     web: {
-      icon: '💻', tag: 'Web Development',
+      icon: '💻', tag: 'Web Development', formValue: 'Website Development',
       title: 'Website Development',
       desc: 'Get a clean, professional website built fast. Perfect for consultants, freelancers, and small businesses who need to look credible online.',
       includes: [
@@ -473,7 +470,7 @@
       ]
     },
     ai: {
-      icon: '🤖', tag: 'AI Tools',
+      icon: '🤖', tag: 'AI Tools', formValue: '',
       title: 'AI Tools Consulting',
       desc: 'AI isn\'t replacing people — it\'s replacing people who don\'t use it. Learn how to apply AI tools to your work, business, and income goals.',
       includes: [
@@ -497,7 +494,7 @@
       <ul class="modal-includes">
         ${s.includes.map(i => `<li><span class="check">✓</span>${i}</li>`).join('')}
       </ul>
-      <button class="modal-book-btn" onclick="closeModal(); openBooking()">📅 Book This Consultation →</button>
+      <button class="modal-book-btn" onclick="closeModal(); prefillService('${s.formValue}')">📅 Get Started →</button>
     `;
     document.getElementById('modal-overlay').classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -515,19 +512,18 @@
   document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closeModal(); closeIntakeForm(); } });
 
   // ── INTAKE FORM MODAL ──
-  function openIntakeForm() {
+  function openIntakeForm(service) {
     var body = document.getElementById('intake-modal-body');
     // Lazy-load iframe only on first open
-    if (!body.querySelector('iframe')) {
+    if (!boif (!body.querySelector('iframe')) {
       var f = document.createElement('iframe');
-      f.src = 'https://zfrmz.com/ghXfMa5pKbUFPtzaJX58';
-      f.setAttribute('aria-label', 'RichOffTech Intake Form');
-      f.setAttribute('frameborder', '0');
-      f.setAttribute('allowtransparency', 'true');
-      f.setAttribute('scrolling', 'yes');
+      f.src = 'https://zfrmz.com/ghXfMa5pKbUFPtzaJX58' + (service ? '?Checkbox=' + encodeURIComponent(service) : '');
+      f.width = '100%'; f.height = '100%'; f.style.border = 'none'; f.title = 'Intake Form';
       body.appendChild(f);
-    }
-    document.getElementById('intake-modal-overlay').classList.add('open');
+    } else {
+      var existingFrame = body.querySelector('iframe');
+      existingFrame.src = 'https://zfrmz.com/ghXfMa5pKbUFPtzaJX58' + (service ? '?Checkbox=' + encodeURIComponent(service) : '');
+    }pen');
     document.body.style.overflow = 'hidden';
   }
 
@@ -539,7 +535,19 @@
   function closeIntakeFormOutside(e) {
     if (e.target === document.getElementById('intake-modal-overlay')) closeIntakeForm();
   }
+
+  // -- URL PARAMS HANDLER (?service=...) --
+  window.addEventListener('DOMContentLoaded', function () {
+    var params = new URLSearchParams(window.location.search);
+    var service = params.get('service');
+    if (service) { openIntakeForm(service); }
+  });
 </script>
 
 </body>
-</html>
+</html>// -- PREFILL SERVICE & OPEN INTAKE FORM --
+  function prefillService(serviceName) {
+    openIntakeForm(serviceName);
+  }
+
+  
