@@ -524,27 +524,26 @@
 
   // -- URL PARAMS HANDLER (?service=...) --
   window.addEventListener('DOMContentLoaded', function () {
-    var params = new URLSearchParams(window.location.s
-earch);
-      if (params.has('service')) {
-              var service = params.get('service');
-              openIntakeForm(service);
-      }
+    var params = new URLSearchParams(window.location.search);
+    if (params.has('service')) {
+      var service = params.get('service');
+      openIntakeForm(service);
+    }
   });
 </script>
 
   <!-- CONSULTATION POPUP -->
   <div id="consultationPopup" class="popup-form">
       <div class="popup-content">
-            <span class="close-btn" onclick="closeForm()">&#x2715;</span>span>
+            <span class="close-btn" onclick="closeForm()">&#x2715;</span>
             <iframe
                     aria-label="RichOffTech"
                     frameborder="0"
                     style="height:700px;width:100%;border:none;"
                     src="https://forms.zohopublic.com/richofftechllcgm1/form/ROTechConsultation/formperma/3Y-J7r3hiEiTJ8YmdWd-RTMuDzj7X83bNPLof3GnCtM">
-            </iframe>iframe>
-      </div>div>
-  </div>div>
+            </iframe>
+      </div>
+  </div>
 
   <script>
     function openForm(){
@@ -592,5 +591,3 @@ earch);
         cursor:pointer;
     }
     </style>
-  </style>
-  </script>
