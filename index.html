@@ -196,6 +196,90 @@
   <a href="#intake" class="nav-cta" onclick="event.preventDefault(); openIntakeForm()">Get Started →</a>
 </nav>
 
+
+<!-- ROT CERTIFICATION TRACKS SECTION -->
+<section id="certification-tracks">
+  <style>
+    #certification-tracks {
+      background: #0a0a0a;
+      padding: 80px 20px;
+      font-family: 'Syne', sans-serif;
+    }
+    .cert-tracks-inner { max-width: 1100px; margin: 0 auto; }
+    .cert-founding-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.35);
+      color: #00ff88; font-size: 0.82rem; font-weight: 700;
+      padding: 8px 18px; border-radius: 50px; margin-bottom: 28px;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      animation: rot-pulse 2s ease-in-out infinite;
+    }
+    @keyframes rot-pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,255,136,0.3); }
+      50% { opacity: 0.75; box-shadow: 0 0 0 6px rgba(0,255,136,0); }
+    }
+    .cert-tracks-header { margin-bottom: 48px; }
+    .cert-tracks-header h2 { font-size: clamp(1.8rem,4vw,2.6rem); font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 12px; }
+    .cert-tracks-header h2 span { color: #00ff88; }
+    .cert-tracks-header p { color: rgba(255,255,255,0.55); font-size: 1rem; max-width: 560px; }
+    .cert-cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 40px; }
+    @media (max-width: 700px) { .cert-cards-grid { grid-template-columns: 1fr; } }
+    .cert-card { background: #0a0f14; border: 1px solid rgba(0,255,136,0.12); border-radius: 16px; padding: 32px 28px 28px; display: flex; flex-direction: column; transition: border-color 0.25s, box-shadow 0.25s; }
+    .cert-card:hover { border-color: rgba(0,255,136,0.38); box-shadow: 0 0 28px rgba(0,255,136,0.07); }
+    .cert-card-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #00ff88; margin-bottom: 10px; }
+    .cert-card h3 { font-size: 1.45rem; font-weight: 800; color: #fff; margin-bottom: 20px; }
+    .cert-card-includes { list-style: none; padding: 0; margin: 0 0 20px; display: flex; flex-direction: column; gap: 9px; }
+    .cert-card-includes li { color: rgba(255,255,255,0.72); font-size: 0.9rem; display: flex; align-items: flex-start; gap: 9px; line-height: 1.4; }
+    .cert-card-includes li::before { content: '✓'; color: #00ff88; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .cert-card-payment { font-size: 0.8rem; color: rgba(0,255,136,0.75); font-weight: 600; letter-spacing: 0.04em; margin-bottom: 22px; border-top: 1px solid rgba(0,255,136,0.08); padding-top: 16px; }
+    .cert-card-cta { margin-top: auto; }
+    .cert-card-cta a { display: block; text-align: center; background: #00ff88; color: #000; font-weight: 700; font-size: 0.95rem; padding: 14px 24px; border-radius: 10px; text-decoration: none; transition: background 0.2s, transform 0.15s; font-family: 'Syne', sans-serif; }
+    .cert-card-cta a:hover { background: #00cc6a; transform: translateY(-2px); }
+    .cert-community-line { background: rgba(0,255,136,0.05); border: 1px solid rgba(0,255,136,0.12); border-radius: 12px; padding: 20px 24px; text-align: center; color: rgba(255,255,255,0.65); font-size: 0.92rem; line-height: 1.6; }
+    .cert-community-line strong { color: #00ff88; font-weight: 700; }
+  </style>
+  <div class="cert-tracks-inner">
+    <div class="cert-tracks-header">
+      <div class="cert-founding-badge">⚡ Founding Rate Ends April 1st</div>
+      <h2>ROT Certification Tracks &mdash;<br><span>Now Enrolling</span></h2>
+      <p>Guided, structured paths to get certified and land the job. Real coaching, real results.</p>
+    </div>
+    <div class="cert-cards-grid">
+      <div class="cert-card">
+        <div class="cert-card-label">Track 01</div>
+        <h3>CompTIA Security+</h3>
+        <ul class="cert-card-includes">
+          <li>1-on-1 coaching</li>
+          <li>Study roadmap</li>
+          <li>Weekly check-ins</li>
+          <li>Resource vault</li>
+          <li>Exam voucher</li>
+          <li>Job placement support</li>
+        </ul>
+        <div class="cert-card-payment">💳 Payment plans available</div>
+        <div class="cert-card-cta"><a href="https://square.link/u/WyMSETJI" target="_blank" rel="noopener noreferrer">Enroll in Sec+ &rarr;</a></div>
+      </div>
+      <div class="cert-card">
+        <div class="cert-card-label">Track 02</div>
+        <h3>ServiceNow CSA</h3>
+        <ul class="cert-card-includes">
+          <li>1-on-1 coaching</li>
+          <li>Hands-on labs</li>
+          <li>CSA study plan</li>
+          <li>Weekly cohort</li>
+          <li>Exam voucher</li>
+          <li>Job placement support</li>
+        </ul>
+        <div class="cert-card-payment">💳 Payment plans available</div>
+        <div class="cert-card-cta"><a href="https://square.link/u/WyMSETJI" target="_blank" rel="noopener noreferrer">Enroll in CSA &rarr;</a></div>
+      </div>
+    </div>
+    <div class="cert-community-line">
+      All enrolled clients get access to the <strong>Rich Off Tech Discord Community</strong> &mdash; connect with alumni, industry experts, and peers at every level.
+    </div>
+  </div>
+</section>
+
 <!-- HERO -->
 <section class="hero">
   <div class="badge"><span class="badge-dot"></span>Now Accepting Clients</div>
@@ -434,135 +518,7 @@
   </div>
 </section>
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-inner">
-    <div class="footer-brand">
-      <span class="logo">Rich<span style="color:var(--green)">Off</span>Tech</span>
-      <p>Empowering individuals to break into tech, earn certifications, navigate clearances, and build lasting digital careers.</p>
-    </div>
-    <div class="footer-links">
-      <h4>Navigate</h4>
-      <ul>
-        <li><a href="#services">Services</a></li>
-        <li><a href="#how">How It Works</a></li>
-        <li><a href="#intake">Intake Form</a></li>
-        
-      </ul>
-    </div>
-    <div class="footer-links">
-      <h4>Services</h4>
-      <ul>
-        <li><a href="#services">Security Clearance</a></li>
-        <li><a href="#services">Certifications</a></li>
-        <li><a href="#services">Web Development</a></li>
-        <li><a href="#services">AI Tools</a></li>
-      </ul>
-    </div>
-    <div class="footer-links">
-      <h4>Contact</h4>
-      <ul>
-        <li><a href="/cdn-cgi/l/email-protection#cbb9a2a8a3a4adadbfaea8a3a7a7a88baca6aaa2a7e5a8a4a6"><span class="__cf_email__" data-cfemail="a7d5cec4cfc8c1c1d3c2c4cfcbcbc4e7c0cac6cecb89c4c8ca">[email&#160;protected]</span></a></li>
-        <li><a href="https://www.instagram.com/richofftech_/" target="_blank">Instagram</a></li>
-        <li><a href="#book">Schedule a Call</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p>© 2026 Rich Off Tech LLC — All Rights Reserved.</p>
-  </div>
-</footer>
-
-<!-- INTAKE FORM MODAL -->
-<div class="intake-modal-overlay" id="intake-modal-overlay" onclick="closeIntakeFormOutside(event)">
-  <div class="intake-modal">
-    <div class="intake-modal-header">
-      <span class="step-badge">Step 1 of 2</span>
-      <span class="modal-title">Tell Us About Yourself</span>
-      <button class="intake-modal-close" onclick="closeIntakeForm()">×</button>
-    </div>
-    <div class="intake-modal-body" id="intake-modal-body">
-      <!-- iframe injected lazily on open -->
-    </div>
-  </div>
-</div>
-
-<!-- SERVICE DETAIL MODAL -->
-<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal()">×</button>
-    <div id="modal-body"></div>
-  </div>
-</div>
-
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-  // ── ZOHO BOOKINGS — original working method ──
-  function openBooking() {
-    var bookSection = document.getElementById('book');
-    if (bookSection) {
-      bookSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }
-
-  
-  const services = {
-    clearance: {
-      icon: '🔐', tag: 'Clearance Guidance', formValue: 'Clearance Guidance',
-      title: 'Security Clearance Guidance',
-      desc: 'Navigate the federal security clearance process with someone who holds an active TS/SCI with Full Scope Poly. Avoid the mistakes that delay or kill clearances.',
-      includes: [
-        'Clearance tier breakdown (Secret, TS, SCI, Poly)',
-        'SF-86 / eQIP completion guidance',
-        'Adjudication issue strategy',
-        'Interview prep & what to expect',
-        'Timeline expectations by agency',
-        'Ongoing support through the process'
-      ]
-    },
-    cert: {
-      icon: '🏆', tag: 'Certification Roadmap', formValue: 'Tech Certification Guidance',
-      title: 'Certification Roadmap',
-      desc: 'Stop guessing which certs to get. Get a personalized roadmap based on your current role, target role, and timeline — backed by real hiring experience.',
-      includes: [
-        'Role-specific cert strategy (SOC, Cloud, Dev, etc.)',
-        'CompTIA, AWS, Azure, ISC² cert paths',
-        'Study resource recommendations',
-        'Exam voucher guidance',
-        'Timeline + priority planning',
-        'Resume alignment after earning certs'
-      ]
-    },
-    web: {
-      icon: '💻', tag: 'Web Development', formValue: 'Website Development',
-      title: 'Website Development',
-      desc: 'Get a clean, professional website built fast. Perfect for consultants, freelancers, and small businesses who need to look credible online.',
-      includes: [
-        'Custom HTML/CSS/JS builds',
-        'GoDaddy, Wix, or self-hosted deployment',
-        'Booking & contact form integration',
-        'Mobile responsive design',
-        'SEO basics and on-page optimization',
-        'Same-week delivery on most projects'
-      ]
-    },
-    ai: {
-      icon: '🤖', tag: 'AI Tools', formValue: '',
-      title: 'AI Tools Consulting',
-      desc: 'AI isn\'t replacing people — it\'s replacing people who don\'t use it. Learn how to apply AI tools to your work, business, and income goals.',
-      includes: [
-        'Best AI tools for your specific use case',
-        'ChatGPT, Claude, Gemini hands-on walkthrough',
-        'Workflow automation with Zapier / Make',
-        'AI-powered content & SOPs',
-        'Custom AI prompt strategy for your industry',
-        'AI for job searching, resumes & interview prep'
-      ]
-    }
-  };
-
-  function openModal(key) {
-    const s = services[key];
-    document.getElementById('modal-body').innerHTML = `
+etElementById('modal-body').innerHTML = `
       <div class="modal-icon">${s.icon}</div>
       <span class="modal-tag">${s.tag}</span>
       <h2>${s.title}</h2>
