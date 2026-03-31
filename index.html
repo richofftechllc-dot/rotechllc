@@ -350,6 +350,90 @@
   </div>
 </section>
 
+
+<!-- ROT CERTIFICATION TRACKS SECTION -->
+<section id="certification-tracks">
+  <style>
+    #certification-tracks {
+      background: #0a0a0a;
+      padding: 80px 20px;
+      font-family: 'Syne', sans-serif;
+    }
+    .cert-tracks-inner { max-width: 1100px; margin: 0 auto; }
+    .cert-founding-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.35);
+      color: #00ff88; font-size: 0.82rem; font-weight: 700;
+      padding: 8px 18px; border-radius: 50px; margin-bottom: 28px;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      animation: rot-pulse 2s ease-in-out infinite;
+    }
+    @keyframes rot-pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,255,136,0.3); }
+      50% { opacity: 0.75; box-shadow: 0 0 0 6px rgba(0,255,136,0); }
+    }
+    .cert-tracks-header { margin-bottom: 48px; }
+    .cert-tracks-header h2 { font-size: clamp(1.8rem,4vw,2.6rem); font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 12px; }
+    .cert-tracks-header h2 span { color: #00ff88; }
+    .cert-tracks-header p { color: rgba(255,255,255,0.55); font-size: 1rem; max-width: 560px; }
+    .cert-cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 40px; }
+    @media (max-width: 700px) { .cert-cards-grid { grid-template-columns: 1fr; } }
+    .cert-card { background: #0a0f14; border: 1px solid rgba(0,255,136,0.12); border-radius: 16px; padding: 32px 28px 28px; display: flex; flex-direction: column; transition: border-color 0.25s, box-shadow 0.25s; }
+    .cert-card:hover { border-color: rgba(0,255,136,0.38); box-shadow: 0 0 28px rgba(0,255,136,0.07); }
+    .cert-card-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #00ff88; margin-bottom: 10px; }
+    .cert-card h3 { font-size: 1.45rem; font-weight: 800; color: #fff; margin-bottom: 20px; }
+    .cert-card-includes { list-style: none; padding: 0; margin: 0 0 20px; display: flex; flex-direction: column; gap: 9px; }
+    .cert-card-includes li { color: rgba(255,255,255,0.72); font-size: 0.9rem; display: flex; align-items: flex-start; gap: 9px; line-height: 1.4; }
+    .cert-card-includes li::before { content: '✓'; color: #00ff88; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .cert-card-payment { font-size: 0.8rem; color: rgba(0,255,136,0.75); font-weight: 600; letter-spacing: 0.04em; margin-bottom: 22px; border-top: 1px solid rgba(0,255,136,0.08); padding-top: 16px; }
+    .cert-card-cta { margin-top: auto; }
+    .cert-card-cta a { display: block; text-align: center; background: #00ff88; color: #000; font-weight: 700; font-size: 0.95rem; padding: 14px 24px; border-radius: 10px; text-decoration: none; transition: background 0.2s, transform 0.15s; font-family: 'Syne', sans-serif; }
+    .cert-card-cta a:hover { background: #00cc6a; transform: translateY(-2px); }
+    .cert-community-line { background: rgba(0,255,136,0.05); border: 1px solid rgba(0,255,136,0.12); border-radius: 12px; padding: 20px 24px; text-align: center; color: rgba(255,255,255,0.65); font-size: 0.92rem; line-height: 1.6; }
+    .cert-community-line strong { color: #00ff88; font-weight: 700; }
+  </style>
+  <div class="cert-tracks-inner">
+    <div class="cert-tracks-header">
+      <div class="cert-founding-badge">⚡ Founding Rate Ends April 1st</div>
+      <h2>ROT Certification Tracks &mdash;<br><span>Now Enrolling</span></h2>
+      <p>Guided, structured paths to get certified and land the job. Real coaching, real results.</p>
+    </div>
+    <div class="cert-cards-grid">
+      <div class="cert-card">
+        <div class="cert-card-label">Track 01</div>
+        <h3>CompTIA Security+</h3>
+        <ul class="cert-card-includes">
+          <li>1-on-1 coaching</li>
+          <li>Study roadmap</li>
+          <li>Weekly check-ins</li>
+          <li>Resource vault</li>
+          <li>Exam voucher</li>
+          <li>Job placement support</li>
+        </ul>
+        <div class="cert-card-payment">💳 Payment plans available</div>
+        <div class="cert-card-cta"><a href="https://square.link/u/WyMSETJI" target="_blank" rel="noopener noreferrer">Enroll in Sec+ &rarr;</a></div>
+      </div>
+      <div class="cert-card">
+        <div class="cert-card-label">Track 02</div>
+        <h3>ServiceNow CSA</h3>
+        <ul class="cert-card-includes">
+          <li>1-on-1 coaching</li>
+          <li>Hands-on labs</li>
+          <li>CSA study plan</li>
+          <li>Weekly cohort</li>
+          <li>Exam voucher</li>
+          <li>Job placement support</li>
+        </ul>
+        <div class="cert-card-payment">💳 Payment plans available</div>
+        <div class="cert-card-cta"><a href="https://square.link/u/WyMSETJI" target="_blank" rel="noopener noreferrer">Enroll in CSA &rarr;</a></div>
+      </div>
+    </div>
+    <div class="cert-community-line">
+      All enrolled clients get access to the <strong>Rich Off Tech Discord Community</strong> &mdash; connect with alumni, industry experts, and peers at every level.
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <div class="footer-inner">
