@@ -240,7 +240,7 @@
   </style>
   <div class="cert-tracks-inner">
     <div class="cert-tracks-header">
-      <div class="cert-founding-badge">⚡ Founding Rate Ends April 1st</div>
+      
       <h2>ROT Certification Tracks &mdash;<br><span>Now Enrolling</span></h2>
       <p>Guided, structured paths to get certified and land the job. Real coaching, real results.</p>
     </div>
@@ -257,7 +257,7 @@
           <li>Job placement support</li>
         </ul>
         <div class="cert-card-payment">💳 Payment plans available</div>
-        <div class="cert-card-cta"><a href="https://square.link/u/WyMSETJI" target="_blank" rel="noopener noreferrer">Enroll in Sec+ &rarr;</a></div>
+        <div class="cert-card-cta"><a href="#" onclick="openTierModal('secplus'); return false;">Enroll in Sec+ &rarr;</a></div>
       </div>
       <div class="cert-card">
         <div class="cert-card-label">Track 02</div>
@@ -271,7 +271,7 @@
           <li>Job placement support</li>
         </ul>
         <div class="cert-card-payment">💳 Payment plans available</div>
-        <div class="cert-card-cta"><a href="https://square.link/u/WyMSETJI" target="_blank" rel="noopener noreferrer">Enroll in CSA &rarr;</a></div>
+        <div class="cert-card-cta"><a href="#" onclick="openTierModal('csa'); return false;">Enroll in CSA &rarr;</a></div>
       </div>
     </div>
     <div class="cert-community-line">
@@ -300,32 +300,32 @@
       <p class="section-sub">Whether you're breaking into tech or leveling up, we have a service tailored for you.</p>
     </div>
     <div class="services-grid">
-      <div class="service-card" onclick="openModal('clearance')">
+      <div class="service-card">
         <div class="service-icon">🔐</div>
         <h3>Security Clearance Guidance</h3>
         <p>Navigate the clearance process with confidence. Get insider guidance from someone who's been through it.</p>
-        <span class="service-link">Learn more →</span>
+        
       
         <button class="card-cta-btn" onclick="event.stopPropagation(); openIntakeForm('Clearance Guidance')">Start Here →</button></div>
-      <div class="service-card" onclick="openModal('cert')">
+      <div class="service-card">
         <div class="service-icon">🏆</div>
         <h3>Certification Roadmap</h3>
         <p>Build a strategic cert path that lands you in the roles you want. No wasted time or money.</p>
-        <span class="service-link">Learn more →</span>
+        
       
         <button class="card-cta-btn" onclick="event.stopPropagation(); openIntakeForm('Tech Certification Guidance')">Start Here →</button></div>
-      <div class="service-card" onclick="openModal('web')">
+      <div class="service-card">
         <div class="service-icon">💻</div>
         <h3>Website Development</h3>
         <p>Professional websites built fast. Perfect for consultants, freelancers, and small businesses.</p>
-        <span class="service-link">Learn more →</span>
+        
       
         <button class="card-cta-btn" onclick="event.stopPropagation(); openIntakeForm('Website Development')">Start Here →</button></div>
-      <div class="service-card" onclick="openModal('ai')">
+      <div class="service-card">
         <div class="service-icon">🤖</div>
         <h3>AI Tools Consulting</h3>
         <p>Leverage the latest AI tools to automate your workflow, save time, and stay competitive.</p>
-        <span class="service-link">Learn more →</span>
+        
       
         <button class="card-cta-btn" onclick="event.stopPropagation(); openIntakeForm()">Start Here →</button></div>
     </div>
@@ -478,7 +478,7 @@
   </style>
   <div class="cert-tracks-inner">
     <div class="cert-tracks-header">
-      <div class="cert-founding-badge">⚡ Founding Rate Ends April 1st</div>
+      
       <h2>ROT Certification Tracks &mdash;<br><span>Now Enrolling</span></h2>
       <p>Guided, structured paths to get certified and land the job. Real coaching, real results.</p>
     </div>
@@ -495,7 +495,7 @@
           <li>Job placement support</li>
         </ul>
         <div class="cert-card-payment">💳 Payment plans available</div>
-        <div class="cert-card-cta"><a href="https://square.link/u/WyMSETJI" target="_blank" rel="noopener noreferrer">Enroll in Sec+ &rarr;</a></div>
+        <div class="cert-card-cta"><a href="#" onclick="openTierModal('secplus'); return false;">Enroll in Sec+ &rarr;</a></div>
       </div>
       <div class="cert-card">
         <div class="cert-card-label">Track 02</div>
@@ -509,7 +509,7 @@
           <li>Job placement support</li>
         </ul>
         <div class="cert-card-payment">💳 Payment plans available</div>
-        <div class="cert-card-cta"><a href="https://square.link/u/WyMSETJI" target="_blank" rel="noopener noreferrer">Enroll in CSA &rarr;</a></div>
+        <div class="cert-card-cta"><a href="#" onclick="openTierModal('csa'); return false;">Enroll in CSA &rarr;</a></div>
       </div>
     </div>
     <div class="cert-community-line">
@@ -518,7 +518,66 @@
   </div>
 </section>
 
-etElementById('modal-body').innerHTML = `
+<!-- AI CONCIERGE COMING SOON -->
+<section style="background: var(--card); padding: 80px 5%;">
+  <div style="max-width: 900px; margin: 0 auto; text-align: center;">
+    <div class="badge" style="margin-bottom: 20px;"><span class="badge-dot"></span>Coming May 15, 2026</div>
+    <h2 class="section-title" style="margin-bottom: 20px;">ROT AI Concierge</h2>
+    <p style="font-size: 1.1rem; color: var(--muted); max-width: 650px; margin: 0 auto 40px auto; line-height: 1.7;">
+      4-week live AI mastery program for small business owners. Learn Claude, ChatGPT, Gemini, Fireflies, and Canva AI to automate your operations and scale without hiring.
+    </p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 40px auto; max-width: 700px;">
+      <div style="padding: 24px 20px; background: var(--dark); border: 1px solid var(--border2); border-radius: 12px;">
+        <div style="font-size: 1.3rem; color: var(--green); font-weight: 700; margin-bottom: 8px;">Week 1</div>
+        <div style="color: var(--muted); font-size: 0.88rem;">AI Foundation + Prompts</div>
+      </div>
+      <div style="padding: 24px 20px; background: var(--dark); border: 1px solid var(--border2); border-radius: 12px;">
+        <div style="font-size: 1.3rem; color: var(--green); font-weight: 700; margin-bottom: 8px;">Week 2</div>
+        <div style="color: var(--muted); font-size: 0.88rem;">Fireflies + Automation</div>
+      </div>
+      <div style="padding: 24px 20px; background: var(--dark); border: 1px solid var(--border2); border-radius: 12px;">
+        <div style="font-size: 1.3rem; color: var(--green); font-weight: 700; margin-bottom: 8px;">Week 3</div>
+        <div style="color: var(--muted); font-size: 0.88rem;">Content with Canva AI</div>
+      </div>
+      <div style="padding: 24px 20px; background: var(--dark); border: 1px solid var(--border2); border-radius: 12px;">
+        <div style="font-size: 1.3rem; color: var(--green); font-weight: 700; margin-bottom: 8px;">Week 4</div>
+        <div style="color: var(--muted); font-size: 0.88rem;">Custom AI Assistant</div>
+      </div>
+    </div>
+    <div style="margin-top: 32px;">
+      <button class="btn-primary" onclick="openIntakeForm('AI Concierge Waitlist')">
+        Join Waitlist
+      </button>
+    </div>
+    <p style="margin-top: 20px; color: var(--muted); font-size: 0.85rem;">
+      Limited to 20 founding members. Enrollment opens May 1st.
+    </p>
+  </div>
+</section>
+
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- INTAKE FORM MODAL -->
+<div class="intake-modal-overlay" id="intake-modal-overlay" onclick="closeIntakeFormOutside(event)">
+  <div class="intake-modal">
+    <div class="intake-modal-header">
+      <div>
+        <span class="step-badge">Step 1</span>
+        <h3 class="modal-title">Let's Get Started</h3>
+      </div>
+      <button class="intake-modal-close" onclick="closeIntakeForm()">&times;</button>
+    </div>
+    <div class="intake-modal-body" id="intake-modal-body"></div>
+  </div>
+</div>
+<script>
+  function openModal(s) {
+    document.getElementById('modal-body').innerHTML = `
       <div class="modal-icon">${s.icon}</div>
       <span class="modal-tag">${s.tag}</span>
       <h2>${s.title}</h2>
@@ -592,7 +651,7 @@ etElementById('modal-body').innerHTML = `
       </div>
   </div>
 
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     function openForm(){
         document.getElementById("consultationPopup").style.display="flex";
     }
@@ -638,3 +697,103 @@ etElementById('modal-body').innerHTML = `
         cursor:pointer;
     }
     </style>
+
+<!-- TIER SELECTION MODAL -->
+<div id="tier-modal-overlay" style="position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.92); backdrop-filter:blur(10px); display:none; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:var(--card); max-width:700px; width:100%; border-radius:16px; border:1px solid var(--border); padding:40px 32px; position:relative;">
+    <button onclick="closeTierModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; color:var(--muted); font-size:28px; cursor:pointer; line-height:1;">&times;</button>
+    
+    <div id="tier-modal-content"></div>
+  </div>
+</div>
+
+<script>
+const tierData = {
+  secplus: {
+    name: 'CompTIA Security+',
+    tiers: [
+      {
+        name: 'Essentials',
+        price: '$1,500',
+        deposit: '$750',
+        features: ['Exam voucher ($550 value)', 'Resume building (ROT style)', 'Optional 15-min call'],
+        fullLink: 'https://square.link/u/g16S019e',
+        depositLink: 'https://square.link/u/1vGhZlth'
+      },
+      {
+        name: 'Accelerated',
+        price: '$2,400',
+        deposit: '$1,200',
+        features: ['Study roadmap + resource vault', 'Exam voucher ($550 value)', 'Resume building (ROT style)', '1-on-1 coaching (60 min)', 'Group sessions + Discord', 'Interview prep'],
+        fullLink: 'https://square.link/u/SIubLoO3',
+        depositLink: 'https://square.link/u/DhDBNa76'
+      }
+    ]
+  },
+  csa: {
+    name: 'ServiceNow CSA',
+    tiers: [
+      {
+        name: 'Essentials',
+        price: '$1,800',
+        deposit: '$900',
+        features: ['Exam voucher ($1,050 value)', 'Resume building (ROT style)', 'Optional 15-min call'],
+        fullLink: 'https://square.link/u/cJJQ5QmY',
+        depositLink: 'https://square.link/u/mOtKpWIW'
+      },
+      {
+        name: 'Accelerated',
+        price: '$2,800',
+        deposit: '$1,400',
+        features: ['Study roadmap + lab access', 'Exam voucher ($1,050 value)', 'Resume building (ROT style)', '1-on-1 coaching (60 min)', 'Group sessions + Discord', 'Interview prep'],
+        fullLink: 'https://square.link/u/8fDsKUbH',
+        depositLink: 'https://square.link/u/jh1wK5QK'
+      }
+    ]
+  }
+};
+
+function openTierModal(cert) {
+  const data = tierData[cert];
+  const html = `
+    <h2 style="font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; color:#fff; margin-bottom:12px; text-align:center;">Choose Your ${data.name} Track</h2>
+    <p style="color:var(--muted); font-size:0.95rem; text-align:center; margin-bottom:32px;">Select the plan that fits your goals</p>
+    
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+      ${data.tiers.map(tier => `
+        <div style="background:var(--dark); border:1px solid var(--border2); border-radius:12px; padding:28px 24px;">
+          <div style="font-size:0.75rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--green); margin-bottom:8px;">${tier.name}</div>
+          <div style="font-family:'Syne',sans-serif; font-size:2rem; font-weight:800; color:#fff; margin-bottom:4px;">${tier.price}</div>
+          <div style="font-size:0.85rem; color:var(--muted); margin-bottom:20px;">or ${tier.deposit} deposit</div>
+          <ul style="list-style:none; padding:0; margin:0 0 24px 0; display:flex; flex-direction:column; gap:10px;">
+            ${tier.features.map(f => `<li style="color:rgba(255,255,255,0.7); font-size:0.87rem; display:flex; align-items:flex-start; gap:8px;"><span style="color:var(--green); flex-shrink:0;">✓</span>${f}</li>`).join('')}
+          </ul>
+          <a href="${tier.fullLink}" target="_blank" rel="noopener noreferrer" style="display:block; text-align:center; background:var(--green); color:#000; font-weight:700; font-size:0.9rem; padding:12px; border-radius:8px; text-decoration:none; margin-bottom:10px; transition:background 0.2s; font-family:'Syne',sans-serif;">Pay in Full</a>
+          <a href="${tier.depositLink}" target="_blank" rel="noopener noreferrer" style="display:block; text-align:center; background:transparent; color:var(--green); font-weight:600; font-size:0.85rem; padding:10px; border:1px solid var(--border); border-radius:8px; text-decoration:none; transition:all 0.2s;">Pay Deposit</a>
+        </div>
+      `).join('')}
+    </div>
+    
+    <p style="color:var(--muted); font-size:0.82rem; text-align:center; margin-top:24px;">Service fees applied at checkout. Discord access included with Accelerated plans.</p>
+  `;
+  
+  document.getElementById('tier-modal-content').innerHTML = html;
+  document.getElementById('tier-modal-overlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeTierModal() {
+  document.getElementById('tier-modal-overlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// Close on outside click
+document.getElementById('tier-modal-overlay')?.addEventListener('click', function(e) {
+  if (e.target === this) closeTierModal();
+});
+</script>
+
+<!-- SERVICE MODAL -->
+
+</body>
+</html>
