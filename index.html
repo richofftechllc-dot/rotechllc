@@ -21,16 +21,15 @@ rel="stylesheet"/>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; 
 }
     :root {
-      --green: #00ff88; --green-dim: #00cc6a; --green-glow: 
-rgba(0,255,136,0.15);
-      --dark: #030608; --card: #0a0f14; --card2: #0f1820;
-      --border: rgba(0,255,136,0.12); --border2: rgba(255,255,255,0.06);
-      --text: #e2e8f0; --muted: #7a8899;
+      --green: #00cc70; --green-dim: #00a85c; --green-glow: rgba(0,168,92,0.18);
+      --dark: #f4fbf6; --card: #ffffff; --card2: #eaf5ec;
+      --border: rgba(0,168,92,0.22); --border2: rgba(0,102,56,0.08);
+      --text: #0f1a14; --muted: #5a6a62;
     }
     html { scroll-behavior: smooth; }
-    body { font-family: 'DM Sans', sans-serif; background: var(--dark); 
-color: var(--text); overflow-x: hidden; }
-    body::before {
+    body { font-family: 'DM Sans', sans-serif; background: linear-gradient(165deg, #f4fbf6 0%, #e0f2e7 35%, #c8ead4 70%, #dcf1e4 100%); background-attachment: fixed; color: var(--text); overflow-x: hidden; min-height: 100vh; }
+    body:
+      :before {
       content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: 
 none;
       background-image: linear-gradient(rgba(0,255,136,0.03) 1px, 
@@ -42,7 +41,7 @@ transparent 1px);
     /* NAV */
     nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; 
 display: flex; align-items: center; justify-content: space-between; 
-padding: 14px 5%; background: rgba(3,6,8,0.92); backdrop-filter: 
+padding: 14px 5%; background: rgba(255,255,255,0.82); border-bottom: 0.5px solid rgba(0,102,56,0.12); backdrop-filter:
 blur(20px); border-bottom: 1px solid var(--border); }
     .nav-logo { display: inline-flex; align-items: center; text-decoration: 
 none; }
@@ -136,7 +135,7 @@ justify-content: flex-start; overflow: hidden; }
 background:var(--green-glow); opacity:0; transition:opacity 0.3s; 
 border-radius:16px; }
     .flip-card:hover .flip-card-front::before { opacity: 1; }
-    .flip-card-back { transform: rotateY(180deg); background: #0d1f16; 
+    .flip-card-back { transform: rotateY(180deg); background: #ffffff; color: #0f1a14; border: 0.5px solid rgba(0,168,92,0.18); 
 border-color: var(--green); justify-content: space-between; }
     .flip-card-back h3 { font-family:'Syne',sans-serif; font-size:1rem; 
 font-weight:700; color: var(--green); margin-bottom: 14px; }
@@ -169,7 +168,7 @@ object-position: center top; display: block; transition: transform 0.4s
 ease; }
     .about-photo-sm:hover img { transform: scale(1.04); }
     .about-photo-main::after { content: ""; position: absolute; inset: 0; 
-background: linear-gradient(to top, rgba(3,6,8,0.4) 0%, transparent 55%); 
+background: linear-gradient(to top, rgba(255,255,255,0.15) 0%, transparent 55%); 
 pointer-events: none; }
     .about-content .section-sub { max-width: 100%; margin-bottom: 24px; }
     .about-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 
@@ -235,7 +234,7 @@ none; border-radius: 10px; }
 
     /* INTAKE FORM MODAL */
     .intake-modal-overlay { position:fixed; inset:0; z-index:600; 
-background:rgba(0,0,0,0.88); backdrop-filter:blur(10px); display:flex; 
+background:rgba(15,26,20,0.55); backdrop-filter:blur(10px); display:flex; 
 align-items:center; justify-content:center; padding:20px; opacity:0; 
 pointer-events:none; transition:opacity 0.3s; }
     .intake-modal-overlay.open { opacity:1; pointer-events:all; }
@@ -263,7 +262,7 @@ border:none; }
 
     /* SERVICE DETAIL MODAL */
     .modal-overlay { position:fixed; inset:0; z-index:500; 
-background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); display:flex; 
+background:rgba(15,26,20,0.50); backdrop-filter:blur(8px); display:flex; 
 align-items:center; justify-content:center; padding:20px; opacity:0; 
 pointer-events:none; transition:opacity 0.3s; }
     .modal-overlay.open { opacity:1; pointer-events:all; }
@@ -356,6 +355,9 @@ Logo" style="height:48px;width:auto;display:block;"></a>
   <a href="#intake" class="nav-cta" onclick="event.preventDefault(); 
 openIntakeForm()">Get Started →</a>
 </nav>
+  <div style="background: linear-gradient(90deg, rgba(0,168,92,0.14) 0%, rgba(255,215,0,0.14) 100%); padding: 12px 5%; text-align: center; font-size: 14px; color: #0a4a2a; border-bottom: 0.5px solid rgba(0,102,56,0.1); margin-top: 66px; font-weight: 500;">
+  🚀 Launched April 10, 2026 · Founder Rate open — <strong>65 spots left of 100</strong> · <a href="https://square.link/u/1Nnl3fM1" style="color: #00a85c; text-decoration: underline; font-weight: 600;">Lock in $96 →</a>
+</div>
 
 
 <!-- ROT CERTIFICATION TRACKS SECTION -->
@@ -468,6 +470,63 @@ onclick="openTierModal('csa'); return false;">Enroll in CSA &rarr;</a></div>
       All enrolled clients get access to the <strong>Rich Off Tech Discord 
 Community</strong> &mdash; connect with alumni, industry experts, and peers 
 at every level.
+    </div>
+  </div>
+</section>
+<section id="agents-demo" style="position: relative; padding: 80px 5%; background: linear-gradient(180deg, transparent 0%, rgba(0,168,92,0.06) 50%, transparent 100%);">
+  <div style="max-width: 1200px; margin: 0 auto;">
+    <div style="text-align: center; margin-bottom: 48px;">
+      <div style="display: inline-block; background: rgba(0, 168, 92, 0.12); color: #0a6b3a; padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; margin-bottom: 14px;">SEE THE AGENTS</div>
+      <h2 style="font-size: 36px; font-weight: 600; margin: 0 0 12px; color: #0f1a14; letter-spacing: -0.02em;">Hear the AI agents in action.</h2>
+      <p style="font-size: 16px; color: #4a5a52; max-width: 580px; margin: 0 auto; line-height: 1.6;">We believe in transparency. Here are actual qualification calls our AI assistants run — same script you'll experience after submitting the form.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+
+      <div style="background: #ffffff; border-radius: 16px; padding: 20px; border: 0.5px solid rgba(0,168,92,0.18); box-shadow: 0 2px 20px rgba(0,168,92,0.08);">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+          <span style="width: 32px; height: 32px; background: rgba(0,168,92,0.12); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 16px;">🛡️</span>
+          <div>
+            <div style="font-size: 15px; font-weight: 600; color: #0f1a14;">Clearance Qualifier</div>
+            <div style="font-size: 12px; color: #5a6a62;">~3 min · Federal clearance intake</div>
+          </div>
+        </div>
+        <div style="position: relative; padding-bottom: 56.25%; height: 0; border-radius: 10px; overflow: hidden; background: #0a0a0a;">
+          <iframe src="https://share.fireflies.ai/embed/meetings/01KPPW8Q6S4YGKTPC7H4QD38KV" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </div>
+
+      <div style="background: #ffffff; border-radius: 16px; padding: 20px; border: 0.5px solid rgba(0,168,92,0.18); box-shadow: 0 2px 20px rgba(0,168,92,0.08);">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+          <span style="width: 32px; height: 32px; background: rgba(255,215,0,0.25); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 16px;">🎓</span>
+          <div>
+            <div style="font-size: 15px; font-weight: 600; color: #0f1a14;">Cert Qualifier</div>
+            <div style="font-size: 12px; color: #5a6a62;">~3 min · Certification track fit</div>
+          </div>
+        </div>
+        <div style="position: relative; padding-bottom: 56.25%; height: 0; border-radius: 10px; overflow: hidden; background: #0a0a0a;">
+          <iframe src="https://share.fireflies.ai/embed/meetings/01KPPXX7MYF7E4K461GQEHT24N" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </div>
+
+      <div style="background: #ffffff; border-radius: 16px; padding: 20px; border: 0.5px solid rgba(0,168,92,0.18); box-shadow: 0 2px 20px rgba(0,168,92,0.08);">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+          <span style="width: 32px; height: 32px; background: rgba(0,122,204,0.15); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 16px;">💻</span>
+          <div>
+            <div style="font-size: 15px; font-weight: 600; color: #0f1a14;">Project Discovery</div>
+            <div style="font-size: 12px; color: #5a6a62;">~5 min · Custom build intake</div>
+          </div>
+        </div>
+        <div style="position: relative; padding-bottom: 56.25%; height: 0; border-radius: 10px; overflow: hidden; background: #0a0a0a;">
+          <iframe src="https://share.fireflies.ai/embed/meetings/01KPPY2AFWAVVZMKCPKNZRQRPV" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="text-align: center; margin-top: 36px;">
+      <p style="font-size: 13px; color: #5a6a62; margin-bottom: 14px;">Ready to take your own qualification call?</p>
+      <a href="#intake" style="display: inline-block; background: linear-gradient(135deg, #00a85c 0%, #008a4a 100%); color: white; padding: 13px 28px; border-radius: 10px; font-size: 14px; font-weight: 600; text-decoration: none;">Start the form →</a>
     </div>
   </div>
 </section>
@@ -690,35 +749,26 @@ Form</button>
   </div>
 </section>
 
-  <!-- TESTIMONIALS SECTION -->
-  <section id="testimonials">
+ <!-- TESTIMONIALS SECTION -->
+<section id="testimonials">
   <div class="section-inner">
     <div class="section-label">What Clients Say</div>
     <h2 class="section-title">Client Testimonials</h2>
     <div class="testimonials-container">
       <div class="testimonial-card">
-        <p class="testimonial-text">"Rich Off Tech transformed our business 
-with their expert consulting. Highly recommended!"</p>
         <div class="testimonial-video">
-          <iframe width="100%" height="315" src="
-https://www.youtube.com/embed/GJvsuIxpF4A" title="Client Testimonial" 
-frameborder="0" allow="accelerometer; autoplay; clipboard-write; 
-encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          <iframe width="100%" height="315" src="https://www.youtube.com/embed/GJvsuIxpF4A" title="Client Testimonial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
       </div>
       <div class="testimonial-card">
         <div class="testimonial-video">
-          <iframe width="100%" height="560" src="
-https://www.youtube.com/embed/n5BtWiWM5P4" title="Client Testimonial" 
-frameborder="0" allow="accelerometer; autoplay; clipboard-write; 
-encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          <iframe width="100%" height="315" src="https://www.youtube.com/embed/n5BtWiWM5P4" title="Client Testimonial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
       </div>
     </div>
   </div>
 </section>
-
-
+  
 <!-- ROT CERTIFICATION TRACKS SECTION -->
 <section id="certification-tracks">
   <style>
