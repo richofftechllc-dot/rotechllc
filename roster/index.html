@@ -34,19 +34,19 @@
   .topbar-right{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.1em}
   .topbar-right .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:6px;animation:pulse 2s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
- 
+
   .hero{padding:48px 22px 24px;max-width:1200px;margin:0 auto;border-bottom:1px solid var(--line)}
   .eyebrow{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);letter-spacing:.25em;text-transform:uppercase;margin-bottom:14px}
   h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,96px);line-height:.92;letter-spacing:.01em}
   h1 .accent{color:var(--green)} h1 .gold{color:var(--gold)}
   .sub{margin-top:18px;color:var(--muted);max-width:680px;font-size:15px;line-height:1.6}
   .sub b{color:var(--text);font-weight:600}
- 
+
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px}
   .stat{border:1px solid var(--line);background:var(--bg-2);padding:14px 16px;border-radius:6px}
   .stat .num{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--green);line-height:1}
   .stat .lbl{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.18em;margin-top:6px;text-transform:uppercase}
- 
+
   .toolbar{max-width:1200px;margin:0 auto;padding:24px 22px 12px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
   .search{flex:1;min-width:220px;display:flex;align-items:center;gap:10px;border:1px solid var(--line-2);background:var(--bg-2);padding:10px 14px;border-radius:6px}
   .search input{flex:1;background:transparent;border:0;outline:0;color:var(--text);font-family:'DM Mono',monospace;font-size:13px}
@@ -59,12 +59,12 @@
   .btn-gold{background:transparent;color:var(--gold);border-color:var(--gold)}
   .btn-gold:hover{background:var(--gold);color:#000}
   .btn:disabled{opacity:.5;cursor:not-allowed}
- 
+
   .filters{max-width:1200px;margin:0 auto;padding:0 22px 16px;display:flex;flex-wrap:wrap;gap:8px}
   .chip{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:7px 12px;border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:99px;cursor:pointer;transition:all .15s}
   .chip.active{background:var(--green);color:#000;border-color:var(--green);font-weight:600}
   .chip:hover{color:var(--text)} .chip.active:hover{color:#000}
- 
+
   .grid{max-width:1200px;margin:0 auto;padding:8px 22px 80px;display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
   .card{border:1px solid var(--line);background:var(--bg-2);border-radius:8px;padding:18px;position:relative;transition:border-color .2s,transform .2s;display:flex;flex-direction:column;gap:12px}
   .card:hover{border-color:var(--green);transform:translateY(-2px)}
@@ -80,24 +80,24 @@
   .clr-secret{background:rgba(0,255,136,.12);color:var(--green);border:1px solid rgba(0,255,136,.4)}
   .clr-public{background:rgba(138,138,138,.12);color:var(--muted);border:1px solid rgba(138,138,138,.4)}
   .clr-other{background:rgba(138,138,138,.12);color:var(--muted);border:1px solid rgba(138,138,138,.4)}
- 
+
   .card-meta{display:flex;flex-wrap:wrap;gap:10px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
   .card-meta .item{display:flex;align-items:center;gap:5px}
   .card-meta .item svg{opacity:.7}
- 
+
   .certs{display:flex;flex-wrap:wrap;gap:6px}
   .cert{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;padding:4px 8px;border-radius:4px;background:#0d1f15;color:var(--green);border:1px solid rgba(0,255,136,.25)}
- 
+
   .card-foot{display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--line)}
   .li-link{display:inline-flex;align-items:center;gap:6px;color:var(--text);text-decoration:none;font-family:'DM Mono',monospace;font-size:11px;padding:6px 10px;border:1px solid var(--line-2);border-radius:4px;transition:all .15s}
   .li-link:hover{border-color:var(--green);color:var(--green)}
   .li-link.empty{color:var(--muted);pointer-events:none;opacity:.5}
   .added{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.06em}
- 
+
   .empty-state{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted)}
   .empty-state h3{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--text);margin-bottom:8px;letter-spacing:.04em}
   .empty-state p{font-size:14px;line-height:1.6}
- 
+
   .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
   .modal-overlay.open{display:flex}
   .modal{background:var(--bg-2);border:1px solid var(--line-2);border-radius:10px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;padding:28px;position:relative}
@@ -115,14 +115,14 @@
   .modal-actions .btn{flex:1}
   .close-x{position:absolute;top:18px;right:18px;background:transparent;border:0;color:var(--muted);font-size:24px;cursor:pointer;line-height:1}
   .close-x:hover{color:var(--text)}
- 
+
   .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--green);color:#000;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:12px 20px;border-radius:6px;font-weight:600;transition:transform .3s;z-index:200;max-width:90vw;text-align:center}
   .toast.show{transform:translateX(-50%) translateY(0)}
   .toast.error{background:var(--red);color:#fff}
- 
+
   .footer-bar{border-top:1px solid var(--line);padding:18px 22px;display:flex;justify-content:space-between;align-items:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.1em}
   .footer-bar .green{color:var(--green)} .footer-bar .gold{color:var(--gold)}
- 
+
   @media (max-width:640px){
     .stats{grid-template-columns:repeat(2,1fr)}
     .toolbar{flex-direction:column;align-items:stretch}
@@ -133,7 +133,7 @@
 </style>
 </head>
 <body>
- 
+
 <div class="topbar">
   <div class="brand">
     <div class="logo-dot"></div>
@@ -141,7 +141,7 @@
   </div>
   <div class="topbar-right"><span class="dot"></span>LIVE ROSTER</div>
 </div>
- 
+
 <section class="hero">
   <div class="eyebrow">// CLEARED TECH TALENT NETWORK</div>
   <h1>THE BRIDGE<br>BETWEEN <span class="accent">MY PEOPLE</span><br>& THE <span class="gold">CORPORATE WORLD</span></h1>
@@ -153,7 +153,7 @@
     <div class="stat"><div class="num" id="statAvgYrs">—</div><div class="lbl">Avg Yrs Exp</div></div>
   </div>
 </section>
- 
+
 <div class="toolbar">
   <div class="search">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -164,7 +164,7 @@
     <button class="btn btn-primary" id="addBtn">+ Add Yourself</button>
   </div>
 </div>
- 
+
 <div class="filters" id="filters">
   <button class="chip active" data-filter="all">All</button>
   <button class="chip" data-filter="TS/SCI">TS/SCI</button>
@@ -173,33 +173,35 @@
   <button class="chip" data-filter="Public Trust">Public Trust</button>
   <button class="chip" data-filter="None">None / Eligible</button>
 </div>
- 
+
 <div class="grid" id="grid">
   <div class="empty-state">
     <h3>LOADING ROSTER...</h3>
     <p>Pulling cleared talent from the network.</p>
   </div>
 </div>
- 
+
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <button class="close-x" id="closeModal">×</button>
     <h2>JOIN THE <span>ROSTER</span></h2>
     <p class="modal-sub">Drop your info — recruiters at Knowledge26 and beyond will see this. Fields with <span style="color:var(--red)">*</span> are required.</p>
- 
+
+    <form id="rosterForm" onsubmit="return false;" autocomplete="on">
+
     <div class="field">
       <label>Full Name<span class="req">*</span></label>
-      <input id="f_name" type="text" placeholder="First and last name" maxlength="60"/>
+      <input id="f_name" name="name" type="text" placeholder="First and last name" maxlength="60" autocomplete="name"/>
     </div>
- 
+
     <div class="field">
       <label>Current Role / Title<span class="req">*</span></label>
-      <input id="f_role" type="text" placeholder="e.g. ServiceNow Architect" maxlength="80"/>
+      <input id="f_role" name="organization-title" type="text" placeholder="e.g. ServiceNow Architect" maxlength="80" autocomplete="organization-title"/>
     </div>
- 
+
     <div class="field">
       <label>Clearance Level<span class="req">*</span></label>
-      <select id="f_clearance">
+      <select id="f_clearance" name="clearance">
         <option value="">Select...</option>
         <option>TS/SCI Full Scope Poly</option>
         <option>TS/SCI CI Poly</option>
@@ -211,68 +213,70 @@
         <option>None</option>
       </select>
     </div>
- 
+
     <div class="field">
       <label>Years of Experience<span class="req">*</span></label>
-      <input id="f_years" type="number" min="0" max="50" placeholder="e.g. 5"/>
+      <input id="f_years" name="years" type="number" min="0" max="50" placeholder="e.g. 5"/>
     </div>
- 
+
     <div class="field">
       <label>Location</label>
-      <input id="f_location" type="text" placeholder="e.g. Hampton Roads, VA" maxlength="60"/>
+      <input id="f_location" name="address-level2" type="text" placeholder="e.g. Hampton Roads, VA" maxlength="60" autocomplete="address-level2"/>
     </div>
- 
+
     <div class="field">
       <label>Certifications</label>
-      <input id="f_certs" type="text" placeholder="e.g. Sec+, CASP+, ServiceNow CSA"/>
+      <input id="f_certs" name="certifications" type="text" placeholder="e.g. Sec+, CASP+, ServiceNow CSA" autocomplete="off"/>
       <div class="hint">SEPARATE WITH COMMAS</div>
     </div>
- 
+
     <div class="field">
       <label>LinkedIn Profile URL</label>
-      <input id="f_linkedin" type="url" placeholder="https://linkedin.com/in/yourname"/>
+      <input id="f_linkedin" name="url" type="url" placeholder="https://linkedin.com/in/yourname" autocomplete="url"/>
     </div>
- 
+
     <div class="field">
       <label>Discord Handle</label>
-      <input id="f_discord" type="text" placeholder="e.g. yourhandle" maxlength="40"/>
+      <input id="f_discord" name="username" type="text" placeholder="e.g. yourhandle" maxlength="40" autocomplete="username"/>
     </div>
- 
+
+    </form>
+
     <div class="modal-actions">
       <button class="btn" id="cancelBtn">Cancel</button>
       <button class="btn btn-primary" id="submitBtn">Add To Roster</button>
     </div>
   </div>
 </div>
- 
+
 <div class="toast" id="toast"></div>
- 
+
 <div class="footer-bar">
   <div><span class="green">RICH OFF TECH LLC</span> · ROTECHLLC.COM</div>
   <div class="gold">// VEGAS · KNOWLEDGE26 · MAY 4–7</div>
 </div>
- 
+
 <script>
 /* ============================================================
    ROTECH COMMUNITY ROSTER — Production Build
    Backend: Google Apps Script Web App → Google Sheet
    Sheet:   ROTECH Community Roster (richofftechllc@gmail.com)
    ============================================================ */
- 
+
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbY0W4ln8XRMlqCmS83cvTqA_F-nLlplfd6xC7Fow6XsQrG3URbd48j_H0qCNH4NU4/exec";
- 
+
 const REFRESH_INTERVAL_MS = 30000;
- 
+
 // ---------- State ----------
 let members = [];
 let activeFilter = 'all';
 let searchTerm = '';
- 
+
 // ---------- DOM ----------
 const grid = document.getElementById('grid');
 const modal = document.getElementById('modalOverlay');
 const toast = document.getElementById('toast');
- 
+
 // ---------- Parse rows from Apps Script ----------
 function rowsToMembers(rows){
   if (!rows || rows.length < 2) return [];
@@ -289,7 +293,7 @@ function rowsToMembers(rows){
   const iLi = idx('linkedin');
   const iDc = idx('discord');
   const iStatus = idx('status');
- 
+
   return rows.slice(1).map(r => {
     const certsRaw = iCerts >= 0 ? String(r[iCerts]||'') : '';
     return {
@@ -306,7 +310,7 @@ function rowsToMembers(rows){
     };
   }).filter(m => m.name);
 }
- 
+
 // ---------- Load from Apps Script ----------
 async function loadMembers(){
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.startsWith('PASTE_')){
@@ -332,7 +336,7 @@ async function loadMembers(){
     }
   }
 }
- 
+
 // ---------- Helpers ----------
 function clearanceClass(c){
   if (!c) return 'clr-other';
@@ -388,7 +392,7 @@ function timeAgo(ts){
   const d = Math.floor(h/24);
   return d + 'd ago';
 }
- 
+
 // ---------- Render ----------
 function render(){
   const total = members.length;
@@ -400,7 +404,7 @@ function render(){
   document.getElementById('statCleared').textContent = cleared;
   document.getElementById('statCerts').textContent = certCount;
   document.getElementById('statAvgYrs').textContent = avgYrs;
- 
+
   const filtered = members.filter(m => matchFilter(m) && matchSearch(m));
   if (filtered.length === 0){
     if (members.length === 0){
@@ -416,14 +420,14 @@ function render(){
     }
     return;
   }
- 
+
   // newest first by timestamp
   const sorted = [...filtered].sort((a,b) => {
     const ta = new Date(a.timestamp).getTime() || 0;
     const tb = new Date(b.timestamp).getTime() || 0;
     return tb - ta;
   });
- 
+
   grid.innerHTML = sorted.map(m => {
     const certs = (m.certs||[]).filter(Boolean);
     const linkedin = m.linkedin ? safeUrl(m.linkedin) : '';
@@ -464,9 +468,35 @@ function render(){
     `;
   }).join('');
 }
- 
+
 // ---------- Modal ----------
-function openModal(){ modal.classList.add('open'); setTimeout(() => document.getElementById('f_name').focus(), 50); }
+const LS_KEY = 'rotech_last_submission';
+
+function restoreLastSubmission(){
+  try {
+    const saved = localStorage.getItem(LS_KEY);
+    if (!saved) return;
+    const d = JSON.parse(saved);
+    if (d.name)      document.getElementById('f_name').value = d.name;
+    if (d.role)      document.getElementById('f_role').value = d.role;
+    if (d.clearance) document.getElementById('f_clearance').value = d.clearance;
+    if (d.years)     document.getElementById('f_years').value = d.years;
+    if (d.location)  document.getElementById('f_location').value = d.location;
+    if (d.certs)     document.getElementById('f_certs').value = d.certs;
+    if (d.linkedin)  document.getElementById('f_linkedin').value = d.linkedin;
+    if (d.discord)   document.getElementById('f_discord').value = d.discord;
+  } catch(e){ /* ignore */ }
+}
+
+function saveLastSubmission(d){
+  try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch(e){ /* ignore */ }
+}
+
+function openModal(){
+  modal.classList.add('open');
+  restoreLastSubmission();
+  setTimeout(() => document.getElementById('f_name').focus(), 50);
+}
 function closeModal(){
   modal.classList.remove('open');
   ['f_name','f_role','f_clearance','f_years','f_location','f_certs','f_linkedin','f_discord'].forEach(id => document.getElementById(id).value = '');
@@ -477,7 +507,7 @@ function showToast(msg, isError){
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 3200);
 }
- 
+
 async function submitMember(){
   const submitBtn = document.getElementById('submitBtn');
   const name = document.getElementById('f_name').value.trim();
@@ -488,25 +518,25 @@ async function submitMember(){
   const certs = document.getElementById('f_certs').value.trim();
   const linkedin = document.getElementById('f_linkedin').value.trim();
   const discord = document.getElementById('f_discord').value.trim();
- 
+
   if (!name || !role || !clearance || years === ''){
     showToast('Fill required fields', true);
     return;
   }
- 
+
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.startsWith('PASTE_')){
     showToast('Backend not configured', true);
     return;
   }
- 
+
   submitBtn.disabled = true;
   submitBtn.textContent = 'Submitting...';
- 
+
   const payload = {
     name, role, clearance, years, location,
     certifications: certs, linkedin, discord, status: ''
   };
- 
+
   try {
     // Apps Script web apps require text/plain to avoid CORS preflight
     await fetch(APPS_SCRIPT_URL, {
@@ -515,6 +545,8 @@ async function submitMember(){
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(payload)
     });
+    // Save to localStorage so this browser remembers them next time
+    saveLastSubmission({ name, role, clearance, years, location, certs, linkedin, discord });
     showToast('Added to roster ✓');
     closeModal();
     // Optimistic local insert
@@ -535,7 +567,7 @@ async function submitMember(){
     submitBtn.textContent = 'Add To Roster';
   }
 }
- 
+
 // ---------- Export CSV ----------
 function exportCSV(){
   if (members.length === 0){ showToast('Nothing to export yet', true); return; }
@@ -554,7 +586,7 @@ function exportCSV(){
   URL.revokeObjectURL(url);
   showToast('CSV exported ✓');
 }
- 
+
 // ---------- Events ----------
 document.getElementById('addBtn').onclick = openModal;
 document.getElementById('closeModal').onclick = closeModal;
@@ -562,12 +594,12 @@ document.getElementById('cancelBtn').onclick = closeModal;
 document.getElementById('submitBtn').onclick = submitMember;
 document.getElementById('exportBtn').onclick = exportCSV;
 modal.onclick = e => { if (e.target === modal) closeModal(); };
- 
+
 document.getElementById('searchInput').addEventListener('input', e => {
   searchTerm = e.target.value;
   render();
 });
- 
+
 document.querySelectorAll('.chip').forEach(c => {
   c.onclick = () => {
     document.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
@@ -576,13 +608,12 @@ document.querySelectorAll('.chip').forEach(c => {
     render();
   };
 });
- 
+
 // Auto-refresh from sheet
 setInterval(loadMembers, REFRESH_INTERVAL_MS);
- 
+
 // Init
 loadMembers();
 </script>
 </body>
 </html>
- 
