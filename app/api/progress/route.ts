@@ -34,7 +34,9 @@ export async function GET(req: NextRequest) {
   if (!code) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   try {
     const doc = await coll("quizProgress").doc(code).get();
-    return NextResponse.json({ progress: doc.exists ? doc.data() : null });
+    const data = doc.exists ? doc.data() : null;
+    // Mirror old quiz schema: return inner `progress` field
+    return NextResponse.json({ progress: data?.progress || null });
   } catch (e) {
     return NextResponse.json({ error: String(e) }, { status: 500 });
   }
@@ -45,9 +47,10 @@ export async function POST(req: NextRequest) {
   if (!code) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   try {
     const body = await req.json();
+    // Mirror old quiz schema: nest payload under `progress` field.
+    // merge:true deep-merges, preserving any existing fields from old quiz writes.
     await coll("quizProgress").doc(code).set({
-      code,
-      ...body,
+      progress: { code, ...body },
       updatedAt: new Date().toISOString(),
     }, { merge: true });
     return NextResponse.json({ ok: true });
