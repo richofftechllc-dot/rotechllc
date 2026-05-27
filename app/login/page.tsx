@@ -27,7 +27,7 @@ export default function Login() {
           className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 mb-4 outline-none focus:border-orange-500" />
         <button onClick={signIn} className="w-full py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg uppercase tracking-wider">Sign In</button>
         {err && <div className="text-red-500 text-sm text-center mt-3">{err}</div>}
-        <div className="text-center text-xs text-gray-500 mt-6">Not a member? <a href="https://square.link/u/gGNBn35n" className="text-orange-500">Join ROT — $96</a></div>
+        <div className="text-center text-xs text-gray-500 mt-6">Not a member? <a href="https://square.link/u/7P6knSUK" className="text-orange-500">Join ROT — $96</a></div>
       </div>
     </main>
   );

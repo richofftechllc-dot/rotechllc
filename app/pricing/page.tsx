@@ -31,7 +31,7 @@ export default async function Pricing() {
           <div className="bg-zinc-900 border border-white/10 rounded-xl p-8 text-center">
             <div className="text-7xl font-black text-orange-500">$96</div>
             <div className="text-gray-500 text-sm mb-6">for 12 months</div>
-            <a href="https://square.link/u/gGNBn35n" target="_blank" rel="noopener noreferrer" className="block w-full py-4 bg-gradient-to-r from-orange-500 to-red-500 font-bold rounded-lg">Lock In Founding</a>
+            <a href="https://square.link/u/7P6knSUK" target="_blank" rel="noopener noreferrer" className="block w-full py-4 bg-gradient-to-r from-orange-500 to-red-500 font-bold rounded-lg">Lock In Founding</a>
             <div className="text-green-500 text-sm mt-4">● {count} / 100 spots claimed</div>
             <div className="text-gray-500 text-xs mt-2 italic">After 100 fill, price moves up to monthly tier.</div>
           </div>

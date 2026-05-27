@@ -27,7 +27,7 @@ export default async function Home() {
             Rich Off Tech is the community Bo built for cleared and aspiring tech professionals. Cert tracks. Career coaching. Real moves from people locked in on the same path.
           </p>
           <div className="flex flex-wrap gap-4">
-            <a href="https://square.link/u/gGNBn35n" target="_blank" rel="noopener noreferrer" className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90">
+            <a href="https://square.link/u/7P6knSUK" target="_blank" rel="noopener noreferrer" className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90">
               Become a Founding Member — $96
             </a>
             <Link href="/roster" className="px-6 py-3 border border-white/20 rounded-lg hover:bg-white/5">
