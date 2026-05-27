@@ -5,7 +5,7 @@ import { TRACKS, LESSONS, type Track, type Domain } from "@/lib/quizData";
 
 type Me = | { ok: true; code: string | null; name: string; track: string | null; authType: string } | { ok: false };
 type ChatMsg = { role: "user" | "assistant"; content: string };
-type DomainProgress = { bestScore?: number; attempts?: number; lastAt?: string; lastAnswers?: number[]; completed?: boolean };
+type DomainProgress = { completed?: boolean; highScore?: number };
 
 const TRACK_COLORS: Record<string, string> = {
   sp: "border-green-400/40 hover:border-green-400",
@@ -13,6 +13,14 @@ const TRACK_COLORS: Record<string, string> = {
   ai: "border-blue-400/40 hover:border-blue-400",
 };
 const TRACK_TEXT: Record<string, string> = { sp: "text-green-400", csa: "text-yellow-400", ai: "text-blue-400" };
+
+// Old quiz schema uses prefixed keys: secplus_sp1, csa_csa1, ai_ai1
+function progKey(domainId: string): string {
+  if (domainId.startsWith("sp")) return `secplus_${domainId}`;
+  if (domainId.startsWith("csa")) return `csa_${domainId}`;
+  if (domainId.startsWith("ai")) return `ai_${domainId}`;
+  return domainId;
+}
 
 function allowedPrefixes(trackStr: string | null): Set<string> {
   const all = new Set(["sp", "csa", "ai"]);
@@ -41,15 +49,25 @@ export default function Quiz() {
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { fetch("/api/me").then(r => r.json()).then(setMe).catch(() => setMe({ ok: false })); }, []);
+
   useEffect(() => {
     fetch("/api/progress")
       .then(r => r.ok ? r.json() : { progress: null })
       .then(data => {
-        const p = data.progress || {};
-        setProgress(p.domains || p || {});
+        const raw = data.progress || {};
+        // Normalize prefixed keys (secplus_sp1) back to internal (sp1)
+        const norm: Record<string, DomainProgress> = {};
+        for (const [k, v] of Object.entries(raw)) {
+          if (typeof v !== "object" || v === null) continue;
+          const m = k.match(/^(?:secplus|csa|ai)_(.+)$/);
+          const id = m ? m[1] : k;
+          norm[id] = v as DomainProgress;
+        }
+        setProgress(norm);
       })
       .catch(() => setProgress({}));
   }, []);
+
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [chat]);
 
   if (!me) return <main className="max-w-2xl mx-auto px-6 py-24 text-center"><h1 className="text-4xl font-black">Loading...</h1></main>;
@@ -70,25 +88,18 @@ export default function Quiz() {
   const start = (d: Domain) => { setDomain(d); setQIdx(0); setPicked(null); setAnswers([]); setShowLesson(false); setChat([]); };
 
   async function saveDomainResult(d: Domain, finalAnswers: number[]) {
+    if (finalAnswers.length !== d.questions.length) return; // only save complete runs
     const correct = finalAnswers.filter((a, i) => a === d.questions[i].answer).length;
     const pct = Math.round((correct / d.questions.length) * 100);
     const existing = progress[d.id] || {};
-    const updated: Record<string, DomainProgress> = {
-      ...progress,
-      [d.id]: {
-        bestScore: Math.max(existing.bestScore || 0, pct),
-        attempts: (existing.attempts || 0) + 1,
-        lastAt: new Date().toISOString(),
-        lastAnswers: finalAnswers,
-        completed: true,
-      },
-    };
-    setProgress(updated);
+    const highScore = Math.max(existing.highScore || 0, pct);
+    const entry: DomainProgress = { completed: true, highScore };
+    setProgress(p => ({ ...p, [d.id]: entry }));
     try {
       await fetch("/api/progress", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ domains: updated, name: me.ok ? me.name : "", track: me.ok ? me.track : "" }),
+        body: JSON.stringify({ [progKey(d.id)]: entry }),
       });
     } catch (e) { console.error("Progress save failed:", e); }
   }
@@ -134,13 +145,13 @@ export default function Quiz() {
         ) : (
           <div className="grid sm:grid-cols-3 gap-4">
             {visibleTracks.map(t => {
-              const completed = t.domains.filter(d => (progress[d.id]?.bestScore || 0) > 0).length;
+              const done = t.domains.filter(d => progress[d.id]?.completed).length;
               return (
                 <button key={t.id} onClick={() => setTrack(t)} className={`bg-zinc-900 border rounded-xl p-6 text-left transition hover:scale-[1.02] ${TRACK_COLORS[t.id] || "border-white/10"}`}>
                   <div className="text-3xl mb-2">{t.id === "sp" ? "🛡️" : t.id === "csa" ? "⚙️" : "🤖"}</div>
                   <div className={`font-bold text-xl mb-1 ${TRACK_TEXT[t.id] || ""}`}>{t.name}</div>
                   <div className="text-xs text-gray-500 font-mono">{t.domains.length} domains · {t.domains.reduce((s, d) => s + d.questions.length, 0)} questions</div>
-                  <div className="text-xs text-orange-400 font-mono mt-2">{completed}/{t.domains.length} complete</div>
+                  <div className="text-xs text-orange-400 font-mono mt-2">{done}/{t.domains.length} complete</div>
                 </button>
               );
             })}
@@ -158,8 +169,8 @@ export default function Quiz() {
         <div className="space-y-2">
           {track.domains.map((d, i) => {
             const p = progress[d.id];
-            const score = p?.bestScore || 0;
-            const completed = score > 0;
+            const score = p?.highScore || 0;
+            const completed = !!p?.completed;
             const hasLesson = !!LESSONS[d.id];
             return (
               <div key={d.id} className={`w-full bg-zinc-900 border rounded-lg p-4 flex items-center justify-between transition ${completed ? "border-green-500/40" : "border-white/10 hover:border-orange-500"}`}>
@@ -173,7 +184,6 @@ export default function Quiz() {
                     <div className="text-xs text-gray-500 font-mono">
                       {d.questions.length} questions · {d.id}
                       {hasLesson ? " · 📖 lesson" : ""}
-                      {p?.attempts ? ` · ${p.attempts} attempt${p.attempts > 1 ? "s" : ""}` : ""}
                     </div>
                   </div>
                 </div>
@@ -210,16 +220,13 @@ export default function Quiz() {
   if (done) {
     const correct = answers.filter((a, i) => a === domain.questions[i].answer).length;
     const pct = Math.round((correct / domain.questions.length) * 100);
-    if (answers.length === domain.questions.length && !progress[domain.id]?.lastAt) {
-      saveDomainResult(domain, answers);
-    }
     return (
       <main className="max-w-2xl mx-auto px-6 py-12 text-center">
         <h1 className="text-5xl font-black mb-4">Done</h1>
         <div className={`text-7xl font-black mb-2 ${pct >= 75 ? "text-green-400" : pct >= 50 ? "text-yellow-400" : "text-red-400"}`}>{pct}%</div>
         <p className="text-gray-400 mb-2">{correct} / {domain.questions.length} correct</p>
-        {progress[domain.id]?.bestScore !== undefined && progress[domain.id].bestScore! > pct && (
-          <p className="text-gray-500 text-xs mb-6">Best: {progress[domain.id].bestScore}%</p>
+        {progress[domain.id]?.highScore !== undefined && progress[domain.id].highScore! > pct && (
+          <p className="text-gray-500 text-xs mb-6">Best: {progress[domain.id].highScore}%</p>
         )}
         <div className="flex gap-3 justify-center flex-wrap mt-6">
           <button onClick={() => start(domain)} className="px-6 py-3 bg-orange-500 text-black font-bold rounded-lg">Retry</button>

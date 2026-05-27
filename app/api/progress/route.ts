@@ -9,13 +9,11 @@ async function getCode(req: NextRequest): Promise<string | null> {
   if (lastDot < 0) return null;
   const payload = token.slice(0, lastDot);
   const sig = token.slice(lastDot + 1);
-
   const enc = new TextEncoder();
   const key = await crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
   const buf = await crypto.subtle.sign("HMAC", key, enc.encode(payload));
   const expected = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
   if (sig !== expected) return null;
-
   if (payload.startsWith("discord:")) {
     const parts = payload.split(":");
     const discordId = parts[1];
@@ -35,7 +33,6 @@ export async function GET(req: NextRequest) {
   try {
     const doc = await coll("quizProgress").doc(code).get();
     const data = doc.exists ? doc.data() : null;
-    // Mirror old quiz schema: return inner `progress` field
     return NextResponse.json({ progress: data?.progress || null });
   } catch (e) {
     return NextResponse.json({ error: String(e) }, { status: 500 });
@@ -47,10 +44,11 @@ export async function POST(req: NextRequest) {
   if (!code) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   try {
     const body = await req.json();
-    // Mirror old quiz schema: nest payload under `progress` field.
-    // merge:true deep-merges, preserving any existing fields from old quiz writes.
+    // Old quiz schema exact: { progress: <flat-map-of-prefixed-domain-keys>, updatedAt }
+    // Body shape: { secplus_sp1: {completed, highScore}, csa_csa1: {...}, ai_ai1: {...} }
+    // merge:true deep-merges into existing progress map - preserves old entries
     await coll("quizProgress").doc(code).set({
-      progress: { code, ...body },
+      progress: body,
       updatedAt: new Date().toISOString(),
     }, { merge: true });
     return NextResponse.json({ ok: true });
