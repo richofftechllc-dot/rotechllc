@@ -3,45 +3,114 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ROT — Member Login</title>
+<title>Member Access — Rich Off Tech</title>
+<link rel="stylesheet" href="/styles.css">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, system-ui, sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.box { background: #141414; border: 1px solid #2a2a2a; border-radius: 12px; padding: 48px 40px; max-width: 420px; width: 100%; }
-.logo { text-align: center; margin-bottom: 32px; }
-.logo img { width: 80px; height: 80px; border-radius: 12px; }
-h1 { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 8px; }
-.sub { text-align: center; color: #888; font-size: 14px; margin-bottom: 32px; }
-label { display: block; font-size: 13px; color: #aaa; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
-input { width: 100%; padding: 14px 16px; background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 8px; color: #fff; font-size: 16px; margin-bottom: 20px; }
-input:focus { outline: none; border-color: #00ff88; }
-button { width: 100%; padding: 14px; background: #00ff88; color: #000; border: none; border-radius: 8px; font-weight: 700; font-size: 15px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; }
-button:hover { background: #00cc6e; }
-.error { color: #ff4444; font-size: 13px; margin-top: 12px; text-align: center; min-height: 18px; }
-.footer { text-align: center; margin-top: 24px; font-size: 12px; color: #555; }
-.footer a { color: #00ff88; text-decoration: none; }
+  body {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 24px;
+    background: radial-gradient(ellipse at center, rgba(238,9,121,0.1), transparent 70%), #0a0a0a;
+  }
+  .login-card {
+    width: 100%; max-width: 420px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-bright);
+    border-radius: 20px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .login-logo {
+    font-size: 32px; font-weight: 800;
+    margin-bottom: 8px; letter-spacing: -1px;
+  }
+  .login-card h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .login-card .sub { color: var(--text-dim); font-size: 14px; margin-bottom: 32px; }
+  .code-input {
+    width: 100%;
+    background: var(--bg);
+    border: 2px solid var(--border-bright);
+    color: var(--text);
+    padding: 16px 20px;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: 600;
+    text-align: center;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+  }
+  .code-input:focus { border-color: var(--accent-orange); }
+  .login-btn {
+    width: 100%; margin-top: 16px; padding: 14px;
+    font-size: 16px;
+  }
+  .login-foot {
+    margin-top: 24px;
+    color: var(--text-faint);
+    font-size: 13px;
+  }
+  .login-foot a { color: var(--accent-orange); }
+  .error-msg {
+    color: #ff5252; font-size: 13px;
+    margin-top: 12px; min-height: 18px;
+  }
+  .success-msg {
+    color: #22c55e; font-size: 14px;
+    margin-top: 12px; font-weight: 600;
+  }
 </style>
 </head>
 <body>
-<div class="box">
-<div class="logo"><img src="rot-logo.png" alt="ROT"></div>
-<h1>Member Sign In</h1>
-<p class="sub">Enter your access code to continue</p>
-<label for="code">Access Code</label>
-<input type="text" id="code" placeholder="FIRSTNAME2026" autocomplete="off" autocapitalize="characters">
-<button onclick="signIn()">SIGN IN</button>
-<div class="error" id="error"></div>
-<div class="footer">Not a member yet? <a href="https://square.link/u/gGNBn35n">Join ROT</a></div>
+
+<div class="login-card">
+  <div class="login-logo gradient-text">ROT</div>
+  <h1>Member Access</h1>
+  <p class="sub">Enter your access code to continue</p>
+
+  <input type="text" class="code-input" id="code" placeholder="ACCESS CODE" maxlength="20" autofocus>
+  <div class="error-msg" id="msg"></div>
+
+  <button class="btn login-btn" id="enter-btn" type="button">Enter</button>
+
+  <div class="login-foot">
+    Don't have a code? <a href="https://square.link/u/gGNBn35n" target="_blank">Become a Founding Member</a>
+    <br><br>
+    <a href="/">&larr; Back to home</a>
+  </div>
 </div>
+
+<script src="/widget.js?v=1779523743"></script>
 <script>
-function signIn() {
-  const code = document.getElementById('code').value.trim().toUpperCase();
-  const err = document.getElementById('error');
-  if (!code) { err.textContent = 'Enter your access code.'; return; }
-  document.cookie = `rot_code=${code}; path=/; max-age=2592000; SameSite=Lax`;
-  window.location.href = `/learn/?ref=${btoa(code)}`;
+const codeInput = document.getElementById("code");
+const msg = document.getElementById("msg");
+const btn = document.getElementById("enter-btn");
+
+function submit() {
+  const code = codeInput.value.trim().toUpperCase();
+  msg.className = "error-msg";
+  msg.textContent = "";
+
+  if (code.length < 4) {
+    msg.textContent = "Code too short. Try again.";
+    return;
+  }
+
+  // DEMO ONLY — no real auth. Any code 4+ chars succeeds.
+  msg.className = "success-msg";
+  msg.textContent = "Locked in. Redirecting...";
+  btn.disabled = true;
+  setTimeout(() => {
+    window.location.href = "/roster.html";
+  }, 1200);
 }
-document.getElementById('code').addEventListener('keypress', e => { if (e.key === 'Enter') signIn(); });
+
+btn.addEventListener("click", submit);
+codeInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") submit();
+});
 </script>
+
 </body>
 </html>

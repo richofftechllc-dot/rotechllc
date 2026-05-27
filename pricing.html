@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pricing — Rich Off Tech</title>
+<link rel="stylesheet" href="/styles.css">
+<script src="/mock-data.js"></script>
+<style>
+  .price-wrap { max-width: 980px; margin: 0 auto; padding: 60px 32px; }
+  .price-head { text-align: center; margin-bottom: 48px; }
+  .price-head h1 { font-size: 48px; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 12px; line-height: 1.05; }
+  .price-head p { color: var(--text-dim); font-size: 17px; max-width: 580px; margin: 0 auto; }
+  .price-card {
+    background: linear-gradient(180deg, #131313, #0a0a0a);
+    border: 2px solid;
+    border-image: linear-gradient(135deg, #ff6a00, #ee0979) 1;
+    border-radius: 20px;
+    padding: 40px;
+    position: relative;
+  }
+  .price-card::before {
+    content: "FOUNDING MEMBER";
+    position: absolute;
+    top: -14px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, #ff6a00, #ee0979);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+  }
+  .price-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center; }
+  @media (max-width: 800px) { .price-grid { grid-template-columns: 1fr; } }
+  .price-features ul { list-style: none; }
+  .price-features li {
+    padding: 10px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 15px;
+    color: var(--text);
+    border-bottom: 1px solid #181818;
+  }
+  .price-features li:last-child { border-bottom: none; }
+  .check {
+    color: #22c55e;
+    font-weight: 800;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .price-amount-box {
+    background: #0a0a0a;
+    border: 1px solid var(--border-bright);
+    border-radius: 14px;
+    padding: 32px;
+    text-align: center;
+  }
+  .price-amount {
+    font-size: 72px;
+    font-weight: 800;
+    letter-spacing: -3px;
+    line-height: 1;
+  }
+  .price-period { color: var(--text-dim); font-size: 14px; margin-top: 6px; }
+  .price-note {
+    font-size: 12px;
+    color: var(--text-faint);
+    margin-top: 16px;
+    font-style: italic;
+  }
+  .price-cta { width: 100%; margin-top: 20px; padding: 14px; font-size: 16px; }
+  .spots-left {
+    font-size: 13px;
+    color: #22c55e;
+    font-weight: 600;
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .spots-left::before {
+    content: "";
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #22c55e;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+</style>
+</head>
+<body>
+
+<div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
+
+<nav class="main">
+  <div class="logo-nav"><a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;"><img src="/bo-avatar.png" alt="Bo" style="width:32px;height:32px;border-radius:50%;object-fit:cover;object-position:center top;box-shadow:0 0 0 2px rgba(255,106,0,0.4);"><span class="gradient-text" style="font-weight:800;font-size:18px;">ROT</span></a></div>
+  <ul>
+    <li><a href="/roster.html">Community</a></li>
+    <li><a href="/quiz.html">Quiz</a></li>
+    <li><a href="/calls.html">Sundays</a></li>
+    <li><a href="/pricing.html">Pricing</a></li>
+    <li><a href="/commands.html">Bot</a></li>
+    <li><a href="https://discord.gg/7bjyPvTx4w" target="_blank">Discord</a></li>
+  </ul>
+</nav>
+
+<div class="price-wrap">
+
+  <div class="price-head">
+    <h1>Everything You Get<br><span class="gradient-text">For $96 / 12 Months.</span></h1>
+    <p>No hidden tiers. No upsells. Founding Member rate stays locked for the full year. After 100 spots fill, price moves up.</p>
+  </div>
+
+  <div class="price-card">
+    <div class="price-grid">
+      <div class="price-features">
+        <ul>
+          <li><span class="check">✓</span> Full Discord access</li>
+          <li><span class="check">✓</span> The Roster (recruiter-visible)</li>
+          <li><span class="check">✓</span> Sunday meetings with hiring managers</li>
+          <li><span class="check">✓</span> Full quiz system (Discord + web)</li>
+          <li><span class="check">✓</span> Free 30-min 1-on-1 strategy call with Bo</li>
+          <li><span class="check">✓</span> 24/7 Bo Tech AI agent</li>
+          <li><span class="check">✓</span> Cert roadmaps for 10+ certifications</li>
+          <li><span class="check">✓</span> Clearance pathway guidance</li>
+          <li><span class="check">✓</span> Real project portfolio guidance</li>
+          <li><span class="check">✓</span> Resume rebuild intake</li>
+          <li><span class="check">✓</span> Salary intel database</li>
+          <li><span class="check">✓</span> Job drops + community wins</li>
+          <li><span class="check">✓</span> Interview prep on demand</li>
+          <li><span class="check">✓</span> $96 locked for your full 12 months</li>
+        </ul>
+      </div>
+
+      <div class="price-amount-box">
+        <div class="price-amount gradient-text">$96</div>
+        <div class="price-period">for 12 months</div>
+        <a href="https://square.link/u/gGNBn35n" class="btn price-cta" target="_blank">Lock In Founding</a>
+        <div class="spots-left">62 / 100 spots claimed</div>
+        <div class="price-note">After 100 fill, price moves up to monthly tier.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="links">
+    <a href="https://discord.gg/7bjyPvTx4w" target="_blank">Discord</a>
+    <a href="https://instagram.com/richofftech_" target="_blank">@richofftech_</a>
+    <a href="/">Home</a>
+    <a href="/roster.html">Roster</a>
+  </div>
+  <div>Powered by Rich Off Tech LLC &copy; <span id="year"></span></div>
+</footer>
+
+<script src="/widget.js?v=1779523743"></script>
+<script>
+document.getElementById("year").textContent = new Date().getFullYear();
+const tickerEl = document.getElementById("ticker");
+const tickerContent = window.MOCK.techNews.map(n => `<span class="ticker-item"><span class="tag">${n.tag}</span>${n.text}</span>`).join("");
+tickerEl.innerHTML = tickerContent + tickerContent;
+</script>
+</body>
+</html>

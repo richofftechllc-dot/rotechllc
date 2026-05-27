@@ -20,3 +20,5 @@ desktop.ini
 
 # Node modules
 node_modules/
+.vercel
+.env*
