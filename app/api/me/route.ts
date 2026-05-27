@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/firebase";
+import { coll } from "@/lib/firebase";
 import crypto from "crypto";
 
 export const runtime = "nodejs";
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
   const code = verify(req.cookies.get("rot_session")?.value);
   if (!code) return NextResponse.json({ ok: false }, { status: 401 });
   try {
-    const snap = await db.collection("customers").where("quizCode", "==", code).limit(1).get();
+    const snap = await coll("customers").where("quizCode", "==", code).limit(1).get();
     if (snap.empty) return NextResponse.json({ ok: false }, { status: 401 });
     const c = snap.docs[0].data();
     return NextResponse.json({

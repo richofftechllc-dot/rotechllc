@@ -11,4 +11,16 @@ if (!admin.apps.length) {
 }
 
 export const db = admin.firestore();
+
+// Environment-aware collection prefix.
+// Production (VERCEL_ENV=production) → no prefix → real data
+// Preview / Development / local → "test_" prefix → isolated test data
+const PREFIX = process.env.VERCEL_ENV === "production" ? "" : "test_";
+
+export function coll(name: string) {
+  return db.collection(`${PREFIX}${name}`);
+}
+
+export const IS_PROD = process.env.VERCEL_ENV === "production";
+
 export default admin;

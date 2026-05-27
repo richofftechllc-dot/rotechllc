@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/firebase";
+import { coll } from "@/lib/firebase";
 import crypto from "crypto";
 
 export const runtime = "nodejs";
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     if (c.length < 4) {
       return NextResponse.json({ ok: false, error: "Invalid code" }, { status: 401 });
     }
-    const snap = await db.collection("customers").where("quizCode", "==", c).limit(1).get();
+    const snap = await coll("customers").where("quizCode", "==", c).limit(1).get();
     if (snap.empty) {
       return NextResponse.json({ ok: false, error: "Invalid code" }, { status: 401 });
     }
