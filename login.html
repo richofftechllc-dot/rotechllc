@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROT — Member Login</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, system-ui, sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.box { background: #141414; border: 1px solid #2a2a2a; border-radius: 12px; padding: 48px 40px; max-width: 420px; width: 100%; }
+.logo { text-align: center; margin-bottom: 32px; }
+.logo img { width: 80px; height: 80px; border-radius: 12px; }
+h1 { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+.sub { text-align: center; color: #888; font-size: 14px; margin-bottom: 32px; }
+label { display: block; font-size: 13px; color: #aaa; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+input { width: 100%; padding: 14px 16px; background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 8px; color: #fff; font-size: 16px; margin-bottom: 20px; }
+input:focus { outline: none; border-color: #00ff88; }
+button { width: 100%; padding: 14px; background: #00ff88; color: #000; border: none; border-radius: 8px; font-weight: 700; font-size: 15px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; }
+button:hover { background: #00cc6e; }
+.error { color: #ff4444; font-size: 13px; margin-top: 12px; text-align: center; min-height: 18px; }
+.footer { text-align: center; margin-top: 24px; font-size: 12px; color: #555; }
+.footer a { color: #00ff88; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="box">
+<div class="logo"><img src="rot-logo.png" alt="ROT"></div>
+<h1>Member Sign In</h1>
+<p class="sub">Enter your access code to continue</p>
+<label for="code">Access Code</label>
+<input type="text" id="code" placeholder="FIRSTNAME2026" autocomplete="off" autocapitalize="characters">
+<button onclick="signIn()">SIGN IN</button>
+<div class="error" id="error"></div>
+<div class="footer">Not a member yet? <a href="https://square.link/u/gGNBn35n">Join ROT</a></div>
+</div>
+<script>
+function signIn() {
+  const code = document.getElementById('code').value.trim().toUpperCase();
+  const err = document.getElementById('error');
+  if (!code) { err.textContent = 'Enter your access code.'; return; }
+  document.cookie = `rot_code=${code}; path=/; max-age=2592000; SameSite=Lax`;
+  window.location.href = `/learn/?ref=${btoa(code)}`;
+}
+document.getElementById('code').addEventListener('keypress', e => { if (e.key === 'Enter') signIn(); });
+</script>
+</body>
+</html>
