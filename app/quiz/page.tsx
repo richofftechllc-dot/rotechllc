@@ -2,32 +2,35 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
+type Me = { ok: true; code: string; name: string; track: string | null } | { ok: false };
+
 export default function Quiz() {
-  const [code, setCode] = useState<string | null>(null);
-  const [redirecting, setRedirecting] = useState(true);
+  const [me, setMe] = useState<Me | null>(null);
 
   useEffect(() => {
-    const c = document.cookie.split("rot_code=")[1]?.split(";")[0];
-    if (!c) {
-      window.location.href = "/login";
-      return;
-    }
-    setCode(c);
-    setRedirecting(false);
+    fetch("/api/me").then(r => r.json()).then(setMe).catch(() => setMe({ ok: false }));
   }, []);
 
-  if (redirecting || !code) {
+  if (!me) {
     return <main className="max-w-2xl mx-auto px-6 py-24 text-center"><h1 className="text-4xl font-black mb-4">Loading...</h1></main>;
   }
+  if (!me.ok) {
+    if (typeof window !== "undefined") window.location.href = "/login";
+    return null;
+  }
 
-  const quizUrl = `https://richofftechllc-dot.github.io/rot-quiz/?ref=${btoa(code)}`;
+  const quizUrl = `https://richofftechllc-dot.github.io/rot-quiz/?ref=${btoa(me.code)}`;
 
   return (
     <main className="max-w-6xl mx-auto px-6 py-12">
       <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
         <div>
           <h1 className="text-4xl font-black">Your Quiz</h1>
-          <p className="text-gray-400 mt-2">Signed in as <span className="text-orange-500 font-mono">{code}</span></p>
+          <p className="text-gray-400 mt-2">
+            Signed in as <span className="text-orange-500 font-semibold">{me.name}</span>
+            <span className="text-gray-500 font-mono ml-2 text-sm">{me.code}</span>
+          </p>
+          {me.track && <p className="text-gray-500 text-sm mt-1">{me.track}</p>}
         </div>
         <a href={quizUrl} target="_blank" rel="noopener noreferrer" className="px-5 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg">Open Full Quiz</a>
       </div>
