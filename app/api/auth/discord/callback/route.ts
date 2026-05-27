@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { coll } from "@/lib/firebase";
 import crypto from "crypto";
 
 export const runtime = "nodejs";
@@ -17,6 +18,15 @@ function loginError(req: NextRequest, code: string) {
   return NextResponse.redirect(new URL(`/login?error=${code}`, req.url));
 }
 
+function setSession(req: NextRequest, payload: string) {
+  const sig = sign(payload);
+  const res = NextResponse.redirect(new URL("/quiz", req.url));
+  res.cookies.set("rot_session", `${payload}.${sig}`, {
+    httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 30,
+  });
+  return res;
+}
+
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get("code");
   if (!code) return loginError(req, "no_code");
@@ -25,11 +35,8 @@ export async function GET(req: NextRequest) {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
-        grant_type: "authorization_code",
-        code,
-        redirect_uri: REDIRECT_URI,
+        client_id: CLIENT_ID, client_secret: CLIENT_SECRET,
+        grant_type: "authorization_code", code, redirect_uri: REDIRECT_URI,
       }),
     });
     const tokenData = await tokenRes.json();
@@ -48,20 +55,19 @@ export async function GET(req: NextRequest) {
     const inROT = Array.isArray(guilds) && guilds.some(g => g.id === ROT_GUILD_ID);
     if (!inROT) return loginError(req, "not_in_server");
 
+    // Look up customer by Discord ID — if linked, sign in as code user (full access)
+    try {
+      const linkedSnap = await coll("customers").where("discordId", "==", user.id).limit(1).get();
+      if (!linkedSnap.empty) {
+        const customer = linkedSnap.docs[0].data();
+        if (customer.quizCode) return setSession(req, customer.quizCode);
+      }
+    } catch {}
+
+    // Fallback: Discord-only session (no code linked)
     const displayName = user.global_name || user.username || "Member";
     const nameB64 = Buffer.from(displayName).toString("base64");
-    const payload = `discord:${user.id}:${nameB64}`;
-    const sig = sign(payload);
-
-    const res = NextResponse.redirect(new URL("/quiz", req.url));
-    res.cookies.set("rot_session", `${payload}.${sig}`, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 30,
-    });
-    return res;
+    return setSession(req, `discord:${user.id}:${nameB64}`);
   } catch {
     return loginError(req, "server_error");
   }

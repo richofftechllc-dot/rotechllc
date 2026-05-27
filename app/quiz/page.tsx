@@ -2,7 +2,9 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
-type Me = { ok: true; code: string; name: string; track: string | null } | { ok: false };
+type Me =
+  | { ok: true; code: string | null; name: string; track: string | null; authType: string }
+  | { ok: false };
 
 export default function Quiz() {
   const [me, setMe] = useState<Me | null>(null);
@@ -19,7 +21,32 @@ export default function Quiz() {
     return null;
   }
 
-  const quizUrl = `https://richofftechllc-dot.github.io/rot-quiz/?ref=${btoa(me.code)}`;
+  // Discord-only auth (no linked quiz code)
+  if (!me.code) {
+    return (
+      <main className="max-w-2xl mx-auto px-6 py-24 text-center">
+        <Image src="/bo-avatar.png" alt="ROT" width={80} height={80} className="rounded-full mx-auto mb-6" />
+        <h1 className="text-3xl font-black mb-4">Welcome, {me.name}</h1>
+        <p className="text-gray-400 mb-2 leading-relaxed">
+          You're signed in via Discord, but your account isn't linked to a quiz code yet.
+        </p>
+        <p className="text-gray-400 mb-8 leading-relaxed">
+          DM Bo in Discord to get your access code, then sign back in.
+        </p>
+        <a href="https://discord.gg/3gFdWYtPB" target="_blank" rel="noopener"
+           className="inline-block px-6 py-3 text-white font-bold rounded-lg transition-colors"
+           style={{ backgroundColor: "#5865F2" }}>
+          Open ROT Discord
+        </a>
+        <p className="text-gray-600 text-xs mt-8">
+          Already have a code? <a href="/login" className="text-orange-500 underline">Sign in with code</a>
+        </p>
+      </main>
+    );
+  }
+
+  // Code-authenticated user — show quiz
+  const quizUrl = `https://learn.rotechllc.com/?ref=${btoa(me.code)}`;
 
   return (
     <main className="max-w-6xl mx-auto px-6 py-12">
@@ -32,7 +59,6 @@ export default function Quiz() {
           </p>
           {me.track && <p className="text-gray-500 text-sm mt-1">{me.track}</p>}
         </div>
-        <a href={quizUrl} target="_blank" rel="noopener noreferrer" className="px-5 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg">Open Full Quiz</a>
       </div>
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-zinc-900 border border-white/10 rounded-xl overflow-hidden">
