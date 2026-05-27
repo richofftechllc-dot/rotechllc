@@ -1,7 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Home() {
+async function getMemberCount() {
+  try {
+    const base = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
+    const res = await fetch(`${base}/api/member-count`, { next: { revalidate: 300 } });
+    const data = await res.json();
+    return data.count || 64;
+  } catch {
+    return 64;
+  }
+}
+
+export default async function Home() {
+  const memberCount = await getMemberCount();
   return (
     <main className="max-w-6xl mx-auto px-6 py-16 md:py-24">
       <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -15,7 +27,7 @@ export default function Home() {
             Rich Off Tech is the community Bo built for cleared and aspiring tech professionals. Cert tracks. Career coaching. Real moves from people locked in on the same path.
           </p>
           <div className="flex flex-wrap gap-4">
-            <a href="https://square.link/u/gGNBn35n" target="_blank" rel="noopener" className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90">
+            <a href="https://square.link/u/gGNBn35n" target="_blank" rel="noopener noreferrer" className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90">
               Become a Founding Member — $96
             </a>
             <Link href="/roster" className="px-6 py-3 border border-white/20 rounded-lg hover:bg-white/5">
@@ -31,7 +43,7 @@ export default function Home() {
 
       <div className="grid grid-cols-3 gap-8 mt-24 text-center">
         <div>
-          <div className="text-5xl font-black text-orange-500">62</div>
+          <div className="text-5xl font-black text-orange-500">{memberCount}</div>
           <div className="text-gray-500 text-sm mt-2">Active members</div>
         </div>
         <div>
