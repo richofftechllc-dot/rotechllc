@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Team from "./components/Team";
+import AboutMontage from "./components/AboutMontage";
 
 async function getMemberCount() {
   try {
@@ -64,6 +65,7 @@ export default async function Home() {
             <div className="bg-zinc-900 border border-white/10 rounded-xl p-6"><div className="text-4xl font-black text-green-500">4</div><div className="text-gray-400 text-sm mt-2">Consulting Services Offered</div></div>
             <div className="bg-zinc-900 border border-white/10 rounded-xl p-6"><div className="text-4xl font-black text-green-500">100%</div><div className="text-gray-400 text-sm mt-2">Virtual & Flexible Sessions</div></div>
           </div>
+          <AboutMontage />
         </div>
       </section>
 
