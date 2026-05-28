@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import Team from "./components/Team";
 import AboutMontage from "./components/AboutMontage";
@@ -127,9 +128,44 @@ export default async function Home() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-orange-500 font-bold tracking-widest text-sm mb-4">ABOUT</div>
           <h2 className="text-5xl md:text-6xl font-black mb-12">Guided by Experience.<br />Powered by Purpose.</h2>
-          <p className="text-gray-400 text-lg max-w-3xl mb-16">
+          <p className="text-gray-400 text-lg max-w-3xl mb-12">
             I&apos;m Randy — a developer and AI engineer, founder of Rich Off Tech LLC. From zero to TS/SCI Full Scope Poly clearance in under 4 years, now at GDIT building the platforms cleared tech needs. I built this company to share what actually works — no fluff, no gatekeeping.
           </p>
+
+          {/* TWO PHOTOS + MISSION */}
+          <div className="grid md:grid-cols-2 gap-8 mb-16 items-start">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-white/10">
+                <Image src="/about/knowledge-2026/k26-portrait-a.jpg" alt="Bo at Knowledge 2026 — Rich Off Tech jacket" fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover" />
+              </div>
+              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 mt-8">
+                <Image src="/about/knowledge-2026/k26-oncam.jpg" alt="Bo on camera — instructor mode" fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover" />
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <div className="text-orange-500 font-bold tracking-widest text-xs mb-3">THE MISSION</div>
+                <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-4">
+                  When federal DEI programs got cancelled, a generation of cleared talent got left in the cold. I&apos;m building the alternative — a pipeline that puts people who look like me in the door, on merit, no quotas. All races, all genders, one rule: come ready to learn.
+                </p>
+                <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-4">
+                  Long term I&apos;m taking this curriculum into high schools and juvenile detention centers — specifically targeting recidivism in young Black men. Same skills that took me from zero to TS/SCI Full Scope Poly in under four years. The system says they can&apos;t be reached. I think it just hasn&apos;t tried.
+                </p>
+              </div>
+
+              <div>
+                <div className="text-orange-500 font-bold tracking-widest text-xs mb-3">WHAT ROT IS</div>
+                <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-4">
+                  Udemy, LinkedIn, and Zapier in one place. Quiz-driven cert tracks. A public roster recruiters scan. An AI agent — <b className="text-orange-400">Bo Tech</b> — that lives in our Discord and tutors you through every lesson, drafts your resume in ATS-safe format, and answers questions at 3 AM. He moves with you: instructor during quizzes, tutor during lessons, on call in DM.
+                </p>
+                <p className="text-gray-300 text-base md:text-lg leading-relaxed">
+                  End state: a community of developers, admins, consultants, and AI integrators ready to help small businesses, enterprises, and government agencies actually adopt AI — instead of pretending to.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="bg-zinc-900 border border-white/10 rounded-xl p-6"><div className="text-4xl font-black text-green-500">4+</div><div className="text-gray-400 text-sm mt-2">Years in IT & Federal Tech</div></div>
             <div className="bg-zinc-900 border border-white/10 rounded-xl p-6"><div className="text-4xl font-black text-green-500">TS/SCI</div><div className="text-gray-400 text-sm mt-2">Active Full Scope Poly</div></div>

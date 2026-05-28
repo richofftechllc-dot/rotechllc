@@ -7,7 +7,21 @@ const EstimateBuilder = dynamic(() => import("./EstimateBuilder"), { ssr: false 
 export default function EstimateBuilderTrigger() {
   const [open, setOpen] = useState(false);
 
-  if (open) return <EstimateBuilder />;
+  if (open) return (
+    <div>
+      <div className="max-w-3xl mx-auto px-6 mb-6 flex items-center justify-between gap-4">
+        <div className="text-orange-500 font-bold tracking-widest text-xs">ESTIMATE BUILDER</div>
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="text-xs text-gray-400 hover:text-white border border-white/15 hover:border-white/40 rounded-lg px-4 py-2 font-bold tracking-wider uppercase transition"
+        >
+          ✕ Close
+        </button>
+      </div>
+      <EstimateBuilder />
+    </div>
+  );
 
   return (
     <div className="max-w-3xl mx-auto px-6">
