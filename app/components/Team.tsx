@@ -66,7 +66,9 @@ export default function Team() {
           {/* BO — Founder */}
           <div className="bg-zinc-900 border border-orange-500/40 rounded-2xl p-6 flex flex-col">
             <div className="flex items-start gap-4 mb-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-500/30 to-red-500/30 border border-orange-500/40 rounded-full flex items-center justify-center text-xl font-black text-orange-300 shrink-0">BO</div>
+              <div className="relative w-16 h-16 rounded-full border border-orange-500/40 overflow-hidden shrink-0">
+                <Image src="/about/knowledge-2026/k26-smile.jpg" alt="Bo" fill sizes="64px" className="object-cover" />
+              </div>
               <div className="min-w-0">
                 <div className="font-bold text-lg leading-tight">Bo <span className="text-gray-500 font-medium text-sm">(Randy Allen)</span></div>
                 <div className="text-gray-400 text-sm mt-0.5">Founder · Developer &amp; AI Engineer</div>

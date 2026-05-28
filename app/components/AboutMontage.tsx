@@ -21,7 +21,7 @@ export default function AboutMontage() {
       <div className="text-orange-500 font-bold tracking-widest text-[11px] mb-4">SERVICENOW KNOWLEDGE 2026 · LAS VEGAS · PARTNER</div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {/* HERO — K26 badge */}
-        <div className="relative aspect-[4/5] md:aspect-auto md:row-span-2 md:col-span-2 rounded-xl overflow-hidden border border-orange-500/30">
+        <div className="relative aspect-[4/5] md:row-span-2 md:col-span-2 rounded-xl overflow-hidden border border-orange-500/30">
           <Image
             src={`${BASE}/k26-badge-hero.jpg`}
             alt="Randy Allen — ServiceNow Knowledge 2026 Partner badge, Rich Off Tech LLC"
