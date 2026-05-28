@@ -106,6 +106,9 @@ export default function Quiz() {
 
   async function askBo(question: string) {
     if (!question.trim() || chatBusy) return;
+    // Render-time gates above (!me, !me.ok, !me.code) don't narrow inside closures.
+    // Re-assert the same three to make the auth contract explicit at call time.
+    if (!me || !me.ok || !me.code) return;
     const userMsg: ChatMsg = { role: "user", content: question };
     setChat(c => [...c, userMsg]);
     setChatInput("");
