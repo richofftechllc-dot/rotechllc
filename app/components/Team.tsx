@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const DISCORD_INVITE = "https://discord.gg/7bjyPvTx4w";
 
 export default function Team() {
@@ -16,7 +18,9 @@ export default function Team() {
           {/* TY — Cert */}
           <div className="bg-zinc-900 border border-yellow-500/20 rounded-2xl p-6 flex flex-col">
             <div className="flex items-start gap-4 mb-4">
-              <div className="w-16 h-16 bg-yellow-500/20 border border-yellow-500/30 rounded-full flex items-center justify-center text-xl font-black text-yellow-500 shrink-0">TY</div>
+              <div className="relative w-16 h-16 rounded-full border border-yellow-500/30 overflow-hidden shrink-0">
+                <Image src="/team/ty.jpg" alt="Ty" fill sizes="64px" className="object-cover" />
+              </div>
               <div className="min-w-0">
                 <div className="font-bold text-lg leading-tight">Ty</div>
                 <div className="text-gray-400 text-sm mt-0.5">Certification Coordinator</div>
@@ -84,6 +88,33 @@ export default function Team() {
             </a>
           </div>
 
+        </div>
+
+        {/* COORDINATOR SPOTLIGHT — full-bleed marketing units. DK + Bo flyers TBD. */}
+        <div className="mt-16">
+          <div className="text-orange-500 font-bold tracking-widest text-[11px] mb-4">COORDINATOR SPOTLIGHT</div>
+          <div className="grid md:grid-cols-3 gap-4">
+            <a
+              href={DISCORD_INVITE}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative block rounded-2xl overflow-hidden border border-yellow-500/30 hover:border-yellow-500/60 transition aspect-[941/1672] bg-black"
+            >
+              <Image
+                src="/team/ty-flyer.jpg"
+                alt="Ty — Certification Coordinator (DMV)"
+                fill
+                sizes="(max-width: 768px) 100vw, 33vw"
+                className="object-cover"
+              />
+            </a>
+            <div className="rounded-2xl border border-dashed border-white/10 aspect-[941/1672] flex items-center justify-center text-gray-600 text-xs">
+              D. Knight · flyer coming
+            </div>
+            <div className="rounded-2xl border border-dashed border-white/10 aspect-[941/1672] flex items-center justify-center text-gray-600 text-xs">
+              Bo · flyer coming
+            </div>
+          </div>
         </div>
       </div>
     </section>
