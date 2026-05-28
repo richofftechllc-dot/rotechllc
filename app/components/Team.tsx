@@ -94,9 +94,15 @@ export default function Team() {
         </div>
 
         {/* COORDINATOR SPOTLIGHT — full-bleed marketing units. DK + Bo flyers TBD. */}
-        <div className="mt-16">
-          <div className="text-orange-500 font-bold tracking-widest text-[11px] mb-4">COORDINATOR SPOTLIGHT</div>
-          <div className="grid md:grid-cols-3 gap-4">
+        <details className="mt-16 group">
+          <summary className="cursor-pointer list-none flex items-center justify-between gap-4 py-4 border-y border-white/10 hover:border-orange-500/40 transition">
+            <div>
+              <div className="text-orange-500 font-bold tracking-widest text-[11px] mb-1">COORDINATOR SPOTLIGHT</div>
+              <div className="text-gray-400 text-sm">Full coordinator pages with deeper info</div>
+            </div>
+            <div className="text-orange-500 text-xl group-open:rotate-180 transition-transform">↓</div>
+          </summary>
+          <div className="grid md:grid-cols-3 gap-4 mt-6">
             <a
               href={DISCORD_INVITE}
               target="_blank"
@@ -127,7 +133,7 @@ export default function Team() {
               handles={["Intro", "Cert", "Clearance", "Project Intake"]}
             />
           </div>
-        </div>
+        </details>
       </div>
     </section>
   );

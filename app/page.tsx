@@ -1,9 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import Team from "./components/Team";
 import AboutMontage from "./components/AboutMontage";
 import BoAvatarFlip from "./components/BoAvatarFlip";
-import EstimateBuilder from "./components/EstimateBuilder";
+import EstimateBuilderTrigger from "./components/EstimateBuilderTrigger";
 
 async function getMemberCount() {
   try {
@@ -50,25 +49,7 @@ export default async function Home() {
         </div>
       </main>
 
-      {/* ABOUT */}
-      <section className="bg-zinc-950 py-24 border-t border-white/5">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-orange-500 font-bold tracking-widest text-sm mb-4">ABOUT</div>
-          <h2 className="text-5xl md:text-6xl font-black mb-12">Guided by Experience.<br />Powered by Purpose.</h2>
-          <p className="text-gray-400 text-lg max-w-3xl mb-16">
-            I'm Randy — a developer and AI engineer, founder of Rich Off Tech LLC. From zero to TS/SCI Full Scope Poly clearance in under 4 years, now at GDIT building the platforms cleared tech needs. I built this company to share what actually works — no fluff, no gatekeeping.
-          </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="bg-zinc-900 border border-white/10 rounded-xl p-6"><div className="text-4xl font-black text-green-500">4+</div><div className="text-gray-400 text-sm mt-2">Years in IT & Federal Tech</div></div>
-            <div className="bg-zinc-900 border border-white/10 rounded-xl p-6"><div className="text-4xl font-black text-green-500">TS/SCI</div><div className="text-gray-400 text-sm mt-2">Active Full Scope Poly</div></div>
-            <div className="bg-zinc-900 border border-white/10 rounded-xl p-6"><div className="text-4xl font-black text-green-500">4</div><div className="text-gray-400 text-sm mt-2">Consulting Services Offered</div></div>
-            <div className="bg-zinc-900 border border-white/10 rounded-xl p-6"><div className="text-4xl font-black text-green-500">100%</div><div className="text-gray-400 text-sm mt-2">Virtual & Flexible Sessions</div></div>
-          </div>
-          <AboutMontage />
-        </div>
-      </section>
-
-      {/* TALK TO AGENTS */}
+      {/* TALK TO AGENTS — primary conversion mechanism */}
       <section className="bg-gradient-to-br from-green-950/30 to-black py-24 border-t border-white/5">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
@@ -114,15 +95,10 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ESTIMATE BUILDER */}
-      <section id="estimate" className="bg-gradient-to-b from-black to-zinc-950 py-16 border-t border-white/5">
-        <EstimateBuilder />
-      </section>
-
-      {/* TEAM */}
+      {/* TEAM — humans behind the AI */}
       <Team />
 
-      {/* TESTIMONIALS */}
+      {/* TESTIMONIALS — social proof */}
       <section className="bg-zinc-950 py-24 border-t border-white/5">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-green-500 font-bold tracking-widest text-sm mb-4">WHAT CLIENTS SAY</div>
@@ -146,7 +122,30 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* ABOUT — Bo's story (after they care). K26 montage collapsed by default. */}
+      <section className="bg-zinc-950 py-24 border-t border-white/5">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-orange-500 font-bold tracking-widest text-sm mb-4">ABOUT</div>
+          <h2 className="text-5xl md:text-6xl font-black mb-12">Guided by Experience.<br />Powered by Purpose.</h2>
+          <p className="text-gray-400 text-lg max-w-3xl mb-16">
+            I&apos;m Randy — a developer and AI engineer, founder of Rich Off Tech LLC. From zero to TS/SCI Full Scope Poly clearance in under 4 years, now at GDIT building the platforms cleared tech needs. I built this company to share what actually works — no fluff, no gatekeeping.
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="bg-zinc-900 border border-white/10 rounded-xl p-6"><div className="text-4xl font-black text-green-500">4+</div><div className="text-gray-400 text-sm mt-2">Years in IT & Federal Tech</div></div>
+            <div className="bg-zinc-900 border border-white/10 rounded-xl p-6"><div className="text-4xl font-black text-green-500">TS/SCI</div><div className="text-gray-400 text-sm mt-2">Active Full Scope Poly</div></div>
+            <div className="bg-zinc-900 border border-white/10 rounded-xl p-6"><div className="text-4xl font-black text-green-500">4</div><div className="text-gray-400 text-sm mt-2">Consulting Services Offered</div></div>
+            <div className="bg-zinc-900 border border-white/10 rounded-xl p-6"><div className="text-4xl font-black text-green-500">100%</div><div className="text-gray-400 text-sm mt-2">Virtual & Flexible Sessions</div></div>
+          </div>
+          <AboutMontage />
+        </div>
+      </section>
+
+      {/* ESTIMATE BUILDER — late-funnel self-serve, lazy-loaded behind a button */}
+      <section id="estimate" className="bg-gradient-to-b from-black to-zinc-950 py-16 border-t border-white/5">
+        <EstimateBuilderTrigger />
+      </section>
+
+      {/* CTA — $96 close */}
       <section className="bg-gradient-to-br from-orange-500/10 to-red-500/10 py-24 border-t border-white/5">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <h2 className="text-4xl md:text-5xl font-black mb-6">Ready to lock in?</h2>

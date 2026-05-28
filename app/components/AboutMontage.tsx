@@ -17,9 +17,15 @@ const k26Thumbs = [
 
 export default function AboutMontage() {
   return (
-    <div className="mt-16">
-      <div className="text-orange-500 font-bold tracking-widest text-[11px] mb-4">SERVICENOW KNOWLEDGE 2026 · LAS VEGAS · PARTNER</div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <details className="mt-16 group">
+      <summary className="cursor-pointer list-none flex items-center justify-between gap-4 py-4 border-y border-white/10 hover:border-orange-500/40 transition">
+        <div>
+          <div className="text-orange-500 font-bold tracking-widest text-[11px] mb-1">SERVICENOW KNOWLEDGE 2026 · LAS VEGAS · PARTNER</div>
+          <div className="text-gray-400 text-sm">See me at the conference — 10 photos</div>
+        </div>
+        <div className="text-orange-500 text-xl group-open:rotate-180 transition-transform">↓</div>
+      </summary>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
         {/* HERO — K26 badge */}
         <div className="relative aspect-[4/5] md:row-span-2 md:col-span-2 rounded-xl overflow-hidden border border-orange-500/30">
           <Image
@@ -47,6 +53,6 @@ export default function AboutMontage() {
           </div>
         ))}
       </div>
-    </div>
+    </details>
   );
 }
