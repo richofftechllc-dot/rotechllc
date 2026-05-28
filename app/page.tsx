@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Team from "./components/Team";
 import AboutMontage from "./components/AboutMontage";
+import BoAvatarFlip from "./components/BoAvatarFlip";
 
 async function getMemberCount() {
   try {
@@ -39,10 +40,7 @@ export default async function Home() {
               </Link>
             </div>
           </div>
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/30 to-red-500/20 rounded-full blur-3xl"></div>
-            <Image src="/bo-avatar.png" alt="Bo" width={500} height={500} className="relative rounded-full" priority />
-          </div>
+          <BoAvatarFlip />
         </div>
         <div className="grid grid-cols-3 gap-8 mt-24 text-center">
           <div><div className="text-5xl font-black text-orange-500">{memberCount}</div><div className="text-gray-500 text-sm mt-2">Active members</div></div>
