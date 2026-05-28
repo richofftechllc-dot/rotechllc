@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import Team from "./components/Team";
 
 async function getMemberCount() {
   try {
@@ -110,6 +111,9 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* TEAM */}
+      <Team />
 
       {/* TESTIMONIALS */}
       <section className="bg-zinc-950 py-24 border-t border-white/5">
