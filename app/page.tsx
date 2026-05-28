@@ -3,6 +3,7 @@ import Link from "next/link";
 import Team from "./components/Team";
 import AboutMontage from "./components/AboutMontage";
 import BoAvatarFlip from "./components/BoAvatarFlip";
+import EstimateBuilder from "./components/EstimateBuilder";
 
 async function getMemberCount() {
   try {
@@ -107,9 +108,15 @@ export default async function Home() {
                 </div>
               </div>
               <iframe src="https://agents.fireflies.ai/connect-to-agent?id=69e6e005462191c47e54e17b" title="ROT Project Discovery" className="w-full rounded-lg bg-zinc-950" height="500" allow="microphone; autoplay" />
+              <a href="#estimate" className="block mt-3 text-center text-xs text-blue-400 hover:text-blue-300 font-bold tracking-widest uppercase">Skip the call · Build an estimate ↓</a>
             </div>
           </div>
         </div>
+      </section>
+
+      {/* ESTIMATE BUILDER */}
+      <section id="estimate" className="bg-gradient-to-b from-black to-zinc-950 py-16 border-t border-white/5">
+        <EstimateBuilder />
       </section>
 
       {/* TEAM */}
