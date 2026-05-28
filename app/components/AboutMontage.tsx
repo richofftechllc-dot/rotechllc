@@ -4,8 +4,8 @@ const BASE = "/about/knowledge-2026";
 
 // All photos from ServiceNow Knowledge 2026, Las Vegas. Partner attribution applies to the whole set.
 const k26Thumbs = [
+  { src: "k26-badge-hero.jpg",    alt: "Randy Allen — K26 Partner badge held at the venue" },
   { src: "k26-infosys-robot.jpg", alt: "Bo at the Infosys booth, Knowledge 2026" },
-  { src: "k26-badge-card.jpg",    alt: "K26 badge and ServiceNow Challenger Level 2 card" },
   { src: "k26-smile.jpg",         alt: "Bo at K26, Rich Off Tech jacket" },
   { src: "k26-laptop.jpg",        alt: "Bo working at the laptop, K26" },
   { src: "k26-phone.jpg",         alt: "Bo on the phone at K26" },
@@ -23,8 +23,8 @@ export default function AboutMontage() {
         {/* HERO — K26 badge */}
         <div className="relative aspect-[4/5] md:row-span-2 md:col-span-2 rounded-xl overflow-hidden border border-orange-500/30">
           <Image
-            src={`${BASE}/k26-badge-hero.jpg`}
-            alt="Randy Allen — ServiceNow Knowledge 2026 Partner badge, Rich Off Tech LLC"
+            src={`${BASE}/k26-badge-card.jpg`}
+            alt="Randy Allen — ServiceNow Knowledge 2026 Partner badge + Challenger Level 2 card, Rich Off Tech LLC"
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover"

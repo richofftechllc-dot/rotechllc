@@ -1,4 +1,5 @@
 import Image from "next/image";
+import CoordinatorCard from "./CoordinatorCard";
 
 const DISCORD_INVITE = "https://discord.gg/7bjyPvTx4w";
 
@@ -110,12 +111,21 @@ export default function Team() {
                 className="object-cover"
               />
             </a>
-            <div className="rounded-2xl border border-dashed border-white/10 aspect-[941/1672] flex items-center justify-center text-gray-600 text-xs">
-              D. Knight · flyer coming
-            </div>
-            <div className="rounded-2xl border border-dashed border-white/10 aspect-[941/1672] flex items-center justify-center text-gray-600 text-xs">
-              Bo · flyer coming
-            </div>
+            <CoordinatorCard
+              name="D. Knight"
+              title="Career & Clearance Coordinator"
+              accent="green"
+              ctaHref={DISCORD_INVITE}
+              handles={["Intro", "Cert", "Clearance"]}
+            />
+            <CoordinatorCard
+              name="Bo"
+              title="Founder · Developer & AI Engineer"
+              accent="orange"
+              photo="/about/knowledge-2026/k26-portrait-a.jpg"
+              ctaHref={DISCORD_INVITE}
+              handles={["Intro", "Cert", "Clearance", "Project Intake"]}
+            />
           </div>
         </div>
       </div>
