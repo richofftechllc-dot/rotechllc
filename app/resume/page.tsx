@@ -63,6 +63,8 @@ export default function ResumePage() {
   const [me, setMe] = useState<Me | null>(null);
   const [rosterPulling, setRosterPulling] = useState(false);
   const [rosterMsg, setRosterMsg] = useState<string | null>(null);
+  const [cloudStatus, setCloudStatus] = useState<"idle" | "loading" | "loaded" | "saving" | "saved" | "no_account" | "error">("idle");
+  const [cloudLoadedAt, setCloudLoadedAt] = useState<string | null>(null);
 
   useEffect(() => {
     setResume(loadResume());
@@ -70,7 +72,52 @@ export default function ResumePage() {
     setHydrated(true);
     fetch("/api/me").then(r => r.json()).then(setMe).catch(() => setMe({ ok: false }));
   }, []);
+
+  // When logged in, try to load saved resume from Firestore (via Zapier).
+  // If cloud copy is newer than localStorage, it overrides; otherwise localStorage wins.
+  useEffect(() => {
+    if (!hydrated || !me || !me.ok || !me.code) return;
+    setCloudStatus("loading");
+    fetch("/api/resume/load", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: me.code }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (!data.ok) { setCloudStatus("error"); return; }
+        if (data.found && data.resume) {
+          setResume(data.resume);
+          setCloudLoadedAt(data.updated_at || null);
+          setCloudStatus("loaded");
+        } else {
+          setCloudStatus("no_account");
+        }
+      })
+      .catch(() => setCloudStatus("error"));
+  }, [hydrated, me]);
+
+  // Persist locally on every change; debounce-save to cloud when logged in.
   useEffect(() => { if (hydrated) saveResume(resume); }, [resume, hydrated]);
+  useEffect(() => {
+    if (!hydrated || !me || !me.ok || !me.code) return;
+    if (cloudStatus === "loading") return;
+    const code = me.code;
+    const name = me.name;
+    setCloudStatus("saving");
+    const t = setTimeout(() => {
+      fetch("/api/resume/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, name, resume }),
+      })
+        .then(r => r.json())
+        .then(data => setCloudStatus(data.persisted ? "saved" : "no_account"))
+        .catch(() => setCloudStatus("error"));
+    }, 1500);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resume, hydrated, me]);
 
   async function pullFromRoster() {
     if (!me || !me.ok) return;
@@ -189,6 +236,14 @@ export default function ResumePage() {
           <div>
             <div className="text-orange-400 font-bold text-sm">Signed in as {me.name}{me.code ? <span className="text-gray-500 font-mono text-xs ml-2">{me.code}</span> : null}</div>
             <div className="text-gray-400 text-xs mt-0.5">{rosterMsg || "Pull your roster row to prefill the form. Existing entries won't be overwritten."}</div>
+            <div className="text-[10px] mt-1 font-mono">
+              {cloudStatus === "loading" && <span className="text-gray-500">↻ Loading saved version…</span>}
+              {cloudStatus === "loaded" && <span className="text-green-500">✓ Saved version loaded{cloudLoadedAt ? ` (${new Date(cloudLoadedAt).toLocaleDateString()})` : ""}</span>}
+              {cloudStatus === "saving" && <span className="text-gray-500">↻ Syncing…</span>}
+              {cloudStatus === "saved" && <span className="text-green-500">✓ Synced to your account</span>}
+              {cloudStatus === "no_account" && <span className="text-gray-600">Local-only · Cloud sync not configured yet</span>}
+              {cloudStatus === "error" && <span className="text-yellow-500">⚠ Sync error — still saved locally</span>}
+            </div>
           </div>
           <button
             type="button"
