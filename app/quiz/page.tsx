@@ -51,12 +51,19 @@ export default function Quiz() {
 
   useEffect(() => { fetch("/api/me").then(r => r.json()).then(setMe).catch(() => setMe({ ok: false })); }, []);
 
+  const [progressStatus, setProgressStatus] = useState<"loading" | "loaded" | "empty" | "unauth" | "error">("loading");
+  const [progressMeta, setProgressMeta] = useState<{ rawKeys: number; normalizedKeys: number } | null>(null);
+
   useEffect(() => {
     fetch("/api/progress")
-      .then(r => r.ok ? r.json() : { progress: null })
+      .then(async r => {
+        if (r.status === 401) { setProgressStatus("unauth"); return { progress: null }; }
+        if (!r.ok) { setProgressStatus("error"); return { progress: null }; }
+        return r.json();
+      })
       .then(data => {
-        const raw = data.progress || {};
-        // Normalize prefixed keys (secplus_sp1) back to internal (sp1)
+        const raw = data?.progress || {};
+        const rawKeys = Object.keys(raw).length;
         const norm: Record<string, DomainProgress> = {};
         for (const [k, v] of Object.entries(raw)) {
           if (typeof v !== "object" || v === null) continue;
@@ -65,8 +72,11 @@ export default function Quiz() {
           norm[id] = v as DomainProgress;
         }
         setProgress(norm);
+        setProgressMeta({ rawKeys, normalizedKeys: Object.keys(norm).length });
+        if (rawKeys === 0) setProgressStatus("empty");
+        else setProgressStatus("loaded");
       })
-      .catch(() => setProgress({}));
+      .catch(() => { setProgress({}); setProgressStatus("error"); });
   }, []);
 
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [chat]);
@@ -141,6 +151,17 @@ export default function Quiz() {
           <h1 className="text-5xl font-black mb-2">Your <span className="text-orange-500">Quiz</span></h1>
           <p className="text-gray-400">Signed in as <span className="text-orange-500 font-semibold">{me.name}</span> <span className="font-mono text-sm text-gray-500 ml-2">{me.code}</span></p>
           {me.track && <p className="text-gray-500 text-sm mt-1">{me.track}</p>}
+          <div className="text-[11px] mt-2 font-mono">
+            {progressStatus === "loading" && <span className="text-gray-500">↻ Loading progress…</span>}
+            {progressStatus === "loaded" && progressMeta && (
+              <span className="text-green-500">✓ Synced ({progressMeta.rawKeys} raw → {progressMeta.normalizedKeys} domain entries)</span>
+            )}
+            {progressStatus === "empty" && (
+              <span className="text-yellow-500">⚠ No saved progress for <code className="text-yellow-300">{me.code}</code> in Firestore. If you completed domains on rotechllc.com/learn, the data should appear here automatically — verify the doc exists at <code>quizProgress/{me.code}</code> in Firebase console.</span>
+            )}
+            {progressStatus === "unauth" && <span className="text-red-400">✗ Progress endpoint returned 401. Session cookie may not be reaching the API.</span>}
+            {progressStatus === "error" && <span className="text-red-400">✗ Progress fetch errored. Check /api/progress in the Network tab.</span>}
+          </div>
         </div>
         {visibleTracks.length === 0 ? (
           <div className="bg-zinc-900 border border-orange-500/30 rounded-xl p-8 text-center">

@@ -60,9 +60,8 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-white/5 mt-10 pt-6 flex flex-wrap items-center justify-between gap-3 text-xs text-gray-600">
-          <div>© {new Date().getFullYear()} Rich Off Tech LLC · Randy Allen, Founder</div>
-          <div>Built in DC · Backed by the diaspora</div>
+        <div className="border-t border-white/5 mt-10 pt-6 text-xs text-gray-600">
+          © {new Date().getFullYear()} Rich Off Tech LLC · Randy Allen, Founder
         </div>
       </div>
     </footer>
