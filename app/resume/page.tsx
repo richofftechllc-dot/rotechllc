@@ -166,6 +166,15 @@ export default function ResumePage() {
     if (active && history[idx] === active) setActive(null);
   }
 
+  // Auth gate — Resume Builder is members-only
+  if (me === null) {
+    return <main className="max-w-2xl mx-auto px-6 py-24 text-center"><h1 className="text-4xl font-black">Loading…</h1></main>;
+  }
+  if (!me.ok) {
+    if (typeof window !== "undefined") window.location.href = "/login?next=/resume";
+    return null;
+  }
+
   return (
     <main className="max-w-5xl mx-auto px-6 py-12">
       <div className="text-orange-500 font-bold tracking-widest text-sm mb-3">ROT RESUME BUILDER</div>

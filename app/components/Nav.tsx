@@ -26,6 +26,7 @@ export default function Nav() {
         </Link>
         <div className="hidden md:flex items-center gap-6 text-sm text-gray-300">
           <Link href="/roster" className="hover:text-white">Community</Link>
+          <Link href="/#about" className="hover:text-white">About</Link>
           <Link href="/quiz" className="hover:text-white">Quiz</Link>
           <Link href="/resume" className="hover:text-white">Resume</Link>
           <Link href="/calls" className="hover:text-white">Sundays</Link>

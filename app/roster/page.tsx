@@ -90,9 +90,20 @@ export default function Roster() {
         between <span className="text-green-500">my people</span><br />
         & the <span className="text-yellow-500">corporate world</span>
       </h1>
-      <p className="text-gray-400 max-w-3xl mb-12">
+      <p className="text-gray-400 max-w-3xl mb-8">
         A live roster of <b>Rich Off Tech LLC</b> community members — cleared professionals, certified operators, and rising talent across cyber, cloud, ServiceNow, and federal IT. Hiring managers and recruiters: this is your shortlist.
       </p>
+
+      <div className="bg-gradient-to-br from-orange-500/10 via-zinc-950 to-zinc-950 border border-orange-500/30 rounded-2xl p-6 mb-12">
+        <div className="text-orange-500 font-bold tracking-widest text-xs mb-3">WHY THIS EXISTS</div>
+        <p className="text-gray-300 leading-relaxed mb-3">
+          When federal DEI programs got cancelled, a generation of cleared talent got left in the cold. This roster is the alternative — a pipeline that puts people who look like me in the door, on merit, no quotas. All races, all genders, one rule: come ready to learn.
+        </p>
+        <p className="text-gray-400 text-sm leading-relaxed">
+          Browse the full community freely — no login required to see who&apos;s here. To get added, request CVs, or update your own row, you need a member code.{" "}
+          <a href="https://discord.gg/3gFdWYtPB" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:text-orange-300 font-bold">Join the Discord</a> to get yours.
+        </p>
+      </div>
 
       <div className="grid grid-cols-3 gap-8 mb-10 text-center">
         <div><div className="text-5xl font-black text-green-500">{members.length}</div><div className="text-gray-500 text-xs uppercase tracking-wider mt-1">Members</div></div>
