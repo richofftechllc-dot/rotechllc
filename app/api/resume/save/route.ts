@@ -1,32 +1,34 @@
 import { NextResponse } from "next/server";
+import { getAuthedCode } from "@/lib/session";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 // POST /api/resume/save
-// Body: { code, name, resume }
-// Forwards to Zapier Catch Hook (ZAPIER_RESUME_SAVE_HOOK env var) which writes to Firestore.
-// Returns ok regardless of webhook configuration — fire-and-forget for save.
+// Auth: rot_session cookie required (members-only).
+// Body: { name?, resume }                — code is derived from session, NOT body.
+// Forwards to Zapier Catch Hook (ZAPIER_RESUME_SAVE_HOOK) which writes to Firestore.
 export async function POST(req: Request) {
-  let body: { code?: string; name?: string; resume?: unknown };
+  const code = await getAuthedCode(req);
+  if (!code) {
+    return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
+  }
+
+  let body: { name?: string; resume?: unknown };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ ok: false, error: "bad_json" }, { status: 400 });
   }
-  if (!body?.code?.trim()) {
-    return NextResponse.json({ ok: false, error: "missing_code" }, { status: 400 });
-  }
 
   const hook = process.env.ZAPIER_RESUME_SAVE_HOOK;
   if (!hook) {
-    // Not configured yet — accept the save silently so the UI works smoothly.
     return NextResponse.json({ ok: true, persisted: false, reason: "no_webhook_configured" });
   }
 
   try {
     const payload = {
-      code: body.code,
+      code, // authoritative — from session, not request body
       name: body.name || "",
       resume_json: JSON.stringify(body.resume || {}),
       updated_at: new Date().toISOString(),

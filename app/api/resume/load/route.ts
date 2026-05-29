@@ -1,23 +1,19 @@
 import { NextResponse } from "next/server";
+import { getAuthedCode } from "@/lib/session";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 // POST /api/resume/load
-// Body: { code }
-// Forwards to Zapier Catch Hook (ZAPIER_RESUME_LOAD_HOOK env var) which runs a Firestore query.
-// Expected Zapier response shape (configure the Zap accordingly):
-//   { resume_json: "<stringified StructuredResume>", updated_at: "<iso>" }
-// or null/empty when no row exists for this code.
+// Auth: rot_session cookie required (members-only).
+// Body: ignored.                   — code is derived from session, NOT body.
+// Prevents anyone from pulling someone else's resume by guessing a code.
+// Forwards to Zapier Catch Hook (ZAPIER_RESUME_LOAD_HOOK) which runs a Firestore query
+// keyed by {code}. Expected response shape: { resume_json, updated_at } or empty.
 export async function POST(req: Request) {
-  let body: { code?: string };
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ ok: false, error: "bad_json" }, { status: 400 });
-  }
-  if (!body?.code?.trim()) {
-    return NextResponse.json({ ok: false, error: "missing_code" }, { status: 400 });
+  const code = await getAuthedCode(req);
+  if (!code) {
+    return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
   const hook = process.env.ZAPIER_RESUME_LOAD_HOOK;
@@ -29,7 +25,7 @@ export async function POST(req: Request) {
     const r = await fetch(hook, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code: body.code }),
+      body: JSON.stringify({ code }), // authoritative — from session, not request body
     });
     if (!r.ok) {
       return NextResponse.json({ ok: false, found: false, status: r.status });
