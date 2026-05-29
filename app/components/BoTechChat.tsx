@@ -17,6 +17,25 @@ export default function BoTechChat() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [msgs]);
 
+  useEffect(() => {
+    function handleOpen(e: Event) {
+      const detail = (e as CustomEvent<{ prefill?: string; context?: { domainId?: string; domainName?: string; timestamp_sec?: number } }>).detail;
+      setOpen(true);
+      if (detail?.prefill) setInput(detail.prefill);
+      if (detail?.context) {
+        const ctx = detail.context;
+        setMsgs(prev => {
+          const last = prev[prev.length - 1];
+          const hint = `Bo here — I see you're on ${ctx.domainName || "this lesson"}${typeof ctx.timestamp_sec === "number" ? ` at ${Math.floor(ctx.timestamp_sec / 60)}:${String(ctx.timestamp_sec % 60).padStart(2, "0")}` : ""}. Ask the question.`;
+          if (last?.role === "assistant" && last.content === hint) return prev;
+          return [...prev, { role: "assistant", content: hint }];
+        });
+      }
+    }
+    window.addEventListener("bo-tech:open", handleOpen);
+    return () => window.removeEventListener("bo-tech:open", handleOpen);
+  }, []);
+
   async function send() {
     if (!input.trim() || loading) return;
     const userMsg = input.trim();

@@ -1,7 +1,7 @@
 // Auto-generated from rot-quiz/index.html. Regenerate: node scripts/extract-quiz-data.js
 export type Question = { q: string; options: string[]; answer: number; exp: string };
 export type Lab = { name: string; url: string; description?: string };
-export type Domain = { id: string; name: string; questions: Question[]; labs?: Lab[] };
+export type Domain = { id: string; name: string; questions: Question[]; labs?: Lab[]; video_url?: string };
 export type Track = { id: string; name: string; domains: Domain[] };
 
 // Toggle on when a community call is live. Wired into the quiz sidebar.

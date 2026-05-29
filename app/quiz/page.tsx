@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { TRACKS, LESSONS, LIVE_SESSION, type Track, type Domain } from "@/lib/quizData";
+import LessonVideo from "@/app/components/LessonVideo";
 
 type Me = | { ok: true; code: string | null; name: string; track: string | null; authType: string } | { ok: false };
 type ChatMsg = { role: "user" | "assistant"; content: string };
@@ -230,6 +231,7 @@ export default function Quiz() {
         <p className="text-gray-500 text-sm mb-6 font-mono">📖 Lesson · {domain.id}</p>
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
+            {domain.video_url && <LessonVideo url={domain.video_url} domainId={domain.id} domainName={domain.name} />}
             <div className="bg-zinc-900 border border-orange-500/30 rounded-xl p-6 prose prose-invert max-w-none mb-6" dangerouslySetInnerHTML={{ __html: lesson }} />
             <button onClick={() => start(domain)} className="px-6 py-3 bg-orange-500 text-black font-bold rounded-lg">Start Quiz →</button>
           </div>
@@ -348,8 +350,15 @@ export default function Quiz() {
   );
 }
 
+function extractYouTubeIdSimple(url: string): string | null {
+  const patterns = [/youtu\.be\/([^?&#]+)/, /youtube\.com\/watch\?v=([^&#]+)/, /youtube\.com\/embed\/([^?#]+)/, /youtube\.com\/live\/([^?#]+)/];
+  for (const p of patterns) { const m = url.match(p); if (m) return m[1]; }
+  return null;
+}
+
 function SidePanel({ domain, onStart }: { domain: Domain; onStart: () => void }) {
   const labs = domain.labs || [];
+  const liveYouTubeId = LIVE_SESSION.url ? extractYouTubeIdSimple(LIVE_SESSION.url) : null;
   return (
     <aside className="space-y-4 h-fit lg:sticky lg:top-4">
       {LIVE_SESSION.active && (
@@ -360,11 +369,21 @@ function SidePanel({ domain, onStart }: { domain: Domain; onStart: () => void })
           </div>
           <div className="font-bold text-sm mb-1">{LIVE_SESSION.title || "Community Session"}</div>
           {LIVE_SESSION.host && <div className="text-xs text-gray-400 mb-3">with {LIVE_SESSION.host}</div>}
-          {LIVE_SESSION.url && (
+          {liveYouTubeId ? (
+            <div className="aspect-video rounded-lg overflow-hidden bg-black">
+              <iframe
+                src={`https://www.youtube.com/embed/${liveYouTubeId}?autoplay=0&rel=0`}
+                title={LIVE_SESSION.title || "Live"}
+                className="w-full h-full"
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          ) : LIVE_SESSION.url ? (
             <a href={LIVE_SESSION.url} target="_blank" rel="noopener noreferrer" className="block w-full text-center px-3 py-2 bg-red-500 text-white font-bold text-xs rounded uppercase tracking-wider">
               Join Now ↗
             </a>
-          )}
+          ) : null}
         </div>
       )}
 
