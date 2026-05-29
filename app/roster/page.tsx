@@ -17,6 +17,21 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbY0W4ln8XRMlq
 
 const filters = ["ALL", "TS/SCI", "TS", "Secret", "Public Trust", "None"];
 
+// Members type URLs inconsistently — "linkedin.com/in/foo", "/in/foo", "@foo", etc.
+// Normalize to a fully-qualified https URL so the anchor doesn't become a relative path.
+function safeUrl(u: string): string {
+  if (!u) return "";
+  const v = u.trim();
+  if (!v) return "";
+  if (/^https?:\/\//i.test(v)) return v;
+  if (v.startsWith("/in/")) return "https://www.linkedin.com" + v;
+  if (v.startsWith("in/")) return "https://www.linkedin.com/" + v;
+  if (v.startsWith("linkedin.com")) return "https://www." + v.replace(/^www\./, "");
+  if (v.startsWith("www.linkedin.com")) return "https://" + v;
+  if (v.startsWith("@")) return "https://www.linkedin.com/in/" + v.slice(1);
+  return "https://" + v;
+}
+
 export default function Roster() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
@@ -146,7 +161,7 @@ export default function Roster() {
                   </div>
                 )}
                 <div className="flex gap-3 text-xs text-gray-500">
-                  {m.linkedin && <a href={m.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-green-500">LinkedIn</a>}
+                  {safeUrl(m.linkedin) && <a href={safeUrl(m.linkedin)} target="_blank" rel="noopener noreferrer" className="text-green-500 hover:text-green-400 font-bold">LinkedIn ↗</a>}
                   {m.discord && <span>@{m.discord}</span>}
                 </div>
               </div>

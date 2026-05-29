@@ -33,5 +33,6 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/quiz/:path*", "/roster/:path*", "/account/:path*"],
+  // /roster is public on purpose — recruiters and hiring managers need to browse without an account.
+  matcher: ["/quiz/:path*", "/account/:path*"],
 };
