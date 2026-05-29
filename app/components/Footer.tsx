@@ -2,7 +2,7 @@ import Link from "next/link";
 
 // TODO Bo: confirm the IG handle + LinkedIn slug below; placeholders if uncertain.
 const SOCIALS = {
-  instagram: "https://www.instagram.com/richofftech",
+  instagram: "https://www.instagram.com/richofftech_/",
   linkedin:  "https://www.linkedin.com/company/rich-off-tech-llc",
   email:     "mailto:richofftechllc@gmail.com",
   discord:   "https://discord.gg/3gFdWYtPB",
