@@ -26,6 +26,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li><Link href="/roster" className="text-gray-400 hover:text-white">Community Roster</Link></li>
               <li><Link href="/quiz" className="text-gray-400 hover:text-white">Quiz Tracks</Link></li>
+              <li><Link href="/resume" className="text-gray-400 hover:text-white">Resume Builder</Link></li>
               <li><Link href="/pricing" className="text-gray-400 hover:text-white">Pricing</Link></li>
               <li><Link href="/calls" className="text-gray-400 hover:text-white">Sunday Calls</Link></li>
               <li><Link href="/commands" className="text-gray-400 hover:text-white">Bo Tech Commands</Link></li>
