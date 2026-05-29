@@ -4,6 +4,7 @@ import Team from "./components/Team";
 import AboutMontage from "./components/AboutMontage";
 import BoAvatarFlip from "./components/BoAvatarFlip";
 import EstimateBuilderTrigger from "./components/EstimateBuilderTrigger";
+import WatchCarousel from "./components/WatchCarousel";
 
 async function getMemberCount() {
   try {
@@ -40,6 +41,7 @@ export default async function Home() {
                 See the Community
               </Link>
             </div>
+            <a href="#about" className="inline-block mt-4 text-sm text-orange-400 hover:text-orange-300 font-bold tracking-wider uppercase">▶ Watch my story (2 min)</a>
           </div>
           <BoAvatarFlip />
         </div>
@@ -96,6 +98,9 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* WATCH — Bo's playbook on YouTube Shorts */}
+      <WatchCarousel />
+
       {/* TEAM — humans behind the AI */}
       <Team />
 
@@ -128,9 +133,21 @@ export default async function Home() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-orange-500 font-bold tracking-widest text-sm mb-4">ABOUT</div>
           <h2 className="text-5xl md:text-6xl font-black mb-12">Guided by Experience.<br />Powered by Purpose.</h2>
-          <p className="text-gray-400 text-lg max-w-3xl mb-12">
+          <p className="text-gray-400 text-lg max-w-3xl mb-8">
             I&apos;m Randy — a developer and AI engineer, founder of Rich Off Tech LLC. From zero to TS/SCI Full Scope Poly clearance in under 4 years, now at GDIT building the platforms cleared tech needs. I built this company to share what actually works — no fluff, no gatekeeping.
           </p>
+
+          {/* MY STORY — full-width video, set the tone before the rest of About */}
+          <div className="aspect-video rounded-2xl overflow-hidden border border-orange-500/30 mb-16 max-w-4xl">
+            <iframe
+              src="https://www.youtube.com/embed/TsHQOxsOZn0?rel=0"
+              title="Rich Off Tech — Just listen to the journey"
+              className="w-full h-full"
+              loading="lazy"
+              allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
 
           {/* TWO PHOTOS + MISSION */}
           <div className="grid md:grid-cols-2 gap-8 mb-16 items-start">
@@ -149,9 +166,23 @@ export default async function Home() {
                 <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-4">
                   When federal DEI programs got cancelled, a generation of cleared talent got left in the cold. I&apos;m building the alternative — a pipeline that puts people who look like me in the door, on merit, no quotas. All races, all genders, one rule: come ready to learn.
                 </p>
-                <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-4">
+                <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-5">
                   Long term I&apos;m taking this curriculum into high schools and juvenile detention centers — specifically targeting recidivism in young Black men. Same skills that took me from zero to TS/SCI Full Scope Poly in under four years. The system says they can&apos;t be reached. I think it just hasn&apos;t tried.
                 </p>
+                <div className="grid grid-cols-3 gap-2">
+                  {["q7d0YmDx328", "SgsQpw0cbEM", "GcXTN3uVxOc"].map((id) => (
+                    <div key={id} className="aspect-[9/16] rounded-lg overflow-hidden border border-white/10 bg-black">
+                      <iframe
+                        src={`https://www.youtube.com/embed/${id}?rel=0`}
+                        title="Juvenile justice / community video"
+                        className="w-full h-full"
+                        loading="lazy"
+                        allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div>
@@ -159,9 +190,23 @@ export default async function Home() {
                 <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-4">
                   Udemy, LinkedIn, and Zapier in one place. Quiz-driven cert tracks. A public roster recruiters scan. An AI agent — <b className="text-orange-400">Bo Tech</b> — that lives in our Discord and tutors you through every lesson, drafts your resume in ATS-safe format, and answers questions at 3 AM. He moves with you: instructor during quizzes, tutor during lessons, on call in DM.
                 </p>
-                <p className="text-gray-300 text-base md:text-lg leading-relaxed">
+                <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-5">
                   End state: a community of developers, admins, consultants, and AI integrators ready to help small businesses, enterprises, and government agencies actually adopt AI — instead of pretending to.
                 </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {["L5u9X4ALkdw", "zCWd8pg0cMs"].map((id) => (
+                    <div key={id} className="aspect-[9/16] rounded-lg overflow-hidden border border-white/10 bg-black">
+                      <iframe
+                        src={`https://www.youtube.com/embed/${id}?rel=0`}
+                        title="Rich Off Tech AI"
+                        className="w-full h-full"
+                        loading="lazy"
+                        allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

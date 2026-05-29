@@ -74,6 +74,23 @@ export default function Calls() {
           Hosted on Google Meet{NEXT_SUNDAY.live_youtube_url ? " · Simulcast on YouTube Live" : ""} · Recordings posted in Discord
         </div>
       </div>
+
+      {/* LAST SESSION — most recent past Sunday recording */}
+      <div className="border border-white/10 rounded-2xl p-6 md:p-8 max-w-4xl mx-auto bg-zinc-950 mt-10">
+        <div className="text-gray-400 text-xs font-bold tracking-widest text-center mb-3 uppercase">From the Last Session</div>
+        <h3 className="text-xl md:text-2xl font-bold text-center mb-4">January 14, 2026 — Community Call</h3>
+        <div className="aspect-video rounded-xl overflow-hidden bg-black border border-white/10">
+          <iframe
+            src="https://www.youtube.com/embed/ib8MfsAzT6k?rel=0"
+            title="ROT Community Call · January 14, 2026"
+            className="w-full h-full"
+            loading="lazy"
+            allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+        <p className="text-gray-500 text-xs text-center mt-4">Past sessions live on YouTube. Subscribe to <a href="https://www.youtube.com/@RichOffTechLLc" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:text-orange-300 font-bold">@RichOffTechLLc</a> for the full archive.</p>
+      </div>
     </main>
   );
 }
