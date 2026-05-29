@@ -50,18 +50,80 @@ function saveHistory(h: GeneratedResume[]) {
 
 type Tab = "resume" | "tailor" | "history";
 
+type Me = { ok: true; code: string | null; name: string; track: string | null } | { ok: false };
+type RosterMember = { name: string; role: string; location: string; clearance: string; certs: string[]; linkedin: string; discord: string; status: string; years: string };
+
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbY0W4ln8XRMlqCmS83cvTqA_F-nLlplfd6xC7Fow6XsQrG3URbd48j_H0qCNH4NU4/exec";
+
 export default function ResumePage() {
   const [tab, setTab] = useState<Tab>("resume");
   const [resume, setResume] = useState<StructuredResume>(EMPTY_RESUME);
   const [history, setHistory] = useState<GeneratedResume[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  const [me, setMe] = useState<Me | null>(null);
+  const [rosterPulling, setRosterPulling] = useState(false);
+  const [rosterMsg, setRosterMsg] = useState<string | null>(null);
 
   useEffect(() => {
     setResume(loadResume());
     setHistory(loadHistory());
     setHydrated(true);
+    fetch("/api/me").then(r => r.json()).then(setMe).catch(() => setMe({ ok: false }));
   }, []);
   useEffect(() => { if (hydrated) saveResume(resume); }, [resume, hydrated]);
+
+  async function pullFromRoster() {
+    if (!me || !me.ok) return;
+    setRosterPulling(true);
+    setRosterMsg(null);
+    try {
+      const r = await fetch(APPS_SCRIPT_URL + "?_ts=" + Date.now());
+      const data = await r.json();
+      const rows = data.rows || data || [];
+      if (!Array.isArray(rows) || rows.length < 2) { setRosterMsg("Roster returned no rows."); return; }
+      const headers = rows[0].map((h: string) => String(h).trim().toLowerCase());
+      const idx = (n: string) => headers.indexOf(n);
+      const meName = (me.name || "").toLowerCase().trim();
+      const members: RosterMember[] = rows.slice(1).map((r: string[]) => ({
+        name: String(r[idx("name")] || ""),
+        role: String(r[idx("role")] || ""),
+        location: String(r[idx("location")] || ""),
+        clearance: String(r[idx("clearance")] || ""),
+        certs: String(r[idx("certifications")] || r[idx("certs")] || "").split(/[,;|]/).map(c => c.trim()).filter(Boolean),
+        linkedin: String(r[idx("linkedin")] || ""),
+        discord: String(r[idx("discord")] || ""),
+        status: String(r[idx("status")] || ""),
+        years: String(r[idx("years")] || ""),
+      }));
+      const row = members.find(m => m.name.toLowerCase().trim() === meName) || members.find(m => m.name.toLowerCase().includes(meName));
+      if (!row) { setRosterMsg(`Couldn't find "${me.name}" on the roster. Edit fields manually.`); return; }
+
+      setResume(r => ({
+        ...r,
+        contact: {
+          ...r.contact,
+          name: r.contact.name || row.name,
+          city: r.contact.city || row.location,
+          links: { ...r.contact.links, linkedin: r.contact.links?.linkedin || row.linkedin },
+        },
+        summary: r.summary || (row.role ? `${row.role}${row.years ? ` · ${row.years} years experience` : ""}${row.clearance ? ` · ${row.clearance} cleared` : ""}.` : r.summary),
+        certifications: r.certifications.length > 0
+          ? r.certifications
+          : row.certs.map(c => ({ name: c })),
+        clearances: r.clearances.length > 0
+          ? r.clearances
+          : (row.clearance ? [{ level: row.clearance, status: "Active" }] : []),
+        experience: r.experience.length > 0
+          ? r.experience
+          : (row.role ? [{ title: row.role, company: "", location: row.location, start: "", end: "Present", bullets: [] }] : []),
+      }));
+      setRosterMsg(`Pulled ${row.name}'s row. Existing fields preserved; blanks filled from roster.`);
+    } catch (e) {
+      setRosterMsg("Roster fetch failed: " + (e instanceof Error ? e.message : String(e)));
+    } finally {
+      setRosterPulling(false);
+    }
+  }
 
   const [job, setJob] = useState<TargetJob>({ title: "", description: "" });
   const [generating, setGenerating] = useState(false);
@@ -112,6 +174,23 @@ export default function ResumePage() {
         Fill the structured form once. Paste a target job description. Bo Tech generates an ATS-safe Rich Off Tech-format resume — using only the facts you provided.
         Until your account is wired up, drafts stay on this device.
       </p>
+
+      {me?.ok && (
+        <div className="bg-gradient-to-br from-orange-500/10 to-zinc-950 border border-orange-500/30 rounded-xl p-4 mb-6 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="text-orange-400 font-bold text-sm">Signed in as {me.name}{me.code ? <span className="text-gray-500 font-mono text-xs ml-2">{me.code}</span> : null}</div>
+            <div className="text-gray-400 text-xs mt-0.5">{rosterMsg || "Pull your roster row to prefill the form. Existing entries won't be overwritten."}</div>
+          </div>
+          <button
+            type="button"
+            onClick={pullFromRoster}
+            disabled={rosterPulling}
+            className="px-4 py-2 bg-orange-500 text-black font-bold rounded-lg text-sm hover:opacity-90 disabled:opacity-50"
+          >
+            {rosterPulling ? "Pulling…" : "↓ Pull from roster"}
+          </button>
+        </div>
+      )}
 
       <div className="flex gap-1 mb-8 border-b border-white/10">
         {(["resume", "tailor", "history"] as Tab[]).map(t => (

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
-import { TRACKS, LESSONS, type Track, type Domain } from "@/lib/quizData";
+import { TRACKS, LESSONS, LIVE_SESSION, type Track, type Domain } from "@/lib/quizData";
 
 type Me = | { ok: true; code: string | null; name: string; track: string | null; authType: string } | { ok: false };
 type ChatMsg = { role: "user" | "assistant"; content: string };
@@ -191,10 +191,24 @@ export default function Quiz() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  {hasLesson && (
-                    <button onClick={() => { setDomain(d); setShowLesson(true); setQIdx(d.questions.length); }} className="px-3 py-1.5 text-xs border border-orange-500/40 text-orange-400 rounded hover:bg-orange-500/10">Study</button>
+                  {hasLesson ? (
+                    <>
+                      <button
+                        onClick={() => { setDomain(d); setShowLesson(true); setQIdx(d.questions.length); setAnswers([]); }}
+                        className="px-3 py-1.5 text-xs bg-orange-500 text-black font-bold rounded"
+                      >
+                        📖 Study {completed ? "→ Retake" : "→ Quiz"}
+                      </button>
+                      <button
+                        onClick={() => start(d)}
+                        className="px-3 py-1.5 text-xs border border-white/15 text-gray-400 rounded hover:border-orange-500/40 hover:text-orange-400"
+                      >
+                        Skip
+                      </button>
+                    </>
+                  ) : (
+                    <button onClick={() => start(d)} className="px-3 py-1.5 text-xs bg-orange-500 text-black font-bold rounded">{completed ? "Retake →" : "Quiz →"}</button>
                   )}
-                  <button onClick={() => start(d)} className="px-3 py-1.5 text-xs bg-orange-500 text-black font-bold rounded">{completed ? "Retake →" : "Quiz →"}</button>
                 </div>
               </div>
             );
@@ -210,12 +224,17 @@ export default function Quiz() {
 
   if (done && showLesson && lesson && answers.length === 0) {
     return (
-      <main className="max-w-4xl mx-auto px-6 py-12">
+      <main className="max-w-7xl mx-auto px-6 py-12">
         <button onClick={() => setDomain(null)} className="text-gray-500 text-sm mb-6 hover:text-orange-500">← {track.name}</button>
         <h1 className="text-3xl font-black mb-2">{domain.name}</h1>
         <p className="text-gray-500 text-sm mb-6 font-mono">📖 Lesson · {domain.id}</p>
-        <div className="bg-zinc-900 border border-orange-500/30 rounded-xl p-6 prose prose-invert max-w-none mb-6" dangerouslySetInnerHTML={{ __html: lesson }} />
-        <button onClick={() => start(domain)} className="px-6 py-3 bg-orange-500 text-black font-bold rounded-lg">Start Quiz →</button>
+        <div className="grid lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <div className="bg-zinc-900 border border-orange-500/30 rounded-xl p-6 prose prose-invert max-w-none mb-6" dangerouslySetInnerHTML={{ __html: lesson }} />
+            <button onClick={() => start(domain)} className="px-6 py-3 bg-orange-500 text-black font-bold rounded-lg">Start Quiz →</button>
+          </div>
+          <SidePanel domain={domain} onStart={() => start(domain)} />
+        </div>
       </main>
     );
   }
@@ -326,5 +345,50 @@ export default function Quiz() {
         </div>
       </div>
     </main>
+  );
+}
+
+function SidePanel({ domain, onStart }: { domain: Domain; onStart: () => void }) {
+  const labs = domain.labs || [];
+  return (
+    <aside className="space-y-4 h-fit lg:sticky lg:top-4">
+      {LIVE_SESSION.active && (
+        <div className="bg-red-500/10 border border-red-500/40 rounded-xl p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />
+            <span className="text-red-400 font-bold text-xs tracking-widest uppercase">Live Now</span>
+          </div>
+          <div className="font-bold text-sm mb-1">{LIVE_SESSION.title || "Community Session"}</div>
+          {LIVE_SESSION.host && <div className="text-xs text-gray-400 mb-3">with {LIVE_SESSION.host}</div>}
+          {LIVE_SESSION.url && (
+            <a href={LIVE_SESSION.url} target="_blank" rel="noopener noreferrer" className="block w-full text-center px-3 py-2 bg-red-500 text-white font-bold text-xs rounded uppercase tracking-wider">
+              Join Now ↗
+            </a>
+          )}
+        </div>
+      )}
+
+      <div className="bg-zinc-900 border border-white/10 rounded-xl p-4">
+        <div className="text-orange-500 font-bold tracking-widest text-[10px] mb-3">🧪 LABS — {domain.id.toUpperCase()}</div>
+        {labs.length === 0 ? (
+          <p className="text-gray-500 text-xs italic">No hands-on labs added for this domain yet.</p>
+        ) : (
+          <ul className="space-y-2">
+            {labs.map(l => (
+              <li key={l.url}>
+                <a href={l.url} target="_blank" rel="noopener noreferrer" className="block text-sm text-orange-400 hover:text-orange-300 font-bold">{l.name} ↗</a>
+                {l.description && <p className="text-xs text-gray-500 mt-0.5">{l.description}</p>}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div className="bg-zinc-900 border border-white/10 rounded-xl p-4">
+        <div className="text-orange-500 font-bold tracking-widest text-[10px] mb-3">READY?</div>
+        <p className="text-xs text-gray-400 mb-3">When you&apos;ve absorbed the lesson, take the quiz to lock it in.</p>
+        <button onClick={onStart} className="w-full px-4 py-2.5 bg-orange-500 text-black font-bold text-sm rounded">Start Quiz →</button>
+      </div>
+    </aside>
   );
 }
