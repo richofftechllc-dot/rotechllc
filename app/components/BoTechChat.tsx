@@ -11,11 +11,29 @@ export default function BoTechChat() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [msgs]);
+
+  // Lazy-load history the first time the chat opens (skip if anonymous → just keeps the greeting).
+  useEffect(() => {
+    if (!open || historyLoaded) return;
+    setHistoryLoaded(true);
+    fetch("/api/chat")
+      .then(r => r.ok ? r.json() : { messages: [] })
+      .then(data => {
+        const history: Msg[] = Array.isArray(data?.messages) ? data.messages : [];
+        if (history.length === 0) return; // keep the default greeting
+        setMsgs([
+          { role: "assistant", content: "Yo, back to it. Picking up where we left off." },
+          ...history.map((m: Msg) => ({ role: m.role, content: m.content })),
+        ]);
+      })
+      .catch(() => { /* silent — keep greeting */ });
+  }, [open, historyLoaded]);
 
   useEffect(() => {
     function handleOpen(e: Event) {
