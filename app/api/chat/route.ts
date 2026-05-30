@@ -40,6 +40,16 @@ async function loadHistory(code: string): Promise<Msg[]> {
   } catch { return []; }
 }
 
+// Same shape /api/me reads from. Used to address the user by name in chat.
+async function loadUserInfo(code: string): Promise<{ name?: string; track?: string }> {
+  try {
+    const snap = await coll("customers").where("quizCode", "==", code).limit(1).get();
+    if (snap.empty) return {};
+    const d = snap.docs[0].data() as { name?: string; track?: string };
+    return { name: d.name, track: d.track };
+  } catch { return {}; }
+}
+
 async function saveHistory(code: string, history: Msg[]) {
   try {
     await coll("chatHistory").doc(code).set({
@@ -82,9 +92,14 @@ export async function POST(req: Request) {
     }
 
     const code = await getAuthedCode(req);
-    const history = code ? await loadHistory(code) : [];
+    const [history, userInfo] = code
+      ? await Promise.all([loadHistory(code), loadUserInfo(code)])
+      : [[], {} as { name?: string; track?: string }];
+    const idParts = code
+      ? [`code ${code}`, userInfo.name ? `name ${userInfo.name}` : null, userInfo.track ? `track ${userInfo.track}` : null].filter(Boolean).join(", ")
+      : "";
     const contextNote = code
-      ? `\n\nNOTE: This user is logged in (code ${code}) — they're a paid member. Be more direct with insider value. The prior messages are this user's chat history with you — pick up where you left off naturally.`
+      ? `\n\nNOTE: This user is logged in (${idParts}) — they're a paid member. Address them by first name when natural; don't force it. Be direct with insider value. Prior messages are this user's chat history with you — pick up where you left off.`
       : `\n\nNOTE: User is NOT logged in. No prior history available. If they ask about joining or coaching, point to the Founding Member button.`;
 
     const recent = history.slice(-CONTEXT_WINDOW).map(m => ({ role: m.role, content: m.content }));
