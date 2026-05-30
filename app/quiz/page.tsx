@@ -133,10 +133,12 @@ export default function Quiz() {
       const r = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: [...chat, { role: "user", content: ctx + "\n\n" + question }] }),
+        // /api/chat expects { message: string }. Inline the quiz context so the model
+        // sees it, plus the user's actual question. History is loaded server-side.
+        body: JSON.stringify({ message: `${ctx}\n\n${question}` }),
       });
       const data = await r.json();
-      const reply = data.message || data.response || data.content || data.text || (typeof data === "string" ? data : JSON.stringify(data));
+      const reply = data.reply || data.message || (data.error ? `(${data.error})` : "Couldn't reach Bo Tech right now. Try again.");
       setChat(c => [...c, { role: "assistant", content: reply }]);
     } catch {
       setChat(c => [...c, { role: "assistant", content: "Couldn't reach Bo Tech right now. Try again in a sec." }]);
