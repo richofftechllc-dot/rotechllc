@@ -41,7 +41,6 @@ export default async function Home() {
                 See the Community
               </Link>
             </div>
-            <a href="#about" className="inline-block mt-4 text-sm text-orange-400 hover:text-orange-300 font-bold tracking-wider uppercase">▶ Watch my story (2 min)</a>
           </div>
           <BoAvatarFlip />
         </div>
@@ -108,7 +107,25 @@ export default async function Home() {
       <section className="bg-zinc-950 py-24 border-t border-white/5">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-green-500 font-bold tracking-widest text-sm mb-4">WHAT CLIENTS SAY</div>
-          <h2 className="text-5xl md:text-6xl font-black mb-12">Client Testimonials</h2>
+          <h2 className="text-5xl md:text-6xl font-black mb-8">Client Testimonials</h2>
+
+          {/* FEATURED: D. Knight's journey — full-width before the quick testimonials */}
+          <div className="bg-zinc-900 border border-green-500/30 rounded-2xl p-6 mb-8">
+            <div className="text-green-500 font-bold tracking-widest text-xs mb-2">FEATURED · D. KNIGHT&apos;S JOURNEY</div>
+            <div className="font-bold text-xl mb-1">Just listen to the journey.</div>
+            <div className="text-gray-500 text-sm mb-4">From the ground up — how D. Knight broke into cleared tech and crossed $200K/yr.</div>
+            <div className="aspect-video rounded-lg overflow-hidden bg-black">
+              <iframe
+                src="https://www.youtube.com/embed/TsHQOxsOZn0?rel=0"
+                title="D. Knight — Just listen to the journey"
+                className="w-full h-full"
+                loading="lazy"
+                allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
+
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6">
               <div className="font-bold mb-1">D. Knight</div>
@@ -136,18 +153,6 @@ export default async function Home() {
           <p className="text-gray-400 text-lg max-w-3xl mb-8">
             I&apos;m Randy — a developer and AI engineer, founder of Rich Off Tech LLC. From zero to TS/SCI Full Scope Poly clearance in under 4 years, now at GDIT building the platforms cleared tech needs. I built this company to share what actually works — no fluff, no gatekeeping.
           </p>
-
-          {/* MY STORY — full-width video, set the tone before the rest of About */}
-          <div className="aspect-video rounded-2xl overflow-hidden border border-orange-500/30 mb-16 max-w-4xl">
-            <iframe
-              src="https://www.youtube.com/embed/TsHQOxsOZn0?rel=0"
-              title="Rich Off Tech — Just listen to the journey"
-              className="w-full h-full"
-              loading="lazy"
-              allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
 
           {/* TWO PHOTOS + MISSION */}
           <div className="grid md:grid-cols-2 gap-8 mb-16 items-start">
