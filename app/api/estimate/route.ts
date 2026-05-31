@@ -94,7 +94,25 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 2 + 3) Fan out to Zapier (email) and Discord — both env-gated, both best-effort
+  // 2) Notify Bo via Bo Tech DM (best-effort)
+  let botNotify: { ok: boolean; status?: number; err?: string } = { ok: true };
+  if (process.env.BOT_NOTIFY_URL) {
+    try {
+      const r = await fetch(process.env.BOT_NOTIFY_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(process.env.NOTIFY_SECRET ? { "x-notify-secret": process.env.NOTIFY_SECRET } : {}),
+        },
+        body: JSON.stringify({ id, ...doc }),
+      });
+      botNotify = { ok: r.ok, status: r.status };
+    } catch (e) {
+      botNotify = { ok: false, err: e instanceof Error ? e.message : String(e) };
+    }
+  }
+
+  // 3) Optional legacy fan-outs (only fire if explicitly configured)
   const [zap, disc] = await Promise.all([
     postWebhook(process.env.ZAPIER_WEBHOOK_URL, { id, ...doc }),
     postWebhook(process.env.DISCORD_WEBHOOK_URL, discordEmbed(p, id)),
@@ -104,6 +122,7 @@ export async function POST(req: NextRequest) {
     ok: true,
     id,
     fanout: {
+      bot: process.env.BOT_NOTIFY_URL ? botNotify : "not_configured",
       zapier: process.env.ZAPIER_WEBHOOK_URL ? zap : "not_configured",
       discord: process.env.DISCORD_WEBHOOK_URL ? disc : "not_configured",
     },
