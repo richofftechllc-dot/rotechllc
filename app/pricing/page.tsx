@@ -1,3 +1,5 @@
+import EstimateBuilderTrigger from "../components/EstimateBuilderTrigger";
+
 async function getMemberCount() {
   try {
     const base = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
@@ -87,6 +89,18 @@ export default async function Pricing() {
             <div className="text-gray-600 text-[11px] mt-3">Bot DMs you when you arrive — pick free or upgrade right there.</div>
           </div>
         </div>
+      </div>
+
+      {/* PROJECT BUILD — Build-an-estimate, separate funnel from the membership tiers */}
+      <div className="mt-16">
+        <div className="text-center mb-8">
+          <div className="text-orange-500 font-bold tracking-widest text-sm mb-3">PROJECT BUILD</div>
+          <h2 className="text-3xl md:text-4xl font-black">Need something built?</h2>
+          <p className="text-gray-400 mt-3 max-w-xl mx-auto">
+            Memberships above are for your career. If you&apos;re a business owner or operator and you want Bo to build/automate something for you, price it yourself here.
+          </p>
+        </div>
+        <EstimateBuilderTrigger />
       </div>
     </main>
   );
