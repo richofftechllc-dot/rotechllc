@@ -87,7 +87,10 @@ export async function POST(req: Request) {
 
     const body = await req.json().catch(() => ({}));
     const message: string = body?.message;
-    if (!message || typeof message !== "string" || message.length > 500) {
+    // 4000 char ceiling — the in-quiz tutor prefixes the user's question with the full quiz
+    // context (domain, question, all 4 options, current answer, running score). That alone
+    // runs 600-800 chars; 500 was rejecting every in-quiz question once a quiz was active.
+    if (!message || typeof message !== "string" || message.length > 4000) {
       return NextResponse.json({ error: "Invalid" }, { status: 400 });
     }
 
