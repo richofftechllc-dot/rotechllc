@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rendezvous Lounge — Washington DC</title>
+<meta name="description" content="DC's newest elevated night vibe. Lounge · Cocktails · Hookah · Vibes. 2020 9th St NW, Washington DC. Open nightly. DM to book your section.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;0,700;1,400&family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   DESIGN: After-dark luxe. Deep midnight + gold.
+   Neon ember accents. Glassy depth. Nightlife.
+   Opposite of J&J's warm daytime spice — this is night.
+   ═══════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --black:#050507;
+  --ink:#0A0A10;
+  --ink2:#10101A;
+  --surface:#14141F;
+  --gold:#C9A24B;
+  --gold-lt:#E5C674;
+  --champagne:#EBD9A8;
+  --magenta:#C42B6B;
+  --magenta-lt:#E04A87;
+  --cyan:#3BA9C4;
+  --text:#EDE8DC;
+  --muted:#8A8398;
+  --dim:#4A4556;
+  --border:rgba(201,162,75,.16);
+  --border-hi:rgba(201,162,75,.4);
+  --ff-display:'Syne',sans-serif;
+  --ff-serif:'Cormorant Garamond',serif;
+  --ff-body:'Outfit',sans-serif;
+  --nav-h:66px;
+  --max:1160px;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--text);font-family:var(--ff-body);font-size:16px;line-height:1.6;overflow-x:hidden;font-weight:300;}
+/* Grain + glow atmosphere */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");background-size:180px;pointer-events:none;z-index:1000;}
+img{display:block;max-width:100%;}
+a{color:inherit;text-decoration:none;}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 clamp(1.25rem,5vw,2.5rem);}
+.btn{display:inline-flex;align-items:center;gap:.5em;padding:.85em 1.9em;font-family:var(--ff-body);font-size:.78rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;border-radius:2px;cursor:pointer;transition:all .2s;border:none;text-decoration:none;}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-lt));color:#0A0A10;}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(201,162,75,.3);}
+.btn-ghost{background:transparent;color:var(--champagne);border:1px solid var(--border-hi);}
+.btn-ghost:hover{border-color:var(--gold);background:rgba(201,162,75,.06);}
+.btn-magenta{background:linear-gradient(135deg,var(--magenta),var(--magenta-lt));color:#fff;}
+.btn-magenta:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(196,43,107,.35);}
+.section-pad{padding:clamp(4.5rem,9vw,8rem) 0;}
+.eyebrow{font-size:.66rem;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;font-family:var(--ff-body);}
+.s-title{font-family:var(--ff-display);font-size:clamp(2rem,5vw,3.4rem);font-weight:800;line-height:1.04;letter-spacing:-.01em;}
+.s-title em{font-family:var(--ff-serif);font-style:italic;font-weight:300;color:var(--gold-lt);}
+
+/* ── NAV ── */
+#nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:rgba(5,5,7,.7);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--border);z-index:900;display:flex;align-items:center;transition:background .3s;}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;width:100%;}
+.nav-logo{font-family:var(--ff-serif);font-size:1.5rem;font-weight:700;font-style:italic;color:var(--champagne);letter-spacing:.02em;}
+.nav-links{display:flex;align-items:center;gap:2.25rem;list-style:none;}
+.nav-links a{font-size:.74rem;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);transition:color .2s;}
+.nav-links a:hover{color:var(--champagne);}
+.nav-cta{margin-left:1rem;}
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px;}
+.hamburger span{display:block;width:24px;height:1.5px;background:var(--champagne);transition:.2s;}
+@media(max-width:860px){.nav-links,.nav-cta{display:none;}.hamburger{display:flex;}.nav-links.open{display:flex;flex-direction:column;position:absolute;top:var(--nav-h);left:0;right:0;background:rgba(5,5,7,.98);border-bottom:1px solid var(--border);padding:1.75rem;gap:1.5rem;align-items:flex-start;}.nav-links.open a{font-size:1rem;color:var(--champagne);}}
+
+/* ── HERO ── */
+#hero{min-height:100svh;display:flex;align-items:center;position:relative;overflow:hidden;padding-top:var(--nav-h);}
+.hero-bg{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 70% 60% at 70% 30%,#1A0E2A 0%,#0A0810 50%,#050507 100%);}
+.hero-bg::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 45% 50% at 80% 40%,rgba(196,43,107,.18) 0%,transparent 60%),radial-gradient(ellipse 40% 45% at 15% 70%,rgba(59,169,196,.12) 0%,transparent 55%),radial-gradient(ellipse 35% 40% at 50% 90%,rgba(201,162,75,.1) 0%,transparent 60%);}
+/* HERO MEDIA SLOT — interior/crowd shot or the IG scroll gif */
+.hero-media{position:absolute;inset:0;z-index:0;opacity:.28;mix-blend-mode:lighten;}
+.hero-media img{width:100%;height:100%;object-fit:cover;}
+.hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(5,5,7,.4) 0%,rgba(5,5,7,.55) 60%,var(--black) 100%);}
+.hero-content{position:relative;z-index:2;max-width:760px;}
+.hero-tag{display:inline-flex;align-items:center;gap:.6rem;font-size:.66rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1.75rem;}
+.hero-tag::before{content:'';width:30px;height:1px;background:var(--gold);}
+.hero-h1{font-family:var(--ff-display);font-size:clamp(3.2rem,9vw,7rem);font-weight:800;line-height:.92;letter-spacing:-.025em;margin-bottom:.5rem;}
+.hero-h1 .script{display:block;font-family:var(--ff-serif);font-style:italic;font-weight:300;font-size:.42em;color:var(--gold-lt);letter-spacing:0;margin-bottom:-.1em;}
+.hero-sub{font-family:var(--ff-serif);font-size:clamp(1.2rem,3vw,1.8rem);font-style:italic;color:var(--champagne);margin:1.5rem 0 .5rem;font-weight:300;}
+.hero-meta-line{font-size:.85rem;color:var(--muted);letter-spacing:.08em;margin-bottom:2.5rem;}
+.hero-meta-line span{color:var(--gold);}
+.hero-ctas{display:flex;gap:.9rem;flex-wrap:wrap;}
+.hero-strip{position:absolute;bottom:0;left:0;right:0;z-index:2;border-top:1px solid var(--border);background:rgba(5,5,7,.5);backdrop-filter:blur(10px);}
+.hero-strip-inner{display:flex;justify-content:space-between;gap:2rem;padding:1.1rem 0;flex-wrap:wrap;}
+.strip-item{display:flex;flex-direction:column;gap:.15rem;}
+.strip-label{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);}
+.strip-val{font-size:.85rem;color:var(--champagne);font-weight:400;}
+
+/* ── WEEKLY LINEUP ── */
+#lineup{background:var(--ink);position:relative;}
+#lineup::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 50% 40% at 90% 10%,rgba(196,43,107,.06) 0%,transparent 60%);}
+.lineup-head{text-align:center;margin-bottom:3.5rem;position:relative;z-index:1;}
+.week-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);position:relative;z-index:1;}
+.night{background:var(--ink2);padding:1.75rem 1.4rem;position:relative;overflow:hidden;transition:background .3s;cursor:default;min-height:200px;display:flex;flex-direction:column;justify-content:space-between;}
+.night::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:.6;transition:opacity .3s;}
+.night:hover{background:var(--surface);}
+.night:hover::before{opacity:1;}
+.night.fri::before{background:var(--magenta);}
+.night.sat::before{background:var(--gold);}
+.night.sun::before{background:#9B7BC4;}
+.night.mon::before{background:var(--cyan);}
+.night.tue::before{background:#5BA88F;}
+.night.wed::before{background:var(--magenta-lt);}
+.night.thu::before{background:#D4625E;}
+.night-day{font-size:.62rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:.6rem;}
+.night-name{font-family:var(--ff-display);font-size:1.15rem;font-weight:700;line-height:1.1;color:var(--text);margin-bottom:.4rem;}
+.night-tagline{font-family:var(--ff-serif);font-style:italic;font-size:.92rem;color:var(--gold-lt);}
+.night-time{font-size:.7rem;color:var(--muted);letter-spacing:.06em;margin-top:auto;padding-top:1rem;}
+
+/* ── ABOUT / VIBE ── */
+#vibe{background:var(--black);}
+.vibe-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;}
+.vibe-features{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:2.5rem;}
+.vibe-feat{border-left:2px solid var(--border-hi);padding-left:1.1rem;}
+.vibe-feat-title{font-family:var(--ff-display);font-size:1rem;font-weight:700;color:var(--champagne);margin-bottom:.25rem;}
+.vibe-feat-desc{font-size:.82rem;color:var(--muted);line-height:1.6;}
+.vibe-body{font-family:var(--ff-serif);font-size:1.2rem;font-style:italic;color:var(--champagne);line-height:1.6;font-weight:300;}
+/* VIBE MEDIA SLOT — interior shot */
+.vibe-media{aspect-ratio:4/5;border-radius:3px;overflow:hidden;border:1px solid var(--border);background:var(--surface);position:relative;display:flex;align-items:center;justify-content:center;}
+.vibe-media img{width:100%;height:100%;object-fit:cover;}
+.media-ph{text-align:center;color:var(--dim);padding:2rem;}
+.media-ph .ic{font-size:2.2rem;margin-bottom:.6rem;}
+.media-ph code{font-size:.66rem;color:var(--gold);background:rgba(201,162,75,.1);padding:.15em .5em;border-radius:2px;}
+@media(max-width:860px){.vibe-grid{grid-template-columns:1fr;gap:3rem;}.vibe-media{order:-1;aspect-ratio:16/10;}}
+
+/* ── EVENTS / FLYERS ── */
+#events{background:var(--ink);}
+.events-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2.5rem;flex-wrap:wrap;gap:1rem;}
+.flyer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;}
+.flyer{aspect-ratio:4/5;border-radius:3px;overflow:hidden;border:1px solid var(--border);background:var(--surface);position:relative;cursor:pointer;display:flex;align-items:flex-end;}
+.flyer img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .4s;}
+.flyer:hover img{transform:scale(1.05);}
+.flyer-ph{position:relative;z-index:1;padding:1.25rem;width:100%;}
+.flyer-label{font-family:var(--ff-display);font-size:.95rem;font-weight:700;color:var(--champagne);}
+.flyer-sub{font-size:.72rem;color:var(--muted);margin-top:.2rem;}
+.flyer-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(0deg,rgba(5,5,7,.92) 0%,rgba(5,5,7,.1) 60%,transparent 100%);pointer-events:none;}
+
+/* ── BOOK SECTION ── */
+#book{background:var(--black);position:relative;overflow:hidden;}
+#book::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 50% 70% at 80% 50%,rgba(196,43,107,.1) 0%,transparent 60%);}
+.book-inner{position:relative;z-index:1;display:grid;grid-template-columns:1.1fr 1fr;gap:5rem;align-items:center;}
+.book-list{list-style:none;display:flex;flex-direction:column;gap:1.25rem;margin-top:2rem;}
+.book-item{display:flex;gap:1rem;align-items:flex-start;}
+.book-ic{font-size:1.3rem;flex-shrink:0;}
+.book-item-t{font-family:var(--ff-display);font-weight:700;font-size:.95rem;color:var(--champagne);margin-bottom:.15rem;}
+.book-item-d{font-size:.82rem;color:var(--muted);line-height:1.55;}
+.book-card{background:linear-gradient(160deg,var(--surface),var(--ink2));border:1px solid var(--border-hi);border-radius:4px;padding:2.5rem;text-align:center;}
+.book-card-t{font-family:var(--ff-serif);font-style:italic;font-size:1.7rem;color:var(--champagne);margin-bottom:.5rem;}
+.book-card-d{font-size:.85rem;color:var(--muted);margin-bottom:1.75rem;line-height:1.6;}
+.book-card .btn{width:100%;justify-content:center;margin-bottom:.75rem;}
+@media(max-width:860px){.book-inner{grid-template-columns:1fr;gap:3rem;}}
+
+/* ── J&J CROSS-FEATURE ── */
+#food{background:linear-gradient(135deg,#0D0A06 0%,#120D08 100%);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.food-inner{display:grid;grid-template-columns:1fr 1.1fr;gap:4rem;align-items:center;}
+.food-badge{display:inline-block;font-size:.62rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#C8921A;border:1px solid rgba(200,146,26,.3);padding:.3em .8em;border-radius:1px;margin-bottom:1.5rem;}
+.food-h2{font-family:var(--ff-display);font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800;line-height:1.08;margin-bottom:1rem;}
+.food-h2 em{font-family:var(--ff-serif);font-style:italic;font-weight:300;color:#DFA825;}
+.food-body{font-size:.95rem;color:var(--muted);line-height:1.7;max-width:46ch;margin-bottom:1.75rem;}
+/* FOOD MEDIA SLOT — J&J food photo */
+.food-media{aspect-ratio:4/3;border-radius:3px;overflow:hidden;border:1px solid rgba(200,146,26,.2);background:var(--surface);display:flex;align-items:center;justify-content:center;}
+.food-media img{width:100%;height:100%;object-fit:cover;}
+@media(max-width:860px){.food-inner{grid-template-columns:1fr;gap:2.5rem;}}
+
+/* ── LOCATION ── */
+#visit{background:var(--ink);}
+.visit-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;margin-top:3rem;align-items:start;}
+.map-box{aspect-ratio:4/3;border-radius:3px;overflow:hidden;border:1px solid var(--border);}
+.map-box iframe{width:100%;height:100%;border:none;filter:grayscale(.5) invert(.92) hue-rotate(180deg) contrast(.9);}
+.visit-card{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:1.75rem;}
+.visit-addr{font-family:var(--ff-serif);font-style:italic;font-size:1.3rem;color:var(--champagne);margin-bottom:.3rem;}
+.visit-hood{font-size:.82rem;color:var(--muted);margin-bottom:1.5rem;}
+.hr-list{border-top:1px solid var(--border);padding-top:1.25rem;display:flex;flex-direction:column;gap:.45rem;}
+.hr-row{display:flex;justify-content:space-between;font-size:.82rem;}
+.hr-day{color:var(--muted);}
+.hr-time{color:var(--champagne);}
+.visit-chips{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.5rem;}
+.chip{font-size:.74rem;color:var(--muted);border:1px solid var(--border);padding:.35rem .8rem;border-radius:2px;transition:.2s;}
+.chip:hover{color:var(--gold);border-color:var(--border-hi);}
+@media(max-width:860px){.visit-grid{grid-template-columns:1fr;}}
+
+/* ── FOOTER ── */
+footer{background:var(--black);border-top:1px solid var(--border);padding:3.5rem 0 2rem;}
+.ft-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem;margin-bottom:2.5rem;}
+.ft-logo{font-family:var(--ff-serif);font-size:1.7rem;font-style:italic;font-weight:700;color:var(--champagne);display:block;margin-bottom:.6rem;}
+.ft-tag{font-size:.85rem;color:var(--muted);line-height:1.7;max-width:32ch;margin-bottom:1rem;}
+.ft-social{display:flex;gap:.6rem;}
+.ft-social a{width:36px;height:36px;border:1px solid var(--border);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:.2s;}
+.ft-social a:hover{border-color:var(--gold);background:rgba(201,162,75,.06);}
+.ft-head{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-bottom:1rem;}
+.ft-links{list-style:none;display:flex;flex-direction:column;gap:.55rem;}
+.ft-links a{font-size:.84rem;color:var(--muted);transition:.2s;}
+.ft-links a:hover{color:var(--champagne);}
+.ft-bottom{border-top:1px solid var(--border);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.75rem;}
+.ft-copy{font-size:.7rem;color:var(--dim);}
+@media(max-width:700px){.ft-grid{grid-template-columns:1fr;gap:2rem;}}
+
+/* ── REVEAL ── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s;}
+.reveal.in{opacity:1;transform:translateY(0);}
+.d1{transition-delay:.1s;}.d2{transition-delay:.22s;}.d3{transition-delay:.34s;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="wrap nav-inner">
+    <a href="#hero" class="nav-logo">Rendezvous</a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#lineup">The Week</a></li>
+      <li><a href="#vibe">The Vibe</a></li>
+      <li><a href="#events">Events</a></li>
+      <li><a href="#food">Food</a></li>
+      <li><a href="#visit">Visit</a></li>
+      <li><a href="https://www.instagram.com/rendezvous_lounge_/" target="_blank" rel="noopener" class="btn btn-ghost nav-cta" style="padding:.5em 1.1em;font-size:.7rem;">Book a Section</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <!-- HERO MEDIA — animated IG flyer scroll -->
+  <div class="hero-media" id="heroMedia">
+    <img src="https://rendezvous-lounge.vercel.app/assets/media/rendezvous-ig-scroll.gif" alt="Rendezvous Lounge event flyers">
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="wrap hero-content">
+    <div class="hero-tag">Washington DC · 2020 9th St NW</div>
+    <h1 class="hero-h1">
+      <span class="script">Welcome to</span>
+      Rendezvous
+    </h1>
+    <p class="hero-sub">DC's newest elevated night vibe.</p>
+    <p class="hero-meta-line">Lounge <span>·</span> Cocktails <span>·</span> Hookah <span>·</span> Vibes</p>
+    <div class="hero-ctas">
+      <a href="https://www.instagram.com/rendezvous_lounge_/" target="_blank" rel="noopener" class="btn btn-gold">Book Your Section</a>
+      <a href="#lineup" class="btn btn-ghost">See the Week</a>
+    </div>
+  </div>
+  <div class="hero-strip">
+    <div class="wrap hero-strip-inner">
+      <div class="strip-item"><span class="strip-label">Location</span><span class="strip-val">2020 9th St NW — Upstairs</span></div>
+      <div class="strip-item"><span class="strip-label">Open</span><span class="strip-val">Nightly · Late</span></div>
+      <div class="strip-item"><span class="strip-label">Vibe</span><span class="strip-val">Lounge · Hookah · Cocktails</span></div>
+      <div class="strip-item"><span class="strip-label">Book</span><span class="strip-val">DM @rendezvous_lounge_</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- WEEKLY LINEUP -->
+<section id="lineup" class="section-pad">
+  <div class="wrap">
+    <div class="lineup-head reveal">
+      <p class="eyebrow">Every Night Hits Different</p>
+      <h2 class="s-title">The <em>Weekly</em> Lineup</h2>
+    </div>
+    <div class="week-grid">
+      <div class="night fri reveal">
+        <div><div class="night-day">Friday</div><div class="night-name">Private Behavior</div><div class="night-tagline">The main event</div></div>
+        <div class="night-time">9PM – 4AM</div>
+      </div>
+      <div class="night sat reveal d1">
+        <div><div class="night-day">Saturday</div><div class="night-name">High Frequency</div><div class="night-tagline">Turn it all the way up</div></div>
+        <div class="night-time">9PM – 4AM</div>
+      </div>
+      <div class="night sun reveal d2">
+        <div><div class="night-day">Sunday</div><div class="night-name">Holly Sins</div><div class="night-tagline">Sunday, reimagined</div></div>
+        <div class="night-time">6PM – 2AM</div>
+      </div>
+      <div class="night mon reveal">
+        <div><div class="night-day">Monday</div><div class="night-name">Moody Monday</div><div class="night-tagline">Slow down the week</div></div>
+        <div class="night-time">8PM – 2AM</div>
+      </div>
+      <div class="night tue reveal d1">
+        <div><div class="night-day">Tuesday</div><div class="night-name">Spill Session</div><div class="night-tagline">Open mic energy</div></div>
+        <div class="night-time">8PM – 2AM</div>
+      </div>
+      <div class="night wed reveal d2">
+        <div><div class="night-day">Wednesday</div><div class="night-name">Wicked Wednesday</div><div class="night-tagline">Midweek mischief</div></div>
+        <div class="night-time">8PM – 2AM</div>
+      </div>
+      <div class="night thu reveal d3">
+        <div><div class="night-day">Thursday</div><div class="night-name">Lipstick & Liquor</div><div class="night-tagline">Dressed to impress</div></div>
+        <div class="night-time">8PM – 3AM</div>
+      </div>
+    </div>
+    <p style="text-align:center;font-size:.76rem;color:var(--dim);margin-top:1.5rem;font-style:italic;font-family:var(--ff-serif);">Lineup and times vary — follow @rendezvous_lounge_ for nightly updates.</p>
+  </div>
+</section>
+
+<!-- VIBE -->
+<section id="vibe" class="section-pad">
+  <div class="wrap vibe-grid">
+    <div class="reveal">
+      <p class="eyebrow">The Vibe</p>
+      <h2 class="s-title">Life begins<br><em>at night.</em></h2>
+      <p class="vibe-body" style="margin-top:1.5rem;">An elevated lounge in the heart of Shaw — where the cocktails are crafted, the hookah flows, and the night doesn't end early.</p>
+      <div class="vibe-features">
+        <div class="vibe-feat"><div class="vibe-feat-title">Craft Cocktails</div><div class="vibe-feat-desc">A full bar with signature pours and classics done right.</div></div>
+        <div class="vibe-feat"><div class="vibe-feat-title">Premium Hookah</div><div class="vibe-feat-desc">Curated flavors, set up tableside in your section.</div></div>
+        <div class="vibe-feat"><div class="vibe-feat-title">Bookable Sections</div><div class="vibe-feat-desc">Reserve your space for the night. DM to lock it in.</div></div>
+        <div class="vibe-feat"><div class="vibe-feat-title">Open Late</div><div class="vibe-feat-desc">Nightly until 2AM, weekends until 4AM.</div></div>
+      </div>
+    </div>
+    <!-- VIBE MEDIA SLOT — Rendezvous storefront illustration -->
+    <div class="vibe-media reveal d1" id="vibeMedia">
+      <img src="https://rendezvous-lounge.vercel.app/assets/media/rendezvous-storefront.png" alt="Rendezvous Lounge storefront illustration" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:3px;">
+    </div>
+  </div>
+</section>
+
+<!-- EVENTS / FLYERS -->
+<section id="events" class="section-pad">
+  <div class="wrap">
+    <div class="events-head reveal">
+      <div><p class="eyebrow">What's Coming Up</p><h2 class="s-title">Upcoming <em>Events</em></h2></div>
+      <a href="https://www.instagram.com/rendezvous_lounge_/" target="_blank" rel="noopener" class="btn btn-ghost">All Events on IG ↗</a>
+    </div>
+    <!-- FLYER SHOWCASE — animated IG flyer scroll (clean individual tiles TBD from IG saves) -->
+    <div class="reveal" style="border-radius:3px;overflow:hidden;border:1px solid var(--border);position:relative;">
+      <img src="https://rendezvous-lounge.vercel.app/assets/media/rendezvous-ig-scroll.gif" alt="Rendezvous Lounge weekly event flyers" style="width:100%;display:block;">
+      <a href="https://www.instagram.com/rendezvous_lounge_/" target="_blank" rel="noopener" style="position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:2rem;background:linear-gradient(0deg,rgba(5,5,7,.85) 0%,transparent 45%);text-decoration:none;">
+        <span class="btn btn-gold">See All Events on Instagram ↗</span>
+      </a>
+    </div>
+    <p style="text-align:center;font-size:.76rem;color:var(--dim);margin-top:1.5rem;font-style:italic;font-family:var(--ff-serif);">Special events: Halloween, Howard Homecoming, live music & more — check the feed.</p>
+  </div>
+</section>
+
+<!-- BOOK A SECTION -->
+<section id="book" class="section-pad">
+  <div class="wrap book-inner">
+    <div class="reveal">
+      <p class="eyebrow">Reserve the Night</p>
+      <h2 class="s-title">Book your <em>section</em></h2>
+      <ul class="book-list">
+        <li class="book-item"><span class="book-ic">🥂</span><div><div class="book-item-t">Bottle Service & Sections</div><div class="book-item-d">Reserve a table or section for your crew. Bottle packages available.</div></div></li>
+        <li class="book-item"><span class="book-ic">🎉</span><div><div class="book-item-t">Private Events & Buyouts</div><div class="book-item-d">Birthdays, celebrations, full venue buyouts. We'll set the night up for you.</div></div></li>
+        <li class="book-item"><span class="book-ic">💨</span><div><div class="book-item-t">Hookah Packages</div><div class="book-item-d">Premium hookah brought to your section, your flavor, all night.</div></div></li>
+      </ul>
+    </div>
+    <div class="book-card reveal d1">
+      <p class="book-card-t">Lock in your night</p>
+      <p class="book-card-d">Sections book fast on weekends. DM us on Instagram to reserve — we'll confirm your spot.</p>
+      <a href="https://www.instagram.com/rendezvous_lounge_/" target="_blank" rel="noopener" class="btn btn-magenta">DM @rendezvous_lounge_</a>
+      <a href="#visit" class="btn btn-ghost">Get Directions</a>
+    </div>
+  </div>
+</section>
+
+<!-- J&J CROSS-FEATURE -->
+<section id="food" class="section-pad">
+  <div class="wrap food-inner">
+    <div class="reveal">
+      <span class="food-badge">↓ Downstairs</span>
+      <h2 class="food-h2">Hungry? <em>Jollof & Jerk</em><br>is right downstairs.</h2>
+      <p class="food-body">Before the night gets going — or right in the middle of it — grab a plate from Jollof & Jerk on the ground floor. West African jollof, Caribbean jerk, oxtail, curry. Order downstairs, bring it up to your section.</p>
+      <a href="https://jollof-and-jerk-chi.vercel.app" target="_blank" rel="noopener" class="btn btn-gold">See the Food Menu ↓</a>
+    </div>
+    <!-- FOOD MEDIA SLOT — J&J menu screenshot -->
+    <div class="food-media reveal d1" id="foodMedia">
+      <img src="https://rendezvous-lounge.vercel.app/assets/media/jnj-menu.png" alt="Jollof &amp; Jerk menu — signature dishes and sides">
+    </div>
+  </div>
+</section>
+
+<!-- VISIT -->
+<section id="visit" class="section-pad">
+  <div class="wrap">
+    <p class="eyebrow reveal">Find Us</p>
+    <h2 class="s-title reveal">Upstairs at <em>2020 9th</em></h2>
+    <div class="visit-grid">
+      <div class="map-box reveal">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3104.887!2d-77.0224!3d38.9171!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b7b7c9c5d5d5d5%3A0x0!2s2020+9th+St+NW%2C+Washington%2C+DC+20001!5e0!3m2!1sen!2sus!4v1" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Rendezvous Lounge location"></iframe>
+      </div>
+      <div class="visit-card reveal d1">
+        <p class="visit-addr">Rendezvous Lounge</p>
+        <p class="visit-hood">2020 9th St NW — Second Floor · Shaw / U Street, Washington DC 20001</p>
+        <div class="hr-list">
+          <div class="hr-row"><span class="hr-day">Mon – Thu</span><span class="hr-time">Open Late</span></div>
+          <div class="hr-row"><span class="hr-day">Fri – Sat</span><span class="hr-time">Until 4AM</span></div>
+          <div class="hr-row"><span class="hr-day">Sunday</span><span class="hr-time">Open Late</span></div>
+        </div>
+        <div class="visit-chips">
+          <a href="https://www.google.com/maps/dir/?api=1&destination=2020+9th+St+NW+Washington+DC" target="_blank" rel="noopener" class="chip">Directions ↗</a>
+          <a href="https://www.instagram.com/rendezvous_lounge_/" target="_blank" rel="noopener" class="chip">@rendezvous_lounge_</a>
+          <a href="https://jollof-and-jerk-chi.vercel.app" target="_blank" rel="noopener" class="chip">Food ↓</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="ft-grid">
+      <div>
+        <span class="ft-logo">Rendezvous</span>
+        <p class="ft-tag">DC's newest elevated night vibe. Lounge · Cocktails · Hookah · Vibes. 2020 9th St NW — upstairs.</p>
+        <div class="ft-social">
+          <a href="https://www.instagram.com/rendezvous_lounge_/" target="_blank" rel="noopener" aria-label="Instagram">📷</a>
+          <a href="https://jollof-and-jerk-chi.vercel.app" target="_blank" rel="noopener" aria-label="Food">🍛</a>
+        </div>
+      </div>
+      <div>
+        <p class="ft-head">The Lounge</p>
+        <ul class="ft-links">
+          <li><a href="#lineup">Weekly Lineup</a></li>
+          <li><a href="#vibe">The Vibe</a></li>
+          <li><a href="#events">Events</a></li>
+          <li><a href="#book">Book a Section</a></li>
+          <li><a href="#visit">Visit</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="ft-head">Connect</p>
+        <ul class="ft-links">
+          <li><a href="https://www.instagram.com/rendezvous_lounge_/" target="_blank" rel="noopener">@rendezvous_lounge_</a></li>
+          <li><a href="https://jollof-and-jerk-chi.vercel.app" target="_blank" rel="noopener">Jollof & Jerk (Food)</a></li>
+          <li><a href="https://www.google.com/maps/dir/?api=1&destination=2020+9th+St+NW+Washington+DC" target="_blank" rel="noopener">Get Directions</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="ft-bottom">
+      <p class="ft-copy">© 2025 Rendezvous Lounge · 2020 9th St NW, Washington DC</p>
+      <p class="ft-copy">Built by Rich Off Tech</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+// NAV
+window.addEventListener('scroll',()=>{document.getElementById('nav').style.background=window.scrollY>40?'rgba(5,5,7,.92)':'rgba(5,5,7,.7)';},{passive:true});
+const ham=document.getElementById('hamburger'),nl=document.getElementById('navLinks');
+ham.addEventListener('click',()=>nl.classList.toggle('open'));
+nl.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>nl.classList.remove('open')));
+// REVEAL
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');});},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

@@ -5,12 +5,12 @@ const nextConfig: NextConfig = {
     return [
       { source: "/learn", destination: "/quiz", permanent: true },
       { source: "/learn/:path*", destination: "/quiz", permanent: true },
+      { source: "/rendezvous-lounge", destination: "/demo/rendezvous-lounge", permanent: false },
     ];
   },
   async rewrites() {
     return [
-      { source: "/rendezvous-lounge", destination: "https://rendezvous-lounge.vercel.app" },
-      { source: "/rendezvous-lounge/:path*", destination: "https://rendezvous-lounge.vercel.app/:path*" },
+      { source: "/demo/rendezvous-lounge", destination: "/demo/rendezvous-lounge.html" },
     ];
   },
 };
