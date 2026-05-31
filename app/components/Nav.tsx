@@ -95,7 +95,7 @@ export default function Nav() {
             ✕
           </button>
         </div>
-        <div className="max-w-md mx-auto px-6 py-8 flex flex-col gap-1" onClick={(e) => e.stopPropagation()}>
+        <div className="px-6 py-6 flex flex-col" onClick={(e) => e.stopPropagation()}>
           {LINKS.map(l => l.external ? (
             <a
               key={l.href}
@@ -103,34 +103,34 @@ export default function Nav() {
               target="_blank"
               rel="noopener"
               onClick={() => setOpen(false)}
-              className="text-2xl font-bold text-white py-3 border-b border-white/5 flex items-center justify-between"
+              className="text-4xl font-black text-white py-5 border-b border-white/10 flex items-center justify-between active:text-orange-400"
             >
               {l.label}
-              <span className="text-orange-500 text-sm">↗</span>
+              <span className="text-orange-500 text-2xl">↗</span>
             </a>
           ) : (
             <Link
               key={l.href}
               href={l.href}
               onClick={() => setOpen(false)}
-              className="text-2xl font-bold text-white py-3 border-b border-white/5"
+              className="text-4xl font-black text-white py-5 border-b border-white/10 active:text-orange-400"
             >
               {l.label}
             </Link>
           ))}
 
-          <div className="mt-8">
+          <div className="mt-8 mb-12">
             {me === null ? (
-              <div className="text-gray-500 text-sm">Loading…</div>
+              <div className="text-gray-500 text-base">Loading…</div>
             ) : me.ok ? (
-              <div className="flex items-center justify-between gap-3 bg-zinc-900 border border-white/10 rounded-xl p-4">
+              <div className="flex items-center justify-between gap-3 bg-zinc-900 border border-white/10 rounded-xl p-5">
                 <div>
-                  <div className="text-orange-500 font-bold">{me.name}</div>
-                  <div className="text-gray-500 text-xs">{me.code}</div>
+                  <div className="text-orange-500 font-bold text-lg">{me.name}</div>
+                  <div className="text-gray-500 text-sm">{me.code}</div>
                 </div>
                 <button
                   onClick={() => { logout(); setOpen(false); }}
-                  className="px-4 py-2 text-sm text-gray-400 hover:text-white border border-white/10 rounded-lg"
+                  className="px-5 py-3 text-base text-white border border-white/15 rounded-lg active:bg-white/10"
                 >
                   Sign Out
                 </button>
@@ -139,7 +139,7 @@ export default function Nav() {
               <Link
                 href="/login"
                 onClick={() => setOpen(false)}
-                className="block w-full text-center py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-xl text-lg"
+                className="block w-full text-center py-5 bg-gradient-to-r from-orange-500 to-red-500 text-white font-black rounded-xl text-2xl shadow-lg shadow-orange-500/30 active:scale-95 transition"
               >
                 Sign In
               </Link>
