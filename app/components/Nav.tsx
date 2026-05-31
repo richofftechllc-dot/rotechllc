@@ -76,9 +76,25 @@ export default function Nav() {
 
       {/* MOBILE DRAWER */}
       <div
-        className={`md:hidden fixed inset-x-0 top-[68px] bottom-0 bg-zinc-950 bg-gradient-to-b from-zinc-950 via-zinc-950 to-black border-t border-orange-500/20 transition-transform duration-200 shadow-2xl ${open ? "translate-x-0" : "translate-x-full"}`}
+        className={`md:hidden fixed inset-0 z-50 border-t border-orange-500/20 transition-transform duration-200 shadow-2xl overflow-y-auto ${open ? "translate-x-0" : "translate-x-full pointer-events-none"}`}
+        style={{ backgroundColor: "#09090b" }}
         onClick={() => setOpen(false)}
+        aria-hidden={!open}
       >
+        {/* Drawer top bar — close affordance + logo */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5" onClick={(e) => e.stopPropagation()}>
+          <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
+            <Image src="/bo-avatar.png" alt="ROT" width={36} height={36} className="rounded-full" />
+            <span className="font-bold tracking-tight text-orange-500">ROT</span>
+          </Link>
+          <button
+            aria-label="Close menu"
+            onClick={() => setOpen(false)}
+            className="w-10 h-10 flex items-center justify-center text-white text-2xl"
+          >
+            ✕
+          </button>
+        </div>
         <div className="max-w-md mx-auto px-6 py-8 flex flex-col gap-1" onClick={(e) => e.stopPropagation()}>
           {LINKS.map(l => l.external ? (
             <a
