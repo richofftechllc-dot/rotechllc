@@ -49,29 +49,20 @@ export default function Calls() {
           {NEXT_SUNDAY.description}
         </p>
 
-        <div className="flex flex-wrap gap-3 justify-center">
-          {NEXT_SUNDAY.google_meet_url && (
-            <a
-              href={NEXT_SUNDAY.google_meet_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-7 py-3.5 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90"
-            >
-              Join Google Meet ↗
-            </a>
-          )}
+        <div className="flex flex-col items-center gap-3">
           <a
-            href="https://discord.gg/3gFdWYtPB"
+            href="https://square.link/u/7P6knSUK"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-7 py-3.5 border border-white/20 text-white font-bold rounded-lg hover:bg-white/5"
+            className="px-7 py-3.5 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90 text-base"
           >
-            Discuss in Discord
+            Join Discord — $96 / 12 months
           </a>
+          <div className="text-orange-400 font-bold tracking-wider text-xs uppercase">First 1,000 only · Founding rate</div>
         </div>
 
         <div className="text-center text-gray-500 text-xs mt-8">
-          Hosted on Google Meet{NEXT_SUNDAY.live_youtube_url ? " · Simulcast on YouTube Live" : ""} · Recordings posted in Discord
+          Sessions run in Discord voice + screen-share. Recordings posted in the same server.
         </div>
       </div>
 

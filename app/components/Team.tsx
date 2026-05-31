@@ -1,5 +1,6 @@
 import Image from "next/image";
 import CoordinatorCard from "./CoordinatorCard";
+import ConsultButton from "./ConsultButton";
 
 const DISCORD_INVITE = "https://discord.gg/7bjyPvTx4w";
 
@@ -30,14 +31,16 @@ export default function Team() {
             <div className="flex flex-wrap gap-2 mb-5">
               <span className="text-xs px-2 py-1 bg-yellow-500/10 text-yellow-500 rounded">Cert</span>
             </div>
-            <a
-              href={DISCORD_INVITE}
-              target="_blank"
-              rel="noopener noreferrer"
+            <ConsultButton
+              name="Ty"
+              title="Certification Coordinator"
+              handles={["Cert"]}
+              accent="yellow"
+              discordInvite={DISCORD_INVITE}
               className="mt-auto inline-block w-full text-center px-4 py-2.5 border border-yellow-500/30 text-yellow-500 font-bold rounded-lg text-sm hover:bg-yellow-500/10"
             >
               Book a Consult →
-            </a>
+            </ConsultButton>
           </div>
 
           {/* D. KNIGHT — Career & Clearance */}
@@ -54,14 +57,16 @@ export default function Team() {
               <span className="text-xs px-2 py-1 bg-yellow-500/10 text-yellow-500 rounded">Cert</span>
               <span className="text-xs px-2 py-1 bg-green-500/10 text-green-500 rounded">Clearance</span>
             </div>
-            <a
-              href={DISCORD_INVITE}
-              target="_blank"
-              rel="noopener noreferrer"
+            <ConsultButton
+              name="D. Knight"
+              title="Career & Clearance Coordinator"
+              handles={["Cert", "Clearance"]}
+              accent="green"
+              discordInvite={DISCORD_INVITE}
               className="mt-auto inline-block w-full text-center px-4 py-2.5 border border-green-500/30 text-green-500 font-bold rounded-lg text-sm hover:bg-green-500/10"
             >
               Book a Consult →
-            </a>
+            </ConsultButton>
           </div>
 
           {/* BO — Founder */}
@@ -81,14 +86,16 @@ export default function Team() {
               <span className="text-xs px-2 py-1 bg-green-500/10 text-green-500 rounded">Clearance</span>
               <span className="text-xs px-2 py-1 bg-blue-500/10 text-blue-500 rounded">Project Intake</span>
             </div>
-            <a
-              href={DISCORD_INVITE}
-              target="_blank"
-              rel="noopener noreferrer"
+            <ConsultButton
+              name="Bo"
+              title="Founder · Developer & AI Engineer"
+              handles={["Cert", "Clearance", "Project Intake"]}
+              accent="orange"
+              discordInvite={DISCORD_INVITE}
               className="mt-auto inline-block w-full text-center px-4 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg text-sm hover:opacity-90"
             >
               Book a Consult →
-            </a>
+            </ConsultButton>
           </div>
 
         </div>

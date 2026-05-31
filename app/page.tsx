@@ -193,7 +193,7 @@ export default async function Home() {
               <div>
                 <div className="text-orange-500 font-bold tracking-widest text-xs mb-3">WHAT ROT IS</div>
                 <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-4">
-                  Udemy, LinkedIn, and Zapier in one place. Quiz-driven cert tracks. A public roster recruiters scan. An AI agent — <b className="text-orange-400">Bo Tech</b> — that lives in our Discord and tutors you through every lesson, drafts your resume in ATS-safe format, and answers questions at 3 AM. He moves with you: instructor during quizzes, tutor during lessons, on call in DM.
+                  Udemy, LinkedIn, and ClearanceJobs in one place. Quiz-driven cert tracks. A public roster recruiters scan. An AI agent — <b className="text-orange-400">Bo Tech</b> — that lives in our Discord and acts as your live AI instructor during self-guided sessions: walks you through every lesson, drafts your resume in ATS-safe format, and answers questions at 3 AM. He moves with you: instructor during quizzes, tutor during lessons, on call in DM.
                 </p>
                 <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-5">
                   End state: a community of developers, admins, consultants, and AI integrators ready to help small businesses, enterprises, and government agencies actually adopt AI — instead of pretending to.
