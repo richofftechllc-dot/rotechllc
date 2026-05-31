@@ -56,9 +56,12 @@ export default function Calls() {
             rel="noopener noreferrer"
             className="px-7 py-3.5 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90 text-base"
           >
-            Join Discord — $96 / 12 months
+            Join Discord — $96 for the year
           </a>
-          <div className="text-orange-400 font-bold tracking-wider text-xs uppercase">First 1,000 only · Founding rate</div>
+          <div className="text-orange-400 font-bold tracking-wider text-xs uppercase text-center leading-relaxed">
+            One-time payment · 12 months access · First 100 only<br />
+            <span className="text-gray-500 normal-case font-normal">No monthly billing. Founding rate.</span>
+          </div>
         </div>
 
         <div className="text-center text-gray-500 text-xs mt-8">
