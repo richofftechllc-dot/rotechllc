@@ -148,7 +148,7 @@ export default async function Home() {
       {/* ABOUT — Bo's story (after they care). K26 montage collapsed by default. */}
       <section id="about" className="bg-zinc-950 py-24 border-t border-white/5 scroll-mt-20">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="text-orange-500 font-bold tracking-widest text-sm mb-4">ABOUT · FOUNDED APRIL 10, 2026</div>
+          <div className="text-orange-500 font-bold tracking-widest text-sm mb-4">ABOUT · RICH OFF TECH LLC · EST. JANUARY 2025</div>
           <h2 className="text-5xl md:text-6xl font-black mb-12">Guided by Experience.<br />Powered by Purpose.</h2>
           <p className="text-gray-400 text-lg max-w-3xl mb-8">
             I&apos;m Randy — a developer and AI engineer, founder of Rich Off Tech LLC. From zero to TS/SCI Full Scope Poly clearance in under 4 years, now at GDIT building the platforms cleared tech needs. I built this company to share what actually works — no fluff, no gatekeeping.
