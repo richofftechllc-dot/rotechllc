@@ -44,10 +44,10 @@ export default async function Home() {
           </div>
           <BoAvatarFlip />
         </div>
-        <div className="grid grid-cols-3 gap-8 mt-24 text-center">
-          <div><div className="text-5xl font-black text-orange-500">{memberCount}</div><div className="text-gray-500 text-sm mt-2">Active members</div></div>
-          <div><div className="text-5xl font-black text-orange-500">14</div><div className="text-gray-500 text-sm mt-2">States represented</div></div>
-          <div><div className="text-5xl font-black text-orange-500">4</div><div className="text-gray-500 text-sm mt-2">Years zero to seven figures</div></div>
+        <div className="grid grid-cols-3 gap-4 sm:gap-8 mt-16 sm:mt-24 text-center">
+          <div><div className="text-3xl sm:text-5xl font-black text-orange-500">{memberCount}</div><div className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2">Active members</div></div>
+          <div><div className="text-3xl sm:text-5xl font-black text-orange-500">14</div><div className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2">States represented</div></div>
+          <div><div className="text-3xl sm:text-5xl font-black text-orange-500">4</div><div className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2">Years zero to seven</div></div>
         </div>
       </main>
 
@@ -174,7 +174,7 @@ export default async function Home() {
                 <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-5">
                   Long term I&apos;m taking this curriculum into high schools and juvenile detention centers — specifically targeting recidivism in young Black men. Same skills that took me from zero to TS/SCI Full Scope Poly in under four years. The system says they can&apos;t be reached. I think it just hasn&apos;t tried.
                 </p>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-2 max-w-sm sm:max-w-none mx-auto sm:mx-0">
                   {["q7d0YmDx328", "SgsQpw0cbEM", "GcXTN3uVxOc"].map((id) => (
                     <div key={id} className="aspect-[9/16] rounded-lg overflow-hidden border border-white/10 bg-black">
                       <iframe

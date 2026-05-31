@@ -120,15 +120,15 @@ export default function Roster() {
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-8 mb-10 text-center">
-        <div><div className="text-5xl font-black text-green-500">{members.length}</div><div className="text-gray-500 text-xs uppercase tracking-wider mt-1">Members</div></div>
-        <div><div className="text-5xl font-black text-green-500">{cleared}</div><div className="text-gray-500 text-xs uppercase tracking-wider mt-1">Cleared</div></div>
-        <div><div className="text-5xl font-black text-yellow-500">{totalCerts}</div><div className="text-gray-500 text-xs uppercase tracking-wider mt-1">Certs Held</div></div>
+      <div className="grid grid-cols-3 gap-4 sm:gap-8 mb-10 text-center">
+        <div><div className="text-3xl sm:text-5xl font-black text-green-500">{members.length}</div><div className="text-gray-500 text-[10px] sm:text-xs uppercase tracking-wider mt-1">Members</div></div>
+        <div><div className="text-3xl sm:text-5xl font-black text-green-500">{cleared}</div><div className="text-gray-500 text-[10px] sm:text-xs uppercase tracking-wider mt-1">Cleared</div></div>
+        <div><div className="text-3xl sm:text-5xl font-black text-yellow-500">{totalCerts}</div><div className="text-gray-500 text-[10px] sm:text-xs uppercase tracking-wider mt-1">Certs Held</div></div>
       </div>
 
       <div className="flex gap-3 mb-6 flex-wrap">
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search name, role, cert, location..." className="flex-1 min-w-[260px] bg-zinc-900 border border-white/10 rounded-full px-6 py-3 outline-none focus:border-green-500" />
-        <button onClick={exportCSV} className="px-5 py-3 border border-yellow-500 text-yellow-500 rounded-full font-bold hover:bg-yellow-500/10">⇩ Export CSV</button>
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search name, role, cert, location..." className="flex-1 min-w-0 sm:min-w-[260px] bg-zinc-900 border border-white/10 rounded-full px-5 sm:px-6 py-3 outline-none focus:border-green-500" />
+        <button onClick={exportCSV} className="px-4 sm:px-5 py-3 border border-yellow-500 text-yellow-500 rounded-full font-bold hover:bg-yellow-500/10 text-sm sm:text-base whitespace-nowrap">⇩ CSV</button>
       </div>
 
       <div className="flex flex-wrap gap-3 mb-10">

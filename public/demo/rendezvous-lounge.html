@@ -204,6 +204,22 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:3.5rem
 .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s;}
 .reveal.in{opacity:1;transform:translateY(0);}
 .d1{transition-delay:.1s;}.d2{transition-delay:.22s;}.d3{transition-delay:.34s;}
+
+/* ── MOBILE COMPRESSION — reduce scroll length on phones ── */
+@media(max-width:600px){
+  .section-pad{padding:2.5rem 0;}
+  #hero{min-height:80svh;}
+  .hero-h1{font-size:2.6rem;}
+  .hero-sub{font-size:1.05rem;margin:1rem 0 .25rem;}
+  .hero-meta-line{margin-bottom:1.5rem;font-size:.78rem;}
+  .hero-strip-inner{gap:.75rem;padding:.7rem 0;}
+  .hero-ctas{gap:.6rem;}
+  .week-grid{grid-template-columns:1fr;}
+  .night{padding:1.1rem 1.2rem;min-height:auto;}
+  .vibe-grid{grid-template-columns:1fr;gap:2rem;}
+  .vibe-features{grid-template-columns:1fr 1fr;gap:.9rem;margin-top:1.5rem;}
+  html{scroll-behavior:smooth;}
+}
 </style>
 </head>
 <body>

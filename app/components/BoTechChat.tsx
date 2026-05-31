@@ -83,7 +83,7 @@ export default function BoTechChat() {
         </button>
       )}
       {open && (
-        <div className="fixed bottom-6 right-6 w-[380px] max-w-[calc(100vw-3rem)] h-[560px] bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl flex flex-col z-50">
+        <div className="fixed bottom-3 right-3 sm:bottom-6 sm:right-6 w-[380px] max-w-[calc(100vw-1.5rem)] sm:max-w-[calc(100vw-3rem)] h-[80vh] sm:h-[560px] max-h-[calc(100vh-1.5rem)] sm:max-h-[calc(100vh-3rem)] bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl flex flex-col z-50">
           <div className="flex items-center justify-between p-4 border-b border-white/10">
             <div className="flex items-center gap-3">
               <Image src="/bo-avatar.png" alt="Bo" width={32} height={32} className="rounded-full" />

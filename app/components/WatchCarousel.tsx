@@ -42,7 +42,7 @@ export default function WatchCarousel() {
 
         <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 -mx-6 px-6 [scrollbar-color:rgba(249,115,22,0.5)_transparent]">
           {SHORTS.map((s) => (
-            <div key={s.id} className="snap-start shrink-0 w-[260px] md:w-[280px]">
+            <div key={s.id} className="snap-start shrink-0 w-[200px] sm:w-[260px] md:w-[280px]">
               <div className="aspect-[9/16] rounded-xl overflow-hidden bg-black border border-white/10">
                 <iframe
                   src={`https://www.youtube.com/embed/${s.id}?rel=0`}
