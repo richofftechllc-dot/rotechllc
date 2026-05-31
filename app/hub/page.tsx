@@ -1,25 +1,23 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getAuthedCode } from "@/lib/session";
+import { loadItems, calcMoney, type LineItem, type Money } from "@/lib/hubData";
+import HubEditor from "./HubEditor";
+
+export const dynamic = "force-dynamic";
 
 const ADMIN_CODES = ["RANDY2026"];
 
-type LinkItem = { label: string; href: string; placeholder?: boolean };
+type LinkItem = { label: string; href: string };
 type LinkGroup = { title: string; items: LinkItem[] };
-type Money = {
-  pending: number;     // invoices sent but not yet paid
-  estimate: number;    // pitched build value still outstanding (after pending)
-  monthlyBasic: number;  // Care Plan basic ($250/mo) + any AI mgmt
-  monthlyContent: number;// Care Plan + Content ($400/mo) + any AI mgmt
-};
 type Project = {
+  slug?: string;       // present on tracked clients (toolkit has no slug)
   badge: string;
   badgeClass: "j" | "r" | "g" | "t" | "e";
   name: string;
   owner: string;
   info?: string;
   pill?: string;
-  money?: Money;
   groups: LinkGroup[];
   next?: string;
   open?: boolean;
@@ -61,13 +59,13 @@ const PROJECTS: Project[] = [
     ],
   },
   {
+    slug: "jollof-and-jerk",
     badge: "JJ",
     badgeClass: "j",
     name: "Jollof & Jerk",
     owner: "Mamadou Bah · 2020 9th St NW, DC",
     info: "Restaurant · West African + Caribbean · Uber Eats active · Client: jollofandjerkcatering@gmail.com",
     pill: "Pitch: Gold $2,500",
-    money: { pending: 1500, estimate: 1000, monthlyBasic: 250, monthlyContent: 400 },
     open: true,
     groups: [
       {
@@ -86,27 +84,20 @@ const PROJECTS: Project[] = [
           { label: "Customer CRM Sheet", href: "https://docs.google.com/spreadsheets/d/1Xyov_5jzKXrOl8BoQMfETa5XPH9U20YVNbDEiKfxSIQ/edit" },
           { label: "Discovery Call (Fireflies)", href: "https://app.fireflies.ai/view/01KSNSNSFBHWFMEZBVMSVP1JTH" },
           { label: "Email Mamadou", href: "mailto:jollofandjerkcatering@gmail.com" },
-        ],
-      },
-      {
-        title: "Square invoices sent",
-        items: [
-          { label: "#000210 · Project Deposit · $250 (due May 29)", href: SQUARE_INVOICES },
-          { label: "#000211 · Website Build Balance · $750 (due Jun 4)", href: SQUARE_INVOICES },
-          { label: "#000212 · Social Content 30 Days · $500 (due Jun 4)", href: SQUARE_INVOICES },
+          { label: "Square invoices", href: SQUARE_INVOICES },
         ],
       },
     ],
     next: "Send proposal + walkthrough → collect access (GBP, domain, Stripe, phone, Square capture, Uber Eats login, his story) → lock the $250 deposit.",
   },
   {
+    slug: "rendezvous-lounge",
     badge: "RL",
     badgeClass: "r",
     name: "Rendezvous Lounge",
     owner: "Eyob · upstairs at 2020 9th St NW",
     info: "Lounge / nightlife · keeps Toast · same building as Jollof · review system is the hook",
     pill: "Pitch: Gold $1,800",
-    money: { pending: 0, estimate: 1800, monthlyBasic: 250, monthlyContent: 400 },
     groups: [
       {
         title: "Live & build",
@@ -127,13 +118,13 @@ const PROJECTS: Project[] = [
     next: "Offer to build the live scan-page demo → collect access (GBP, domain, bar phone for alerts, bartender names, photos). Toast stays untouched. Lock the $540 deposit.",
   },
   {
+    slug: "gg-locks",
     badge: "GG",
     badgeClass: "g",
     name: "GG Locks",
     owner: "Fernando 'Nando' Lewis · lewisnando96@icloud.com",
     info: "Platform build + AI agent · domain gglocks.com pending purchase · uptime monitored via UptimeRobot",
     pill: "Deposit: $1,000 (invoice sent)",
-    money: { pending: 1000, estimate: 4000, monthlyBasic: 375, monthlyContent: 525 },
     groups: [
       {
         title: "Live & build",
@@ -156,28 +147,23 @@ const PROJECTS: Project[] = [
         ],
       },
       {
-        title: "Square invoice sent",
-        items: [
-          { label: "#GGLOCKS-001 · Platform Build Deposit · $1,000 (due May 26)", href: SQUARE_INVOICES },
-        ],
-      },
-      {
         title: "Client",
         items: [
           { label: "Email Nando (iCloud)", href: "mailto:lewisnando96@icloud.com" },
+          { label: "Square invoices", href: SQUARE_INVOICES },
         ],
       },
     ],
     next: "Confirm domain purchase (gglocks.com), follow up on the $1,000 deposit invoice, fix the last failed Vercel deploys.",
   },
   {
+    slug: "owed-to-eddie",
     badge: "OE",
     badgeClass: "e",
     name: "Owed To Eddie",
     owner: "Eddie · OWEDTOEDDIE@yahoo.com · Newport News, VA",
     info: "Food truck (the 757) · demo built + pitched May 19 · waiting on Eddie to confirm walkthrough times",
     pill: "Pitch: Gold $2,500",
-    money: { pending: 0, estimate: 2500, monthlyBasic: 250, monthlyContent: 400 },
     groups: [
       {
         title: "Live & build",
@@ -206,6 +192,15 @@ export default async function Hub() {
   if (!code || !ADMIN_CODES.includes(code)) {
     redirect(`/login?from=${encodeURIComponent("/hub")}`);
   }
+
+  // Load line items for every tracked project (parallel)
+  const tracked = PROJECTS.filter(p => p.slug);
+  const itemSets = await Promise.all(tracked.map(p => loadItems(p.slug!)));
+  const byslug: Record<string, LineItem[]> = {};
+  tracked.forEach((p, i) => { byslug[p.slug!] = itemSets[i]; });
+
+  const moneyBySlug: Record<string, Money> = {};
+  Object.entries(byslug).forEach(([slug, items]) => { moneyBySlug[slug] = calcMoney(items); });
 
   const styles = `
     .hub-wrap{max-width:780px;margin:0 auto;padding:46px 18px 80px;color:#f4f1ea;font-family:"Hanken Grotesk",system-ui,sans-serif;line-height:1.5}
@@ -265,19 +260,24 @@ export default async function Hub() {
         <div className="hub-brand">Rich Off Tech LLC · Private</div>
         <h1 className="hub-h1">Project Hub</h1>
         <p className="hub-sub">
-          Every client, every link, in one place. Tap a project to open its links — sites, code, deploys, proposals, CRM, calls, invoices. Admin-only.
+          Every client, every link, every line item, in one place. Add upsells right on the card — totals auto-recalculate.
         </p>
 
-        <MoneySnapshot projects={PROJECTS.filter(p => p.money)} />
+        <MoneySnapshot moneyBySlug={moneyBySlug} />
 
         <div className="hub-seclbl">Toolkit</div>
-        {PROJECTS.slice(0, 1).map(p => (
-          <ProjectCard key={p.name} p={p} />
+        {PROJECTS.filter(p => !p.slug).map(p => (
+          <ProjectCard key={p.name} p={p} items={[]} money={null} />
         ))}
 
         <div className="hub-seclbl">Active projects</div>
-        {PROJECTS.slice(1).map(p => (
-          <ProjectCard key={p.name} p={p} />
+        {PROJECTS.filter(p => p.slug).map(p => (
+          <ProjectCard
+            key={p.name}
+            p={p}
+            items={byslug[p.slug!]}
+            money={moneyBySlug[p.slug!]}
+          />
         ))}
 
         <div className="hub-foot">Rich Off Tech LLC · richofftechllc@gmail.com · signed in as <b style={{ color: "#d9b65a" }}>{code}</b></div>
@@ -286,24 +286,24 @@ export default async function Hub() {
   );
 }
 
-function MoneySnapshot({ projects }: { projects: Project[] }) {
-  const sumMoney = (list: Project[]) =>
-    list.reduce(
-      (acc, p) => {
-        if (!p.money) return acc;
-        acc.pending += p.money.pending;
-        acc.build += p.money.pending + p.money.estimate;
-        acc.monthlyBasic += p.money.monthlyBasic;
-        acc.monthlyContent += p.money.monthlyContent;
+function MoneySnapshot({ moneyBySlug }: { moneyBySlug: Record<string, Money> }) {
+  const sumOf = (slugs: string[]) =>
+    slugs.reduce(
+      (acc, s) => {
+        const m = moneyBySlug[s];
+        if (!m) return acc;
+        acc.pending += m.pending;
+        acc.build += m.totalBuild;
+        acc.monthly += m.monthly;
         return acc;
       },
-      { pending: 0, build: 0, monthlyBasic: 0, monthlyContent: 0 }
+      { pending: 0, build: 0, monthly: 0 }
     );
-  const three = sumMoney(projects.filter(p => p.name !== "Owed To Eddie"));
-  const all = sumMoney(projects);
+  const three = sumOf(["jollof-and-jerk", "rendezvous-lounge", "gg-locks"]);
+  const all = sumOf(["jollof-and-jerk", "rendezvous-lounge", "gg-locks", "owed-to-eddie"]);
   return (
     <div className="money">
-      <div className="money-head">Money snapshot · all 4 clients</div>
+      <div className="money-head">Money snapshot · live from your line items</div>
       <div className="money-grid">
         <div className="money-cell">
           <div className="money-lbl">Pending invoices</div>
@@ -313,12 +313,12 @@ function MoneySnapshot({ projects }: { projects: Project[] }) {
         <div className="money-cell">
           <div className="money-lbl">Total build value</div>
           <div className="money-val gold">{fmt(all.build)}</div>
-          <div className="money-sub">One-time builds, all 4 combined</div>
+          <div className="money-sub">All one-time items, all 4</div>
         </div>
         <div className="money-cell">
           <div className="money-lbl">Monthly recurring</div>
-          <div className="money-val pos">{fmt(all.monthlyBasic)}–{fmt(all.monthlyContent)}/mo</div>
-          <div className="money-sub">Care vs Care+Content tier</div>
+          <div className="money-val pos">{fmt(all.monthly)}/mo</div>
+          <div className="money-sub">Sum of all monthly items</div>
         </div>
       </div>
       <div className="money-locked">
@@ -327,15 +327,15 @@ function MoneySnapshot({ projects }: { projects: Project[] }) {
           <div style={{ background: "#0e0e12", border: "1px solid rgba(217,182,90,.18)", borderRadius: 10, padding: "11px 14px" }}>
             <div style={{ fontWeight: 700, color: "#f4f1ea", marginBottom: 4 }}>If the 3 active deals lock <span style={{ color: "#9c968b", fontWeight: 500, fontSize: 12 }}>· J&amp;J + Rendezvous + GG Locks</span></div>
             <div style={{ fontSize: 13, color: "#9c968b" }}>
-              Build: <b style={{ color: "#f3dd9c" }}>{fmt(three.build)}</b> · Recurring: <b style={{ color: "#7fd1a6" }}>{fmt(three.monthlyBasic)}–{fmt(three.monthlyContent)}/mo</b><br />
-              Year-1 take: <b style={{ color: "#f3dd9c" }}>{fmt(three.build + three.monthlyBasic * 12)}</b> → <b style={{ color: "#f3dd9c" }}>{fmt(three.build + three.monthlyContent * 12)}</b>
+              Build: <b style={{ color: "#f3dd9c" }}>{fmt(three.build)}</b> · Recurring: <b style={{ color: "#7fd1a6" }}>{fmt(three.monthly)}/mo</b><br />
+              Year-1 take: <b style={{ color: "#f3dd9c" }}>{fmt(three.build + three.monthly * 12)}</b>
             </div>
           </div>
           <div style={{ background: "#0e0e12", border: "1px solid rgba(217,182,90,.18)", borderRadius: 10, padding: "11px 14px" }}>
             <div style={{ fontWeight: 700, color: "#f4f1ea", marginBottom: 4 }}>If all 4 lock <span style={{ color: "#9c968b", fontWeight: 500, fontSize: 12 }}>· + Owed To Eddie</span></div>
             <div style={{ fontSize: 13, color: "#9c968b" }}>
-              Build: <b style={{ color: "#f3dd9c" }}>{fmt(all.build)}</b> · Recurring: <b style={{ color: "#7fd1a6" }}>{fmt(all.monthlyBasic)}–{fmt(all.monthlyContent)}/mo</b><br />
-              Year-1 take: <b style={{ color: "#f3dd9c" }}>{fmt(all.build + all.monthlyBasic * 12)}</b> → <b style={{ color: "#f3dd9c" }}>{fmt(all.build + all.monthlyContent * 12)}</b>
+              Build: <b style={{ color: "#f3dd9c" }}>{fmt(all.build)}</b> · Recurring: <b style={{ color: "#7fd1a6" }}>{fmt(all.monthly)}/mo</b><br />
+              Year-1 take: <b style={{ color: "#f3dd9c" }}>{fmt(all.build + all.monthly * 12)}</b>
             </div>
           </div>
         </div>
@@ -344,7 +344,7 @@ function MoneySnapshot({ projects }: { projects: Project[] }) {
   );
 }
 
-function ProjectCard({ p }: { p: Project }) {
+function ProjectCard({ p, items, money }: { p: Project; items: LineItem[]; money: Money | null }) {
   return (
     <details className="proj" {...(p.open ? { open: true } : {})}>
       <summary>
@@ -358,12 +358,12 @@ function ProjectCard({ p }: { p: Project }) {
       </summary>
       <div className="pinner">
         {p.info ? <div className="info">{p.info}</div> : null}
-        {p.money ? (
+        {money ? (
           <div className="pmoney">
-            <span>Pending <b>{fmt(p.money.pending)}</b></span>
-            <span>Build value <b>{fmt(p.money.pending + p.money.estimate)}</b></span>
-            <span>Monthly (Care) <b>{fmt(p.money.monthlyBasic)}/mo</b></span>
-            <span>Monthly (+ Content) <b>{fmt(p.money.monthlyContent)}/mo</b></span>
+            <span>Pending <b>{fmt(money.pending)}</b></span>
+            <span>Build value <b>{fmt(money.totalBuild)}</b></span>
+            <span>Monthly <b>{fmt(money.monthly)}/mo</b></span>
+            <span>Year-1 <b>{fmt(money.totalBuild + money.monthly * 12)}</b></span>
           </div>
         ) : null}
         {p.groups.map(g => (
@@ -384,6 +384,7 @@ function ProjectCard({ p }: { p: Project }) {
             </div>
           </div>
         ))}
+        {p.slug ? <HubEditor slug={p.slug} items={items} /> : null}
         {p.next ? <div className="next"><b>Next:</b> {p.next}</div> : null}
       </div>
     </details>
