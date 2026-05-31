@@ -76,7 +76,7 @@ export default function Nav() {
 
       {/* MOBILE DRAWER */}
       <div
-        className={`md:hidden fixed inset-x-0 top-[68px] bottom-0 bg-black/95 backdrop-blur-xl transition-transform duration-200 ${open ? "translate-x-0" : "translate-x-full"}`}
+        className={`md:hidden fixed inset-x-0 top-[68px] bottom-0 bg-zinc-950 bg-gradient-to-b from-zinc-950 via-zinc-950 to-black border-t border-orange-500/20 transition-transform duration-200 shadow-2xl ${open ? "translate-x-0" : "translate-x-full"}`}
         onClick={() => setOpen(false)}
       >
         <div className="max-w-md mx-auto px-6 py-8 flex flex-col gap-1" onClick={(e) => e.stopPropagation()}>
