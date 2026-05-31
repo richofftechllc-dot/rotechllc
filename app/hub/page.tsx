@@ -6,17 +6,26 @@ const ADMIN_CODES = ["RANDY2026"];
 
 type LinkItem = { label: string; href: string; placeholder?: boolean };
 type LinkGroup = { title: string; items: LinkItem[] };
+type Money = {
+  pending: number;     // invoices sent but not yet paid
+  estimate: number;    // pitched build value still outstanding (after pending)
+  monthlyBasic: number;  // Care Plan basic ($250/mo) + any AI mgmt
+  monthlyContent: number;// Care Plan + Content ($400/mo) + any AI mgmt
+};
 type Project = {
   badge: string;
-  badgeClass: "j" | "r" | "g" | "t";
+  badgeClass: "j" | "r" | "g" | "t" | "e";
   name: string;
   owner: string;
   info?: string;
   pill?: string;
+  money?: Money;
   groups: LinkGroup[];
   next?: string;
   open?: boolean;
 };
+
+const fmt = (n: number) => "$" + n.toLocaleString();
 
 const DRIVE_PDF = (id: string) => `https://drive.google.com/file/d/${id}/view`;
 const DRIVE_DOC = (id: string) => `https://docs.google.com/document/d/${id}/edit`;
@@ -58,6 +67,7 @@ const PROJECTS: Project[] = [
     owner: "Mamadou Bah · 2020 9th St NW, DC",
     info: "Restaurant · West African + Caribbean · Uber Eats active · Client: jollofandjerkcatering@gmail.com",
     pill: "Pitch: Gold $2,500",
+    money: { pending: 1500, estimate: 1000, monthlyBasic: 250, monthlyContent: 400 },
     open: true,
     groups: [
       {
@@ -96,6 +106,7 @@ const PROJECTS: Project[] = [
     owner: "Eyob · upstairs at 2020 9th St NW",
     info: "Lounge / nightlife · keeps Toast · same building as Jollof · review system is the hook",
     pill: "Pitch: Gold $1,800",
+    money: { pending: 0, estimate: 1800, monthlyBasic: 250, monthlyContent: 400 },
     groups: [
       {
         title: "Live & build",
@@ -122,6 +133,7 @@ const PROJECTS: Project[] = [
     owner: "Fernando 'Nando' Lewis · lewisnando96@icloud.com",
     info: "Platform build + AI agent · domain gglocks.com pending purchase · uptime monitored via UptimeRobot",
     pill: "Deposit: $1,000 (invoice sent)",
+    money: { pending: 1000, estimate: 4000, monthlyBasic: 375, monthlyContent: 525 },
     groups: [
       {
         title: "Live & build",
@@ -158,6 +170,33 @@ const PROJECTS: Project[] = [
     ],
     next: "Confirm domain purchase (gglocks.com), follow up on the $1,000 deposit invoice, fix the last failed Vercel deploys.",
   },
+  {
+    badge: "OE",
+    badgeClass: "e",
+    name: "Owed To Eddie",
+    owner: "Eddie · OWEDTOEDDIE@yahoo.com · Newport News, VA",
+    info: "Food truck (the 757) · demo built + pitched May 19 · waiting on Eddie to confirm walkthrough times",
+    pill: "Pitch: Gold $2,500",
+    money: { pending: 0, estimate: 2500, monthlyBasic: 250, monthlyContent: 400 },
+    groups: [
+      {
+        title: "Live & build",
+        items: [
+          { label: "Live Demo", href: "https://owed-to-eddie-demo.vercel.app" },
+          { label: "GitHub Repo", href: "https://github.com/richofftechllc-dot/owed-to-eddie-demo" },
+          { label: "Vercel Project", href: "https://vercel.com/rotech/owed-to-eddie-demo" },
+        ],
+      },
+      {
+        title: "Client",
+        items: [
+          { label: "Email Eddie", href: "mailto:OWEDTOEDDIE@yahoo.com" },
+          { label: "Original pitch email", href: "https://mail.google.com/mail/u/0/#search/owedtoeddie" },
+        ],
+      },
+    ],
+    next: "Follow up on the walkthrough — propose 2–3 specific times. Demo: real-time site update from a text + AI voice agent answers a catering call.",
+  },
 ];
 
 export default async function Hub() {
@@ -183,6 +222,22 @@ export default async function Hub() {
     .badge.r{background:linear-gradient(135deg,#cfa6e0,#7a4fa0);color:#fff}
     .badge.t{background:linear-gradient(135deg,#cfd4dd,#9aa0ab);color:#1a1a1a}
     .badge.g{background:linear-gradient(135deg,#7fd1a6,#2a8c5a);color:#0b0b0d}
+    .badge.e{background:linear-gradient(135deg,#ff8c5a,#c43a1b);color:#fff}
+    .money{background:linear-gradient(135deg,#1a1a20,#16161b);border:1px solid rgba(217,182,90,.25);border-radius:14px;padding:18px 20px;margin:20px 0 8px}
+    .money-head{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#d9b65a;font-weight:800;margin-bottom:12px}
+    .money-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    @media(min-width:600px){.money-grid{grid-template-columns:repeat(4,1fr)}}
+    .money-cell{background:#0e0e12;border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:11px 13px}
+    .money-lbl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6b665d;font-weight:700;margin-bottom:4px}
+    .money-val{font-weight:800;font-size:21px;color:#f4f1ea;letter-spacing:-.01em}
+    .money-val.pos{color:#7fd1a6}
+    .money-val.gold{color:#f3dd9c}
+    .money-sub{font-size:11px;color:#6b665d;margin-top:2px}
+    .money-locked{margin-top:14px;padding-top:14px;border-top:1px dashed rgba(255,255,255,.08);font-size:12.5px;color:#9c968b;line-height:1.6}
+    .money-locked b{color:#f3dd9c}
+    .pmoney{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;font-size:11.5px}
+    .pmoney span{background:#0e0e12;border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:4px 8px;color:#9c968b}
+    .pmoney span b{color:#f3dd9c;font-weight:700}
     .pname{font-weight:800;font-size:19px;color:#f4f1ea}
     .powner{color:#9c968b;font-size:12.5px;margin-top:1px}
     .pill{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px;border-radius:99px;color:#0b0b0d;background:linear-gradient(90deg,#e9c977,#b8862f)}
@@ -213,6 +268,8 @@ export default async function Hub() {
           Every client, every link, in one place. Tap a project to open its links — sites, code, deploys, proposals, CRM, calls, invoices. Admin-only.
         </p>
 
+        <MoneySnapshot projects={PROJECTS.filter(p => p.money)} />
+
         <div className="hub-seclbl">Toolkit</div>
         {PROJECTS.slice(0, 1).map(p => (
           <ProjectCard key={p.name} p={p} />
@@ -226,6 +283,54 @@ export default async function Hub() {
         <div className="hub-foot">Rich Off Tech LLC · richofftechllc@gmail.com · signed in as <b style={{ color: "#d9b65a" }}>{code}</b></div>
       </div>
     </main>
+  );
+}
+
+function MoneySnapshot({ projects }: { projects: Project[] }) {
+  const m = projects.reduce(
+    (acc, p) => {
+      if (!p.money) return acc;
+      acc.pending += p.money.pending;
+      acc.estimate += p.money.estimate;
+      acc.monthlyBasic += p.money.monthlyBasic;
+      acc.monthlyContent += p.money.monthlyContent;
+      return acc;
+    },
+    { pending: 0, estimate: 0, monthlyBasic: 0, monthlyContent: 0 }
+  );
+  const totalBuild = m.pending + m.estimate;
+  const year1Basic = totalBuild + m.monthlyBasic * 12;
+  const year1Content = totalBuild + m.monthlyContent * 12;
+  return (
+    <div className="money">
+      <div className="money-head">Money snapshot · all 4 clients</div>
+      <div className="money-grid">
+        <div className="money-cell">
+          <div className="money-lbl">Pending invoices</div>
+          <div className="money-val gold">{fmt(m.pending)}</div>
+          <div className="money-sub">Sent, awaiting pay</div>
+        </div>
+        <div className="money-cell">
+          <div className="money-lbl">Estimate left</div>
+          <div className="money-val">{fmt(m.estimate)}</div>
+          <div className="money-sub">Pitched, not yet invoiced</div>
+        </div>
+        <div className="money-cell">
+          <div className="money-lbl">Total deal value</div>
+          <div className="money-val gold">{fmt(totalBuild)}</div>
+          <div className="money-sub">One-time builds combined</div>
+        </div>
+        <div className="money-cell">
+          <div className="money-lbl">Monthly potential</div>
+          <div className="money-val pos">{fmt(m.monthlyBasic)}–{fmt(m.monthlyContent)}/mo</div>
+          <div className="money-sub">Care vs Care+Content</div>
+        </div>
+      </div>
+      <div className="money-locked">
+        <b>If all 4 lock in:</b> {fmt(totalBuild)} one-time build · {fmt(m.monthlyBasic)}/mo recurring on basic Care, {fmt(m.monthlyContent)}/mo on Content tier.<br />
+        <b>Year-1 take:</b> {fmt(year1Basic)} (basic Care across the board) up to {fmt(year1Content)} (Content tier across the board).
+      </div>
+    </div>
   );
 }
 
@@ -243,6 +348,14 @@ function ProjectCard({ p }: { p: Project }) {
       </summary>
       <div className="pinner">
         {p.info ? <div className="info">{p.info}</div> : null}
+        {p.money ? (
+          <div className="pmoney">
+            <span>Pending <b>{fmt(p.money.pending)}</b></span>
+            <span>Estimate left <b>{fmt(p.money.estimate)}</b></span>
+            <span>Monthly (Care) <b>{fmt(p.money.monthlyBasic)}/mo</b></span>
+            <span>Monthly (+ Content) <b>{fmt(p.money.monthlyContent)}/mo</b></span>
+          </div>
+        ) : null}
         {p.groups.map(g => (
           <div className="lgroup" key={g.title}>
             <div className="lt">{g.title}</div>
