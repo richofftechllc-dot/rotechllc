@@ -74,79 +74,67 @@ export default function Nav() {
         </button>
       </div>
 
-      {/* MOBILE DRAWER */}
-      <div
-        className={`md:hidden fixed inset-0 z-50 border-t border-orange-500/20 transition-transform duration-200 shadow-2xl overflow-y-auto ${open ? "translate-x-0" : "translate-x-full pointer-events-none"}`}
-        style={{ backgroundColor: "#09090b" }}
-        onClick={() => setOpen(false)}
-        aria-hidden={!open}
-      >
-        {/* Drawer top bar — close affordance + logo */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5" onClick={(e) => e.stopPropagation()}>
-          <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-            <Image src="/bo-avatar.png" alt="ROT" width={36} height={36} className="rounded-full" />
-            <span className="font-bold tracking-tight text-orange-500">ROT</span>
-          </Link>
-          <button
-            aria-label="Close menu"
-            onClick={() => setOpen(false)}
-            className="w-10 h-10 flex items-center justify-center text-white text-2xl"
-          >
-            ✕
-          </button>
-        </div>
-        <div className="px-6 py-6 flex flex-col" onClick={(e) => e.stopPropagation()}>
-          {LINKS.map(l => l.external ? (
-            <a
-              key={l.href}
-              href={l.href}
-              target="_blank"
-              rel="noopener"
-              onClick={() => setOpen(false)}
-              className="text-4xl font-black text-white py-5 border-b border-white/10 flex items-center justify-between active:text-orange-400"
-            >
-              {l.label}
-              <span className="text-orange-500 text-2xl">↗</span>
-            </a>
-          ) : (
-            <Link
-              key={l.href}
-              href={l.href}
-              onClick={() => setOpen(false)}
-              className="text-4xl font-black text-white py-5 border-b border-white/10 active:text-orange-400"
-            >
-              {l.label}
-            </Link>
-          ))}
-
-          <div className="mt-8 mb-12">
-            {me === null ? (
-              <div className="text-gray-500 text-base">Loading…</div>
-            ) : me.ok ? (
-              <div className="flex items-center justify-between gap-3 bg-zinc-900 border border-white/10 rounded-xl p-5">
-                <div>
-                  <div className="text-orange-500 font-bold text-lg">{me.name}</div>
-                  <div className="text-gray-500 text-sm">{me.code}</div>
-                </div>
-                <button
-                  onClick={() => { logout(); setOpen(false); }}
-                  className="px-5 py-3 text-base text-white border border-white/15 rounded-lg active:bg-white/10"
+      {/* MOBILE DROPDOWN — drops down below the nav bar, 2-col grid so all 8 links fit on screen */}
+      {open && (
+        <div
+          className="md:hidden absolute inset-x-0 top-full border-t border-orange-500/30 shadow-2xl"
+          style={{ backgroundColor: "#09090b" }}
+        >
+          <div className="px-4 py-4">
+            <div className="grid grid-cols-2 gap-2">
+              {LINKS.map(l => l.external ? (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  target="_blank"
+                  rel="noopener"
+                  onClick={() => setOpen(false)}
+                  className="bg-zinc-900 border border-white/10 rounded-xl px-4 py-4 text-white font-bold text-base flex items-center justify-between active:bg-orange-500/20 active:border-orange-500"
                 >
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              <Link
-                href="/login"
-                onClick={() => setOpen(false)}
-                className="block w-full text-center py-5 bg-gradient-to-r from-orange-500 to-red-500 text-white font-black rounded-xl text-2xl shadow-lg shadow-orange-500/30 active:scale-95 transition"
-              >
-                Sign In
-              </Link>
-            )}
+                  {l.label}
+                  <span className="text-orange-500">↗</span>
+                </a>
+              ) : (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  onClick={() => setOpen(false)}
+                  className="bg-zinc-900 border border-white/10 rounded-xl px-4 py-4 text-white font-bold text-base active:bg-orange-500/20 active:border-orange-500"
+                >
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+
+            <div className="mt-3">
+              {me === null ? (
+                <div className="text-gray-500 text-sm text-center py-2">Loading…</div>
+              ) : me.ok ? (
+                <div className="flex items-center justify-between gap-3 bg-zinc-900 border border-white/10 rounded-xl px-4 py-3">
+                  <div className="min-w-0">
+                    <div className="text-orange-500 font-bold text-sm truncate">{me.name}</div>
+                    <div className="text-gray-500 text-xs truncate">{me.code}</div>
+                  </div>
+                  <button
+                    onClick={() => { logout(); setOpen(false); }}
+                    className="px-4 py-2 text-sm text-white border border-white/15 rounded-lg active:bg-white/10 whitespace-nowrap"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setOpen(false)}
+                  className="block w-full text-center py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-black rounded-xl text-lg shadow-lg shadow-orange-500/30 active:scale-95 transition"
+                >
+                  Sign In
+                </Link>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 }
