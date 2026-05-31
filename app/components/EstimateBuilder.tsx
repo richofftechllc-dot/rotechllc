@@ -1,245 +1,344 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 
-type Item = {
+type Bundle = {
   id: string;
+  cls: "silver" | "gold" | "platinum" | "premier";
   name: string;
   price: number;
-  what: string;
-  eg: string;
-  bundle?: boolean;
-  recur?: boolean;
-  requires_retainer?: boolean;
-  rec?: boolean;
+  save: number;
+  line: string;
+  items: string[];
+  quote?: boolean;
+  popular?: boolean;
 };
-type Category = { cat: string; desc: string; items: Item[] };
 
-const DATA: Category[] = [
-  { cat: "⭐ Starter Bundles", desc: "Most businesses start with one of these. Pick a bundle, then add anything below. Bundles save vs buying à la carte.", items: [
-    { id: "bundle_found", name: "Get Found", price: 1000, bundle: true, what: "INCLUDES: full website on your own domain · your real menu/services · photos · Google profile cleanup · review link + QR codes.", eg: "Everything you need to exist online and show up on Google. The starting point for most." },
-    { id: "bundle_paid", name: "Get Paid  (most popular)", price: 2500, bundle: true, what: "INCLUDES everything in Get Found, PLUS online ordering & payments (card/Apple Pay/Cash App) + 1 month of social content (posts + graphics).", eg: "You're taking orders and money directly, and your socials are handled for a month. Saves ~$700 vs separate." },
-    { id: "bundle_auto", name: "Whole Kitchen", price: 4200, bundle: true, what: "INCLUDES everything in Get Paid, PLUS a catering/booking system + the one-text command center + an AI agent of your choice. (3 months of management included, then a Care Plan.)", eg: "The full self-running setup — like what Rich Off Tech runs for itself. Saves ~$1,200 vs separate." },
-  ]},
-  { cat: "Websites & Pages", desc: "Your home base online. (Already covered if you picked a bundle above.)", items: [
-    { id: "site_starter", name: "Full website", price: 1000, what: "A complete mobile-first site. INCLUDES: up to 6 sections, your menu/services, photos, map, mobile layout, and going live.", eg: "No website at all → a live site with menu, hours, photos, and a map to your door." },
-    { id: "new_page", name: "Extra page", price: 250, what: "One additional page on your site. INCLUDES: layout, copy formatting, and links.", eg: "Adding a dedicated Catering or Events page." },
-    { id: "redesign", name: "Redesign / refresh", price: 800, what: "Rebuild the look of a site you already have. INCLUDES: new layout, colors, fonts, mobile polish. Does NOT include new features (see below).", eg: "Old, dated site → clean modern look that matches your brand." },
-    { id: "section", name: "New section or feature", price: 150, what: "One block added to an existing page. INCLUDES: the design + build of that one piece.", eg: "A photo gallery, an FAQ, a live 'Open Now' badge, or a countdown." },
-  ]},
-  { cat: "Forms & Booking", desc: "Capture leads, take requests, fill the calendar.", items: [
-    { id: "form_simple", name: "Contact / signup form", price: 150, what: "A form wired to email you or save to a sheet. INCLUDES: up to ~6 fields + delivery setup.", eg: "A 'Request Catering' form that drops straight into your inbox." },
-    { id: "form_smart", name: "Smart multi-step form", price: 350, what: "A guided form with logic. INCLUDES: multiple steps, conditional questions, and routing to you.", eg: "Event booking that asks date, headcount, menu — then routes it to you." },
-    { id: "booking", name: "Booking + deposit", price: 600, what: "Reserve a spot and pay a deposit to hold it. INCLUDES: booking form, deposit checkout, and confirmation. (Note: a payment account like Stripe is required — you set it up, it's free to start.)", eg: "A lounge taking section reservations with a deposit so no-shows stop killing the night." },
-    { id: "field", name: "Add a field", price: 40, what: "One new field on a form you already have.", eg: "Adding 'allergies' or 'how'd you hear about us' to an order form." },
-  ]},
-  { cat: "Online Ordering & Payments", desc: "Take money directly — keep what the apps take. (Note: payments run through your own Stripe account — you set it up, your money goes straight to your bank, Rich Off Tech never touches it.)", items: [
-    { id: "order_pay", name: "Online ordering + checkout", price: 1200, what: "The full ordering system. INCLUDES: add-to-cart menu, options/modifiers, checkout by card/Apple Pay/Cash App, tax, and an order alert to you. (This is the cart + checkout below, bundled — saves $100.)", eg: "Customers order $25 plates on your site instead of a delivery app that skims 15–30%." },
-    { id: "cart", name: "Add-to-cart menu only", price: 600, what: "Just the menu + cart (no payment processing). INCLUDES: browsable menu, options, running total.", eg: "A build-your-plate menu with a 'pick 2 sides' picker, where you take payment another way." },
-    { id: "checkout", name: "Checkout only (payments)", price: 700, what: "Just the payment piece. INCLUDES: card/Apple Pay/Cash App checkout for a set item or amount.", eg: "A 'Pay your invoice' or 'Buy a gift card' button." },
-    { id: "subscription", name: "Recurring billing", price: 300, what: "Auto-charge customers on a schedule. INCLUDES: plan setup + recurring charge logic.", eg: "A membership, a meal plan, or a VIP club that bills every month." },
-  ]},
-  { cat: "Automations — set it and forget it", desc: "The system does the repetitive stuff so you don't have to. (Texting/email usage runs through your own account at cost — pennies.)", items: [
-    { id: "auto_notify", name: "Instant alerts", price: 120, what: "A text or email fires the moment something happens. INCLUDES: one trigger → one alert.", eg: "New order → you get a text. New booking → it hits your calendar." },
-    { id: "auto_followup", name: "Auto follow-up sequence", price: 200, what: "Messages that send themselves after an event. INCLUDES: a timed sequence of up to 3 messages.", eg: "After a booking: confirmation goes out → a day later a 'see you soon' text → after the visit, a review request. All on its own." },
-    { id: "auto_email_after", name: "Auto-email after a booking/order", price: 200, what: "The right email sends itself when something happens. INCLUDES: one triggered email with your content.", eg: "Someone books catering → they instantly get a 'here's what happens next' email with your menu attached." },
-    { id: "auto_notes", name: "Auto note-taking / logging", price: 250, what: "Every order, call, or form gets logged automatically. INCLUDES: auto-save to a sortable sheet/CRM.", eg: "Every catering request auto-saved to a spreadsheet you can sort and search — no manual entry." },
-    { id: "auto_inventory", name: "Inventory / order tracking", price: 350, what: "Track what's selling and what's low. INCLUDES: sold-out toggle that syncs everywhere + low-stock alerts.", eg: "Mark a dish 'sold out' once → it updates everywhere, and you get a heads-up when a top seller is moving fast." },
-    { id: "sms_blast", name: "Text-blast system", price: 300, what: "One message to your whole customer list at once. INCLUDES: list setup, send tool, and opt-out handling.", eg: "Slow Tuesday? Blast 'Half-off jollof til 9pm' to everyone who's ordered before." },
-    { id: "api_sync", name: "Connect outside platforms", price: 400, what: "Tie in tools you already use. INCLUDES: one integration set up and tested.", eg: "Sync your delivery-app menu, your POS, or your accounting so they stay in step." },
-  ]},
-  { cat: "AI Agents — work that runs itself", desc: "Smart helpers that handle tasks live, 24/7. (These are living systems — a Care Plan is recommended to keep them running. Usage runs through your own accounts at cost.)", items: [
-    { id: "agent_voice", name: "Voice agent (answers the phone)", price: 1500, what: "If you never want to answer a call again — an AI picks up, takes the order or booking, and texts a pay link. INCLUDES: phone number setup, custom script, order/booking handling.", eg: "Friday rush, phone won't stop → the agent answers every call, takes the order, repeats it back, never misses a sale.", rec: true },
-    { id: "agent_onetext", name: "One-text command center", price: 900, what: "You text one line; it updates everything, live. INCLUDES: dispatch to your site + text list + social caption from a single text.", eg: "Text 'jollof special tonight $3 off' → your site, your text list, and your social caption all update in under 30 seconds.", rec: true },
-    { id: "agent_chat", name: "Conversational website chat", price: 600, what: "An AI chat on your site that talks to visitors and captures their info. INCLUDES: trained on your business, lead capture, handoff to you.", eg: "Answers 'are you open?', 'do you cater?', grabs their number, books them — even at 3am.", rec: true },
-    { id: "agent_orders", name: "AI order / task manager", price: 700, what: "One dashboard that watches your orders/tasks and keeps them moving. INCLUDES: unified view, late-flagging, alerts to you.", eg: "Pulls every order from every channel into one view, flags what's late, texts you what needs attention.", rec: true },
-    { id: "agent_discord", name: "Discord / community bot (+ onboarding)", price: 500, what: "A bot that runs your group/team chat AND onboards new members automatically. INCLUDES: auto-welcome + onboarding flow, FAQ answers, scheduled posts, staff pings.", eg: "New member joins → bot welcomes them, walks them through the rules/menu/links, posts daily specials, and pings staff for shift changes.", rec: true },
-    { id: "agent_custom", name: "Custom AI workflow", price: 700, what: "A smart helper built around your exact problem. INCLUDES: scoped build for your specific task.", eg: "Reads incoming catering emails and drafts a quote back automatically.", rec: true },
-  ]},
-  { cat: "Get Found — Google & Reviews", desc: "Show up when people search. Stack 5-star reviews.", items: [
-    { id: "review_reward", name: "Scan-to-Review system  (all-in-one)", price: 500, what: "The complete review engine. INCLUDES: Google profile cleanup + review link + printable QR codes + the scan→honest-review→live staff alert. (You do NOT need the two items below if you get this — they're already in here.)", eg: "Scan at the bar → leave an honest review → bartender gets a text → free shot handed over on the spot." },
-    { id: "gbp", name: "Google profile cleanup only", price: 200, what: "Just the listing fix (if you don't want the full system above). INCLUDES: claim, fix hours/photos/categories, optimize.", eg: "Wrong hours, no photos, unclaimed → fully optimized so you show up in 'near me' searches." },
-    { id: "review_qr", name: "Review link + QR only", price: 150, what: "Just the review link + printable QR codes (if that's all you need). Already included in the all-in-one above.", eg: "A QR on the receipt that opens straight to your Google review box." },
-    { id: "seo", name: "Local SEO pass", price: 300, what: "Tune your site so you rank locally. INCLUDES: on-page SEO, local keywords, listing consistency.", eg: "Show up on page one for 'jerk chicken near me' in your neighborhood." },
-  ]},
-  { cat: "Design & Content", desc: "Look good everywhere. Stay posted without lifting a finger.", items: [
-    { id: "content_month", name: "Social content — 30 days", price: 500, what: "A done-for-you month of posting. INCLUDES: ~12–16 posts written + the post graphics designed + scheduled/posted. (Custom one-off designs like logos or event flyers are the separate line below.)", eg: "Daily posts telling the story behind each dish, designed and posted — you just approve." },
-    { id: "graphics", name: "Custom graphic / flyer (one-off)", price: 150, what: "A specific custom design, made once. INCLUDES: one designed piece with revisions. (This is for standalone pieces — your monthly post graphics are already in the content month above.)", eg: "An event flyer, a menu card, a 'now open' announcement, or a logo touch-up." },
-    { id: "campaign", name: "Themed campaign", price: 400, what: "A multi-day campaign, pre-built. INCLUDES: each day's post + graphic + deal, scheduled to run on its own.", eg: "A full holiday-week push: each day a story + a deal, scheduled in advance." },
-    { id: "pdf", name: "Branded PDF / one-pager", price: 150, what: "A clean designed document. INCLUDES: one designed PDF (menu, proposal, packet).", eg: "A catering packet or proposal you can hand a client." },
-    { id: "media_edit", name: "Photo / video edit pass", price: 150, what: "Clean up media you already have. INCLUDES: cropping, color, and sizing for web + social.", eg: "Your phone photos cropped, color-fixed, and sized for the site and Instagram." },
-  ]},
-  { cat: "Keep It Running (Monthly)", desc: "Optional — your site stays live either way. A Care Plan keeps me on call to make changes for you. Cancel anytime.", items: [
-    { id: "ret_basic", name: "Care Plan", price: 250, recur: true, what: "INCLUDES: bug fixes, menu/price/hours updates, system monitoring, AI/automation management, review monitoring, and small tweaks — on call, same-day.", eg: "Menu changed? Hours changed? Voice agent acting up? Text me, handled. Required if you have AI agents or automations running." },
-    { id: "ret_content", name: "Care Plan + Content", price: 400, recur: true, what: "INCLUDES everything in the Care Plan, PLUS weekly social posts written + posted for you.", eg: "I keep your site current AND post for you every week." },
-    { id: "ret_priority", name: "Priority Support  (add-on)", price: 150, recur: true, requires_retainer: true, what: "An ADD-ON to a Care Plan — not sold alone. Bumps your requests to the front of the line for same-hour turnaround on urgent changes.", eg: "You're on a Care Plan and need a change RIGHT NOW during a rush → it jumps the queue. (Requires a Care Plan above.)" },
-  ]},
+const BUNDLES: Bundle[] = [
+  {
+    id: "silver", cls: "silver", name: "Silver", price: 1000, save: 350,
+    line: "Get online and get found.",
+    items: ["Full website on your own domain", "What you offer + photos", "Google profile cleanup", "Review link + QR codes"],
+  },
+  {
+    id: "gold", cls: "gold", name: "Gold", price: 2500, save: 550, popular: true,
+    line: "Take orders and money direct — socials handled.",
+    items: ["Everything in Silver", "Online ordering + payments (card / Apple Pay / Cash App)", "1 month of social content"],
+  },
+  {
+    id: "platinum", cls: "platinum", name: "Platinum", price: 4200, save: 1800,
+    line: "The full self-running setup.",
+    items: ["Everything in Gold", "Booking system", "The one-text command center", "An AI agent of your choice", "3 months of management included"],
+  },
+  {
+    id: "premier", cls: "premier", name: "Premier", price: 10000, save: 0, quote: true,
+    line: "A complete AI-operated business stack — built to scope.",
+    items: ["Everything in Platinum", "Voice AI receptionist", "CRM + retention automations", "Priority support", "6 months of management included"],
+  },
 ];
 
-const PAY_PLANS = [
-  { id: "full", name: "Pay in full", sub: "One payment, cleanest. Save on processing.", tag: "BEST VALUE" },
-  { id: "split2", name: "Deposit + 2 monthly", sub: "~60 days. No interest. Best for projects $500–$1,500.", tag: "" },
-  { id: "split3", name: "Deposit + 3 monthly", sub: "~90 days. No interest. Most popular for $1k–$2k builds.", tag: "POPULAR" },
-  { id: "split4", name: "Deposit + 4 monthly", sub: "~120 days. No interest. Best for $2k–$4k builds.", tag: "" },
-  { id: "split6", name: "Deposit + 6 monthly", sub: "~6 months. No interest. For the biggest builds.", tag: "" },
-  { id: "afterpay4", name: "Afterpay — Pay in 4", sub: "4 payments over 6 weeks, no interest. Up to $2,000.", tag: "INSTANT" },
-  { id: "afterpay6", name: "Afterpay — 6 months", sub: "$400–$4,000 builds. Interest applies (Afterpay sets it).", tag: "" },
-  { id: "afterpay12", name: "Afterpay — 12 months", sub: "$400–$4,000 builds. Interest applies (Afterpay sets it).", tag: "" },
+type ALItem = { id: string; nm: string; pr: number; inc: string; ex: string; ai?: boolean };
+type Cat = { title: string; kicker: string; sub: string; items: ALItem[] };
+
+const CATS: Cat[] = [
+  {
+    title: "Audits & Strategy", kicker: "Start here",
+    sub: "Not sure what you need? Start with an audit. I map what you're running, find where you're leaking time and money, and hand you a plan — credited toward your build if you move forward.",
+    items: [
+      { id: "audit_ai", nm: "AI & Workflow Audit", pr: 500, inc: "I review your tools + processes (POS, ordering, social, phone, the manual stuff) and deliver a one-page plan: what to automate, what to fix, rough ROI.", ex: "Running everything by hand → walk out with a prioritized automation plan." },
+    ],
+  },
+  {
+    title: "Websites & Pages", kicker: "Build",
+    sub: "Your home base online. (Already covered if you picked a tier above.)",
+    items: [
+      { id: "web_full", nm: "Full website", pr: 1000, inc: "Up to 6 sections, your services, photos, map, mobile layout, going live.", ex: "No site at all → a live, professional site people can find." },
+      { id: "web_page", nm: "Extra page", pr: 250, inc: "One more page — layout, copy formatting, links.", ex: "A dedicated Services, Events, or About page." },
+      { id: "web_redesign", nm: "Redesign / refresh", pr: 800, inc: "New layout, colors, fonts, mobile polish. (Look only — features are below.)", ex: "An old, dated site → a clean modern look." },
+      { id: "web_feature", nm: "New section or feature", pr: 150, inc: "One block added to a page.", ex: "A gallery, an FAQ, a live 'Open Now' badge, or a countdown." },
+    ],
+  },
+  {
+    title: "Forms & Booking", kicker: "Capture",
+    sub: "Capture leads, take requests, fill the calendar.",
+    items: [
+      { id: "form_contact", nm: "Contact / signup form", pr: 150, inc: "Wired to email you or save to a sheet (~6 fields).", ex: "A 'Request a Quote' form straight to your inbox." },
+      { id: "form_smart", nm: "Smart multi-step form", pr: 350, inc: "Guided form with logic + routing to you.", ex: "A booking flow: date, details, budget → routed to you." },
+      { id: "form_booking", nm: "Booking + deposit", pr: 600, inc: "Booking form, deposit checkout, confirmation. (Your own Stripe — free to start.)", ex: "Take appointments with a deposit so no-shows stop costing you." },
+      { id: "form_field", nm: "Add a field", pr: 40, inc: "One new field on a form you already have.", ex: "Adding 'how'd you hear about us' to a form." },
+    ],
+  },
+  {
+    title: "Sell Online & Take Payments", kicker: "Earn",
+    sub: "Take money directly — keep what the apps take. Payments run through your own Stripe; your money goes straight to your bank, we never touch it.",
+    items: [
+      { id: "sell_full", nm: "Online store / ordering + checkout", pr: 1200, inc: "Catalog + cart, options, checkout (card / Apple Pay / Cash App), tax, order alert to you.", ex: "Customers buy from you direct instead of a platform skimming 15–30%." },
+      { id: "sell_cart", nm: "Cart / catalog only", pr: 600, inc: "Browsable catalog + cart, no payment processing.", ex: "A build-your-order menu where you take payment another way." },
+      { id: "sell_checkout", nm: "Checkout only (payments)", pr: 700, inc: "Card / Apple Pay / Cash App checkout for a set item or amount.", ex: "A 'Pay your invoice' or 'Buy a gift card' button." },
+      { id: "sell_recurring", nm: "Recurring billing", pr: 300, inc: "Plan setup + recurring charge logic.", ex: "A membership or VIP club that bills every month." },
+    ],
+  },
+  {
+    title: "Automations", kicker: "Hands-off",
+    sub: "The system does the repetitive stuff so you don't have to. Texting / email runs through your own account at cost — usually pennies.",
+    items: [
+      { id: "auto_alert", nm: "Instant alerts", pr: 120, inc: "One trigger → one text or email.", ex: "New order or booking → you get a text the second it happens." },
+      { id: "auto_seq", nm: "Auto follow-up sequence", pr: 200, inc: "A timed sequence of up to 3 messages.", ex: "Confirmation → reminder → review request, all on its own." },
+      { id: "auto_email", nm: "Auto-email after a booking/order", pr: 200, inc: "One triggered email with your content.", ex: "Someone books → instantly gets a 'here's what's next' email." },
+      { id: "auto_log", nm: "Auto note-taking / logging", pr: 250, inc: "Auto-save to a sortable sheet / CRM.", ex: "Every request auto-saved — no manual entry." },
+      { id: "auto_inv", nm: "Inventory / stock tracking", pr: 350, inc: "Sold-out toggle that syncs everywhere + low-stock alerts.", ex: "Mark something sold out once → it updates everywhere." },
+      { id: "auto_blast", nm: "Text-blast system", pr: 300, inc: "List setup, send tool, opt-out handling.", ex: "Slow day? Blast a deal to everyone who's bought before." },
+      { id: "auto_connect", nm: "Connect outside platforms", pr: 400, inc: "One integration set up and tested.", ex: "Sync your email list, calendar, or accounting so they stay in step." },
+    ],
+  },
+  {
+    title: "AI Agents", kicker: "Runs itself",
+    sub: "Smart helpers that handle tasks live, 24/7. Each running agent needs a Care Plan + AI management so it keeps working. Usage runs through your own accounts at cost.",
+    items: [
+      { id: "ai_voice", nm: "Voice agent (answers the phone)", pr: 2500, ai: true, inc: "Phone setup, custom script, order/booking handling, texts a pay link.", ex: "Rush hour, phone won't stop → AI answers every call, never misses a sale." },
+      { id: "ai_onetext", nm: "One-text command center", pr: 1500, ai: true, inc: "Text one line → dispatches to your site + text list + social caption.", ex: "Text a special → site, list, and caption all update in under 30 seconds." },
+      { id: "ai_chat", nm: "Conversational website chat", pr: 850, ai: true, inc: "Trained on your business, captures leads, hands off to you.", ex: "Answers 'are you open?', grabs their number, books them — even at 3am." },
+      { id: "ai_manager", nm: "AI task / order manager", pr: 700, ai: true, inc: "Unified view, late-flagging, alerts to you.", ex: "Pulls every order or lead into one view, flags what's late." },
+      { id: "ai_discord", nm: "Discord / community bot", pr: 500, ai: true, inc: "Auto-welcome + onboarding, FAQ answers, scheduled posts, staff pings.", ex: "New member joins → bot welcomes, onboards, posts updates." },
+      { id: "ai_custom", nm: "Custom AI workflow", pr: 1500, ai: true, inc: "A scoped build around your exact problem.", ex: "Reads incoming emails and drafts a reply or quote automatically." },
+    ],
+  },
+  {
+    title: "Google & Reviews", kicker: "Get found",
+    sub: "Show up when people search. Stack honest 5-star reviews — the safe way.",
+    items: [
+      { id: "rev_all", nm: "Scan-to-Review system (all-in-one)", pr: 500, inc: "Google cleanup + review link + printable QR + scan → live staff alert.", ex: "Reward is for scanning in / joining your list — never for the review itself. Keeps your listing 100% safe." },
+      { id: "rev_clean", nm: "Google profile cleanup only", pr: 200, inc: "Claim, fix hours / photos / categories, optimize.", ex: "Unclaimed, wrong hours → fully optimized so you show up nearby." },
+      { id: "rev_link", nm: "Review link + QR only", pr: 150, inc: "Review link + printable QR codes. (Already in the all-in-one.)", ex: "A QR on the receipt that opens your review box." },
+      { id: "rev_seo", nm: "Local SEO pass", pr: 300, inc: "On-page SEO, local keywords, listing consistency.", ex: "Show up on page one for 'your service near me.'" },
+    ],
+  },
+  {
+    title: "Design & Content", kicker: "Look good",
+    sub: "Look good everywhere. Social comes in two flavors — pics cost less, reels reach more. Pick the mix that fits.",
+    items: [
+      { id: "soc_pics", nm: "Social — Pics & Graphics (30 days)", pr: 500, inc: "~12 designed posts/mo: branded graphics + captions, scheduled & posted. No video.", ex: "A month of clean static posts — you just approve." },
+      { id: "soc_reels", nm: "Social — Pics + Reels (30 days)", pr: 950, inc: "~12 posts + 6 short reels/mo (reels edited from your clips), scheduled & posted.", ex: "Reels reach far more people than static — this mixes both." },
+      { id: "soc_full", nm: "Social — Full Push (30 days)", pr: 1600, inc: "~20 posts + 10 reels + daily stories, scheduled & posted.", ex: "Maximum presence — looks like you never stop posting." },
+      { id: "soc_reel1", nm: "Single reel (one-off)", pr: 100, inc: "One short-form video edited from your footage.", ex: "A one-off reel for a launch or event." },
+      { id: "con_logo", nm: "Logo design", pr: 250, inc: "2–3 concepts, revisions, and final files (PNG + SVG) you own.", ex: "No logo yet → a clean mark in every format." },
+      { id: "con_flyer", nm: "Custom graphic / flyer (one-off)", pr: 150, inc: "One designed piece with revisions.", ex: "An event flyer or a 'now open' announcement." },
+      { id: "con_camp", nm: "Themed campaign", pr: 400, inc: "Each day's post + graphic + deal, scheduled to run on its own.", ex: "A full holiday-week push, scheduled in advance." },
+      { id: "con_pdf", nm: "Branded PDF / one-pager", pr: 150, inc: "One designed PDF.", ex: "A proposal or packet you can hand a client." },
+      { id: "con_media", nm: "Photo / video edit pass", pr: 150, inc: "Cropping, color, sizing for web + social.", ex: "Your phone photos cleaned up and sized for the site." },
+    ],
+  },
 ];
 
-const MILESTONES = [
-  { key: "kickoff", pct: 25, what: "Scoping, kickoff call, account setup, first build push" },
-  { key: "build",   pct: 50, what: "Core build complete, ready for review" },
-  { key: "launch",  pct: 25, what: "Revisions, polish, go-live" },
+type CarePlan = { id: string; cls: "silver" | "gold"; name: string; price: number; line: string; items: string[] };
+const CARE: CarePlan[] = [
+  {
+    id: "care_basic", cls: "silver", name: "Care Plan", price: 250,
+    line: "On-call upkeep.",
+    items: ["Bug fixes + updates", "Hours / price / content changes", "Monitoring + review watching", "Same-day small tweaks"],
+  },
+  {
+    id: "care_content", cls: "gold", name: "Care Plan + Content", price: 400,
+    line: "Upkeep + I post for you.",
+    items: ["Everything in Care Plan", "Weekly pic posts written + posted (reels = add a Social package)"],
+  },
 ];
 
-const AI_REQUIRES_CARE = new Set(["agent_voice","agent_onetext","agent_chat","agent_orders","agent_discord","agent_custom","auto_inventory","auto_followup","sms_blast"]);
-const FAST_TRACK_FEE = 300;
+type CareAddon = { id: string; nm: string; pr: number; inc: string; ex: string };
+const CARE_ADDONS: CareAddon[] = [
+  { id: "add_priority", nm: "Priority Support", pr: 150, inc: "Front-of-line, same-hour turnaround on urgent changes. (Requires a Care Plan.)", ex: "Need a change RIGHT NOW during a rush → it jumps the queue." },
+];
 
-function fmt(n: number) { return "$" + n.toLocaleString(); }
-function depositFor(total: number) {
-  if (total < 1000) return Math.max(250, Math.round(total * 0.25));
-  if (total < 2500) return Math.round(total * 0.30);
-  if (total < 5000) return Math.round(total * 0.40);
-  return Math.round(total * 0.50);
-}
-function depositPct(total: number) {
-  if (total < 1000) return 25;
-  if (total < 2500) return 30;
-  if (total < 5000) return 40;
-  return 50;
-}
-function testingWeeks(total: number) { return total < 1500 ? 1 : 2; }
+const AI_FEE = 125;
 
-function lookup(id: string): Item | undefined {
-  for (const g of DATA) for (const it of g.items) if (it.id === id) return it;
+const PLANS = [
+  { id: "full", label: "Pay in full" },
+  { id: "dep3", label: "Deposit + 3 monthly" },
+  { id: "dep6", label: "Deposit + 6 monthly" },
+  { id: "after", label: "Afterpay (Pay in 4)" },
+];
+
+const fmt = (n: number) => "$" + n.toLocaleString();
+
+function depositInfo(total: number): { rate: number; min: number; pct: number; amount: number } {
+  let rate = 0.5, min = 0, pct = 50;
+  if (total < 1000) { rate = 0.25; min = 250; pct = 25; }
+  else if (total < 2500) { rate = 0.30; pct = 30; }
+  else if (total < 5000) { rate = 0.40; pct = 40; }
+  const amount = Math.max(Math.round(total * rate), min);
+  return { rate, min, pct, amount };
 }
 
 export default function EstimateBuilder() {
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [sprintCadence, setSprintCadence] = useState<"2w" | "1w">("2w");
-  const [chosenPlan, setChosenPlan] = useState<string | null>(null);
-  const [cliName, setCliName] = useState("");
-  const [cliBiz, setCliBiz] = useState("");
+  const [bundle, setBundle] = useState<string | null>(null);
+  const [items, setItems] = useState<Set<string>>(new Set());
+  const [care, setCare] = useState<string | null>(null);
+  const [addons, setAddons] = useState<Set<string>>(new Set());
+  const [plan, setPlan] = useState("full");
+  const [name, setName] = useState("");
+  const [biz, setBiz] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [reviewOpen, setReviewOpen] = useState(false);
-  const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
 
-  const summary = useMemo(() => {
-    const items: Item[] = [];
-    let one = 0, rec = 0;
-    selected.forEach(id => {
-      const it = lookup(id); if (!it) return;
-      items.push(it);
-      if (it.recur) rec += it.price; else one += it.price;
-    });
-    const fastTrack = (sprintCadence === "1w" && one > 0) ? FAST_TRACK_FEE : 0;
-    if (fastTrack > 0) { items.push({ id: "_fasttrack", name: "Fast Track (1-week sprints)", price: fastTrack, what: "", eg: "" }); one += fastTrack; }
-    return { items, one, rec, fastTrack };
-  }, [selected, sprintCadence]);
+  const byId = useMemo(() => {
+    const m: Record<string, ALItem> = {};
+    CATS.forEach(c => c.items.forEach(i => { m[i.id] = i; }));
+    return m;
+  }, []);
 
-  const hasCarePlan = selected.has("ret_basic") || selected.has("ret_content");
-  const needsCare = useMemo(() => {
-    for (const id of AI_REQUIRES_CARE) if (selected.has(id)) return true;
-    return false;
-  }, [selected]);
+  const calc = useMemo(() => {
+    let oneTime = 0;
+    const b = BUNDLES.find(x => x.id === bundle);
+    if (b) oneTime += b.price;
+    items.forEach(id => { oneTime += byId[id]?.pr || 0; });
+
+    const itemAi = [...items].filter(id => byId[id]?.ai).length;
+    const bundleAi = bundle === "platinum" ? 1 : bundle === "premier" ? 2 : 0;
+    const aiCount = itemAi + bundleAi;
+
+    let monthly = 0;
+    const carePlan = CARE.find(x => x.id === care);
+    if (carePlan) monthly += carePlan.price;
+    const aiFee = carePlan && aiCount > 0 ? aiCount * AI_FEE : 0;
+    monthly += aiFee;
+    addons.forEach(id => {
+      const a = CARE_ADDONS.find(x => x.id === id);
+      if (a) monthly += a.pr;
+    });
+
+    return { oneTime, monthly, aiCount, aiFee };
+  }, [bundle, items, care, addons, byId]);
 
   useEffect(() => {
-    if (!toastMsg) return;
-    const t = setTimeout(() => setToastMsg(null), 2200);
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 2200);
     return () => clearTimeout(t);
-  }, [toastMsg]);
+  }, [toast]);
 
-  function toggle(it: Item) {
-    setSelected(prev => {
+  const warn = useMemo(() => {
+    if (calc.aiCount > 0 && !care) return "⚠ You picked an AI agent. A Care Plan + AI management is required to keep it running — pick one under Keep It Running.";
+    if (addons.has("add_priority") && !care) return "⚠ Priority Support is an add-on to a Care Plan — pick a Care Plan to use it.";
+    return null;
+  }, [calc.aiCount, care, addons]);
+
+  function pickBundle(id: string) { setBundle(b => (b === id ? null : id)); }
+  function toggleItem(id: string) {
+    setItems(prev => {
       const next = new Set(prev);
-      if (it.requires_retainer && !next.has(it.id)) {
-        if (!next.has("ret_basic") && !next.has("ret_content")) {
-          setToastMsg("Add a Care Plan first — Priority is an add-on");
-          return prev;
-        }
-      }
-      if (next.has(it.id)) next.delete(it.id); else next.add(it.id);
-      if ((it.id === "ret_basic" || it.id === "ret_content") && !next.has("ret_basic") && !next.has("ret_content")) {
-        if (next.has("ret_priority")) { next.delete("ret_priority"); setToastMsg("Priority removed — needs a Care Plan"); }
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+  function pickCare(id: string) {
+    setCare(c => {
+      const next = c === id ? null : id;
+      if (!next && addons.has("add_priority")) {
+        setAddons(a => { const n = new Set(a); n.delete("add_priority"); return n; });
+        setToast("Priority removed — needs a Care Plan");
       }
       return next;
     });
   }
+  function toggleAddon(id: string) {
+    if (id === "add_priority" && !care && !addons.has(id)) {
+      setToast("Pick a Care Plan first — Priority is an add-on");
+      return;
+    }
+    setAddons(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+  function resetAll() {
+    setBundle(null); setItems(new Set()); setCare(null); setAddons(new Set());
+    setPlan("full"); window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function buildLineItems() {
+    const lines: Array<{ id: string; name: string; price: number; recur?: boolean }> = [];
+    const b = BUNDLES.find(x => x.id === bundle);
+    if (b) lines.push({ id: b.id, name: `${b.name} package`, price: b.price });
+    items.forEach(id => { const it = byId[id]; if (it) lines.push({ id: it.id, name: it.nm, price: it.pr }); });
+    const c = CARE.find(x => x.id === care);
+    if (c) lines.push({ id: c.id, name: c.name, price: c.price, recur: true });
+    if (calc.aiFee > 0) lines.push({ id: "_ai_fee", name: `AI management (${calc.aiCount}×$${AI_FEE})`, price: calc.aiFee, recur: true });
+    addons.forEach(id => { const a = CARE_ADDONS.find(x => x.id === id); if (a) lines.push({ id: a.id, name: a.nm, price: a.pr, recur: true }); });
+    return lines;
+  }
+
+  function copyEstimate() {
+    const lines = buildLineItems();
+    let txt = `RICH OFF TECH — ESTIMATE\n${name || "(no name)"}${biz ? " / " + biz : ""}\n${email}${phone ? "  ·  " + phone : ""}\n\n`;
+    lines.filter(l => !l.recur).forEach(l => { txt += `• ${l.name} — ${fmt(l.price)}\n`; });
+    if (calc.oneTime) txt += `\nBUILD (one-time): ${fmt(calc.oneTime)}\n`;
+    const recurLines = lines.filter(l => l.recur);
+    if (recurLines.length) {
+      txt += `\nMONTHLY:\n`;
+      recurLines.forEach(l => { txt += `• ${l.name} — ${fmt(l.price)}/mo\n`; });
+      txt += `MONTHLY TOTAL: ${fmt(calc.monthly)}/mo\n`;
+    }
+    txt += `\nrichofftechllc@gmail.com`;
+    navigator.clipboard.writeText(txt).then(() => setToast("Estimate copied ✓"));
+  }
 
   async function save() {
     if (savedId) return;
-    if (summary.one > 0 && !chosenPlan) {
-      setToastMsg("Pick how you want to pay first");
-      document.getElementById("eb-paybox")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (!calc.oneTime && !calc.monthly) {
+      setToast("Pick a tier or any item first");
       return;
     }
-    if (needsCare && !hasCarePlan) {
-      setToastMsg("Add a Care Plan — AI agents need management");
+    if (warn) {
+      setToast(warn);
       document.getElementById("eb-care")?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
-    const planObj = chosenPlan ? PAY_PLANS.find(p => p.id === chosenPlan) : null;
+    const planObj = PLANS.find(p => p.id === plan);
+    const dep = depositInfo(calc.oneTime);
     const payload = {
-      client_name: cliName.trim() || undefined,
-      business: cliBiz.trim() || undefined,
+      client_name: name.trim() || undefined,
+      business: biz.trim() || undefined,
       email: email.trim() || undefined,
       phone: phone.trim() || undefined,
-      selected_ids: [...selected],
-      line_items: summary.items.map(it => ({ id: it.id, name: it.name, price: it.price, recur: !!it.recur })),
-      one_time_total: summary.one,
-      monthly_total: summary.rec,
-      sprint_cadence: sprintCadence,
-      fast_track_fee: chosenPlan && sprintCadence === "1w" ? FAST_TRACK_FEE : 0,
-      testing_weeks: summary.one > 0 ? testingWeeks(summary.one) : 0,
-      warranty_days: summary.one > 0 ? 90 : 0,
+      selected_ids: [bundle, ...items, care, ...addons].filter(Boolean) as string[],
+      line_items: buildLineItems(),
+      one_time_total: calc.oneTime,
+      monthly_total: calc.monthly,
+      payment_plan: plan,
+      payment_plan_label: planObj?.label || null,
+      deposit_required: plan === "full" ? calc.oneTime : (plan.startsWith("dep") ? dep.amount : 0),
+      deposit_pct: plan.startsWith("dep") ? dep.pct : null,
+      warranty_days: calc.oneTime > 0 ? 90 : 0,
       hourly_rate_after_warranty: 75,
-      payment_plan: chosenPlan,
-      payment_plan_label: planObj ? planObj.name : null,
-      deposit_required: chosenPlan && chosenPlan.startsWith("split") ? depositFor(summary.one) : (chosenPlan === "full" ? summary.one : 0),
-      deposit_pct: chosenPlan && chosenPlan.startsWith("split") ? depositPct(summary.one) : null,
-      milestones: MILESTONES,
-      retainer_terms: summary.rec > 0 ? {
-        monthly_total: summary.rec,
-        billing_day: 1,
-        first_charge: "at kickoff",
-        term: "month-to-month",
-        cancellation: "14 days written notice; current month non-refundable; no fees",
-      } : null,
     };
     setSubmitting(true);
     try {
       const r = await fetch("/api/estimate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const data = await r.json();
-      if (data?.ok) { setSavedId(data.id); setToastMsg("Saved ✓"); }
-      else { setToastMsg("Couldn't save — try again"); }
+      if (data?.ok) { setSavedId(data.id); setToast("Saved ✓"); }
+      else { setToast("Couldn't save — try again"); }
     } catch {
-      setToastMsg("Couldn't save — try again");
+      setToast("Couldn't save — try again");
     } finally {
       setSubmitting(false);
     }
   }
 
-  const planObj = chosenPlan ? PAY_PLANS.find(p => p.id === chosenPlan) : null;
-  const dep = depositFor(summary.one);
-  const pct = depositPct(summary.one);
+  const dep = depositInfo(calc.oneTime);
 
   if (savedId) {
     return (
-      <div className="eb-success">
-        <div className="eb-success-card">
-          <div className="eb-success-kick">Saved ✓</div>
-          <h3>Your estimate is in.</h3>
-          <p>
-            We&apos;ll email you a fixed quote within 24 hours
-            {email ? <> at <b>{email}</b></> : null}.
-            If you&apos;d like to talk it through first, the Project Discovery agent above takes calls anytime.
+      <div className="max-w-3xl mx-auto px-6 py-12">
+        <div className="bg-zinc-950 border border-green-500/40 rounded-2xl p-10 text-center">
+          <div className="text-green-500 font-bold tracking-widest text-xs mb-3">SAVED ✓</div>
+          <h3 className="text-3xl font-black mb-4">Your estimate is in.</h3>
+          <p className="text-gray-400 mb-3">
+            We&apos;ll email you a fixed quote within 24 hours{email ? <> at <b className="text-white">{email}</b></> : null}.
           </p>
-          <p className="eb-success-id">Reference: <code>{savedId}</code></p>
+          <p className="text-gray-500 text-xs mt-6">Reference: <code className="bg-zinc-900 px-2 py-1 rounded text-orange-500 font-mono">{savedId}</code></p>
         </div>
-        <style jsx>{styles}</style>
       </div>
     );
   }
@@ -247,200 +346,167 @@ export default function EstimateBuilder() {
   return (
     <div className="eb-root">
       <div className="eb-wrap">
+
         <header className="eb-header">
           <div className="kicker">Rich Off Tech LLC</div>
-          <h1>Build Your <em>Estimate</em></h1>
-          <p className="sub">Tap anything you want. Your total builds as you go — no surprises. Start with what you need today, add the rest whenever you&apos;re ready.</p>
-          <div className="namebar">
-            <input value={cliName} onChange={e=>setCliName(e.target.value)} type="text" placeholder="Your name" />
-            <input value={cliBiz}  onChange={e=>setCliBiz(e.target.value)}  type="text" placeholder="Business name" />
-          </div>
-          <div className="namebar">
-            <input value={email} onChange={e=>setEmail(e.target.value)} type="email" placeholder="Email (so we can send you the quote)" />
-            <input value={phone} onChange={e=>setPhone(e.target.value)} type="tel"   placeholder="Phone (optional)" />
-          </div>
-          <p className="disclaim">Starting prices shown — final quote confirmed once we talk through the details. You own everything we build.</p>
+          <h1>Build Your Estimate</h1>
+          <p className="sub">
+            Tap anything you want. Your total builds as you go — no surprises. Start with what you need today, add the rest whenever you&apos;re ready.
+          </p>
+          <p className="note">
+            Starting prices shown. Final quote confirmed once we talk through the details. You own everything we build — site, accounts, and data. We never take a cut of your sales. Third-party fees (payments, texting, domain) are billed to you at cost.
+          </p>
         </header>
 
-        <div id="cats">
-          {DATA.map(group => (
-            <div key={group.cat} className="cat" id={group.cat.includes("Keep It Running") ? "eb-care" : undefined}>
-              <div className="cat-head">
-                <div className="cat-title">{group.cat}</div>
-                <div className="cat-line"></div>
-              </div>
-              <div className="cat-desc">{group.desc}</div>
-              {group.items.map(it => {
-                const on = selected.has(it.id);
-                return (
-                  <div
-                    key={it.id}
-                    className={`item${on ? " on" : ""}${it.bundle ? " is-bundle" : ""}`}
-                    onClick={() => toggle(it)}
-                  >
-                    <div className="check">✓</div>
-                    <div className="it-body">
-                      <div className="it-top">
-                        <span className="it-name">{it.name}</span>
-                        <span className="it-price">{it.recur ? `${fmt(it.price)}/mo` : (it.bundle ? fmt(it.price) : `from ${fmt(it.price)}`)}</span>
-                      </div>
-                      <div className="it-what">{it.what}</div>
-                      <div className="it-eg"><b>Example:</b> {it.eg}</div>
-                      {it.recur && !it.requires_retainer && <span className="recur">monthly · cancel anytime</span>}
-                      {it.requires_retainer && <span className="recur eb-gold">add-on · requires a Care Plan</span>}
-                      {it.rec && <span className="recur eb-gold">⚠ requires a Care Plan ($250+/mo) to run</span>}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ))}
+        <div className="contact">
+          <div className="fld full"><label>Your name</label><input value={name} onChange={e => setName(e.target.value)} placeholder="Your name" /></div>
+          <div className="fld"><label>Business name</label><input value={biz} onChange={e => setBiz(e.target.value)} placeholder="Business name" /></div>
+          <div className="fld"><label>Email</label><input value={email} onChange={e => setEmail(e.target.value)} placeholder="So we can send your quote" type="email" /></div>
+          <div className="fld full"><label>Phone (optional)</label><input value={phone} onChange={e => setPhone(e.target.value)} placeholder="Phone" type="tel" /></div>
         </div>
 
-        <p className="foot-note">
-          <b>How it works:</b> pick what you want → save your estimate → we send a fixed quote.<br/>
-          You own the site, accounts, and data. We never take a cut of your sales. Third-party fees (payments, texting, domain) are billed to you at cost.<br/>
-          Rich Off Tech LLC · richofftechllc@gmail.com
-        </p>
+        {/* BUNDLES */}
+        <section>
+          <div className="sec-head"><span className="sec-kick">Packages</span><h2 className="sec-h2">Pick a tier</h2></div>
+          <p className="sec-sub">Most clients start with one of these. Pick a tier, then add anything below. Bundling saves vs buying à la carte.</p>
+          <div className="tiers">
+            {BUNDLES.map(b => (
+              <div key={b.id} className={`tier ${b.cls}${bundle === b.id ? " sel" : ""}`} onClick={() => pickBundle(b.id)}>
+                <div className="metal" />
+                {b.popular && <span className="pop">Most popular</span>}
+                <div className="tname">{b.name}</div>
+                <div className="price">{b.quote ? "from " + fmt(b.price) : fmt(b.price)}</div>
+                <div className="save">{b.save ? `Saves ${fmt(b.save)} vs separate` : (b.quote ? "By quote · custom scope" : "")}</div>
+                <div className="tline">{b.line}</div>
+                <ul>{b.items.map(i => <li key={i}>{i}</li>)}</ul>
+                <div className="pick">{bundle === b.id ? "● selected" : "tap to choose"}</div>
+              </div>
+            ))}
+          </div>
+        </section>
 
-        {summary.one > 0 && (
-          <div className="pay-box" id="eb-paybox">
-            <div className="cat-head"><div className="cat-title">How would you like to pay?</div><div className="cat-line"></div></div>
-            <div className="cat-desc">Deposit scales with the project — covers kickoff work and reserves your spot. Pick what works for your cash flow.</div>
-            <div className="pay-grid">
-              {PAY_PLANS.map(p => (
-                <div key={p.id} className={`pay-opt${chosenPlan === p.id ? " on" : ""}`} onClick={() => setChosenPlan(p.id)}>
-                  <div className="po-name">{p.name}{p.tag && <span className="po-tag">{p.tag}</span>}</div>
-                  <div className="po-sub">{p.sub}</div>
+        {/* CATEGORIES */}
+        {CATS.map(c => (
+          <section key={c.title}>
+            <div className="sec-head"><span className="sec-kick">{c.kicker}</span><h2 className="sec-h2">{c.title}</h2></div>
+            <p className="cat-sub">{c.sub}</p>
+            <div className="items">
+              {c.items.map(i => (
+                <div key={i.id} className={`item${items.has(i.id) ? " sel" : ""}`} onClick={() => toggleItem(i.id)}>
+                  <div className="top"><span className="nm">{i.nm}</span><span className="pr">from {fmt(i.pr)}</span></div>
+                  <div className="inc">{i.inc}</div>
+                  <div className="ex">{i.ex}</div>
+                  {i.ai && <span className="badge">needs Care Plan + AI mgmt</span>}
                 </div>
               ))}
             </div>
+          </section>
+        ))}
 
-            {chosenPlan && summary.one > 0 && (
+        {/* MONTHLY */}
+        <section id="eb-care">
+          <div className="sec-head"><span className="sec-kick">Monthly</span><h2 className="sec-h2">Keep It Running</h2></div>
+          <p className="cat-sub">
+            Optional — your site stays live either way. A Care Plan keeps me on call to make changes for you. Cancel anytime.
+          </p>
+          <div className="tiers care-tiers">
+            {CARE.map(c => (
+              <div key={c.id} className={`tier ${c.cls}${care === c.id ? " sel" : ""}`} onClick={() => pickCare(c.id)}>
+                <div className="metal" />
+                <div className="tname">{c.name}</div>
+                <div className="price">{fmt(c.price)}<span className="mo">/mo</span></div>
+                <div className="tline">{c.line}</div>
+                <ul>{c.items.map(i => <li key={i}>{i}</li>)}</ul>
+                <div className="pick">{care === c.id ? "● selected" : "tap to choose"}</div>
+              </div>
+            ))}
+          </div>
+          <div className="items care-add">
+            {CARE_ADDONS.map(a => (
+              <div key={a.id} className={`item${addons.has(a.id) ? " sel" : ""}`} onClick={() => toggleAddon(a.id)}>
+                <div className="top"><span className="nm">{a.nm}</span><span className="pr">+{fmt(a.pr)}/mo</span></div>
+                <div className="inc">{a.inc}</div>
+                <div className="ex">{a.ex}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* PAYMENT INFO */}
+        <div className="info">
+          <h3>How payment works</h3>
+          <div className="plans">
+            {PLANS.map(p => (
+              <div key={p.id} className={`plan${plan === p.id ? " sel" : ""}`} onClick={() => setPlan(p.id)}>{p.label}</div>
+            ))}
+          </div>
+          <div className="ginfo">
+            <p><b>Deposit</b> scales with the project: 25% (min $250) under $1k · 30% to $2.5k · 40% to $5k · 50% above $5k.</p>
+            <p><b>Sprints &amp; testing</b> included: 2-week build sprints with demos, then a staging URL you test before launch.</p>
+            <p><b>Warranty:</b> 90 days of free bug fixes after launch. After that, free while on a Care Plan.</p>
+            <p><b>Cancellation, fair both ways:</b> you pay for milestones done — never for work that didn&apos;t happen.</p>
+          </div>
+        </div>
+
+        {/* SUMMARY */}
+        <div className="summary">
+          <h3>Your estimate</h3>
+          <div className="lines">
+            {bundle && (() => {
+              const b = BUNDLES.find(x => x.id === bundle);
+              return b ? <div className="srow"><span>{b.name} package</span><span className="v">{fmt(b.price)}</span></div> : null;
+            })()}
+            {[...items].map(id => byId[id] && (
+              <div key={id} className="srow"><span>{byId[id].nm}</span><span className="v">{fmt(byId[id].pr)}</span></div>
+            ))}
+            {calc.oneTime > 0 ? (
               <>
-                <div className="pay-summary show">
-                  <div className="ps-line"><span>Project total</span><span><b>{fmt(summary.one)}</b></span></div>
-                  {chosenPlan === "full" && (
-                    <div className="ps-line"><span>Due today</span><span><b>{fmt(summary.one)}</b></span></div>
-                  )}
-                  {chosenPlan.startsWith("split") && (() => {
-                    const months = parseInt(chosenPlan.replace("split", ""), 10);
-                    const remaining = Math.max(0, summary.one - dep);
-                    const monthly = remaining > 0 ? Math.ceil(remaining / months) : 0;
-                    return (
-                      <>
-                        <div className="ps-line"><span>Deposit today ({pct}% — required to start)</span><span><b>{fmt(dep)}</b></span></div>
-                        {monthly > 0 && <div className="ps-line"><span>Then {months} monthly payment{months > 1 ? "s" : ""} of</span><span><b>{fmt(monthly)}/mo</b></span></div>}
-                        <div className="ps-line ps-total"><span>Total over {months} month{months > 1 ? "s" : ""}</span><span>{fmt(dep + monthly * months)}</span></div>
-                      </>
-                    );
-                  })()}
-                  {chosenPlan.startsWith("afterpay") && (
-                    <>
-                      <div className="ps-line"><span>Paid via Afterpay (Rich Off Tech paid in full upfront)</span><span><b>{fmt(summary.one)}</b></span></div>
-                      {chosenPlan === "afterpay4" && (() => { const each = Math.ceil(summary.one / 4); return <div className="ps-line"><span>You pay Afterpay</span><span>4× {fmt(each)} over 6 weeks</span></div>; })()}
-                      {(chosenPlan === "afterpay6" || chosenPlan === "afterpay12") && (
-                        <div className="ps-line"><span>You pay Afterpay</span><span>{chosenPlan === "afterpay6" ? 6 : 12} monthly + interest</span></div>
-                      )}
-                    </>
-                  )}
+                <div className="srow tot"><span>Build total (one-time)</span><span className="v">{fmt(calc.oneTime)}</span></div>
+                <div className="srow sub">
+                  {plan === "full" && `Pay in full: ${fmt(calc.oneTime)}`}
+                  {plan === "dep3" && `Deposit ${fmt(dep.amount)} now, then ${fmt(Math.ceil((calc.oneTime - dep.amount) / 3))}/mo × 3`}
+                  {plan === "dep6" && `Deposit ${fmt(dep.amount)} now, then ${fmt(Math.ceil((calc.oneTime - dep.amount) / 6))}/mo × 6`}
+                  {plan === "after" && `Afterpay: 4 payments of ${fmt(Math.ceil(calc.oneTime / 4))}`}
                 </div>
-                <p className="pay-terms">
-                  {chosenPlan === "full" && <><b>Pay in full.</b> Card, debit, Apple Pay, Google Pay, Cash App Pay, or bank transfer. Same milestone protections apply if you cancel before delivery.</>}
-                  {chosenPlan.startsWith("split") && <><b>Billing:</b> monthly payments hit the same day of the month each time. 7-day grace, then a small late fee. <b>You only pay for work that actually happens. No interest, no chase, no chargeback drama.</b></>}
-                  {chosenPlan === "afterpay4" && <><b>Afterpay Pay in 4:</b> 4 interest-free installments over 6 weeks. Project must be under $2,000. Subject to Afterpay approval. Same milestone cancellation rules apply.</>}
-                  {(chosenPlan === "afterpay6" || chosenPlan === "afterpay12") && <><b>Afterpay Pay Monthly:</b> {chosenPlan === "afterpay6" ? 6 : 12} months. Interest applies (6.99%–35.99%, set by Afterpay per customer). Project must be $400–$4,000. Subject to Afterpay approval.</>}
-                </p>
+              </>
+            ) : (
+              <div className="srow sub" style={{ borderBottom: "none" }}>Nothing selected yet — tap a tier or any item above.</div>
+            )}
+            {calc.monthly > 0 && (
+              <>
+                <div className="srow sub" style={{ marginTop: 10, borderBottom: "none" }}>— Monthly —</div>
+                {(() => { const c = CARE.find(x => x.id === care); return c && <div className="srow"><span>{c.name}</span><span className="v">{fmt(c.price)}/mo</span></div>; })()}
+                {calc.aiFee > 0 && <div className="srow"><span>AI management ({calc.aiCount} {calc.aiCount > 1 ? "systems" : "system"} × ${AI_FEE})</span><span className="v">{fmt(calc.aiFee)}/mo</span></div>}
+                {[...addons].map(id => { const a = CARE_ADDONS.find(x => x.id === id); return a && <div key={id} className="srow"><span>{a.nm}</span><span className="v">+{fmt(a.pr)}/mo</span></div>; })}
+                <div className="srow tot"><span>Monthly total</span><span className="v">{fmt(calc.monthly)}/mo</span></div>
               </>
             )}
-
-            <div className="milestones">
-              <div className="ms-label">How your project actually runs (SDLC)</div>
-              <div className="ms-row">
-                <div className="ms-step"><div className="ms-pct">25%</div><div className="ms-name">Kickoff</div><div className="ms-what">Discovery, scope locked, deposit collected, day-1 build push</div></div>
-                <div className="ms-arrow">→</div>
-                <div className="ms-step"><div className="ms-pct">50%</div><div className="ms-name">Build sprints</div><div className="ms-what">{sprintCadence === "1w" ? "1-week sprints w/ weekly demos. Fast Track (+$300)." : "2-week sprints w/ demos every 2 weeks."}</div></div>
-                <div className="ms-arrow">→</div>
-                <div className="ms-step ms-test"><div className="ms-pct">incl</div><div className="ms-name">Testing (UAT)</div><div className="ms-what">{testingWeeks(summary.one)}-week UAT on staging. You test, flag bugs, we fix the list — no extra charge.</div></div>
-                <div className="ms-arrow">→</div>
-                <div className="ms-step"><div className="ms-pct">25%</div><div className="ms-name">Launch</div><div className="ms-what">Final polish, go live, hand-off, 90-day warranty starts</div></div>
-              </div>
-
-              <div className="sprint-pick">
-                <div className="sp-label">Sprint cadence — how often we demo work to you</div>
-                <div className="sp-grid">
-                  <div className={`sp-opt${sprintCadence === "2w" ? " on" : ""}`} onClick={() => setSprintCadence("2w")}>
-                    <div className="sp-name">2-week sprints  <span className="sp-tag-incl">INCLUDED</span></div>
-                    <div className="sp-sub">Standard agile. Demo every 2 weeks. Best balance of speed + cost.</div>
-                  </div>
-                  <div className={`sp-opt${sprintCadence === "1w" ? " on" : ""}`} onClick={() => setSprintCadence("1w")}>
-                    <div className="sp-name">1-week sprints  <span className="sp-tag-up">FAST TRACK +$300</span></div>
-                    <div className="sp-sub">Demos every week. Faster turnaround. Good if you need it live yesterday.</div>
-                  </div>
-                </div>
-              </div>
-
-              <p className="ms-note">Testing/UAT is built into every project (no extra charge). If you cancel mid-project, you pay for milestones completed + the percentage done on the current one. Future milestones cost nothing. <b>90 days of bug fixes are free after launch.</b> After that, free with a Care Plan or $75/hr without.</p>
-            </div>
           </div>
-        )}
-
-        {summary.rec > 0 && (
-          <div className="ret-box">
-            <div className="ret-head">
-              <div className="ret-pulse"></div>
-              <div>
-                <div className="ret-kicker">Monthly Plan Selected</div>
-                <div className="ret-title">{fmt(summary.rec)}/mo</div>
-              </div>
-            </div>
-            <div className="ret-grid">
-              <div className="ret-cell"><div className="rc-label">First charge</div><div className="rc-val">When we kick off</div></div>
-              <div className="ret-cell"><div className="rc-label">Billing day</div><div className="rc-val">1st of each month</div></div>
-              <div className="ret-cell"><div className="rc-label">Term</div><div className="rc-val">Month-to-month</div></div>
-              <div className="ret-cell"><div className="rc-label">Cancel</div><div className="rc-val">14 days&apos; notice, anytime</div></div>
-            </div>
-            <p className="ret-terms">A card on file auto-bills on the <b>1st of each month</b>. Cancel anytime with 14 days&apos; written notice — your final month finishes out (you keep access until it ends). <b>No long-term lock-in, no cancellation fees.</b></p>
+          {warn && <div className="warnbox">{warn}</div>}
+          <div className="actions">
+            <button className="btn primary" onClick={save} disabled={submitting}>{submitting ? "Saving…" : "Save & Send to Bo"}</button>
+            <button className="btn ghost" onClick={copyEstimate}>Copy my estimate</button>
+            <button className="btn ghost" onClick={resetAll}>Start over</button>
           </div>
-        )}
+        </div>
+
+        <footer className="eb-footer">
+          Pick what you want → save or copy → we send a fixed quote.<br />
+          Rich Off Tech LLC · <a href="mailto:richofftechllc@gmail.com">richofftechllc@gmail.com</a>
+        </footer>
       </div>
 
-      <div className="bar">
-        <div className="bar-in">
-          <div>
-            <div className="tot-label">Your estimate</div>
-            <div className="tot-row">
-              <span className="tot-1"><span className="pre">from</span>{fmt(summary.one)}</span>
-              {summary.rec > 0 && <span className="tot-rec">+ {fmt(summary.rec)}/mo</span>}
-            </div>
-            <div className="tot-count">{selected.size > 0 ? `${selected.size} item${selected.size > 1 ? "s" : ""} selected${summary.fastTrack > 0 ? ` · +$${summary.fastTrack} Fast Track` : ""}` : "Nothing selected yet"}</div>
+      <div className="stick">
+        <div className="stick-in">
+          <div className="nums">
+            <div><div className="lbl">Build (one-time)</div><div className="amt">{fmt(calc.oneTime)}</div></div>
+            <div><div className="lbl">Monthly</div><div className="amt m">{calc.monthly ? fmt(calc.monthly) + "/mo" : "$0"}</div></div>
           </div>
-          <div className="bar-btns">
-            <button className="btn btn-ghost" onClick={() => setReviewOpen(true)}>Review</button>
-            <button className="btn btn-save" onClick={save} disabled={submitting}>{submitting ? "Saving…" : "Save Estimate"}</button>
-          </div>
+          <div className="jump" onClick={() => document.querySelector(".summary")?.scrollIntoView({ behavior: "smooth" })}>View estimate ↓</div>
         </div>
       </div>
 
-      {toastMsg && <div className="toast show">{toastMsg}</div>}
-
-      {reviewOpen && (
-        <div className="modal open" onClick={(e) => { if (e.target === e.currentTarget) setReviewOpen(false); }}>
-          <div className="modal-card">
-            <h3>{cliName ? `${cliName}'s Estimate` : "Your Estimate"}</h3>
-            <p>{summary.items.length ? "Here's what you've picked. Starting prices — final quote confirmed when we talk." : "Nothing selected yet. Tap items above to build your estimate."}</p>
-            <div className="mlist">
-              {summary.items.map(it => (
-                <div key={it.id} className="mline"><span className="mn">{it.name}</span><span className="mp">{it.recur ? `${fmt(it.price)}/mo` : (it.bundle ? fmt(it.price) : `from ${fmt(it.price)}`)}</span></div>
-              ))}
-            </div>
-            <div className="mtot"><span>One-time total</span><span>from {fmt(summary.one)}</span></div>
-            {summary.rec > 0 && <div className="mtot eb-mtot-sub"><span>Monthly</span><span>{fmt(summary.rec)}/mo</span></div>}
-            {planObj && <div className="mtot eb-mtot-plan"><span>Payment plan</span><span>{planObj.name}</span></div>}
-            <button className="btn btn-save eb-mclose" onClick={() => setReviewOpen(false)}>Looks good — close</button>
-          </div>
-        </div>
-      )}
+      {toast && <div className="toast show">{toast}</div>}
 
       <style jsx>{styles}</style>
     </div>
@@ -448,128 +514,111 @@ export default function EstimateBuilder() {
 }
 
 const styles = `
-.eb-root{font-family:'DM Sans',sans-serif;color:#F2EAD5;padding-bottom:140px;position:relative;}
-.eb-root :global(*){box-sizing:border-box;}
-.eb-wrap{max-width:920px;margin:0 auto;padding:0 18px;}
-.eb-header{padding:34px 0 16px;}
-.kicker{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#E0A53C;font-weight:700;}
-h1{font-family:'Fraunces',serif;font-size:clamp(30px,6vw,46px);font-weight:900;line-height:1.02;margin:8px 0 6px;color:#F2EAD5;}
-h1 em{font-style:italic;color:#E0431F;}
-.sub{color:rgba(242,234,213,.55);font-size:15px;max-width:560px;line-height:1.5;}
-.namebar{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 8px;}
-.namebar input{flex:1;min-width:180px;background:#181512;border:1px solid rgba(242,234,213,.10);border-radius:11px;padding:13px 15px;color:#F2EAD5;font-size:15px;font-family:inherit;}
-.namebar input:focus{outline:none;border-color:#E0A53C;}
-.namebar input::placeholder{color:rgba(242,234,213,.35);}
-.disclaim{font-size:11px;color:rgba(242,234,213,.35);font-style:italic;margin-top:4px;}
-.cat{margin-top:26px;}
-.cat-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
-.cat-title{font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:#F2EAD5;}
-.cat-line{flex:1;height:1px;background:rgba(242,234,213,.10);}
-.cat-desc{color:rgba(242,234,213,.35);font-size:12.5px;margin:-6px 0 12px;}
-.item{background:#181512;border:1px solid rgba(242,234,213,.10);border-radius:14px;padding:15px 16px;margin-bottom:9px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;transition:border-color .18s,background .18s,transform .1s;}
-.item:hover{border-color:rgba(224,165,60,.4);}
-.item.on{border-color:#E0A53C;background:#1F1B16;}
-.item:active{transform:scale(.995);}
-.check{flex-shrink:0;width:24px;height:24px;border-radius:7px;border:2px solid rgba(242,234,213,.35);display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .18s;font-size:14px;color:transparent;}
-.item.on .check{background:#E0A53C;border-color:#E0A53C;color:#1A1410;}
-.item.is-bundle{background:linear-gradient(135deg,rgba(224,165,60,.10),rgba(224,67,31,.06));border-color:rgba(224,165,60,.35);}
-.item.is-bundle .it-name{font-family:'Fraunces',serif;font-size:17px;}
-.item.is-bundle .it-price{font-size:18px;}
-.it-body{flex:1;min-width:0;}
-.it-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;}
-.it-name{font-weight:700;font-size:15px;}
-.it-price{color:#E0A53C;font-weight:700;font-size:15px;white-space:nowrap;font-family:'Fraunces',serif;}
-.it-what{color:rgba(242,234,213,.55);font-size:13px;margin-top:3px;line-height:1.45;}
-.it-eg{color:rgba(242,234,213,.35);font-size:11.5px;margin-top:5px;font-style:italic;line-height:1.4;}
-.it-eg b{color:rgba(242,234,213,.55);font-style:normal;}
-.recur{font-size:10px;color:#37B24D;font-weight:700;letter-spacing:.04em;text-transform:uppercase;display:inline-block;margin-top:6px;}
-.recur.eb-gold{color:#E0A53C;}
-.foot-note{font-size:11px;color:rgba(242,234,213,.35);text-align:center;margin-top:30px;line-height:1.6;padding:0 10px;}
-.foot-note b{color:rgba(242,234,213,.55);}
-.pay-box{margin-top:30px;background:linear-gradient(135deg,rgba(224,165,60,.08),rgba(55,178,77,.05));border:1px solid rgba(224,165,60,.25);border-radius:14px;padding:18px;}
-.pay-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:14px 0 12px;}
-.pay-opt{background:#181512;border:1.5px solid rgba(242,234,213,.10);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .18s;}
-.pay-opt:hover{border-color:#E0A53C;}
-.pay-opt.on{border-color:#E0A53C;background:#1F1B16;box-shadow:0 0 0 1px #E0A53C inset;}
-.po-name{font-weight:700;font-size:14px;margin-bottom:3px;}
-.po-tag{display:inline-block;font-size:9px;background:#E0A53C;color:#1A1410;padding:1px 6px;border-radius:99px;font-weight:700;letter-spacing:.06em;margin-left:6px;vertical-align:middle;}
-.po-sub{font-size:11.5px;color:rgba(242,234,213,.55);line-height:1.4;}
-.pay-summary{background:#1A1410;border-radius:10px;padding:13px 16px;font-size:13px;line-height:1.6;display:none;}
-.pay-summary.show{display:block;}
-.pay-summary b{color:#E0A53C;}
-.pay-summary .ps-line{display:flex;justify-content:space-between;padding:3px 0;}
-.pay-summary .ps-total{border-top:1px solid rgba(242,234,213,.10);margin-top:5px;padding-top:8px;font-weight:700;color:#F2EAD5;}
-.pay-terms{font-size:11px;color:rgba(242,234,213,.35);margin-top:10px;line-height:1.6;font-style:italic;}
-.milestones{margin-top:18px;padding-top:18px;border-top:1px solid rgba(242,234,213,.10);}
-.ms-label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#E0A53C;font-weight:700;margin-bottom:12px;}
-.ms-row{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap;}
-.ms-step{flex:1;min-width:130px;background:#181512;border:1px solid rgba(242,234,213,.10);border-radius:11px;padding:11px 12px;}
-.ms-pct{font-family:'Fraunces',serif;font-size:22px;font-weight:900;color:#E0A53C;line-height:1;}
-.ms-name{font-weight:700;font-size:13px;margin-top:3px;}
-.ms-what{font-size:11px;color:rgba(242,234,213,.55);margin-top:3px;line-height:1.4;}
-.ms-arrow{color:rgba(242,234,213,.35);align-self:center;font-size:18px;}
-.ms-note{font-size:12px;color:rgba(242,234,213,.55);margin-top:12px;line-height:1.6;font-style:italic;}
-.ms-note b{color:#37B24D;font-style:normal;}
-.ms-step.ms-test{background:linear-gradient(135deg,rgba(55,178,77,.08),#181512);border-color:rgba(55,178,77,.30);}
-.ms-step.ms-test .ms-pct{color:#37B24D;font-size:14px;text-transform:uppercase;letter-spacing:.06em;}
-.sprint-pick{margin-top:14px;padding-top:14px;border-top:1px dashed rgba(242,234,213,.10);}
-.sp-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(242,234,213,.35);font-weight:700;margin-bottom:9px;}
-.sp-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.sp-opt{background:#181512;border:1.5px solid rgba(242,234,213,.10);border-radius:11px;padding:11px 13px;cursor:pointer;transition:all .15s;}
-.sp-opt:hover{border-color:#E0A53C;}
-.sp-opt.on{border-color:#E0A53C;background:#1F1B16;box-shadow:0 0 0 1px #E0A53C inset;}
-.sp-name{font-weight:700;font-size:13px;margin-bottom:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-.sp-sub{font-size:11.5px;color:rgba(242,234,213,.55);line-height:1.4;}
-.sp-tag-incl{font-size:9px;background:#37B24D;color:#fff;padding:1px 6px;border-radius:99px;font-weight:700;letter-spacing:.06em;}
-.sp-tag-up{font-size:9px;background:#E0A53C;color:#1A1410;padding:1px 6px;border-radius:99px;font-weight:700;letter-spacing:.06em;}
-.ret-box{margin-top:18px;background:linear-gradient(135deg,rgba(55,178,77,.08),rgba(55,178,77,.03));border:1px solid rgba(55,178,77,.30);border-radius:14px;padding:18px;}
-.ret-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
-.ret-pulse{width:10px;height:10px;border-radius:50%;background:#37B24D;box-shadow:0 0 0 4px rgba(55,178,77,.18);animation:ebpulse 2s infinite;}
-@keyframes ebpulse{0%{box-shadow:0 0 0 4px rgba(55,178,77,.18);}70%{box-shadow:0 0 0 10px rgba(55,178,77,0);}100%{box-shadow:0 0 0 4px rgba(55,178,77,0);}}
-.ret-kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#37B24D;font-weight:700;}
-.ret-title{font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:#F2EAD5;margin-top:2px;}
-.ret-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:12px;}
-.ret-cell{background:#181512;border:1px solid rgba(242,234,213,.10);border-radius:10px;padding:10px 12px;}
-.rc-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(242,234,213,.35);font-weight:700;}
-.rc-val{font-size:13px;font-weight:600;color:#F2EAD5;margin-top:3px;line-height:1.3;}
-.ret-terms{font-size:12px;color:rgba(242,234,213,.55);line-height:1.6;font-style:italic;}
-.ret-terms b{color:#F2EAD5;font-style:normal;}
-.bar{position:sticky;bottom:0;left:0;right:0;background:rgba(20,17,13,.92);backdrop-filter:blur(14px);border-top:1px solid #E0A53C;z-index:5;margin-top:30px;}
-.bar-in{max-width:920px;margin:0 auto;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
-.tot-label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(242,234,213,.35);}
-.tot-row{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;}
-.tot-1{font-family:'Fraunces',serif;font-size:28px;font-weight:900;color:#F2EAD5;}
-.tot-1 .pre{font-size:14px;color:rgba(242,234,213,.55);font-weight:500;margin-right:4px;}
-.tot-rec{font-size:14px;color:#37B24D;font-weight:700;}
-.tot-count{font-size:12px;color:rgba(242,234,213,.35);}
-.bar-btns{display:flex;gap:9px;}
-.btn{border:none;border-radius:11px;padding:13px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .12s,opacity .12s;}
-.btn:active{transform:scale(.96);}
-.btn:disabled{opacity:.5;cursor:wait;}
-.btn-save{background:#E0A53C;color:#1A1410;}
-.btn-ghost{background:transparent;color:#F2EAD5;border:1px solid rgba(242,234,213,.10);}
-.btn-ghost:hover{border-color:#E0A53C;}
-.toast{position:fixed;bottom:120px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;background:#37B24D;color:#fff;padding:12px 22px;border-radius:99px;font-weight:600;font-size:14px;z-index:60;pointer-events:none;transition:all .3s;box-shadow:0 8px 30px rgba(55,178,77,.4);}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:70;display:flex;align-items:center;justify-content:center;padding:18px;}
-.modal-card{background:#181512;border:1px solid #E0A53C;border-radius:18px;padding:26px;max-width:460px;width:100%;}
-.modal-card h3{font-family:'Fraunces',serif;font-size:24px;margin-bottom:6px;color:#F2EAD5;}
-.modal-card p{color:rgba(242,234,213,.55);font-size:14px;line-height:1.55;margin-bottom:14px;}
-.mlist{background:#0E0C0A;border-radius:11px;padding:14px;margin-bottom:14px;max-height:240px;overflow-y:auto;}
-.mline{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid rgba(242,234,213,.10);}
-.mline:last-child{border:none;}
-.mn{color:#F2EAD5;}
-.mp{color:#E0A53C;font-weight:600;white-space:nowrap;}
-.mtot{display:flex;justify-content:space-between;font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-top:10px;padding-top:10px;border-top:1px solid #E0A53C;color:#F2EAD5;}
-.mtot.eb-mtot-sub{font-size:14px;border:none;padding-top:4px;}
-.mtot.eb-mtot-plan{font-size:13px;border:none;padding-top:4px;color:#E0A53C;}
-.eb-mclose{width:100%;margin-top:16px;}
-.eb-success{padding:60px 18px;display:flex;justify-content:center;}
-.eb-success-card{background:#181512;border:1px solid #37B24D;border-radius:18px;padding:36px;max-width:520px;text-align:center;}
-.eb-success-kick{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#37B24D;font-weight:700;margin-bottom:10px;}
-.eb-success-card h3{font-family:'Fraunces',serif;font-size:30px;font-weight:900;color:#F2EAD5;margin-bottom:14px;}
-.eb-success-card p{color:rgba(242,234,213,.55);font-size:15px;line-height:1.55;margin-bottom:10px;}
-.eb-success-id{font-size:12px;color:rgba(242,234,213,.35);margin-top:18px;}
-.eb-success-id code{background:#0E0C0A;padding:3px 8px;border-radius:6px;color:#E0A53C;font-family:monospace;}
-@media(max-width:540px){.ms-arrow{display:none;}.ms-step{min-width:100%;}.sp-grid{grid-template-columns:1fr;}}
+.eb-root { color: #fff; padding-bottom: 120px; font-family: inherit; }
+.eb-root :global(*) { box-sizing: border-box; }
+.eb-wrap { max-width: 920px; margin: 0 auto; padding: 0 18px; }
+
+.eb-header { padding: 30px 0 16px; }
+.kicker { font-size: 12px; letter-spacing: .28em; text-transform: uppercase; color: #f97316; font-weight: 700; }
+.eb-header h1 { font-size: clamp(34px, 7vw, 56px); font-weight: 900; line-height: 1.02; margin: 10px 0 10px; letter-spacing: -.02em; }
+.sub { color: #a1a1aa; font-size: 16px; max-width: 46ch; line-height: 1.55; }
+.note { color: #71717a; font-size: 13px; margin-top: 14px; max-width: 60ch; line-height: 1.55; }
+
+.contact { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 22px 0 8px; }
+.contact .full { grid-column: 1 / -1; }
+.fld label { display: block; font-size: 11px; letter-spacing: .08em; color: #a1a1aa; margin-bottom: 6px; text-transform: uppercase; font-weight: 700; }
+.fld input { width: 100%; background: #18181b; border: 1px solid rgba(255,255,255,.10); color: #fff; padding: 13px 14px; border-radius: 12px; font-size: 15px; font-family: inherit; outline: none; transition: .18s; }
+.fld input:focus { border-color: #f97316; box-shadow: 0 0 0 3px rgba(249,115,22,.15); }
+.fld input::placeholder { color: #52525b; }
+@media(max-width:560px) { .contact { grid-template-columns: 1fr; } }
+
+section { margin-top: 40px; }
+.sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; }
+.sec-h2 { font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+.sec-kick { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: #f97316; font-weight: 700; }
+.sec-sub, .cat-sub { color: #a1a1aa; font-size: 14px; margin-bottom: 16px; max-width: 62ch; line-height: 1.55; }
+
+.tiers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.care-tiers { grid-template-columns: 1fr 1fr; }
+@media(max-width:860px) { .tiers { grid-template-columns: repeat(2,1fr); } }
+@media(max-width:520px) { .tiers, .care-tiers { grid-template-columns: 1fr; } }
+
+.tier { position: relative; border: 1px solid rgba(255,255,255,.10); border-radius: 16px; padding: 22px 18px 18px; cursor: pointer; overflow: hidden; transition: .2s; background: #18181b; }
+.tier:hover { border-color: rgba(255,255,255,.18); transform: translateY(-2px); }
+.tier .metal { position: absolute; inset: 0 0 auto 0; height: 5px; }
+.tier.silver .metal { background: linear-gradient(90deg,#71717a,#e4e4e7,#71717a); }
+.tier.gold .metal { background: linear-gradient(90deg,#ea580c,#fb923c,#ef4444); }
+.tier.platinum .metal { background: linear-gradient(90deg,#d4d4d8,#ffffff,#a1a1aa); }
+.tier.premier .metal { background: linear-gradient(90deg,#0a0a0a,#f97316,#0a0a0a); }
+.tier .tname { font-weight: 900; font-size: 22px; letter-spacing: -.01em; }
+.tier.silver .tname { color: #d4d4d8; }
+.tier.gold .tname { color: #fb923c; }
+.tier.platinum .tname { color: #f4f4f5; }
+.tier.premier .tname { color: #fdba74; }
+.tier .price { font-size: 30px; font-weight: 900; margin: 4px 0 2px; letter-spacing: -.02em; }
+.tier .price .mo { font-size: 14px; color: #a1a1aa; font-weight: 600; margin-left: 2px; }
+.tier .save { font-size: 12px; color: #22c55e; font-weight: 600; margin-bottom: 12px; min-height: 14px; }
+.tier .tline { font-size: 13.5px; color: #a1a1aa; margin-bottom: 12px; min-height: 36px; line-height: 1.4; }
+.tier ul { list-style: none; font-size: 13.5px; display: flex; flex-direction: column; gap: 7px; padding: 0; margin: 0; }
+.tier li { position: relative; padding-left: 18px; color: #d4d4d8; }
+.tier li::before { content: "✓"; position: absolute; left: 0; color: #f97316; font-weight: 700; }
+.pop { position: absolute; top: 14px; right: 14px; background: linear-gradient(90deg,#ea580c,#fb923c); color: #18181b; font-size: 10.5px; font-weight: 800; letter-spacing: .06em; padding: 4px 9px; border-radius: 99px; text-transform: uppercase; }
+.tier.sel { border-color: #f97316; box-shadow: 0 0 0 1px #f97316, 0 18px 40px -20px rgba(249,115,22,.5); }
+.tier .pick { margin-top: 14px; font-size: 11px; letter-spacing: .08em; color: #52525b; text-transform: uppercase; font-weight: 700; }
+.tier.sel .pick { color: #f97316; }
+
+.items { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+.care-add { margin-top: 11px; }
+@media(max-width:640px) { .items { grid-template-columns: 1fr; } }
+.item { border: 1px solid rgba(255,255,255,.10); border-radius: 13px; padding: 14px 14px 13px; cursor: pointer; background: #18181b; transition: .16s; display: flex; flex-direction: column; gap: 5px; position: relative; }
+.item:hover { border-color: rgba(255,255,255,.18); background: #1f1f23; }
+.item.sel { border-color: #f97316; background: linear-gradient(180deg,rgba(249,115,22,.10),transparent); box-shadow: 0 0 0 1px rgba(249,115,22,.5); }
+.item .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.item .nm { font-weight: 700; font-size: 15px; }
+.item .pr { font-weight: 800; font-size: 15px; color: #fb923c; white-space: nowrap; }
+.item .inc { font-size: 12.5px; color: #a1a1aa; line-height: 1.45; }
+.item .ex { font-size: 12px; color: #71717a; font-style: italic; line-height: 1.4; }
+.badge { display: inline-block; font-size: 10.5px; color: #eab308; border: 1px solid rgba(234,179,8,.35); padding: 2px 7px; border-radius: 99px; margin-top: 2px; align-self: flex-start; font-weight: 600; }
+
+.info { background: #18181b; border: 1px solid rgba(255,255,255,.10); border-radius: 16px; padding: 22px; margin-top: 30px; }
+.info h3 { font-size: 16px; font-weight: 800; margin-bottom: 10px; }
+.info .ginfo { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; margin-top: 14px; }
+@media(max-width:640px) { .info .ginfo { grid-template-columns: 1fr; } }
+.info p { font-size: 13px; color: #a1a1aa; line-height: 1.55; }
+.info b { color: #fff; font-weight: 600; }
+.plans { display: flex; flex-wrap: wrap; gap: 8px; }
+.plan { border: 1px solid rgba(255,255,255,.10); background: #1f1f23; padding: 9px 14px; border-radius: 99px; font-size: 13px; cursor: pointer; transition: .15s; color: #a1a1aa; font-weight: 600; }
+.plan:hover { border-color: rgba(255,255,255,.20); }
+.plan.sel { border-color: #f97316; color: #fb923c; background: rgba(249,115,22,.08); }
+
+.summary { background: linear-gradient(180deg,#18181b,#0e0e10); border: 1px solid rgba(255,255,255,.14); border-radius: 16px; padding: 24px; margin-top: 26px; }
+.summary h3 { font-size: 22px; font-weight: 900; margin-bottom: 14px; letter-spacing: -.02em; }
+.srow { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; padding: 8px 0; border-bottom: 1px dashed rgba(255,255,255,.10); color: #d4d4d8; }
+.srow .v { font-weight: 700; }
+.srow.tot { border-bottom: none; font-size: 17px; font-weight: 800; padding-top: 12px; }
+.srow.tot .v { color: #fb923c; }
+.srow.sub { color: #a1a1aa; font-size: 13px; border: none; padding: 4px 0; font-style: italic; }
+.warnbox { background: rgba(234,179,8,.08); border: 1px solid rgba(234,179,8,.30); color: #eab308; font-size: 13px; padding: 11px 13px; border-radius: 11px; margin-top: 14px; }
+.actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+.btn { border: none; cursor: pointer; font-family: inherit; font-weight: 800; font-size: 14px; padding: 13px 20px; border-radius: 12px; transition: .15s; }
+.btn:disabled { opacity: .5; cursor: wait; }
+.btn.primary { background: linear-gradient(90deg,#f97316,#ef4444); color: #fff; }
+.btn.primary:hover { filter: brightness(1.07); }
+.btn.ghost { background: transparent; border: 1px solid rgba(255,255,255,.18); color: #fff; }
+.btn.ghost:hover { border-color: #f97316; color: #fb923c; }
+
+.stick { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: rgba(9,9,11,.92); backdrop-filter: blur(12px); border-top: 1px solid rgba(255,255,255,.18); }
+.stick-in { max-width: 920px; margin: 0 auto; padding: 13px 18px; display: flex; align-items: center; gap: 18px; justify-content: space-between; }
+.nums { display: flex; gap: 22px; }
+.lbl { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: #71717a; font-weight: 700; }
+.amt { font-weight: 900; font-size: 21px; letter-spacing: -.02em; }
+.amt.m { color: #fb923c; font-size: 18px; }
+.jump { font-size: 13px; color: #f97316; cursor: pointer; font-weight: 700; white-space: nowrap; }
+@media(max-width:560px) { .nums { gap: 16px; } .amt { font-size: 18px; } }
+
+.eb-footer { color: #71717a; font-size: 12.5px; text-align: center; padding: 34px 0 10px; line-height: 1.7; }
+.eb-footer a { color: #f97316; text-decoration: none; }
+
+.toast { position: fixed; bottom: 96px; left: 50%; transform: translateX(-50%) translateY(20px); background: linear-gradient(90deg,#f97316,#ef4444); color: #fff; font-weight: 700; font-size: 14px; padding: 11px 18px; border-radius: 99px; opacity: 0; transition: .25s; z-index: 60; pointer-events: none; box-shadow: 0 8px 30px rgba(249,115,22,.4); }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 `;

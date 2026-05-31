@@ -29,8 +29,7 @@ export default function EstimateBuilderTrigger() {
         <div className="text-orange-500 font-bold tracking-widest text-xs mb-3">SELF-SERVE</div>
         <h2 className="text-3xl md:text-4xl font-black mb-3">Build your own estimate.</h2>
         <p className="text-gray-400 text-base md:text-lg max-w-xl mx-auto mb-6">
-          30+ services, transparent prices, 8 payment plans including Afterpay.
-          Pick what you want — see the total live. We send a fixed quote within 24h.
+          4 tiered packages + 40+ à la carte services. Pick what you want — total builds live, no surprises. We send a fixed quote within 24h.
         </p>
         <button
           type="button"
