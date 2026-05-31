@@ -112,7 +112,11 @@ export default function ResumePage() {
         body: JSON.stringify({ code, name, resume }),
       })
         .then(r => r.json())
-        .then(data => setCloudStatus(data.persisted ? "saved" : "no_account"))
+        .then(data => {
+          if (data.persisted) setCloudStatus("saved");
+          else if (data.reason === "no_webhook_configured") setCloudStatus("no_account");
+          else setCloudStatus("error");
+        })
         .catch(() => setCloudStatus("error"));
     }, 1500);
     return () => clearTimeout(t);
