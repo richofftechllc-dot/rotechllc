@@ -287,48 +287,58 @@ export default async function Hub() {
 }
 
 function MoneySnapshot({ projects }: { projects: Project[] }) {
-  const m = projects.reduce(
-    (acc, p) => {
-      if (!p.money) return acc;
-      acc.pending += p.money.pending;
-      acc.estimate += p.money.estimate;
-      acc.monthlyBasic += p.money.monthlyBasic;
-      acc.monthlyContent += p.money.monthlyContent;
-      return acc;
-    },
-    { pending: 0, estimate: 0, monthlyBasic: 0, monthlyContent: 0 }
-  );
-  const totalBuild = m.pending + m.estimate;
-  const year1Basic = totalBuild + m.monthlyBasic * 12;
-  const year1Content = totalBuild + m.monthlyContent * 12;
+  const sumMoney = (list: Project[]) =>
+    list.reduce(
+      (acc, p) => {
+        if (!p.money) return acc;
+        acc.pending += p.money.pending;
+        acc.build += p.money.pending + p.money.estimate;
+        acc.monthlyBasic += p.money.monthlyBasic;
+        acc.monthlyContent += p.money.monthlyContent;
+        return acc;
+      },
+      { pending: 0, build: 0, monthlyBasic: 0, monthlyContent: 0 }
+    );
+  const three = sumMoney(projects.filter(p => p.name !== "Owed To Eddie"));
+  const all = sumMoney(projects);
   return (
     <div className="money">
       <div className="money-head">Money snapshot · all 4 clients</div>
       <div className="money-grid">
         <div className="money-cell">
           <div className="money-lbl">Pending invoices</div>
-          <div className="money-val gold">{fmt(m.pending)}</div>
+          <div className="money-val gold">{fmt(all.pending)}</div>
           <div className="money-sub">Sent, awaiting pay</div>
         </div>
         <div className="money-cell">
-          <div className="money-lbl">Estimate left</div>
-          <div className="money-val">{fmt(m.estimate)}</div>
-          <div className="money-sub">Pitched, not yet invoiced</div>
+          <div className="money-lbl">Total build value</div>
+          <div className="money-val gold">{fmt(all.build)}</div>
+          <div className="money-sub">One-time builds, all 4 combined</div>
         </div>
         <div className="money-cell">
-          <div className="money-lbl">Total deal value</div>
-          <div className="money-val gold">{fmt(totalBuild)}</div>
-          <div className="money-sub">One-time builds combined</div>
-        </div>
-        <div className="money-cell">
-          <div className="money-lbl">Monthly potential</div>
-          <div className="money-val pos">{fmt(m.monthlyBasic)}–{fmt(m.monthlyContent)}/mo</div>
-          <div className="money-sub">Care vs Care+Content</div>
+          <div className="money-lbl">Monthly recurring</div>
+          <div className="money-val pos">{fmt(all.monthlyBasic)}–{fmt(all.monthlyContent)}/mo</div>
+          <div className="money-sub">Care vs Care+Content tier</div>
         </div>
       </div>
       <div className="money-locked">
-        <b>If all 4 lock in:</b> {fmt(totalBuild)} one-time build · {fmt(m.monthlyBasic)}/mo recurring on basic Care, {fmt(m.monthlyContent)}/mo on Content tier.<br />
-        <b>Year-1 take:</b> {fmt(year1Basic)} (basic Care across the board) up to {fmt(year1Content)} (Content tier across the board).
+        <div style={{ fontWeight: 800, color: "#f3dd9c", fontSize: 11, letterSpacing: ".18em", textTransform: "uppercase", marginBottom: 10 }}>Year-1 projection · with retainers</div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 10 }}>
+          <div style={{ background: "#0e0e12", border: "1px solid rgba(217,182,90,.18)", borderRadius: 10, padding: "11px 14px" }}>
+            <div style={{ fontWeight: 700, color: "#f4f1ea", marginBottom: 4 }}>If the 3 active deals lock <span style={{ color: "#9c968b", fontWeight: 500, fontSize: 12 }}>· J&amp;J + Rendezvous + GG Locks</span></div>
+            <div style={{ fontSize: 13, color: "#9c968b" }}>
+              Build: <b style={{ color: "#f3dd9c" }}>{fmt(three.build)}</b> · Recurring: <b style={{ color: "#7fd1a6" }}>{fmt(three.monthlyBasic)}–{fmt(three.monthlyContent)}/mo</b><br />
+              Year-1 take: <b style={{ color: "#f3dd9c" }}>{fmt(three.build + three.monthlyBasic * 12)}</b> → <b style={{ color: "#f3dd9c" }}>{fmt(three.build + three.monthlyContent * 12)}</b>
+            </div>
+          </div>
+          <div style={{ background: "#0e0e12", border: "1px solid rgba(217,182,90,.18)", borderRadius: 10, padding: "11px 14px" }}>
+            <div style={{ fontWeight: 700, color: "#f4f1ea", marginBottom: 4 }}>If all 4 lock <span style={{ color: "#9c968b", fontWeight: 500, fontSize: 12 }}>· + Owed To Eddie</span></div>
+            <div style={{ fontSize: 13, color: "#9c968b" }}>
+              Build: <b style={{ color: "#f3dd9c" }}>{fmt(all.build)}</b> · Recurring: <b style={{ color: "#7fd1a6" }}>{fmt(all.monthlyBasic)}–{fmt(all.monthlyContent)}/mo</b><br />
+              Year-1 take: <b style={{ color: "#f3dd9c" }}>{fmt(all.build + all.monthlyBasic * 12)}</b> → <b style={{ color: "#f3dd9c" }}>{fmt(all.build + all.monthlyContent * 12)}</b>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -351,7 +361,7 @@ function ProjectCard({ p }: { p: Project }) {
         {p.money ? (
           <div className="pmoney">
             <span>Pending <b>{fmt(p.money.pending)}</b></span>
-            <span>Estimate left <b>{fmt(p.money.estimate)}</b></span>
+            <span>Build value <b>{fmt(p.money.pending + p.money.estimate)}</b></span>
             <span>Monthly (Care) <b>{fmt(p.money.monthlyBasic)}/mo</b></span>
             <span>Monthly (+ Content) <b>{fmt(p.money.monthlyContent)}/mo</b></span>
           </div>
