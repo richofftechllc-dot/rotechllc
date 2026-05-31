@@ -159,13 +159,24 @@ const PLANS = [
 
 const fmt = (n: number) => "$" + n.toLocaleString();
 
-function depositInfo(total: number): { rate: number; min: number; pct: number; amount: number } {
-  let rate = 0.5, min = 0, pct = 50;
-  if (total < 1000) { rate = 0.25; min = 250; pct = 25; }
-  else if (total < 2500) { rate = 0.30; pct = 30; }
-  else if (total < 5000) { rate = 0.40; pct = 40; }
-  const amount = Math.max(Math.round(total * rate), min);
-  return { rate, min, pct, amount };
+// Financing premium: split-pay plans add a small % to the project total
+// because Bo is carrying the customer. Pay-in-full and Afterpay are 0%.
+function financingRate(plan: string): number {
+  if (plan === "dep3") return 0.05;
+  if (plan === "dep6") return 0.10;
+  return 0;
+}
+
+function depositInfo(total: number, plan: string): { pct: number; min: number; amount: number } {
+  // Base deposit ladder scales with project size.
+  let basePct = 50, min = 0;
+  if (total < 1000) { basePct = 25; min = 250; }
+  else if (total < 2500) basePct = 30;
+  else if (total < 5000) basePct = 40;
+  // Dep+6 carries you longer → add 10 points to the deposit so Bo has more skin upfront.
+  const pct = plan === "dep6" ? basePct + 10 : basePct;
+  const amount = Math.max(Math.round(total * pct / 100), min);
+  return { pct, min, amount };
 }
 
 export default function EstimateBuilder() {
@@ -271,9 +282,21 @@ export default function EstimateBuilder() {
 
   function copyEstimate() {
     const lines = buildLineItems();
+    const planObj = PLANS.find(p => p.id === plan);
     let txt = `RICH OFF TECH — ESTIMATE\n${name || "(no name)"}${biz ? " / " + biz : ""}\n${email}${phone ? "  ·  " + phone : ""}\n\n`;
     lines.filter(l => !l.recur).forEach(l => { txt += `• ${l.name} — ${fmt(l.price)}\n`; });
-    if (calc.oneTime) txt += `\nBUILD (one-time): ${fmt(calc.oneTime)}\n`;
+    if (calc.oneTime) {
+      txt += `\nBUILD TOTAL: ${fmt(calc.oneTime)}\n`;
+      if (financeFee > 0) {
+        txt += `Financing premium (${plan === "dep3" ? "3-month" : "6-month"}): +${fmt(financeFee)}\n`;
+        txt += `PROJECT TOTAL: ${fmt(financedTotal)}\n`;
+      }
+      txt += `Plan: ${planObj?.label}\n`;
+      if (plan === "full") txt += `Due today: ${fmt(calc.oneTime)}\n`;
+      else if (plan === "dep3") txt += `Deposit (${dep.pct}%): ${fmt(dep.amount)} + ${fmt(Math.ceil((financedTotal - dep.amount) / 3))}/mo × 3\n`;
+      else if (plan === "dep6") txt += `Deposit (${dep.pct}%): ${fmt(dep.amount)} + ${fmt(Math.ceil((financedTotal - dep.amount) / 6))}/mo × 6\n`;
+      else if (plan === "after") txt += `Afterpay: 4 × ${fmt(Math.ceil(calc.oneTime / 4))}\n`;
+    }
     const recurLines = lines.filter(l => l.recur);
     if (recurLines.length) {
       txt += `\nMONTHLY:\n`;
@@ -296,7 +319,6 @@ export default function EstimateBuilder() {
       return;
     }
     const planObj = PLANS.find(p => p.id === plan);
-    const dep = depositInfo(calc.oneTime);
     const payload = {
       client_name: name.trim() || undefined,
       business: biz.trim() || undefined,
@@ -305,6 +327,8 @@ export default function EstimateBuilder() {
       selected_ids: [bundle, ...items, care, ...addons].filter(Boolean) as string[],
       line_items: buildLineItems(),
       one_time_total: calc.oneTime,
+      financing_fee: financeFee,
+      financed_total: financedTotal,
       monthly_total: calc.monthly,
       payment_plan: plan,
       payment_plan_label: planObj?.label || null,
@@ -326,7 +350,9 @@ export default function EstimateBuilder() {
     }
   }
 
-  const dep = depositInfo(calc.oneTime);
+  const financeFee = Math.round(calc.oneTime * financingRate(plan));
+  const financedTotal = calc.oneTime + financeFee;
+  const dep = depositInfo(financedTotal, plan);
 
   if (savedId) {
     return (
@@ -441,10 +467,11 @@ export default function EstimateBuilder() {
             ))}
           </div>
           <div className="ginfo">
-            <p><b>Deposit</b> scales with the project: 25% (min $250) under $1k · 30% to $2.5k · 40% to $5k · 50% above $5k.</p>
+            <p><b>Financing premium</b> on split plans: Pay in full &amp; Afterpay = no premium. <b>Deposit + 3 monthly = +5%</b>, <b>Deposit + 6 monthly = +10%</b> on the project total — small fee for us carrying you.</p>
+            <p><b>Deposit ladder</b> by project size: 25% (min $250) under $1k · 30% to $2.5k · 40% to $5k · 50% above $5k. <b>Deposit + 6 plans add 10 points</b> on top because the carry is longer.</p>
             <p><b>Sprints &amp; testing</b> included: 2-week build sprints with demos, then a staging URL you test before launch.</p>
             <p><b>Warranty:</b> 90 days of free bug fixes after launch. After that, free while on a Care Plan.</p>
-            <p><b>Cancellation, fair both ways:</b> you pay for milestones done — never for work that didn&apos;t happen.</p>
+            <p><b>Cancellation, fair both ways:</b> you pay for milestones done — never for work that didn&apos;t happen. Domain, deploy, and final ownership transfer when paid in full.</p>
           </div>
         </div>
 
@@ -461,12 +488,18 @@ export default function EstimateBuilder() {
             ))}
             {calc.oneTime > 0 ? (
               <>
-                <div className="srow tot"><span>Build total (one-time)</span><span className="v">{fmt(calc.oneTime)}</span></div>
+                <div className="srow tot"><span>Build total</span><span className="v">{fmt(calc.oneTime)}</span></div>
+                {financeFee > 0 && (
+                  <>
+                    <div className="srow"><span>Financing premium ({plan === "dep3" ? "3-month, +5%" : "6-month, +10%"})</span><span className="v">+{fmt(financeFee)}</span></div>
+                    <div className="srow tot"><span>Project total</span><span className="v">{fmt(financedTotal)}</span></div>
+                  </>
+                )}
                 <div className="srow sub">
-                  {plan === "full" && `Pay in full: ${fmt(calc.oneTime)}`}
-                  {plan === "dep3" && `Deposit ${fmt(dep.amount)} now, then ${fmt(Math.ceil((calc.oneTime - dep.amount) / 3))}/mo × 3`}
-                  {plan === "dep6" && `Deposit ${fmt(dep.amount)} now, then ${fmt(Math.ceil((calc.oneTime - dep.amount) / 6))}/mo × 6`}
-                  {plan === "after" && `Afterpay: 4 payments of ${fmt(Math.ceil(calc.oneTime / 4))}`}
+                  {plan === "full" && `Pay in full: ${fmt(calc.oneTime)} due today`}
+                  {plan === "dep3" && `Deposit ${fmt(dep.amount)} (${dep.pct}%) now, then ${fmt(Math.ceil((financedTotal - dep.amount) / 3))}/mo × 3`}
+                  {plan === "dep6" && `Deposit ${fmt(dep.amount)} (${dep.pct}%) now, then ${fmt(Math.ceil((financedTotal - dep.amount) / 6))}/mo × 6`}
+                  {plan === "after" && `Afterpay: 4 payments of ${fmt(Math.ceil(calc.oneTime / 4))} · no premium · Bo paid in full upfront`}
                 </div>
               </>
             ) : (
