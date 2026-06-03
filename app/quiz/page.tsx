@@ -32,8 +32,11 @@ export default function Quiz() {
   const [track, setTrack] = useState<Track | null>(null);
   const [domain, setDomain] = useState<Domain | null>(null);
   const [qIdx, setQIdx] = useState(0);
-  const [picked, setPicked] = useState<number | null>(null);
-  const [answers, setAnswers] = useState<number[]>([]);
+  // answers[i] = chosen option for question i, or null if skipped/unanswered (indexed,
+  // so you can skip a question and come back to it).
+  const [answers, setAnswers] = useState<(number | null)[]>([]);
+  const [finished, setFinished] = useState(false); // true once the student chooses to finish
+  const savedRef = useRef(false);                   // ensures the result saves exactly once
   const [showLesson, setShowLesson] = useState(false);
   const [chat, setChat] = useState<ChatMsg[]>([]);
   const [chatInput, setChatInput] = useState("");
@@ -87,10 +90,23 @@ export default function Quiz() {
   const allowed = allowedPrefixes(me.track);
   const visibleTracks = TRACKS.filter(t => allowed.has(t.id));
 
-  const reset = () => { setTrack(null); setDomain(null); setQIdx(0); setPicked(null); setAnswers([]); setShowLesson(false); setChat([]); };
-  const start = (d: Domain) => { setDomain(d); setQIdx(0); setPicked(null); setAnswers([]); setShowLesson(false); setChat([]); };
+  const reset = () => { setTrack(null); setDomain(null); setQIdx(0); setAnswers([]); setFinished(false); savedRef.current = false; setShowLesson(false); setChat([]); };
+  const start = (d: Domain) => { setDomain(d); setQIdx(0); setAnswers(Array(d.questions.length).fill(null)); setFinished(false); savedRef.current = false; setShowLesson(false); setChat([]); };
 
-  async function saveDomainResult(d: Domain, finalAnswers: number[]) {
+  // Save the result exactly once when the student lands on the results screen
+  // (all answered, or they chose "Finish anyway" with some left blank).
+  useEffect(() => {
+    if (!domain) return;
+    const total = domain.questions.length;
+    const isDone = qIdx >= total && answers.length === total;
+    const unansweredCount = answers.filter(a => a == null).length;
+    if (isDone && (finished || unansweredCount === 0) && !savedRef.current) {
+      savedRef.current = true;
+      saveDomainResult(domain, answers);
+    }
+  }, [qIdx, finished, domain, answers]);
+
+  async function saveDomainResult(d: Domain, finalAnswers: (number | null)[]) {
     if (finalAnswers.length !== d.questions.length) return; // only save complete runs
     const correct = finalAnswers.filter((a, i) => a === d.questions[i].answer).length;
     const pct = Math.round((correct / d.questions.length) * 100);
@@ -120,7 +136,7 @@ export default function Quiz() {
       const q = domain?.questions[qIdx];
       const correctSoFar = answers.filter((a, i) => domain && a === domain.questions[i].answer).length;
       const ctx = domain && q
-        ? `[Quiz context — student: ${me.name} (${me.code}), track: ${me.track}, domain: ${domain.name} (${domain.id}), question ${qIdx+1}/${domain.questions.length}: "${q.q}", options: ${q.options.map((o,i)=>String.fromCharCode(65+i)+") "+o).join(" | ")}, correct: ${String.fromCharCode(65+q.answer)}, student picked: ${picked !== null ? String.fromCharCode(65+picked) : "nothing yet"}, score so far: ${correctSoFar}/${answers.length}]`
+        ? `[Quiz context — student: ${me.name} (${me.code}), track: ${me.track}, domain: ${domain.name} (${domain.id}), question ${qIdx+1}/${domain.questions.length}: "${q.q}", options: ${q.options.map((o,i)=>String.fromCharCode(65+i)+") "+o).join(" | ")}, correct: ${String.fromCharCode(65+q.answer)}, student picked: ${answers[qIdx] != null ? String.fromCharCode(65 + (answers[qIdx] as number)) : "nothing yet"}, score so far: ${correctSoFar}/${answers.filter(a => a != null).length}]`
         : `[Student: ${me.name}, track: ${me.track}]`;
       const r = await fetch("/api/chat", {
         method: "POST",
@@ -237,6 +253,7 @@ export default function Quiz() {
   const q = domain.questions[qIdx];
   const done = qIdx >= domain.questions.length;
   const lesson = LESSONS[domain.id];
+  const unanswered = answers.map((a, i) => (a == null ? i : -1)).filter(i => i >= 0);
 
   if (done && showLesson && lesson && answers.length === 0) {
     return (
@@ -256,14 +273,35 @@ export default function Quiz() {
     );
   }
 
+  // Reached the end with questions still skipped — let them go back or finish anyway.
+  if (done && !finished && unanswered.length > 0) {
+    return (
+      <main className="max-w-2xl mx-auto px-6 py-12 text-center">
+        <h1 className="text-3xl font-black mb-3">Hold up ⚠️</h1>
+        <p className="text-gray-300 mb-1">
+          You left <span className="text-orange-400 font-bold">{unanswered.length}</span> question{unanswered.length > 1 ? "s" : ""} unanswered.
+        </p>
+        <p className="text-gray-500 text-sm mb-6">
+          Question{unanswered.length > 1 ? "s" : ""}: {unanswered.map(i => i + 1).join(", ")}
+        </p>
+        <div className="flex gap-3 justify-center flex-wrap">
+          <button onClick={() => setQIdx(unanswered[0])} className="px-6 py-3 bg-orange-500 text-black font-bold rounded-lg">Answer them →</button>
+          <button onClick={() => setFinished(true)} className="px-6 py-3 bg-zinc-800 text-white font-bold rounded-lg">Finish anyway</button>
+        </div>
+      </main>
+    );
+  }
+
   if (done) {
     const correct = answers.filter((a, i) => a === domain.questions[i].answer).length;
+    const skipped = answers.filter(a => a == null).length;
     const pct = Math.round((correct / domain.questions.length) * 100);
     return (
       <main className="max-w-2xl mx-auto px-6 py-12 text-center">
         <h1 className="text-5xl font-black mb-4">Done</h1>
         <div className={`text-7xl font-black mb-2 ${pct >= 75 ? "text-green-400" : pct >= 50 ? "text-yellow-400" : "text-red-400"}`}>{pct}%</div>
-        <p className="text-gray-400 mb-2">{correct} / {domain.questions.length} correct</p>
+        <p className="text-gray-400 mb-1">{correct} / {domain.questions.length} correct</p>
+        {skipped > 0 && <p className="text-orange-400 text-sm mb-2">{skipped} left unanswered</p>}
         {progress[domain.id]?.highScore !== undefined && progress[domain.id].highScore! > pct && (
           <p className="text-gray-500 text-xs mb-6">Best: {progress[domain.id].highScore}%</p>
         )}
@@ -277,17 +315,9 @@ export default function Quiz() {
   }
 
   const correctSoFar = answers.filter((a, i) => a === domain.questions[i].answer).length;
-
-  function commitAnswer() {
-    if (picked === null) return;
-    const next = [...answers, picked];
-    setAnswers(next);
-    setQIdx(qIdx + 1);
-    setPicked(null);
-    if (next.length === domain!.questions.length) {
-      saveDomainResult(domain!, next);
-    }
-  }
+  const cur = answers[qIdx];                                   // null/undefined = not answered yet
+  const isLast = qIdx + 1 >= domain.questions.length;
+  const setAnswer = (i: number) => setAnswers(a => { const n = [...a]; n[qIdx] = i; return n; });
 
   return (
     <main className="max-w-7xl mx-auto px-6 py-12">
@@ -303,29 +333,34 @@ export default function Quiz() {
           <div className="text-lg font-bold mb-6">{q.q}</div>
           <div className="space-y-3">
             {q.options.map((opt, i) => {
-              const isPicked = picked === i;
+              const isPicked = cur === i;
               const isCorrect = i === q.answer;
-              const show = picked !== null;
+              const show = cur != null;
               let cls = "border-white/10 hover:border-orange-500/50";
               if (show && isCorrect) cls = "border-green-500 bg-green-500/10";
               else if (show && isPicked && !isCorrect) cls = "border-red-500 bg-red-500/10";
               else if (show) cls = "border-white/5 opacity-50";
               return (
-                <button key={i} onClick={() => picked === null && setPicked(i)} disabled={picked !== null} className={`w-full text-left p-4 border rounded-lg transition ${cls}`}>
+                <button key={i} onClick={() => cur == null && setAnswer(i)} disabled={cur != null} className={`w-full text-left p-4 border rounded-lg transition ${cls}`}>
                   <span className="font-mono text-xs text-gray-500 mr-3">{String.fromCharCode(65+i)}.</span>
                   {opt}
                 </button>
               );
             })}
           </div>
-          {picked !== null && (
-            <div className="mt-6 pt-6 border-t border-white/10">
-              <div className="text-sm text-gray-300 mb-4">{q.exp}</div>
-              <button onClick={commitAnswer} className="px-6 py-3 bg-orange-500 text-black font-bold rounded-lg">
-                {qIdx + 1 < domain.questions.length ? "Next →" : "Finish"}
-              </button>
-            </div>
+          {cur != null && (
+            <div className="mt-6 pt-6 border-t border-white/10 text-sm text-gray-300">{q.exp}</div>
           )}
+          <div className="mt-6 flex items-center gap-3 flex-wrap">
+            {qIdx > 0 && (
+              <button onClick={() => setQIdx(qIdx - 1)} className="px-5 py-3 bg-zinc-800 text-white font-bold rounded-lg">← Prev</button>
+            )}
+            {cur == null ? (
+              <button onClick={() => setQIdx(qIdx + 1)} className="px-5 py-3 border border-orange-500/50 text-orange-400 font-bold rounded-lg">Skip →</button>
+            ) : (
+              <button onClick={() => setQIdx(qIdx + 1)} className="px-6 py-3 bg-orange-500 text-black font-bold rounded-lg">{isLast ? "See results →" : "Next →"}</button>
+            )}
+          </div>
         </div>
         <div className="bg-zinc-900 border border-orange-500/30 rounded-xl p-4 h-fit sticky top-4">
           <div className="flex items-center gap-3 mb-4">
