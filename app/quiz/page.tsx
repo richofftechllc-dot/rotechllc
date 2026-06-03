@@ -76,6 +76,19 @@ export default function Quiz() {
 
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [chat]);
 
+  // Save the result exactly once when the student lands on results. MUST be above the
+  // early returns below (Rules of Hooks — every hook runs on every render).
+  useEffect(() => {
+    if (!domain) return;
+    const total = domain.questions.length;
+    const isDone = qIdx >= total && answers.length === total;
+    const unansweredCount = answers.filter(a => a == null).length;
+    if (isDone && (finished || unansweredCount === 0) && !savedRef.current) {
+      savedRef.current = true;
+      saveDomainResult(domain, answers);
+    }
+  }, [qIdx, finished, domain, answers]);
+
   if (!me) return <main className="max-w-2xl mx-auto px-6 py-24 text-center"><h1 className="text-4xl font-black">Loading...</h1></main>;
   if (!me.ok) { if (typeof window !== "undefined") window.location.href = "/login"; return null; }
   if (!me.code) return (
@@ -92,19 +105,6 @@ export default function Quiz() {
 
   const reset = () => { setTrack(null); setDomain(null); setQIdx(0); setAnswers([]); setFinished(false); savedRef.current = false; setShowLesson(false); setChat([]); };
   const start = (d: Domain) => { setDomain(d); setQIdx(0); setAnswers(Array(d.questions.length).fill(null)); setFinished(false); savedRef.current = false; setShowLesson(false); setChat([]); };
-
-  // Save the result exactly once when the student lands on the results screen
-  // (all answered, or they chose "Finish anyway" with some left blank).
-  useEffect(() => {
-    if (!domain) return;
-    const total = domain.questions.length;
-    const isDone = qIdx >= total && answers.length === total;
-    const unansweredCount = answers.filter(a => a == null).length;
-    if (isDone && (finished || unansweredCount === 0) && !savedRef.current) {
-      savedRef.current = true;
-      saveDomainResult(domain, answers);
-    }
-  }, [qIdx, finished, domain, answers]);
 
   async function saveDomainResult(d: Domain, finalAnswers: (number | null)[]) {
     if (finalAnswers.length !== d.questions.length) return; // only save complete runs
