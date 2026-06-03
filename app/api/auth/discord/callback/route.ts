@@ -8,7 +8,7 @@ const CLIENT_ID = process.env.DISCORD_CLIENT_ID || "";
 const CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET || "";
 const SESSION_SECRET = process.env.SESSION_SECRET || "";
 const ROT_GUILD_ID = "1488597128329822369";
-const REDIRECT_URI = "https://rotechllc.vercel.app/api/auth/discord/callback";
+const REDIRECT_URI = "https://www.rotechllc.com/api/auth/discord/callback";
 
 function sign(payload: string): string {
   return crypto.createHmac("sha256", SESSION_SECRET).update(payload).digest("hex");

@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { TRACKS, LESSONS, LIVE_SESSION, type Track, type Domain } from "@/lib/quizData";
 import LessonVideo from "@/app/components/LessonVideo";
+import { allowedPrefixes } from "@/lib/access";
 
 type Me = | { ok: true; code: string | null; name: string; track: string | null; authType: string } | { ok: false };
 type ChatMsg = { role: "user" | "assistant"; content: string };
@@ -23,17 +24,8 @@ function progKey(domainId: string): string {
   return domainId;
 }
 
-function allowedPrefixes(trackStr: string | null): Set<string> {
-  const all = new Set(["sp", "csa", "ai"]);
-  if (!trackStr) return all;
-  const t = trackStr.toLowerCase();
-  const out = new Set<string>();
-  if (t.includes("security+") || t.includes("sec+") || t.includes("comptia security")) out.add("sp");
-  if (t.includes("servicenow") || t.includes("csa")) out.add("csa");
-  if (t.includes("aws ai") || t.includes("ai practitioner")) out.add("ai");
-  if (t.includes("full") || t.includes("admin") || t.includes("all access")) return all;
-  return out.size > 0 ? out : all;
-}
+// allowedPrefixes now lives in lib/access.ts (single source of truth, shared with
+// the /api/video-token gate). Imported above.
 
 export default function Quiz() {
   const [me, setMe] = useState<Me | null>(null);

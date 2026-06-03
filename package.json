@@ -8,13 +8,16 @@
     "start": "next start"
   },
   "dependencies": {
+    "@mux/mux-player-react": "^3.13.0",
     "firebase-admin": "^13.10.0",
+    "jsonwebtoken": "^9.0.3",
     "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
