@@ -46,19 +46,24 @@ export default function Team() {
           {/* D. KNIGHT — Career & Clearance */}
           <div className="bg-zinc-900 border border-green-500/20 rounded-2xl p-6 flex flex-col">
             <div className="flex items-start gap-4 mb-4">
-              <div className="w-16 h-16 bg-green-500/20 border border-green-500/30 rounded-full flex items-center justify-center text-xl font-black text-green-500 shrink-0">DK</div>
+              <div className="relative w-16 h-16 rounded-full border border-green-500/30 overflow-hidden shrink-0">
+                <Image src="/team/dk.jpg" alt="Daquan Knight" fill sizes="64px" className="object-cover" />
+              </div>
               <div className="min-w-0">
-                <div className="font-bold text-lg leading-tight">D. Knight</div>
+                <div className="font-bold text-lg leading-tight">Daquan Knight</div>
                 <div className="text-gray-400 text-sm mt-0.5">Career &amp; Clearance Coordinator</div>
               </div>
             </div>
-            <div className="flex flex-wrap gap-2 mb-5">
+            <div className="flex flex-wrap gap-2 mb-4">
               <span className="text-xs px-2 py-1 bg-white/5 text-gray-300 border border-white/10 rounded">Intro</span>
               <span className="text-xs px-2 py-1 bg-yellow-500/10 text-yellow-500 rounded">Cert</span>
               <span className="text-xs px-2 py-1 bg-green-500/10 text-green-500 rounded">Clearance</span>
             </div>
+            <p className="text-gray-400 text-sm leading-relaxed mb-5">
+              28-year-old IT professional from Newport News, Virginia, with a lifelong passion for technology and hands-on experience across enterprise, healthcare, and MSP environments. He&apos;s supported major organizations including <span className="text-gray-300">Apple, Ferguson Enterprises, Canon, IntellecTechs, and The Pavilion</span> — from hardware repair to system administration. His background spans Active Directory, Azure AD, MDM (Intune/Jamf), Windows Server, virtualization, and large-scale deployments. Whether leading onsite IT operations or supporting 300+ remote clients, he&apos;s known for strong troubleshooting, clear communication, and keeping systems running smoothly.
+            </p>
             <ConsultButton
-              name="D. Knight"
+              name="Daquan Knight"
               title="Career & Clearance Coordinator"
               handles={["Cert", "Clearance"]}
               accent="green"
@@ -100,7 +105,7 @@ export default function Team() {
 
         </div>
 
-        {/* COORDINATOR SPOTLIGHT — full-bleed marketing units. DK + Bo flyers TBD. */}
+        {/* COORDINATOR SPOTLIGHT — full-bleed marketing units. */}
         <details className="mt-16 group">
           <summary className="cursor-pointer list-none flex items-center justify-between gap-4 py-4 border-y border-white/10 hover:border-orange-500/40 transition">
             <div>
@@ -124,13 +129,20 @@ export default function Team() {
                 className="object-cover"
               />
             </a>
-            <CoordinatorCard
-              name="D. Knight"
-              title="Career & Clearance Coordinator"
-              accent="green"
-              ctaHref={DISCORD_INVITE}
-              handles={["Intro", "Cert", "Clearance"]}
-            />
+            <a
+              href={DISCORD_INVITE}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative block rounded-2xl overflow-hidden border border-green-500/30 hover:border-green-500/60 transition aspect-[561/701] bg-black"
+            >
+              <Image
+                src="/team/dk-flyer.jpg"
+                alt="Daquan Knight — Career & Clearance Coordinator"
+                fill
+                sizes="(max-width: 768px) 100vw, 33vw"
+                className="object-cover"
+              />
+            </a>
             <CoordinatorCard
               name="Bo"
               title="Founder · Developer & AI Engineer"
