@@ -2,10 +2,15 @@ import EstimateBuilderTrigger from "../components/EstimateBuilderTrigger";
 
 async function getMemberCount() {
   try {
-    const base = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
-    const res = await fetch(`${base}/api/member-count`, { next: { revalidate: 300 } });
+    // Hit Discord directly. The old self-fetch to `${VERCEL_URL}/api/member-count`
+    // failed behind Vercel deployment protection and silently fell back to 72.
+    const res = await fetch(
+      "https://discord.com/api/v10/guilds/1488597128329822369?with_counts=true",
+      { headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` }, next: { revalidate: 120 } }
+    );
+    if (!res.ok) return 72;
     const data = await res.json();
-    return data.count || 72;
+    return data.approximate_member_count || 72;
   } catch {
     return 72;
   }
