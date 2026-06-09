@@ -17,16 +17,16 @@ export default function BoAvatarFlip() {
         className={`relative transform-3d transition-transform duration-700 ease-out group-hover:rotate-y-180 ${flipped ? "rotate-y-180" : ""}`}
       >
         <Image
-          src="/bo-avatar.png"
-          alt="Bo"
+          src="/bo-cartoon.png"
+          alt="Bo, illustrated"
           width={500}
           height={500}
           priority
           className="rounded-full backface-hidden"
         />
         <Image
-          src="/bo-cartoon.png"
-          alt="Bo, illustrated"
+          src="/bo-avatar.png"
+          alt="Bo"
           width={500}
           height={500}
           className="absolute inset-0 w-full h-full rounded-full backface-hidden rotate-y-180"

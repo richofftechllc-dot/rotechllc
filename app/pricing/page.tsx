@@ -5,9 +5,9 @@ async function getMemberCount() {
     const base = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
     const res = await fetch(`${base}/api/member-count`, { next: { revalidate: 300 } });
     const data = await res.json();
-    return data.count || 64;
+    return data.count || 72;
   } catch {
-    return 64;
+    return 72;
   }
 }
 
@@ -44,7 +44,7 @@ export default async function Pricing() {
       </p>
 
       <div className="border-2 border-orange-500/30 rounded-2xl p-8 md:p-12 relative">
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-1 bg-gradient-to-r from-orange-500 to-red-500 rounded-full text-xs font-bold tracking-wider">FOUNDING MEMBER</div>
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-1 bg-gradient-to-r from-orange-500 to-red-500 rounded-full text-xs font-bold tracking-wider">VIP MEMBER ACCESS</div>
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <ul className="space-y-3">
             {benefits.map(b => <li key={b} className="flex gap-3 text-gray-300"><span className="text-green-500">✓</span>{b}</li>)}
@@ -53,7 +53,7 @@ export default async function Pricing() {
             <div className="text-7xl font-black text-orange-500">$96</div>
             <div className="text-orange-400 text-xs font-bold tracking-widest uppercase mt-1">One-time · 12 months access</div>
             <div className="text-gray-500 text-xs mt-1 mb-6">No monthly charges · First 100 only</div>
-            <a href={FOUNDING_LINK} target="_blank" rel="noopener noreferrer" className="block w-full py-4 bg-gradient-to-r from-orange-500 to-red-500 font-bold rounded-lg">Lock In Founding</a>
+            <a href={FOUNDING_LINK} target="_blank" rel="noopener noreferrer" className="block w-full py-4 bg-gradient-to-r from-orange-500 to-red-500 font-bold rounded-lg">Lock In VIP Access</a>
             <div className="text-green-500 text-sm mt-4">● {count} / 100 spots claimed</div>
             <div className="text-gray-500 text-xs mt-2 italic">After 100 fill, price moves to a monthly tier.</div>
           </div>
@@ -79,7 +79,7 @@ export default async function Pricing() {
               ))}
             </div>
 
-            <p className="text-gray-500 text-xs italic mt-5">When you&apos;re ready for cert prep, the live calls, Bo Tech 1-on-1, and the recruiter-facing roster — upgrade to Founding anytime. Same Discord, more channels unlocked.</p>
+            <p className="text-gray-500 text-xs italic mt-5">When you&apos;re ready for cert prep, the live calls, Bo Tech 1-on-1, and the recruiter-facing roster — upgrade to VIP anytime. Same Discord, more channels unlocked.</p>
           </div>
 
           <div className="bg-zinc-900 border border-white/10 rounded-xl p-7 text-center md:min-w-[260px]">

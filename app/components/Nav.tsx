@@ -5,11 +5,11 @@ import { useEffect, useState } from "react";
 
 type Me = { ok: true; code: string; name: string } | { ok: false };
 
-const LINKS: Array<{ href: string; label: string; external?: boolean }> = [
+const LINKS: Array<{ href: string; label: string; external?: boolean; authOnly?: boolean }> = [
   { href: "/roster", label: "Community" },
   { href: "/#about", label: "About" },
-  { href: "/quiz", label: "Quiz" },
-  { href: "/resume", label: "Resume" },
+  { href: "/quiz", label: "Quiz", authOnly: true },
+  { href: "/resume", label: "Resume", authOnly: true },
   { href: "/calls", label: "Sundays" },
   { href: "/pricing", label: "Pricing" },
   { href: "/commands", label: "Bot" },
@@ -19,6 +19,8 @@ const LINKS: Array<{ href: string; label: string; external?: boolean }> = [
 export default function Nav() {
   const [me, setMe] = useState<Me | null>(null);
   const [open, setOpen] = useState(false);
+  // Quiz + Resume only show once signed in.
+  const visibleLinks = LINKS.filter(l => !l.authOnly || (me !== null && me.ok));
 
   useEffect(() => {
     fetch("/api/me").then(r => r.json()).then(setMe).catch(() => setMe({ ok: false }));
@@ -44,7 +46,7 @@ export default function Nav() {
 
         {/* DESKTOP NAV */}
         <div className="hidden md:flex items-center gap-6 text-sm text-gray-300">
-          {LINKS.map(l => l.external ? (
+          {visibleLinks.map(l => l.external ? (
             <a key={l.href} href={l.href} target="_blank" rel="noopener" className="hover:text-white">{l.label}</a>
           ) : (
             <Link key={l.href} href={l.href} className="hover:text-white">{l.label}</Link>
@@ -82,7 +84,7 @@ export default function Nav() {
         >
           <div className="px-4 py-4">
             <div className="grid grid-cols-2 gap-2">
-              {LINKS.map(l => l.external ? (
+              {visibleLinks.map(l => l.external ? (
                 <a
                   key={l.href}
                   href={l.href}

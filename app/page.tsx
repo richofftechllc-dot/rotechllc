@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import Team from "./components/Team";
 import AboutMontage from "./components/AboutMontage";
 import BoAvatarFlip from "./components/BoAvatarFlip";
@@ -11,9 +10,9 @@ async function getMemberCount() {
     const base = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
     const res = await fetch(`${base}/api/member-count`, { next: { revalidate: 300 } });
     const data = await res.json();
-    return data.count || 64;
+    return data.count || 72;
   } catch {
-    return 64;
+    return 72;
   }
 }
 
@@ -26,33 +25,118 @@ export default async function Home() {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
             <div className="text-orange-500 font-bold tracking-widest text-sm mb-4">BO TECH · YOUR AI-POWERED CAREER COMMAND CENTER</div>
-            <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-6">
-              Cleared Tech.<br />
+            <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-4">
+              Break into Tech.<br />
               <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">No shortcuts.</span>
             </h1>
+            <div className="text-gray-300 font-bold tracking-wide text-sm mb-6">Tech · GovTech · Commercial Tech · AI</div>
             <p className="text-gray-400 text-lg mb-8 max-w-md">
-              Rich Off Tech is the community Bo built for cleared and aspiring tech professionals. Cert tracks. Career coaching. Real moves from people locked in on the same path.
+              Self-paced and live-cohort certification tracks, an AI tutor that lives in your Discord, exam vouchers, clearance guidance, and real project work — the guided system Bo built for breaking into Tech, GovTech, Commercial Tech, and AI.
             </p>
             <div className="flex flex-wrap gap-4">
-              <a href="https://square.link/u/7P6knSUK" target="_blank" rel="noopener noreferrer" className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90">
-                Become a Founding Member — $96
+              <a href="https://discord.gg/3gFdWYtPB" target="_blank" rel="noopener noreferrer" className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90">
+                Join the Discord — Free
               </a>
-              <Link href="/roster" className="px-6 py-3 border border-white/20 rounded-lg hover:bg-white/5">
-                See the Community
-              </Link>
+              <a href="#agents" className="px-6 py-3 border border-white/20 rounded-lg hover:bg-white/5">
+                Talk to an AI agent
+              </a>
+              <a href="#inside" className="px-6 py-3 border border-white/20 rounded-lg hover:bg-white/5">
+                What&apos;s inside →
+              </a>
             </div>
+            <p className="text-gray-500 text-sm mt-4">Free to join. Everything else gets handled inside — no checkout here.</p>
           </div>
           <BoAvatarFlip />
         </div>
-        <div className="grid grid-cols-3 gap-4 sm:gap-8 mt-16 sm:mt-24 text-center">
-          <div><div className="text-3xl sm:text-5xl font-black text-orange-500">{memberCount}</div><div className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2">Active members</div></div>
-          <div><div className="text-3xl sm:text-5xl font-black text-orange-500">14</div><div className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2">States represented</div></div>
-          <div><div className="text-3xl sm:text-5xl font-black text-orange-500">4</div><div className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2">Years zero to seven</div></div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8 mt-16 sm:mt-24 text-center">
+          <div><div className="text-3xl sm:text-5xl font-black text-orange-500">{memberCount}</div><div className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2">Active members (live)</div></div>
+          <div><div className="text-3xl sm:text-5xl font-black text-orange-500">200+</div><div className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2">online certifications</div></div>
+          <div><div className="text-3xl sm:text-5xl font-black text-orange-500">14+</div><div className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2">States represented</div></div>
+          <div><div className="text-3xl sm:text-5xl font-black text-orange-500">100%</div><div className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2">Virtual &amp; flexible</div></div>
         </div>
       </main>
 
+      {/* WHO IT'S FOR — audience paths (cleared / commercial / recruiters / businesses) */}
+      <section id="who" className="bg-black py-20 border-t border-white/5 scroll-mt-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-orange-500 font-bold tracking-widest text-sm mb-4 text-center">WHO IT&apos;S FOR</div>
+          <h2 className="text-4xl md:text-5xl font-black mb-4 text-center">Pick your lane.</h2>
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto text-center mb-12">Cleared, commercial, hiring, or building — ROT meets you where you are.</p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+            <a href="#inside" className="block bg-zinc-900 border border-green-500/20 rounded-2xl p-6 hover:border-green-500/50 transition">
+              <div className="text-3xl mb-3">🛡️</div>
+              <div className="font-bold text-lg mb-2">Cleared professionals</div>
+              <p className="text-gray-400 text-sm">Already hold a clearance? Jump to cleared roles, cert upkeep, and the recruiter roster. We keep you moving on-site.</p>
+            </a>
+            <a href="#inside" className="block bg-zinc-900 border border-orange-500/20 rounded-2xl p-6 hover:border-orange-500/50 transition">
+              <div className="text-3xl mb-3">🚀</div>
+              <div className="font-bold text-lg mb-2">Aspiring &amp; commercial pros</div>
+              <p className="text-gray-400 text-sm">Breaking in or leveling up in commercial tech. Cert tracks (self-paced or live cohort), AI tutor, resume + interview prep — clearance optional.</p>
+            </a>
+            <a href="/roster" className="block bg-zinc-900 border border-blue-500/20 rounded-2xl p-6 hover:border-blue-500/50 transition">
+              <div className="text-3xl mb-3">🧭</div>
+              <div className="font-bold text-lg mb-2">Recruiters &amp; hiring managers</div>
+              <p className="text-gray-400 text-sm">Scan a vetted public roster of cleared and commercial talent ready to interview. Reach out direct.</p>
+            </a>
+            <a href="#ai" className="block bg-zinc-900 border border-purple-500/20 rounded-2xl p-6 hover:border-purple-500/50 transition">
+              <div className="text-3xl mb-3">🤝</div>
+              <div className="font-bold text-lg mb-2">Businesses &amp; founders</div>
+              <p className="text-gray-400 text-sm">CEOs and entrepreneurs: automate your processes, get a website or SaaS built, and deploy AI + 24/7 voice agents so you never miss a call.</p>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* WHAT'S INSIDE — value-first explainer (no prices) */}
+      <section id="inside" className="bg-zinc-950 py-24 border-t border-white/5 scroll-mt-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-orange-500 font-bold tracking-widest text-sm mb-4 text-center">WHAT YOU GET INSIDE ROT</div>
+          <h2 className="text-4xl md:text-6xl font-black mb-6 text-center">Everything to break into tech.</h2>
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto text-center mb-14">
+            Not a video dump — a guided system. Self-paced or live-cohort cert tracks, a live AI tutor, your exam voucher, clearance guidance, and real project work. You move, Bo Tech moves with you.
+          </p>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6">
+              <div className="text-3xl mb-3">🎯</div>
+              <div className="font-bold text-lg mb-2">Cert Tracks — Self-Paced or Live Cohort</div>
+              <p className="text-gray-400 text-sm leading-relaxed"><b className="text-white">CompTIA plus 200+ certs you can take online</b> (ServiceNow, AWS, Google, Microsoft &amp; more). Go <b className="text-white">self-paced</b> through the quiz-driven modules (pass 75% to unlock the next) or join a <b className="text-white">live cohort</b>. <b className="text-green-400">Guaranteed pass*</b> when you follow the track.</p>
+              <p className="text-orange-400 text-xs font-bold mt-3">⚡ Need it fast? Accelerated sessions available.</p>
+            </div>
+            <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6">
+              <div className="text-3xl mb-3">🤖</div>
+              <div className="font-bold text-lg mb-2">Quiz System + Bo Tech Tutor</div>
+              <p className="text-gray-400 text-sm leading-relaxed">Your access code unlocks the quiz engine at <span className="text-orange-400">rotechllc.com/learn</span>. <b className="text-white">Bo Tech</b> is your live AI instructor — explains every question, drafts your resume, and answers at 3 AM in Discord.</p>
+            </div>
+            <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6">
+              <div className="text-3xl mb-3">🎟️</div>
+              <div className="font-bold text-lg mb-2">Exam Voucher + Test-Day Setup</div>
+              <p className="text-gray-400 text-sm leading-relaxed">We get you the official cert voucher and run your OnVUE / UltraViewer setup so you walk into exam day ready. You keep and test under your own account.</p>
+            </div>
+            <div className="bg-zinc-900 border border-green-500/20 rounded-2xl p-6">
+              <div className="text-3xl mb-3">🛡️</div>
+              <div className="font-bold text-lg mb-2">Clearance Guidance</div>
+              <p className="text-gray-400 text-sm leading-relaxed">We map your path to a security clearance and help position you to get <b className="text-white">sponsored by a cleared employer</b> — guidance and positioning, not a guarantee, and we don&apos;t issue clearances. Start with the Clearance Qualifier call below.</p>
+            </div>
+            <div id="ai" className="bg-zinc-900 border border-purple-500/20 rounded-2xl p-6 scroll-mt-20">
+              <div className="text-3xl mb-3">⚙️</div>
+              <div className="font-bold text-lg mb-2">AI Builds &amp; Automation</div>
+              <p className="text-gray-400 text-sm leading-relaxed">For businesses &amp; founders: AI integrations into your existing workflows, custom <b className="text-white">websites &amp; SaaS</b>, AI agents, and <b className="text-white">24/7 voice agents</b> so you never miss a call. Start with the Project Discovery call below.</p>
+            </div>
+            <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6">
+              <div className="text-3xl mb-3">🌎</div>
+              <div className="font-bold text-lg mb-2">Community + Recruiter Roster</div>
+              <p className="text-gray-400 text-sm leading-relaxed">A locked-in Discord and a public roster recruiters actually scan. Weekly calls, interview prep, and job drops Mon/Wed/Fri.</p>
+            </div>
+          </div>
+          <div className="text-center mt-12">
+            <a href="#agents" className="inline-block px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90">Start with a quick AI call →</a>
+          </div>
+          <p className="text-gray-600 text-xs text-center mt-6 max-w-2xl mx-auto">*Pass guarantee: complete your track and the coursework — if you don&apos;t pass, we keep coaching you (retake voucher included) until you do. Full terms shared at enrollment.</p>
+        </div>
+      </section>
+
       {/* TALK TO AGENTS — primary conversion mechanism */}
-      <section className="bg-gradient-to-br from-green-950/30 to-black py-24 border-t border-white/5">
+      <section id="agents" className="bg-gradient-to-br from-green-950/30 to-black py-24 border-t border-white/5 scroll-mt-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <div className="text-green-500 font-bold tracking-widest text-sm mb-4">TALK TO THE AGENTS</div>
@@ -231,14 +315,19 @@ export default async function Home() {
         <EstimateBuilderTrigger />
       </section>
 
-      {/* CTA — $96 close */}
+      {/* CTA — value close, no price */}
       <section className="bg-gradient-to-br from-orange-500/10 to-red-500/10 py-24 border-t border-white/5">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <h2 className="text-4xl md:text-5xl font-black mb-6">Ready to lock in?</h2>
-          <p className="text-gray-400 text-lg mb-8">$96 for 12 months. Founding rate. Until 100 spots fill.</p>
-          <a href="https://square.link/u/7P6knSUK" target="_blank" rel="noopener noreferrer" className="inline-block px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg text-lg hover:opacity-90">
-            Become a Founding Member — $96
-          </a>
+          <h2 className="text-4xl md:text-5xl font-black mb-6">Join free. Lock in inside.</h2>
+          <p className="text-gray-400 text-lg mb-8">Hop in the Discord — it&apos;s free. Bo Tech and the team map your cert track, exam voucher, clearance path, or AI build from there. No checkout here.</p>
+          <div className="flex flex-wrap gap-4 justify-center">
+            <a href="https://discord.gg/3gFdWYtPB" target="_blank" rel="noopener noreferrer" className="inline-block px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg text-lg hover:opacity-90">
+              Join the Discord — Free
+            </a>
+            <a href="#agents" className="inline-block px-8 py-4 border border-white/20 rounded-lg text-lg hover:bg-white/5">
+              Talk to an agent first
+            </a>
+          </div>
         </div>
       </section>
     </>

@@ -28,9 +28,13 @@ export default function Team() {
                 <div className="text-gray-400 text-sm mt-0.5">Certification Coordinator</div>
               </div>
             </div>
-            <div className="flex flex-wrap gap-2 mb-5">
+            <div className="flex flex-wrap gap-2 mb-4">
               <span className="text-xs px-2 py-1 bg-yellow-500/10 text-yellow-500 rounded">Cert</span>
+              <span className="text-xs px-2 py-1 bg-yellow-500/10 text-yellow-500 rounded">ServiceNow</span>
             </div>
+            <p className="text-gray-400 text-sm leading-relaxed mb-5">
+              Broke into tech in <span className="text-gray-300">2024</span> and hasn&apos;t slowed down since — building her foundation on <span className="text-gray-300">Linux</span> before excelling through the <span className="text-gray-300">ServiceNow Rise Up</span> program. She specializes in <span className="text-gray-300">business process</span> on the Now Platform and in guiding people through their <span className="text-gray-300">certification</span> journeys. Equal parts technologist and coach — she maps the fastest line from stuck to certified and hired.
+            </p>
             <ConsultButton
               name="Ty"
               title="Certification Coordinator"
@@ -91,6 +95,9 @@ export default function Team() {
               <span className="text-xs px-2 py-1 bg-green-500/10 text-green-500 rounded">Clearance</span>
               <span className="text-xs px-2 py-1 bg-blue-500/10 text-blue-500 rounded">Project Intake</span>
             </div>
+            <p className="text-gray-400 text-sm leading-relaxed mb-5">
+              I&apos;m Randy — developer, AI engineer, and founder of Rich Off Tech. From zero to <span className="text-gray-300">TS/SCI Full Scope Poly</span> clearance in under four years, now building cleared-tech platforms at <span className="text-gray-300">GDIT</span>. I started ROT to share exactly what works — cert tracks, clearance guidance, and real AI builds — no fluff, no gatekeeping. Come ready to learn and I&apos;ll show you the line.
+            </p>
             <ConsultButton
               name="Bo"
               title="Founder · Developer & AI Engineer"

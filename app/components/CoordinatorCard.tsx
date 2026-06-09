@@ -40,7 +40,6 @@ export const AGENT_MAP: Record<string, AgentOption> = {
   "Project Intake": { label: "Project Discovery",   agent_id: "69e6e005462191c47e54e17b" },
 };
 
-const FOUNDING_HREF = "https://square.link/u/7P6knSUK";
 
 export default function CoordinatorCard({
   name,
@@ -165,22 +164,14 @@ export default function CoordinatorCard({
                     </p>
                   </div>
 
-                  <div className="mt-5 grid sm:grid-cols-2 gap-2.5">
-                    <a
-                      href={FOUNDING_HREF}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block text-center px-5 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg text-sm hover:opacity-90"
-                    >
-                      Become Founding Member — $96
-                    </a>
+                  <div className="mt-5">
                     <a
                       href={ctaHref}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`block text-center px-5 py-3 rounded-lg text-sm font-bold border ${a.cta}`}
+                      className="block text-center px-5 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg text-sm hover:opacity-90"
                     >
-                      Just join Discord
+                      Join the Discord — Free
                     </a>
                   </div>
                 </>
