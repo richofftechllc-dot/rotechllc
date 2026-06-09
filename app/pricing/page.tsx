@@ -11,7 +11,7 @@ async function getMemberCount() {
   }
 }
 
-const FOUNDING_LINK = "https://square.link/u/7P6knSUK";
+const FOUNDING_LINK = "https://square.link/u/iAsbUg2Z";
 const DISCORD_LINK = "https://discord.gg/dtcYf8PTNa";
 
 const benefits = [
