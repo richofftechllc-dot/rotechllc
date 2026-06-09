@@ -2,7 +2,7 @@ import Image from "next/image";
 import CoordinatorCard from "./CoordinatorCard";
 import ConsultButton from "./ConsultButton";
 
-const DISCORD_INVITE = "https://discord.gg/7bjyPvTx4w";
+const DISCORD_INVITE = "https://discord.gg/dtcYf8PTNa";
 
 export default function Team() {
   return (

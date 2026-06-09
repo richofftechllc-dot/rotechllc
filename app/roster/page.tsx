@@ -116,7 +116,7 @@ export default function Roster() {
         </p>
         <p className="text-gray-400 text-sm leading-relaxed">
           Browse the full community freely — no login required to see who&apos;s here. To get added, request CVs, or update your own row, you need a member code.{" "}
-          <a href="https://discord.gg/3gFdWYtPB" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:text-orange-300 font-bold">Join the Discord</a> to get yours.
+          <a href="https://discord.gg/dtcYf8PTNa" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:text-orange-300 font-bold">Join the Discord</a> to get yours.
         </p>
       </div>
 

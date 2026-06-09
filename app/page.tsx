@@ -34,7 +34,7 @@ export default async function Home() {
               Self-paced and live-cohort certification tracks, an AI tutor that lives in your Discord, exam vouchers, clearance guidance, and real project work — the guided system Bo built for breaking into Tech, GovTech, Commercial Tech, and AI.
             </p>
             <div className="flex flex-wrap gap-4">
-              <a href="https://discord.gg/3gFdWYtPB" target="_blank" rel="noopener noreferrer" className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90">
+              <a href="https://discord.gg/dtcYf8PTNa" target="_blank" rel="noopener noreferrer" className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90">
                 Join the Discord — Free
               </a>
               <a href="#agents" className="px-6 py-3 border border-white/20 rounded-lg hover:bg-white/5">
@@ -321,7 +321,7 @@ export default async function Home() {
           <h2 className="text-4xl md:text-5xl font-black mb-6">Join free. Lock in inside.</h2>
           <p className="text-gray-400 text-lg mb-8">Hop in the Discord — it&apos;s free. Bo Tech and the team map your cert track, exam voucher, clearance path, or AI build from there. No checkout here.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <a href="https://discord.gg/3gFdWYtPB" target="_blank" rel="noopener noreferrer" className="inline-block px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg text-lg hover:opacity-90">
+            <a href="https://discord.gg/dtcYf8PTNa" target="_blank" rel="noopener noreferrer" className="inline-block px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg text-lg hover:opacity-90">
               Join the Discord — Free
             </a>
             <a href="#agents" className="inline-block px-8 py-4 border border-white/20 rounded-lg text-lg hover:bg-white/5">

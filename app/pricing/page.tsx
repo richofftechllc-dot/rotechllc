@@ -12,7 +12,7 @@ async function getMemberCount() {
 }
 
 const FOUNDING_LINK = "https://square.link/u/7P6knSUK";
-const DISCORD_LINK = "https://discord.gg/3gFdWYtPB";
+const DISCORD_LINK = "https://discord.gg/dtcYf8PTNa";
 
 const benefits = [
   "Full Discord access", "The Roster (recruiter-visible)", "Weekly meetings with the community",

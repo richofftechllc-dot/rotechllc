@@ -96,7 +96,7 @@ export default function Quiz() {
       <Image src="/bo-avatar.png" alt="ROT" width={80} height={80} className="rounded-full mx-auto mb-6" />
       <h1 className="text-3xl font-black mb-4">Welcome, {me.name}</h1>
       <p className="text-gray-400 mb-8">Discord signed in but no quiz code linked. DM Bo in Discord for your code.</p>
-      <a href="https://discord.gg/3gFdWYtPB" target="_blank" rel="noopener" className="inline-block px-6 py-3 text-white font-bold rounded-lg" style={{backgroundColor:"#5865F2"}}>Open ROT Discord</a>
+      <a href="https://discord.gg/dtcYf8PTNa" target="_blank" rel="noopener" className="inline-block px-6 py-3 text-white font-bold rounded-lg" style={{backgroundColor:"#5865F2"}}>Open ROT Discord</a>
     </main>
   );
 

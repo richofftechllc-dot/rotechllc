@@ -5,7 +5,7 @@ const SOCIALS = {
   instagram: "https://www.instagram.com/richofftech_/",
   linkedin:  "https://www.linkedin.com/company/rich-off-tech-llc",
   email:     "mailto:richofftechllc@gmail.com",
-  discord:   "https://discord.gg/3gFdWYtPB",
+  discord:   "https://discord.gg/dtcYf8PTNa",
 };
 
 export default function Footer() {

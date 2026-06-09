@@ -13,7 +13,7 @@ const LINKS: Array<{ href: string; label: string; external?: boolean; authOnly?:
   { href: "/calls", label: "Sundays" },
   { href: "/pricing", label: "Pricing" },
   { href: "/commands", label: "Bot" },
-  { href: "https://discord.gg/3gFdWYtPB", label: "Discord", external: true },
+  { href: "https://discord.gg/dtcYf8PTNa", label: "Discord", external: true },
 ];
 
 export default function Nav() {

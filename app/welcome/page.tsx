@@ -16,7 +16,7 @@ export default function Welcome() {
           <div className="text-orange-500 font-bold text-sm mb-2">STEP 1</div>
           <h2 className="text-xl font-bold mb-3">Join the Discord</h2>
           <p className="text-gray-400 mb-4">This is where everything happens — coaching, calls, quizzes, jobs, the community.</p>
-          <a href="https://discord.gg/3gFdWYtPB" target="_blank" rel="noopener noreferrer" className="inline-block px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg">Join Discord</a>
+          <a href="https://discord.gg/dtcYf8PTNa" target="_blank" rel="noopener noreferrer" className="inline-block px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg">Join Discord</a>
         </div>
         <div className="bg-zinc-900 border border-white/10 rounded-xl p-6">
           <div className="text-orange-500 font-bold text-sm mb-2">STEP 2</div>
