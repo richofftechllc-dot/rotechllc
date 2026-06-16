@@ -42,6 +42,7 @@ export default function Quiz() {
   const [chat, setChat] = useState<ChatMsg[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [chatBusy, setChatBusy] = useState(false);
+  const [persona, setPersona] = useState<"bo" | "flo">("bo");
   const [progress, setProgress] = useState<Record<string, DomainProgress>>({});
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -145,7 +146,7 @@ export default function Quiz() {
         // /api/chat expects { message: string }. Inline the quiz context so the model
         // sees it, plus the user's actual question. History is loaded server-side.
         // domainId lets the server ground Bo in this module's lesson material.
-        body: JSON.stringify({ message: `${ctx}\n\n${question}`, domainId: domain?.id }),
+        body: JSON.stringify({ message: `${ctx}\n\n${question}`, domainId: domain?.id, persona }),
       });
       const data = await r.json();
       const reply = data.reply || data.message || (data.error ? `(${data.error})` : "Couldn't reach Bo Tech right now. Try again.");
@@ -380,25 +381,47 @@ export default function Quiz() {
           </div>
         </div>
         <div className="bg-zinc-900 border border-orange-500/30 rounded-xl p-4 h-fit sticky top-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <Image src="/bo-avatar.png" alt="Bo" width={40} height={40} className="rounded-full border-2 border-orange-500" />
-              <div><div className="font-bold text-sm">Bo Tech</div><div className="text-green-500 text-xs">Live · knows this question</div></div>
+          <div className="mb-3">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-3">
+                {persona === "bo" ? (
+                  <Image src="/bo-avatar.png" alt="Bo" width={40} height={40} className="rounded-full border-2 border-orange-500" />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-fuchsia-400 bg-gradient-to-br from-fuchsia-500 to-purple-600 text-sm font-black text-white">F</div>
+                )}
+                <div>
+                  <div className="font-bold text-sm">{persona === "bo" ? "Bo Tech" : "Flo"}</div>
+                  <div className={`text-xs ${persona === "bo" ? "text-green-500" : "text-fuchsia-300"}`}>{persona === "bo" ? "Live · knows this question" : "Live · ServiceNow instructor"}</div>
+                </div>
+              </div>
+              <button
+                onClick={clearChat}
+                disabled={chatBusy}
+                title="Start a new chat — your tutor keeps what they've learned about you"
+                className="text-xs text-gray-400 hover:text-orange-400 border border-white/10 hover:border-orange-500/40 rounded px-2 py-1 disabled:opacity-40"
+              >
+                ↻ New
+              </button>
             </div>
-            <button
-              onClick={clearChat}
-              disabled={chatBusy}
-              title="Start a new chat — Bo keeps what he's learned about you"
-              className="text-xs text-gray-400 hover:text-orange-400 border border-white/10 hover:border-orange-500/40 rounded px-2 py-1 disabled:opacity-40"
-            >
-              ↻ New chat
-            </button>
+            <div className="flex rounded-lg bg-zinc-800 p-0.5 text-xs">
+              <button onClick={() => setPersona("bo")} className={`flex-1 rounded-md py-1 font-bold transition-colors ${persona === "bo" ? "bg-orange-500 text-black" : "text-gray-400 hover:text-white"}`}>Bo · plain talk</button>
+              <button onClick={() => setPersona("flo")} className={`flex-1 rounded-md py-1 font-bold transition-colors ${persona === "flo" ? "bg-fuchsia-500 text-black" : "text-gray-400 hover:text-white"}`}>Flo · technical</button>
+            </div>
           </div>
           <div className="space-y-2 max-h-96 overflow-y-auto mb-3 text-sm">
             {chat.length === 0 && (
               <div className="text-gray-500 text-xs space-y-2">
-                <p>Yo {me.name.split(" ")[0]}. I see the question you on.</p>
-                <p>Ask me anything — &quot;why is C right?&quot;, &quot;break this down,&quot; &quot;real-world example?&quot;</p>
+                {persona === "bo" ? (
+                  <>
+                    <p>Yo {me.name.split(" ")[0]}. I see the question you on.</p>
+                    <p>Ask me anything — &quot;why is C right?&quot;, &quot;break this down,&quot; &quot;real-world example?&quot;</p>
+                  </>
+                ) : (
+                  <>
+                    <p>Hey {me.name.split(" ")[0]} — Flo here. Let&apos;s do it the ServiceNow way.</p>
+                    <p>Ask me the term, the click-path, or &quot;what&apos;s the exam trick here?&quot;</p>
+                  </>
+                )}
               </div>
             )}
             {chat.map((m, i) => (
