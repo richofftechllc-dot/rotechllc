@@ -1,6 +1,20 @@
 import { NextResponse } from "next/server";
 import { coll } from "@/lib/firebase";
 import { getAuthedCode } from "@/lib/session";
+import { LESSONS } from "@/lib/quizData";
+
+// Strip a lesson's HTML to plain text so Bo can be grounded in it via the system prompt.
+function lessonToText(html: string): string {
+  return html
+    .replace(/<\/(h3|p|li|ul)>/gi, "\n")
+    .replace(/<li>/gi, "• ")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+    .replace(/\n{2,}/g, "\n")
+    .trim()
+    .slice(0, 3500);
+}
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -105,6 +119,13 @@ export async function POST(req: Request) {
       ? `\n\nNOTE: This user is logged in (${idParts}) — they're a paid member. Address them by first name when natural; don't force it. Be direct with insider value. Prior messages are this user's chat history with you — pick up where you left off.`
       : `\n\nNOTE: User is NOT logged in. No prior history available. If they ask about joining or coaching, point to the Founding Member button.`;
 
+    // Ground Bo in the exact module the student is studying, so his tutoring matches the lessons.
+    const domainId = typeof body?.domainId === "string" ? body.domainId : "";
+    const lessonText = domainId && LESSONS[domainId] ? lessonToText(LESSONS[domainId]) : "";
+    const lessonNote = lessonText
+      ? `\n\nLESSON MATERIAL — the student is studying the "${domainId}" module. This is the exact lesson they're working through; ground your tutoring in it, reuse its analogies and terms, and reinforce its cheat-sheet points. Don't contradict it:\n${lessonText}`
+      : "";
+
     const recent = history.slice(-CONTEXT_WINDOW).map(m => ({ role: m.role, content: m.content }));
     const messages = [...recent, { role: "user" as const, content: message }];
 
@@ -118,7 +139,7 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         model: "claude-opus-4-7",
         max_tokens: 512,
-        system: SYSTEM_PROMPT + contextNote,
+        system: SYSTEM_PROMPT + contextNote + lessonNote,
         messages,
       }),
     });
