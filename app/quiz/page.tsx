@@ -156,6 +156,21 @@ export default function Quiz() {
     setChatBusy(false);
   }
 
+  // Start a fresh thread. Clears the visible chat + server context, but Bo distills
+  // and KEEPS a persistent memory of the student, so he still knows you next time.
+  async function clearChat() {
+    if (chatBusy) return;
+    setChat([]);
+    setChatInput("");
+    try {
+      await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "clear" }),
+      });
+    } catch { /* visible chat already cleared; memory persists server-side */ }
+  }
+
   if (!track) {
     return (
       <main className="max-w-6xl mx-auto px-6 py-12">
@@ -365,9 +380,19 @@ export default function Quiz() {
           </div>
         </div>
         <div className="bg-zinc-900 border border-orange-500/30 rounded-xl p-4 h-fit sticky top-4">
-          <div className="flex items-center gap-3 mb-4">
-            <Image src="/bo-avatar.png" alt="Bo" width={40} height={40} className="rounded-full border-2 border-orange-500" />
-            <div><div className="font-bold text-sm">Bo Tech</div><div className="text-green-500 text-xs">Live · knows this question</div></div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Image src="/bo-avatar.png" alt="Bo" width={40} height={40} className="rounded-full border-2 border-orange-500" />
+              <div><div className="font-bold text-sm">Bo Tech</div><div className="text-green-500 text-xs">Live · knows this question</div></div>
+            </div>
+            <button
+              onClick={clearChat}
+              disabled={chatBusy}
+              title="Start a new chat — Bo keeps what he's learned about you"
+              className="text-xs text-gray-400 hover:text-orange-400 border border-white/10 hover:border-orange-500/40 rounded px-2 py-1 disabled:opacity-40"
+            >
+              ↻ New chat
+            </button>
           </div>
           <div className="space-y-2 max-h-96 overflow-y-auto mb-3 text-sm">
             {chat.length === 0 && (

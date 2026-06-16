@@ -54,6 +54,37 @@ async function loadHistory(code: string): Promise<Msg[]> {
   } catch { return []; }
 }
 
+// Durable, cross-chat memory Bo keeps about a student (survives "New chat").
+async function loadMemory(code: string): Promise<string> {
+  try {
+    const doc = await coll("chatHistory").doc(code).get();
+    const m = doc.exists ? (doc.data() as { memory?: string }).memory : "";
+    return typeof m === "string" ? m : "";
+  } catch { return ""; }
+}
+
+// On "New chat", distill prior memory + the conversation into a concise, stable
+// profile so Bo remembers WHO the student is without the old thread. Falls back
+// to the existing memory on any failure — we never lose what we already knew.
+async function summarizeMemory(prev: string, history: Msg[]): Promise<string> {
+  try {
+    const convo = history.map(m => `${m.role === "user" ? "Student" : "Bo"}: ${m.content}`).join("\n").slice(-6000);
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-api-key": process.env.ANTHROPIC_API_KEY!, "anthropic-version": "2023-06-01" },
+      body: JSON.stringify({
+        model: "claude-opus-4-7",
+        max_tokens: 400,
+        system: "You maintain a durable memory profile of a student for their tutor, Bo. Merge the existing memory with the new conversation into a concise profile (<=120 words) of STABLE facts only: name, cert/track and goals, strengths, weak areas, study preferences, and where they are in the material. Drop pleasantries and one-off Q&A. Output ONLY the profile text.",
+        messages: [{ role: "user", content: `EXISTING MEMORY:\n${prev || "(none yet)"}\n\nNEW CONVERSATION:\n${convo}\n\nUpdated memory profile:` }],
+      }),
+    });
+    const data = await res.json();
+    const text = data?.content?.[0]?.text;
+    return typeof text === "string" && text.trim() ? text.trim().slice(0, 1200) : prev;
+  } catch { return prev; }
+}
+
 // Same shape /api/me reads from. Used to address the user by name in chat.
 async function loadUserInfo(code: string): Promise<{ name?: string; track?: string }> {
   try {
@@ -87,6 +118,22 @@ export async function GET(req: Request) {
 // POST /api/chat — send a message, get a reply. Persists history for logged-in users.
 export async function POST(req: Request) {
   try {
+    const body = await req.json().catch(() => ({}));
+
+    // "New chat" — wipe the visible thread + active context, but first distill what
+    // Bo learned into persistent memory so he still knows the student next time.
+    if (body?.action === "clear") {
+      const code = await getAuthedCode(req);
+      if (!code) return NextResponse.json({ ok: true });
+      const [history, memory] = await Promise.all([loadHistory(code), loadMemory(code)]);
+      const newMemory = history.length ? await summarizeMemory(memory, history) : memory;
+      await coll("chatHistory").doc(code).set(
+        { messages: [], memory: newMemory, lastActiveAt: new Date().toISOString(), clearedAt: new Date().toISOString() },
+        { merge: true },
+      );
+      return NextResponse.json({ ok: true });
+    }
+
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
     const now = Date.now();
     const rec = rateLimit.get(ip);
@@ -99,7 +146,6 @@ export async function POST(req: Request) {
       rateLimit.set(ip, { count: 1, reset: now + WINDOW_MS });
     }
 
-    const body = await req.json().catch(() => ({}));
     const message: string = body?.message;
     // 4000 char ceiling — the in-quiz tutor prefixes the user's question with the full quiz
     // context (domain, question, all 4 options, current answer, running score). That alone
@@ -109,15 +155,19 @@ export async function POST(req: Request) {
     }
 
     const code = await getAuthedCode(req);
-    const [history, userInfo] = code
-      ? await Promise.all([loadHistory(code), loadUserInfo(code)])
-      : [[], {} as { name?: string; track?: string }];
+    const [history, userInfo, memory] = code
+      ? await Promise.all([loadHistory(code), loadUserInfo(code), loadMemory(code)])
+      : [[], {} as { name?: string; track?: string }, ""];
     const idParts = code
       ? [`code ${code}`, userInfo.name ? `name ${userInfo.name}` : null, userInfo.track ? `track ${userInfo.track}` : null].filter(Boolean).join(", ")
       : "";
     const contextNote = code
       ? `\n\nNOTE: This user is logged in (${idParts}) — they're a paid member. Address them by first name when natural; don't force it. Be direct with insider value. Prior messages are this user's chat history with you — pick up where you left off.`
       : `\n\nNOTE: User is NOT logged in. No prior history available. If they ask about joining or coaching, point to the Founding Member button.`;
+
+    const memoryNote = memory
+      ? `\n\nPERSISTENT MEMORY about this student (you've learned this over prior chats; it carries across sessions even when they start a new thread — use it, don't re-ask what you already know): ${memory}`
+      : "";
 
     // Ground Bo in the exact module the student is studying, so his tutoring matches the lessons.
     const domainId = typeof body?.domainId === "string" ? body.domainId : "";
@@ -139,7 +189,7 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         model: "claude-opus-4-7",
         max_tokens: 512,
-        system: SYSTEM_PROMPT + contextNote + lessonNote,
+        system: SYSTEM_PROMPT + contextNote + memoryNote + lessonNote,
         messages,
       }),
     });
