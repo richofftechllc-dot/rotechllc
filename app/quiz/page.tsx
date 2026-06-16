@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { TRACKS, LESSONS, LIVE_SESSION, type Track, type Domain } from "@/lib/quizData";
 import LessonVideo from "@/app/components/LessonVideo";
+import InteractiveLesson from "@/app/components/InteractiveLesson";
 import { allowedPrefixes } from "@/lib/access";
 
 type Me = | { ok: true; code: string | null; name: string; track: string | null; authType: string } | { ok: false };
@@ -143,7 +144,8 @@ export default function Quiz() {
         headers: { "Content-Type": "application/json" },
         // /api/chat expects { message: string }. Inline the quiz context so the model
         // sees it, plus the user's actual question. History is loaded server-side.
-        body: JSON.stringify({ message: `${ctx}\n\n${question}` }),
+        // domainId lets the server ground Bo in this module's lesson material.
+        body: JSON.stringify({ message: `${ctx}\n\n${question}`, domainId: domain?.id }),
       });
       const data = await r.json();
       const reply = data.reply || data.message || (data.error ? `(${data.error})` : "Couldn't reach Bo Tech right now. Try again.");
@@ -264,7 +266,7 @@ export default function Quiz() {
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             {domain.video_url && <LessonVideo url={domain.video_url} domainId={domain.id} domainName={domain.name} />}
-            <div className="bg-zinc-900 border border-orange-500/30 rounded-xl p-6 prose prose-invert max-w-none mb-6" dangerouslySetInnerHTML={{ __html: lesson }} />
+            <InteractiveLesson html={lesson} />
             <button onClick={() => start(domain)} className="px-6 py-3 bg-orange-500 text-black font-bold rounded-lg">Start Quiz →</button>
           </div>
           <SidePanel domain={domain} onStart={() => start(domain)} />
