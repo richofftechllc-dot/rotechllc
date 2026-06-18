@@ -4,6 +4,7 @@ import Image from "next/image";
 import { TRACKS, LESSONS, LIVE_SESSION, type Track, type Domain } from "@/lib/quizData";
 import LessonVideo from "@/app/components/LessonVideo";
 import InteractiveLesson from "@/app/components/InteractiveLesson";
+import Markdown from "@/app/components/Markdown";
 import { allowedPrefixes } from "@/lib/access";
 
 type Me = | { ok: true; code: string | null; name: string; track: string | null; authType: string } | { ok: false };
@@ -45,6 +46,7 @@ export default function Quiz() {
   const [persona, setPersona] = useState<"bo" | "flo">("bo");
   const [progress, setProgress] = useState<Record<string, DomainProgress>>({});
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatScrollRef = useRef<HTMLDivElement>(null);
   const [autoSpeak, setAutoSpeak] = useState(false);
   const [speakingIdx, setSpeakingIdx] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -104,7 +106,8 @@ export default function Quiz() {
       .catch(() => { setProgress({}); setProgressStatus("error"); });
   }, []);
 
-  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [chat]);
+  // Keep the chat PANEL scrolled to its latest message — never scroll the whole page.
+  useEffect(() => { const el = chatScrollRef.current; if (el) el.scrollTop = el.scrollHeight; }, [chat]);
 
   // Save the result exactly once when the student lands on results. MUST be above the
   // early returns below (Rules of Hooks — every hook runs on every render).
@@ -168,18 +171,27 @@ export default function Quiz() {
       const ctx = domain && q
         ? `[Quiz context — student: ${me.name} (${me.code}), track: ${me.track}, domain: ${domain.name} (${domain.id}), question ${qIdx+1}/${domain.questions.length}: "${q.q}", options: ${q.options.map((o,i)=>String.fromCharCode(65+i)+") "+o).join(" | ")}, correct: ${String.fromCharCode(65+q.answer)}, student picked: ${answers[qIdx] != null ? String.fromCharCode(65 + (answers[qIdx] as number)) : "nothing yet"}, score so far: ${correctSoFar}/${answers.filter(a => a != null).length}]`
         : `[Student: ${me.name}, track: ${me.track}]`;
+      // Real-tutor signal: their best scores per module, weak areas, and what they just missed.
+      const histParts: string[] = [];
+      if (track?.domains) {
+        const scored = track.domains.filter(d => progress[d.id]?.highScore !== undefined);
+        if (scored.length) histParts.push("best scores — " + scored.map(d => `${d.name} ${progress[d.id]!.highScore}%`).join("; "));
+        const weak = scored.filter(d => (progress[d.id]!.highScore ?? 101) < 70).map(d => d.name);
+        if (weak.length) histParts.push("WEAK areas (<70%): " + weak.join(", "));
+      }
+      const missedNow = domain ? answers.map((a, i) => (a != null && a !== domain.questions[i].answer) ? `"${domain.questions[i].q.slice(0, 55)}"` : null).filter(Boolean) : [];
+      if (missedNow.length) histParts.push("missed this session: " + missedNow.join("; "));
+      const hist = histParts.length ? `\n[Student history — ${histParts.join(" | ")}. Be a REAL tutor: target their weak areas, reference what they missed, don't re-teach what they already aced.]` : "";
       const r = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // /api/chat expects { message: string }. Inline the quiz context so the model
-        // sees it, plus the user's actual question. History is loaded server-side.
-        // domainId lets the server ground Bo in this module's lesson material.
-        body: JSON.stringify({ message: `${ctx}\n\n${question}`, domainId: domain?.id, persona }),
+        // domainId grounds Bo in this module's lesson; hist makes the tutoring personal.
+        body: JSON.stringify({ message: `${ctx}${hist}\n\n${question}`, domainId: domain?.id, persona }),
       });
       const data = await r.json();
       const reply = data.reply || data.message || (data.error ? `(${data.error})` : "Couldn't reach Bo Tech right now. Try again.");
       setChat(c => [...c, { role: "assistant", content: reply }]);
-      if (autoSpeak) speak(reply, -1);
+      if (autoSpeak) speak(reply, chat.length + 1);
     } catch {
       setChat(c => [...c, { role: "assistant", content: "Couldn't reach Bo Tech right now. Try again in a sec." }]);
     }
@@ -457,6 +469,10 @@ export default function Quiz() {
                 </div>
               </div>
               <div className="flex items-center gap-1">
+                {speakingIdx !== null && (
+                  <button onClick={stopSpeak} title="Stop reading"
+                    className="text-xs rounded px-2 py-1 border border-red-500/40 bg-red-500/10 text-red-300">⏹ Stop</button>
+                )}
                 <button onClick={toggleAutoSpeak} title="Speak replies aloud"
                   className={`text-xs rounded px-2 py-1 border ${autoSpeak ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300" : "border-white/10 text-gray-400 hover:text-white"}`}>
                   {autoSpeak ? "🔊" : "🔈"}
@@ -472,7 +488,7 @@ export default function Quiz() {
               <button onClick={() => switchPersona("flo")} disabled={chatBusy} className={`flex-1 rounded-md py-1 font-bold transition-colors disabled:opacity-50 ${persona === "flo" ? "bg-fuchsia-500 text-black" : "text-gray-400 hover:text-white"}`}>Flo · technical</button>
             </div>
           </div>
-          <div className="space-y-2 max-h-96 overflow-y-auto mb-3 text-sm">
+          <div ref={chatScrollRef} className="space-y-2 max-h-96 overflow-y-auto mb-3 text-sm">
             {chat.length === 0 && (
               <div className="text-gray-500 text-xs space-y-2">
                 {persona === "bo" ? (
@@ -496,10 +512,12 @@ export default function Quiz() {
                     <button onClick={() => (speakingIdx === i ? stopSpeak() : speak(m.content, i))} title="Hear it" className="text-xs text-gray-500 hover:text-white">{speakingIdx === i ? "⏹" : "🔊"}</button>
                   )}
                 </div>
-                <div className="whitespace-pre-wrap">{m.content}</div>
+                {m.role === "assistant"
+                  ? <Markdown text={m.content} />
+                  : <div className="whitespace-pre-wrap">{m.content}</div>}
               </div>
             ))}
-            {chatBusy && <div className="text-orange-400 text-xs animate-pulse">Bo&apos;s thinking...</div>}
+            {chatBusy && <div className="text-orange-400 text-xs animate-pulse">{persona === "bo" ? "Bo" : "Flo"}&apos;s thinking...</div>}
             <div ref={chatEndRef} />
           </div>
           <div className="flex gap-2">
