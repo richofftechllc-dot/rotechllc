@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     body: JSON.stringify({
       text: clean,
       model_id: "eleven_multilingual_v2",   // richer, less robotic than turbo
-      voice_settings: { stability: 0.32, similarity_boost: 0.85, style: 0.55, use_speaker_boost: true }, // lower stability + higher style = lively, expressive
+      voice_settings: { stability: 0.32, similarity_boost: 0.85, style: 0.55, use_speaker_boost: true, speed: 1.12 }, // lively + a touch faster
     }),
   });
 
