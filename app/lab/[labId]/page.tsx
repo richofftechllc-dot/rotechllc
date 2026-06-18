@@ -9,11 +9,14 @@ import { getLab } from "@/lib/labs";
 import Markdown from "@/app/components/Markdown";
 
 type Msg = { role: "user" | "assistant"; content: string };
-const FLO_VOICE = "XrExE9yKIg1WjnnlVkGX";
+const VOICES = { bo: "CwhRBWXzGAHq8TQ4Fs17", flo: "XrExE9yKIg1WjnnlVkGX" };
 
 export default function LabPage({ params }: { params: Promise<{ labId: string }> }) {
   const { labId } = use(params);
   const lab = getLab(labId);
+  const coach: "bo" | "flo" = lab?.coach ?? "flo";
+  const coachName = coach === "bo" ? "Bo" : "Flo";
+  const accent = coach === "bo" ? "#f97316" : "#d946ef";
 
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -38,7 +41,7 @@ export default function LabPage({ params }: { params: Promise<{ labId: string }>
     stopSpeak();
     const gen = genRef.current;
     try {
-      const r = await fetch("/api/bo/voice", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, voiceId: FLO_VOICE }) });
+      const r = await fetch("/api/bo/voice", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, voiceId: VOICES[coach] }) });
       if (gen !== genRef.current || !r.ok) return;
       const url = URL.createObjectURL(await r.blob());
       if (gen !== genRef.current) { URL.revokeObjectURL(url); return; }
@@ -51,7 +54,7 @@ export default function LabPage({ params }: { params: Promise<{ labId: string }>
   function labCtx(curStep: number): string {
     if (!lab) return "";
     const steps = lab.steps.map((s, i) => `${i + 1}) ${s.title}: ${s.do} (verify: ${s.verify})`).join(" ");
-    return `[LAB COACH MODE — you are Flo, guiding a hands-on ServiceNow lab in the student's OWN free PDI. Lab: "${lab.title}". Objective: ${lab.objective}. All steps: ${steps}. The student is currently on STEP ${curStep + 1}: ${lab.steps[curStep]?.do || "wrap-up"}. Coach ONE step at a time in your exact-but-warm voice; give the precise click-path. Verify by what they describe. When they confirm a step, celebrate in one line and move them to the next. Keep replies tight — 2-4 sentences.]`;
+    return `[LAB COACH MODE — you are ${coachName}, guiding a hands-on ${lab.cert} lab in the student's OWN environment. Lab: "${lab.title}". Objective: ${lab.objective}. All steps: ${steps}. The student is currently on STEP ${curStep + 1}: ${lab.steps[curStep]?.do || "wrap-up"}. Coach ONE step at a time in your voice; give the precise, exact steps/click-path. Verify by what they describe. When they confirm a step, celebrate in one line and move them to the next. Keep replies tight — 2-4 sentences.]`;
   }
 
   async function ask(sendText: string, displayText?: string, curStep = step) {
@@ -63,13 +66,13 @@ export default function LabPage({ params }: { params: Promise<{ labId: string }>
       const r = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: `${labCtx(curStep)}\n\n${sendText}`, persona: "flo", handoff: true }),
+        body: JSON.stringify({ message: `${labCtx(curStep)}\n\n${sendText}`, persona: coach, handoff: true }),
       });
       const data = await r.json();
-      const reply = data.reply || data.message || "Couldn't reach Flo — try again.";
+      const reply = data.reply || data.message || `Couldn't reach ${coachName} — try again.`;
       setMessages((m) => [...m, { role: "assistant", content: reply }]);
       if (autoSpeak) speak(reply);
-    } catch { setMessages((m) => [...m, { role: "assistant", content: "Couldn't reach Flo right now." }]); }
+    } catch { setMessages((m) => [...m, { role: "assistant", content: `Couldn't reach ${coachName} right now.` }]); }
     setBusy(false);
   }
 
@@ -77,7 +80,7 @@ export default function LabPage({ params }: { params: Promise<{ labId: string }>
   useEffect(() => {
     if (!lab || startedRef.current) return;
     startedRef.current = true;
-    ask("(Start the lab: greet me as Flo in one line, say what we're building, then walk me into step 1 with the exact click-path.)", "");
+    ask(`(Start the lab: greet me as ${coachName} in one line, say what we're building, then walk me into step 1 with exact steps.)`, "");
   }, [lab]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function markStepDone() {
@@ -120,10 +123,10 @@ export default function LabPage({ params }: { params: Promise<{ labId: string }>
         <Link href="/quiz" className="text-sm text-gray-500 hover:text-orange-500">← Back to tracks</Link>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
           <div>
-            <p className="font-mono text-xs text-fuchsia-300">🧪 LAB · {lab.cert} · {lab.est}</p>
+            <p className="font-mono text-xs" style={{ color: accent }}>🧪 LAB · {lab.cert} · {lab.est}</p>
             <h1 className="text-2xl font-black">{lab.title}</h1>
           </div>
-          <a href={lab.pdiUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-fuchsia-500 px-4 py-2 text-sm font-bold text-black hover:bg-fuchsia-400">🚀 Open my PDI ↗</a>
+          <a href={lab.pdiUrl} target="_blank" rel="noreferrer" className="rounded-lg px-4 py-2 text-sm font-bold text-black hover:opacity-90" style={{ background: accent }}>{lab.envLabel || "🚀 Open my PDI ↗"}</a>
         </div>
         <p className="mt-1 text-gray-400">{lab.objective}</p>
 
@@ -150,12 +153,12 @@ export default function LabPage({ params }: { params: Promise<{ labId: string }>
             </div>
           </div>
 
-          {/* Flo chat */}
-          <div className="flex h-[70vh] flex-col rounded-xl border border-fuchsia-500/30 bg-zinc-900">
+          {/* Coach chat */}
+          <div className="flex h-[70vh] flex-col rounded-xl border bg-zinc-900" style={{ borderColor: `${accent}55` }}>
             <div className="flex items-center justify-between border-b border-white/10 p-3">
               <div className="flex items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-500 to-purple-600 text-xs font-black">F</span>
-                <span className="text-sm font-bold">Flo · lab coach</span>
+                <span className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-black text-white" style={{ background: accent }}>{coachName[0]}</span>
+                <span className="text-sm font-bold">{coachName} · lab coach</span>
               </div>
               <div className="flex items-center gap-1 text-xs">
                 {speaking && <button onClick={stopSpeak} className="rounded border border-red-500/40 bg-red-500/10 px-2 py-1 text-red-300">⏹ Stop</button>}
