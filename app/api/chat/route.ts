@@ -206,7 +206,8 @@ export async function POST(req: Request) {
     const data = await res.json();
     const reply: string = data?.content?.[0]?.text || "Something went wrong.";
 
-    if (code) {
+    // Skip persisting tutor-switch handoff turns — their SYSTEM instruction shouldn't pollute history.
+    if (code && body?.handoff !== true) {
       const now = new Date().toISOString();
       const updated: Msg[] = [
         ...history,
