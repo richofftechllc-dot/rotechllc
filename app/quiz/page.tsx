@@ -65,6 +65,14 @@ export default function Quiz() {
       await a.play().catch(() => setSpeakingIdx(null));
     } catch { setSpeakingIdx(null); }
   }
+  // Toggling sound ON immediately speaks the most recent reply (so you hear something
+  // right away), and the click itself is the user-gesture browsers require for audio.
+  function toggleAutoSpeak() {
+    const next = !autoSpeak;
+    setAutoSpeak(next);
+    if (next) { const last = [...chat].reverse().find(m => m.role === "assistant" && m.content); if (last) speak(last.content, -1); }
+    else stopSpeak();
+  }
 
   useEffect(() => { fetch("/api/me").then(r => r.json()).then(setMe).catch(() => setMe({ ok: false })); }, []);
 
@@ -449,7 +457,7 @@ export default function Quiz() {
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <button onClick={() => setAutoSpeak(v => !v)} title="Speak replies aloud"
+                <button onClick={toggleAutoSpeak} title="Speak replies aloud"
                   className={`text-xs rounded px-2 py-1 border ${autoSpeak ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300" : "border-white/10 text-gray-400 hover:text-white"}`}>
                   {autoSpeak ? "🔊" : "🔈"}
                 </button>
