@@ -86,7 +86,7 @@ export default function Quiz() {
     let finalText = "";
     r.onresult = (e) => { let interim = ""; for (let i = e.resultIndex; i < e.results.length; i++) { const t = e.results[i][0].transcript; if (e.results[i].isFinal) finalText += t; else interim += t; } setChatInput((finalText + interim).trim()); };
     r.onerror = () => setListening(false);
-    r.onend = () => { setListening(false); const t = finalText.trim(); if (t) askBo(t); };
+    r.onend = () => { setListening(false); const t = finalText.trim(); if (t) askBo(t, true); };
     recogRef.current = r; setListening(true); r.start();
   }
   // Toggling sound ON immediately speaks the most recent reply (so you hear something
@@ -179,7 +179,7 @@ export default function Quiz() {
     } catch (e) { console.error("Progress save failed:", e); }
   }
 
-  async function askBo(question: string) {
+  async function askBo(question: string, forceSpeak = false) {
     if (!question.trim() || chatBusy) return;
     // Render-time gates above (!me, !me.ok, !me.code) don't narrow inside closures.
     // Re-assert the same three to make the auth contract explicit at call time.
@@ -214,7 +214,7 @@ export default function Quiz() {
       const data = await r.json();
       const reply = data.reply || data.message || (data.error ? `(${data.error})` : "Couldn't reach Bo Tech right now. Try again.");
       setChat(c => [...c, { role: "assistant", content: reply }]);
-      if (autoSpeak) speak(reply, chat.length + 1);
+      if (autoSpeak || forceSpeak) speak(reply, chat.length + 1);
     } catch {
       setChat(c => [...c, { role: "assistant", content: "Couldn't reach Bo Tech right now. Try again in a sec." }]);
     }
