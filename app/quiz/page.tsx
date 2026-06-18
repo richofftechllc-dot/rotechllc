@@ -157,6 +157,37 @@ export default function Quiz() {
     setChatBusy(false);
   }
 
+  // Switch tutor. With an ongoing chat, the new tutor PICKS IT UP — it announces the
+  // switch and re-explains the last point in its own style, so a stuck student can
+  // hear a different version (Bo's street take ↔ Flo's technical breakdown).
+  async function switchPersona(to: "bo" | "flo") {
+    if (to === persona || chatBusy) return;
+    setPersona(to);
+    if (!chat.length || !me || !me.ok || !me.code) return; // no convo yet → greeting handles it
+    setChatBusy(true);
+    setChat(c => [...c, { role: "assistant", content: "" }]); // thinking placeholder
+    try {
+      const q = domain?.questions[qIdx];
+      const ctx = domain && q
+        ? `[Quiz context — student: ${me.name}, track: ${me.track}, domain: ${domain.name} (${domain.id}), current question: "${q.q}"]`
+        : `[Student: ${me.name}, track: ${me.track}]`;
+      const who = to === "flo" ? "Flo" : "Bo";
+      const from = to === "flo" ? "Bo" : "Flo";
+      const msg = `${ctx}\n\n(SYSTEM: The student just switched tutors from ${from} to you, ${who}. They likely want the last thing explained a different way. In ONE line say it's you taking over, then re-explain the most recent point concisely in YOUR style. Keep it to 2-4 sentences.)`;
+      const r = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg, domainId: domain?.id, persona: to, handoff: true }),
+      });
+      const data = await r.json();
+      const reply = data.reply || data.message || `${who} here — want me to break that down my way?`;
+      setChat(c => { const cc = [...c]; cc[cc.length - 1] = { role: "assistant", content: reply }; return cc; });
+    } catch {
+      setChat(c => { const cc = [...c]; cc[cc.length - 1] = { role: "assistant", content: `${to === "flo" ? "Flo" : "Bo"} here — ask me and I'll explain it my way.` }; return cc; });
+    }
+    setChatBusy(false);
+  }
+
   // Start a fresh thread. Clears the visible chat + server context, but Bo distills
   // and KEEPS a persistent memory of the student, so he still knows you next time.
   async function clearChat() {
@@ -404,8 +435,8 @@ export default function Quiz() {
               </button>
             </div>
             <div className="flex rounded-lg bg-zinc-800 p-0.5 text-xs">
-              <button onClick={() => setPersona("bo")} className={`flex-1 rounded-md py-1 font-bold transition-colors ${persona === "bo" ? "bg-orange-500 text-black" : "text-gray-400 hover:text-white"}`}>Bo · plain talk</button>
-              <button onClick={() => setPersona("flo")} className={`flex-1 rounded-md py-1 font-bold transition-colors ${persona === "flo" ? "bg-fuchsia-500 text-black" : "text-gray-400 hover:text-white"}`}>Flo · technical</button>
+              <button onClick={() => switchPersona("bo")} disabled={chatBusy} className={`flex-1 rounded-md py-1 font-bold transition-colors disabled:opacity-50 ${persona === "bo" ? "bg-orange-500 text-black" : "text-gray-400 hover:text-white"}`}>Bo · plain talk</button>
+              <button onClick={() => switchPersona("flo")} disabled={chatBusy} className={`flex-1 rounded-md py-1 font-bold transition-colors disabled:opacity-50 ${persona === "flo" ? "bg-fuchsia-500 text-black" : "text-gray-400 hover:text-white"}`}>Flo · technical</button>
             </div>
           </div>
           <div className="space-y-2 max-h-96 overflow-y-auto mb-3 text-sm">
