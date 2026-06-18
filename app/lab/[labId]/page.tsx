@@ -24,12 +24,14 @@ export default function LabPage({ params }: { params: Promise<{ labId: string }>
   const [listening, setListening] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const genRef = useRef(0);
   const recogRef = useRef<{ stop: () => void } | null>(null);
   const startedRef = useRef(false);
 
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, busy]);
+  // Scroll only the chat box, never the page — no jumping while Flo thinks/streams.
+  useEffect(() => { const el = scrollRef.current; if (el) el.scrollTop = el.scrollHeight; }, [messages, busy]);
 
   function stopSpeak() { genRef.current++; if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; } setSpeaking(false); }
   async function speak(text: string) {
@@ -160,7 +162,7 @@ export default function LabPage({ params }: { params: Promise<{ labId: string }>
                 <button onClick={() => { const n = !autoSpeak; setAutoSpeak(n); if (!n) stopSpeak(); }} className={`rounded border px-2 py-1 ${autoSpeak ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300" : "border-white/10 text-gray-400"}`}>{autoSpeak ? "🔊" : "🔈"}</button>
               </div>
             </div>
-            <div className="flex-1 space-y-3 overflow-y-auto p-3 text-sm">
+            <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto p-3 text-sm">
               {messages.map((m, i) => (
                 <div key={i} className={m.role === "user" ? "ml-auto max-w-[85%] rounded-2xl bg-fuchsia-500 px-3 py-2 text-black" : "max-w-[90%] rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-gray-100"}>
                   {m.role === "assistant" ? <Markdown text={m.content} /> : <span className="whitespace-pre-wrap">{m.content}</span>}
