@@ -18,6 +18,23 @@ const PDI = "https://developer.servicenow.com/dev.do#!/home";
 
 export const LABS: Lab[] = [
   {
+    id: "csa-navigation",
+    cert: "ServiceNow CSA",
+    domainId: "csa1",
+    title: "Master the Navigator: filter, favorite, history, impersonate",
+    objective: "Move through ServiceNow like a senior admin — fuzzy filter, favorites, history, open-in-new-tab, and impersonation.",
+    est: "~10 min",
+    pdiUrl: PDI,
+    steps: [
+      { title: "Get into your instance", do: "Open developer.servicenow.com, sign in, request/open your Personal Developer Instance (PDI), and log in.", verify: "You're on the ServiceNow home page with the left navigator." },
+      { title: "Fuzzy filter", do: "In the Filter navigator (top-left), type just 'inc' and watch the menu narrow live. Open Incident > All.", verify: "Typing a few letters filtered the whole menu and the Incident list opened." },
+      { title: "Favorite it", do: "Hover the 'Incident' application in the navigator and click the ★ star to favorite it. Switch to the Favorites tab (star icon at the top of the navigator).", verify: "Incident shows under your Favorites." },
+      { title: "Use History", do: "Click the History (clock) icon at the top of the navigator. Click a record you recently opened to jump back to it.", verify: "History showed your recent records and you reopened one." },
+      { title: "Open in a new tab", do: "In any incident list, right-click an INC number and choose 'Open in New Tab' (or '...in New Window').", verify: "The record opened separately while your filtered list stayed put." },
+      { title: "Impersonate a user", do: "Click your name (top-right) or the gear/profile menu and choose Impersonate User. Pick any user, see ServiceNow as them, then End Impersonation.", verify: "You saw the platform as another user, then returned to yourself." },
+    ],
+  },
+  {
     id: "csa-incident",
     cert: "ServiceNow CSA",
     domainId: "csa7",
