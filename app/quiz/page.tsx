@@ -51,21 +51,43 @@ export default function Quiz() {
   const [speakingIdx, setSpeakingIdx] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const lastSpeakRef = useRef<{ text: string; t: number }>({ text: "", t: 0 });
+  const speakGenRef = useRef(0);                // cancels in-flight speech so two voices never overlap
+  const recogRef = useRef<{ stop: () => void } | null>(null);
+  const [listening, setListening] = useState(false);
   const VOICE = { bo: "CwhRBWXzGAHq8TQ4Fs17", flo: "XrExE9yKIg1WjnnlVkGX" }; // ElevenLabs (Roger laid-back / Matilda)
-  function stopSpeak() { if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; } setSpeakingIdx(null); }
+  function stopSpeak() { speakGenRef.current++; if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; } setSpeakingIdx(null); }
   async function speak(text: string, idx: number, p: "bo" | "flo" = persona) {
     const now = Date.now();
     if (lastSpeakRef.current.text === text && now - lastSpeakRef.current.t < 2500) return;
     lastSpeakRef.current = { text, t: now };
     stopSpeak();
+    const gen = speakGenRef.current; // any newer speak/stop bumps this → this call aborts
     try {
       const r = await fetch("/api/bo/voice", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, voiceId: VOICE[p] }) });
-      if (!r.ok) return;
+      if (gen !== speakGenRef.current || !r.ok) return;
       const url = URL.createObjectURL(await r.blob());
+      if (gen !== speakGenRef.current) { URL.revokeObjectURL(url); return; }
       const a = new Audio(url); audioRef.current = a; setSpeakingIdx(idx);
       a.onended = () => { setSpeakingIdx(null); URL.revokeObjectURL(url); };
       await a.play().catch(() => setSpeakingIdx(null));
     } catch { setSpeakingIdx(null); }
+  }
+  // Talk to the tutor. Starting the mic STOPS the tutor's voice (it listens), then
+  // transcribes what you say and sends it — a live back-and-forth.
+  function toggleMic() {
+    if (listening) { recogRef.current?.stop(); setListening(false); return; }
+    const SR = (window as unknown as { SpeechRecognition?: new () => unknown; webkitSpeechRecognition?: new () => unknown }).SpeechRecognition
+      || (window as unknown as { webkitSpeechRecognition?: new () => unknown }).webkitSpeechRecognition;
+    if (!SR) { alert("Voice input needs Chrome or Safari, or just type."); return; }
+    stopSpeak();          // tutor stops the moment you start talking
+    setAutoSpeak(true);   // conversational: it answers out loud
+    const r = new (SR as new () => { lang: string; interimResults: boolean; continuous: boolean; start: () => void; stop: () => void; onresult: (e: { resultIndex: number; results: ArrayLike<ArrayLike<{ transcript: string }> & { isFinal: boolean }> }) => void; onend: () => void; onerror: () => void; })();
+    r.lang = "en-US"; r.interimResults = true; r.continuous = false;
+    let finalText = "";
+    r.onresult = (e) => { let interim = ""; for (let i = e.resultIndex; i < e.results.length; i++) { const t = e.results[i][0].transcript; if (e.results[i].isFinal) finalText += t; else interim += t; } setChatInput((finalText + interim).trim()); };
+    r.onerror = () => setListening(false);
+    r.onend = () => { setListening(false); const t = finalText.trim(); if (t) askBo(t); };
+    recogRef.current = r; setListening(true); r.start();
   }
   // Toggling sound ON immediately speaks the most recent reply (so you hear something
   // right away), and the click itself is the user-gesture browsers require for audio.
@@ -76,6 +98,7 @@ export default function Quiz() {
     else stopSpeak();
   }
 
+  useEffect(() => { stopSpeak(); }, [qIdx]); // moving to another question stops the voice
   useEffect(() => { fetch("/api/me").then(r => r.json()).then(setMe).catch(() => setMe({ ok: false })); }, []);
 
   const [progressStatus, setProgressStatus] = useState<"loading" | "loaded" | "empty" | "unauth" | "error">("loading");
@@ -525,10 +548,11 @@ export default function Quiz() {
               value={chatInput}
               onChange={e => setChatInput(e.target.value)}
               onKeyDown={e => e.key === "Enter" && askBo(chatInput)}
-              placeholder="Ask Bo..."
+              placeholder={listening ? "Listening…" : `Ask ${persona === "bo" ? "Bo" : "Flo"}…`}
               disabled={chatBusy}
               className="flex-1 bg-zinc-800 border border-white/10 rounded px-3 py-2 text-sm focus:outline-none focus:border-orange-500"
             />
+            <button onClick={toggleMic} title="Talk to your tutor" className={`px-3 rounded font-bold ${listening ? "bg-red-500 text-white animate-pulse" : "bg-zinc-800 text-gray-300 hover:text-white border border-white/10"}`}>🎤</button>
             <button onClick={() => askBo(chatInput)} disabled={chatBusy || !chatInput.trim()} className="px-3 bg-orange-500 text-black font-bold rounded disabled:opacity-40">→</button>
           </div>
         </div>
