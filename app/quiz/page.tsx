@@ -45,6 +45,26 @@ export default function Quiz() {
   const [persona, setPersona] = useState<"bo" | "flo">("bo");
   const [progress, setProgress] = useState<Record<string, DomainProgress>>({});
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const [autoSpeak, setAutoSpeak] = useState(false);
+  const [speakingIdx, setSpeakingIdx] = useState<number | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const lastSpeakRef = useRef<{ text: string; t: number }>({ text: "", t: 0 });
+  const VOICE = { bo: "pNInz6obpgDQGcFmaJgB", flo: "XrExE9yKIg1WjnnlVkGX" }; // ElevenLabs (Adam / Matilda)
+  function stopSpeak() { if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; } setSpeakingIdx(null); }
+  async function speak(text: string, idx: number, p: "bo" | "flo" = persona) {
+    const now = Date.now();
+    if (lastSpeakRef.current.text === text && now - lastSpeakRef.current.t < 2500) return;
+    lastSpeakRef.current = { text, t: now };
+    stopSpeak();
+    try {
+      const r = await fetch("/api/bo/voice", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, voiceId: VOICE[p] }) });
+      if (!r.ok) return;
+      const url = URL.createObjectURL(await r.blob());
+      const a = new Audio(url); audioRef.current = a; setSpeakingIdx(idx);
+      a.onended = () => { setSpeakingIdx(null); URL.revokeObjectURL(url); };
+      await a.play().catch(() => setSpeakingIdx(null));
+    } catch { setSpeakingIdx(null); }
+  }
 
   useEffect(() => { fetch("/api/me").then(r => r.json()).then(setMe).catch(() => setMe({ ok: false })); }, []);
 
@@ -151,6 +171,7 @@ export default function Quiz() {
       const data = await r.json();
       const reply = data.reply || data.message || (data.error ? `(${data.error})` : "Couldn't reach Bo Tech right now. Try again.");
       setChat(c => [...c, { role: "assistant", content: reply }]);
+      if (autoSpeak) speak(reply, -1);
     } catch {
       setChat(c => [...c, { role: "assistant", content: "Couldn't reach Bo Tech right now. Try again in a sec." }]);
     }
@@ -182,6 +203,7 @@ export default function Quiz() {
       const data = await r.json();
       const reply = data.reply || data.message || `${who} here — want me to break that down my way?`;
       setChat(c => { const cc = [...c]; cc[cc.length - 1] = { role: "assistant", content: reply }; return cc; });
+      if (autoSpeak) speak(reply, -1, to);
     } catch {
       setChat(c => { const cc = [...c]; cc[cc.length - 1] = { role: "assistant", content: `${to === "flo" ? "Flo" : "Bo"} here — ask me and I'll explain it my way.` }; return cc; });
     }
@@ -192,6 +214,7 @@ export default function Quiz() {
   // and KEEPS a persistent memory of the student, so he still knows you next time.
   async function clearChat() {
     if (chatBusy) return;
+    stopSpeak();
     setChat([]);
     setChatInput("");
     try {
@@ -425,14 +448,16 @@ export default function Quiz() {
                   <div className={`text-xs ${persona === "bo" ? "text-green-500" : "text-fuchsia-300"}`}>{persona === "bo" ? "Live · knows this question" : "Live · ServiceNow instructor"}</div>
                 </div>
               </div>
-              <button
-                onClick={clearChat}
-                disabled={chatBusy}
-                title="Start a new chat — your tutor keeps what they've learned about you"
-                className="text-xs text-gray-400 hover:text-orange-400 border border-white/10 hover:border-orange-500/40 rounded px-2 py-1 disabled:opacity-40"
-              >
-                ↻ New
-              </button>
+              <div className="flex items-center gap-1">
+                <button onClick={() => setAutoSpeak(v => !v)} title="Speak replies aloud"
+                  className={`text-xs rounded px-2 py-1 border ${autoSpeak ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300" : "border-white/10 text-gray-400 hover:text-white"}`}>
+                  {autoSpeak ? "🔊" : "🔈"}
+                </button>
+                <button onClick={clearChat} disabled={chatBusy} title="Start a new chat — your tutor keeps what they've learned about you"
+                  className="text-xs text-gray-400 hover:text-orange-400 border border-white/10 hover:border-orange-500/40 rounded px-2 py-1 disabled:opacity-40">
+                  ↻ New
+                </button>
+              </div>
             </div>
             <div className="flex rounded-lg bg-zinc-800 p-0.5 text-xs">
               <button onClick={() => switchPersona("bo")} disabled={chatBusy} className={`flex-1 rounded-md py-1 font-bold transition-colors disabled:opacity-50 ${persona === "bo" ? "bg-orange-500 text-black" : "text-gray-400 hover:text-white"}`}>Bo · plain talk</button>
@@ -457,7 +482,12 @@ export default function Quiz() {
             )}
             {chat.map((m, i) => (
               <div key={i} className={m.role === "user" ? "bg-zinc-800 rounded p-2 text-gray-300" : "bg-orange-500/10 border border-orange-500/20 rounded p-2 text-gray-200"}>
-                <div className="text-xs text-gray-500 mb-1">{m.role === "user" ? "You" : "Bo"}</div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-gray-500">{m.role === "user" ? "You" : (persona === "bo" ? "Bo" : "Flo")}</span>
+                  {m.role === "assistant" && m.content && (
+                    <button onClick={() => (speakingIdx === i ? stopSpeak() : speak(m.content, i))} title="Hear it" className="text-xs text-gray-500 hover:text-white">{speakingIdx === i ? "⏹" : "🔊"}</button>
+                  )}
+                </div>
                 <div className="whitespace-pre-wrap">{m.content}</div>
               </div>
             ))}
