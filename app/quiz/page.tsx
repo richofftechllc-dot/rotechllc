@@ -49,7 +49,7 @@ export default function Quiz() {
   const [speakingIdx, setSpeakingIdx] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const lastSpeakRef = useRef<{ text: string; t: number }>({ text: "", t: 0 });
-  const VOICE = { bo: "pNInz6obpgDQGcFmaJgB", flo: "XrExE9yKIg1WjnnlVkGX" }; // ElevenLabs (Adam / Matilda)
+  const VOICE = { bo: "CwhRBWXzGAHq8TQ4Fs17", flo: "XrExE9yKIg1WjnnlVkGX" }; // ElevenLabs (Roger laid-back / Matilda)
   function stopSpeak() { if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; } setSpeakingIdx(null); }
   async function speak(text: string, idx: number, p: "bo" | "flo" = persona) {
     const now = Date.now();

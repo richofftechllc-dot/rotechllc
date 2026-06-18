@@ -3,12 +3,13 @@ export const dynamic = "force-dynamic";
 
 const DEFAULT_VOICE = "21m00Tcm4TlvDq8ikWAM"; // Rachel — fallback
 
-// Strip markdown so the voice reads clean prose, not asterisks/backticks.
+// Strip markdown + fix pronunciations so the voice reads clean, natural prose.
 function plain(s: string): string {
   return s
     .replace(/```[\s\S]*?```/g, " (code block) ")
     .replace(/[*_#>`]/g, "")
     .replace(/\[(.*?)\]\(.*?\)/g, "$1")
+    .replace(/service\s*now/gi, "Servicenow")   // say it as ONE word, not "Service Now"
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, 2500);
@@ -32,8 +33,8 @@ export async function POST(req: Request) {
     },
     body: JSON.stringify({
       text: clean,
-      model_id: "eleven_turbo_v2_5",
-      voice_settings: { stability: 0.4, similarity_boost: 0.75, style: 0.2, use_speaker_boost: true },
+      model_id: "eleven_multilingual_v2",   // richer, less robotic than turbo
+      voice_settings: { stability: 0.32, similarity_boost: 0.85, style: 0.55, use_speaker_boost: true }, // lower stability + higher style = lively, expressive
     }),
   });
 
