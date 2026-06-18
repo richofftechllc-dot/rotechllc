@@ -84,8 +84,6 @@ export const LABS: Lab[] = [
       { title: "Add to a dashboard", do: "Use the report's menu to Add to dashboard — create a new dashboard 'My CSA Lab' if needed.", verify: "Your chart appears on a dashboard." },
     ],
   },
-];
-
   {
     id: "csa-lists",
     cert: "ServiceNow CSA",
@@ -150,8 +148,6 @@ export const LABS: Lab[] = [
       { title: "Mark complete", do: "Set the Update Set state to Complete (this is the set you'd export/promote to Test/Prod).", verify: "The set is Complete and ready to move." },
     ],
   },
-];
-
   // ── Security+ (Bo-coached, free tools) ──────────────────────────
   {
     id: "secplus-hashing",
