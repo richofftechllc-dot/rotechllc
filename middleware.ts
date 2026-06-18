@@ -35,5 +35,5 @@ export async function middleware(req: NextRequest) {
 export const config = {
   // /roster is public on purpose — recruiters and hiring managers need to browse without an account.
   // /hub is admin-only; middleware enforces a valid session, the page enforces the admin code.
-  matcher: ["/quiz/:path*", "/account/:path*", "/hub", "/hub/:path*"],
+  matcher: ["/quiz/:path*", "/lab/:path*", "/account/:path*", "/hub", "/hub/:path*"],
 };

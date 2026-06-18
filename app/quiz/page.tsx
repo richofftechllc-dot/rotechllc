@@ -5,6 +5,7 @@ import { TRACKS, LESSONS, LIVE_SESSION, type Track, type Domain } from "@/lib/qu
 import LessonVideo from "@/app/components/LessonVideo";
 import InteractiveLesson from "@/app/components/InteractiveLesson";
 import Markdown from "@/app/components/Markdown";
+import { labsForDomain } from "@/lib/labs";
 import { allowedPrefixes } from "@/lib/access";
 
 type Me = | { ok: true; code: string | null; name: string; track: string | null; authType: string } | { ok: false };
@@ -568,7 +569,7 @@ function extractYouTubeIdSimple(url: string): string | null {
 }
 
 function SidePanel({ domain, onStart }: { domain: Domain; onStart: () => void }) {
-  const labs = domain.labs || [];
+  const labs = labsForDomain(domain.id);
   const liveYouTubeId = LIVE_SESSION.url ? extractYouTubeIdSimple(LIVE_SESSION.url) : null;
   return (
     <aside className="space-y-4 h-fit lg:sticky lg:top-4">
@@ -601,13 +602,16 @@ function SidePanel({ domain, onStart }: { domain: Domain; onStart: () => void })
       <div className="bg-zinc-900 border border-white/10 rounded-xl p-4">
         <div className="text-orange-500 font-bold tracking-widest text-[10px] mb-3">🧪 LABS — {domain.id.toUpperCase()}</div>
         {labs.length === 0 ? (
-          <p className="text-gray-500 text-xs italic">No hands-on labs added for this domain yet.</p>
+          <p className="text-gray-500 text-xs italic">No hands-on labs for this domain yet.</p>
         ) : (
           <ul className="space-y-2">
             {labs.map(l => (
-              <li key={l.url}>
-                <a href={l.url} target="_blank" rel="noopener noreferrer" className="block text-sm text-orange-400 hover:text-orange-300 font-bold">{l.name} ↗</a>
-                {l.description && <p className="text-xs text-gray-500 mt-0.5">{l.description}</p>}
+              <li key={l.id}>
+                <a href={`/lab/${l.id}`} className="block rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/5 p-2.5 hover:border-fuchsia-500/60">
+                  <span className="block text-sm font-bold text-fuchsia-300">🧪 {l.title}</span>
+                  <span className="block text-[11px] text-gray-400">{l.objective}</span>
+                  <span className="mt-1 inline-block text-[11px] font-bold text-fuchsia-400">Start with Flo · {l.est} →</span>
+                </a>
               </li>
             ))}
           </ul>
