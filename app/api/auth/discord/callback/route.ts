@@ -18,9 +18,15 @@ function loginError(req: NextRequest, code: string) {
   return NextResponse.redirect(new URL(`/login?error=${code}`, req.url));
 }
 
+// Only allow internal relative paths as the post-login destination (no open redirects).
+function safeDest(req: NextRequest): string {
+  const s = req.nextUrl.searchParams.get("state") || "";
+  return /^\/[A-Za-z0-9/_-]*$/.test(s) && !s.startsWith("//") ? s : "/quiz";
+}
+
 function setSession(req: NextRequest, payload: string) {
   const sig = sign(payload);
-  const res = NextResponse.redirect(new URL("/quiz", req.url));
+  const res = NextResponse.redirect(new URL(safeDest(req), req.url));
   res.cookies.set("rot_session", `${payload}.${sig}`, {
     httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 30,
   });

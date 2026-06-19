@@ -14,6 +14,21 @@ export async function GET(req: Request) {
 
   try {
     const snap = await coll("members").limit(1000).get();
+
+    // One read pulls everyone's quiz progress; map by code (the doc id) to join below.
+    const progByCode: Record<string, { domain: string; highScore: number; completed: boolean }[]> = {};
+    try {
+      const progSnap = await coll("quizProgress").limit(2000).get();
+      progSnap.docs.forEach((p) => {
+        const raw = (p.data() as { progress?: Record<string, { completed?: boolean; highScore?: number }> }).progress || {};
+        progByCode[p.id] = Object.entries(raw).map(([k, v]) => ({
+          domain: k.replace(/^(secplus|csa|ai)_/, ""),
+          highScore: typeof v?.highScore === "number" ? v.highScore : 0,
+          completed: !!v?.completed,
+        }));
+      });
+    } catch { /* progress is best-effort */ }
+
     const now = Date.now();
     let comped = 0;
     const members = snap.docs.map((d) => {
@@ -22,6 +37,14 @@ export async function GET(req: Request) {
       const status = (m.status as string) || "unknown";
       const tier = (m.accessTier as string) || "";
       if (tier === "comp" || status === "comp") comped++;
+      const prog = progByCode[(m.quizCode as string) || ""] || [];
+      const scored = prog.filter((p) => p.completed || p.highScore > 0);
+      const progress = {
+        domains: prog,
+        done: prog.filter((p) => p.completed).length,
+        avg: scored.length ? Math.round(scored.reduce((s, p) => s + p.highScore, 0) / scored.length) : null,
+        weak: prog.filter((p) => p.completed && p.highScore < 70).map((p) => p.domain),
+      };
       const late = !isNaN(end) && end < now && status !== "canceled" && status !== "comp";
       // payment status WITHOUT price — what the team is allowed to see
       const paymentStatus = late ? "late"
@@ -45,6 +68,7 @@ export async function GET(req: Request) {
         rolesAssigned: !!m.rolesAssigned,
         assignedTo: (m.assignedTo as string) || "",
         notes: (m.crmNotes as string) || "",
+        progress,
       };
     });
     // newest-expiring / late first is most useful; sort late → soonest end
