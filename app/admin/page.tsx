@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
+import Image from "next/image";
 
 type Member = {
   email: string; name: string; discordTag: string; discordId: string;
@@ -12,21 +13,28 @@ type Followup = {
   id: string; title: string; memberEmail?: string; source?: string;
   status: "open" | "done"; assignedTo?: string; notes?: Note[]; createdAt?: string; createdBy?: string;
 };
+type Schedule = { id?: string; discordId: string; name: string; days: Record<string, string>; note?: string; updatedAt?: string };
+const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-const STATUS_COLOR: Record<string, string> = {
-  late: "text-red-400 border-red-500/40 bg-red-500/10",
-  active: "text-green-400 border-green-500/40 bg-green-500/10",
-  comp: "text-blue-400 border-blue-500/40 bg-blue-500/10",
-  expired: "text-yellow-400 border-yellow-500/40 bg-yellow-500/10",
-  canceled: "text-gray-400 border-white/15 bg-white/5",
+// Light, professional palette (Google Admin / Zoho feel): white surfaces, near-black
+// text, gray borders, status pills in muted tones, one orange accent for the brand.
+const PILL: Record<string, string> = {
+  late: "bg-red-50 text-red-700 border-red-200",
+  active: "bg-green-50 text-green-700 border-green-200",
+  comp: "bg-blue-50 text-blue-700 border-blue-200",
+  expired: "bg-amber-50 text-amber-700 border-amber-200",
+  canceled: "bg-gray-100 text-gray-500 border-gray-200",
 };
 
 export default function AdminCRM() {
   const [authed, setAuthed] = useState<"loading" | "yes" | "no">("loading");
-  const [tab, setTab] = useState<"followups" | "members">("followups");
+  const [tab, setTab] = useState<"followups" | "members" | "schedule">("followups");
   const [members, setMembers] = useState<Member[]>([]);
   const [stats, setStats] = useState<{ total: number; comped: number } | null>(null);
   const [followups, setFollowups] = useState<Followup[]>([]);
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [me, setMe] = useState<{ discordId: string; name: string } | null>(null);
+  const [schedDraft, setSchedDraft] = useState<{ days: Record<string, string>; note: string }>({ days: {}, note: "" });
   const [q, setQ] = useState("");
   const [noteDraft, setNoteDraft] = useState<Record<string, string>>({});
 
@@ -44,21 +52,37 @@ export default function AdminCRM() {
     const d = await r.json();
     if (d.ok) setFollowups(d.items);
   }, []);
+  const loadSchedule = useCallback(async () => {
+    const r = await fetch("/api/admin/schedule");
+    if (r.status === 403) { setAuthed("no"); return; }
+    setAuthed("yes");
+    const d = await r.json();
+    if (d.ok) {
+      setSchedules(d.schedules);
+      setMe(d.me);
+      const mine = (d.schedules as Schedule[]).find((s) => s.discordId === d.me.discordId);
+      if (mine) setSchedDraft({ days: { ...mine.days }, note: mine.note || "" });
+    }
+  }, []);
 
-  useEffect(() => { loadMembers(); loadFollowups(); }, [loadMembers, loadFollowups]);
+  useEffect(() => { loadMembers(); loadFollowups(); loadSchedule(); }, [loadMembers, loadFollowups, loadSchedule]);
 
   async function act(body: Record<string, unknown>) {
     await fetch("/api/admin/followups", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     loadFollowups();
   }
+  async function saveSchedule() {
+    await fetch("/api/admin/schedule", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(schedDraft) });
+    loadSchedule();
+  }
 
-  if (authed === "loading") return <main className="min-h-screen flex items-center justify-center text-gray-400">Loading CRM…</main>;
+  if (authed === "loading") return <main className="min-h-screen bg-[#f8f9fa] flex items-center justify-center text-gray-500">Loading CRM…</main>;
   if (authed === "no") return (
-    <main className="min-h-screen flex flex-col items-center justify-center gap-4 px-6 text-center">
-      <h1 className="text-3xl font-black">ROT <span className="text-orange-500">CRM</span></h1>
-      <p className="text-gray-400 max-w-sm">Coaches only. Sign in with the Discord account on the admin list.</p>
-      <a href="/api/auth/discord" className="px-6 py-3 font-bold rounded-lg text-white" style={{ backgroundColor: "#5865F2" }}>Sign in with Discord</a>
-      <p className="text-gray-600 text-xs">Not seeing access? Ask Randy to add your Discord ID to <code>ADMIN_DISCORD_IDS</code>.</p>
+    <main className="min-h-screen bg-[#f8f9fa] flex flex-col items-center justify-center gap-4 px-6 text-center text-[#202124]">
+      <Image src="/rot-logo.png" alt="Rich Off Tech" width={56} height={56} className="rounded-xl" />
+      <h1 className="text-2xl font-bold">Rich Off Tech — CRM</h1>
+      <p className="text-gray-500 max-w-sm">Coaches only. Sign in with the Discord account that holds the ROT Coach role.</p>
+      <a href="/api/auth/discord" className="px-6 py-3 font-semibold rounded-lg text-white" style={{ backgroundColor: "#5865F2" }}>Sign in with Discord</a>
     </main>
   );
 
@@ -68,114 +92,197 @@ export default function AdminCRM() {
     !q || [m.name, m.email, m.discordTag, m.tier, m.tracks.join(",")].join(" ").toLowerCase().includes(q.toLowerCase()));
   const lateCount = members.filter(m => m.paymentStatus === "late").length;
 
+  const TABS: { id: typeof tab; label: string }[] = [
+    { id: "followups", label: "Follow-ups" },
+    { id: "members", label: "Members" },
+    { id: "schedule", label: "Schedule" },
+  ];
+
   return (
-    <main className="max-w-6xl mx-auto px-6 py-10">
-      <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
-        <h1 className="text-4xl font-black">ROT <span className="text-orange-500">CRM</span></h1>
-        <div className="flex gap-2 text-xs font-mono">
-          <span className="px-3 py-1.5 rounded bg-zinc-900 border border-white/10">{stats?.total ?? members.length} members</span>
-          <span className="px-3 py-1.5 rounded bg-red-500/10 border border-red-500/30 text-red-300">{lateCount} late</span>
-          <span className="px-3 py-1.5 rounded bg-blue-500/10 border border-blue-500/30 text-blue-300">{stats?.comped ?? 0} comped</span>
-          <span className="px-3 py-1.5 rounded bg-orange-500/10 border border-orange-500/30 text-orange-300">{openFollowups.length} open follow-ups</span>
-        </div>
-      </div>
-
-      <div className="flex gap-2 mb-6">
-        <button onClick={() => setTab("followups")} className={`px-4 py-2 rounded-lg font-bold text-sm ${tab === "followups" ? "bg-orange-500 text-black" : "bg-zinc-900 text-gray-400 border border-white/10"}`}>Follow-ups</button>
-        <button onClick={() => setTab("members")} className={`px-4 py-2 rounded-lg font-bold text-sm ${tab === "members" ? "bg-orange-500 text-black" : "bg-zinc-900 text-gray-400 border border-white/10"}`}>Members</button>
-      </div>
-
-      {tab === "followups" && (
-        <div className="space-y-6">
-          <button onClick={() => act({ action: "create", title: "New follow-up", source: "manual" })}
-            className="text-xs px-3 py-2 rounded border border-orange-500/40 text-orange-300 hover:bg-orange-500/10">+ Add follow-up</button>
-
-          {openFollowups.length === 0 && <p className="text-gray-500 text-sm">No open follow-ups. Completed calls drop in here automatically.</p>}
-          {openFollowups.map(f => (
-            <div key={f.id} className="bg-zinc-900 border border-white/10 rounded-xl p-4">
-              <div className="flex items-start justify-between gap-3 flex-wrap">
-                <div>
-                  <div className="font-bold">{f.title}</div>
-                  <div className="text-xs text-gray-500 font-mono mt-0.5">
-                    {f.memberEmail ? f.memberEmail + " · " : ""}{f.source || "manual"}{f.createdAt ? " · " + new Date(f.createdAt).toLocaleDateString() : ""}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs font-mono px-2 py-1 rounded border ${f.assignedTo ? "border-green-500/40 text-green-300 bg-green-500/10" : "border-white/15 text-gray-400"}`}>
-                    {f.assignedTo ? `👤 ${f.assignedTo}` : "unassigned"}
-                  </span>
-                  {!f.assignedTo && <button onClick={() => act({ action: "assign", id: f.id })} className="text-xs px-2 py-1 rounded bg-zinc-800 border border-white/10 hover:border-orange-500/40">Assign to me</button>}
-                  <button onClick={() => act({ action: "status", id: f.id, status: "done" })} className="text-xs px-2 py-1 rounded bg-green-600/20 border border-green-500/40 text-green-300">✓ Done</button>
-                </div>
-              </div>
-              {(f.notes || []).length > 0 && (
-                <div className="mt-3 space-y-1">
-                  {(f.notes || []).map((n, i) => (
-                    <div key={i} className="text-xs text-gray-300 bg-zinc-800/60 rounded px-2 py-1"><span className="text-gray-500">{n.by}:</span> {n.text}</div>
-                  ))}
-                </div>
-              )}
-              <div className="mt-3 flex gap-2">
-                <input value={noteDraft[f.id] || ""} onChange={e => setNoteDraft(s => ({ ...s, [f.id]: e.target.value }))}
-                  placeholder="Add a note…" className="flex-1 bg-zinc-800 border border-white/10 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-orange-500" />
-                <button onClick={() => { if ((noteDraft[f.id] || "").trim()) { act({ action: "note", id: f.id, note: noteDraft[f.id] }); setNoteDraft(s => ({ ...s, [f.id]: "" })); } }}
-                  className="text-sm px-3 rounded bg-orange-500 text-black font-bold">Note</button>
-              </div>
+    <main className="min-h-screen bg-[#f8f9fa] text-[#202124]">
+      {/* Header */}
+      <header className="bg-white border-b border-[#dadce0] sticky top-0 z-10">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Image src="/rot-logo.png" alt="Rich Off Tech" width={36} height={36} className="rounded-lg" />
+            <div className="leading-tight">
+              <div className="font-semibold text-[15px]">Rich Off Tech</div>
+              <div className="text-[11px] text-gray-500 tracking-wide uppercase">Admin · CRM</div>
             </div>
-          ))}
-
-          {doneFollowups.length > 0 && (
-            <details className="text-sm">
-              <summary className="text-gray-500 cursor-pointer">✓ {doneFollowups.length} completed</summary>
-              <div className="mt-2 space-y-1">
-                {doneFollowups.map(f => (
-                  <div key={f.id} className="text-xs text-gray-500 flex items-center justify-between bg-zinc-900/50 rounded px-3 py-1.5">
-                    <span className="line-through">{f.title}</span>
-                    <button onClick={() => act({ action: "status", id: f.id, status: "open" })} className="text-orange-400 hover:underline">reopen</button>
-                  </div>
-                ))}
-              </div>
-            </details>
+          </div>
+          {me && (
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <span className="hidden sm:inline">{me.name}</span>
+              <span className="w-8 h-8 rounded-full bg-[#202124] text-white grid place-items-center text-xs font-semibold">{me.name.slice(0, 2).toUpperCase()}</span>
+            </div>
           )}
         </div>
-      )}
+      </header>
 
-      {tab === "members" && (
-        <div>
-          <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search name, email, tier, track…"
-            className="w-full bg-zinc-900 border border-white/10 rounded-lg px-4 py-2.5 text-sm mb-4 focus:outline-none focus:border-orange-500" />
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="text-left text-xs text-gray-500 font-mono uppercase">
-                <tr className="border-b border-white/10">
-                  <th className="py-2 pr-4">Member</th><th className="pr-4">Tier</th><th className="pr-4">Tracks</th>
-                  <th className="pr-4">Payment</th><th className="pr-4">Access ends</th><th className="pr-4">Role</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredMembers.map(m => (
-                  <tr key={m.email} className="border-b border-white/5 hover:bg-white/[.02]">
-                    <td className="py-2.5 pr-4">
-                      <div className="font-bold">{m.name || m.email}</div>
-                      <div className="text-xs text-gray-500">{m.email}{m.discordTag ? ` · ${m.discordTag}` : ""}</div>
-                    </td>
-                    <td className="pr-4 text-gray-300">{m.tier || "—"}</td>
-                    <td className="pr-4">{m.tracks.length ? m.tracks.map(t => <span key={t} className="inline-block text-[10px] font-mono mr-1 px-1.5 py-0.5 rounded bg-zinc-800 border border-white/10">{t}</span>) : <span className="text-gray-600">—</span>}</td>
-                    <td className="pr-4">
-                      <span className={`text-xs font-mono px-2 py-0.5 rounded border ${STATUS_COLOR[m.paymentStatus] || "text-gray-400 border-white/15"}`}>{m.paymentStatus}</span>
-                      {m.invoiced && <span className="ml-1 text-[10px] text-gray-500">🧾 invoiced</span>}
-                    </td>
-                    <td className="pr-4 text-gray-400 text-xs font-mono">{m.accessEndDate ? m.accessEndDate.slice(0, 10) : "—"}</td>
-                    <td className="pr-4">{m.rolesAssigned ? "✅" : "⚠️"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {filteredMembers.length === 0 && <p className="text-gray-500 text-sm py-6 text-center">No members match.</p>}
-          </div>
-          <p className="text-gray-600 text-xs mt-4">💲 Prices are hidden by design — you see status (late / active / comp), invoices, and discounts, not dollar amounts.</p>
+      <div className="max-w-6xl mx-auto px-6 py-6">
+        {/* Stat cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+          {[
+            { label: "Members", value: stats?.total ?? members.length, tone: "text-[#202124]" },
+            { label: "Late / overdue", value: lateCount, tone: "text-red-600" },
+            { label: "Comped", value: stats?.comped ?? 0, tone: "text-blue-600" },
+            { label: "Open follow-ups", value: openFollowups.length, tone: "text-amber-600" },
+          ].map(c => (
+            <div key={c.label} className="bg-white border border-[#dadce0] rounded-xl p-4">
+              <div className={`text-3xl font-semibold ${c.tone}`}>{c.value}</div>
+              <div className="text-xs text-gray-500 mt-1">{c.label}</div>
+            </div>
+          ))}
         </div>
-      )}
+
+        {/* Tabs */}
+        <div className="flex gap-6 border-b border-[#dadce0] mb-6">
+          {TABS.map(t => (
+            <button key={t.id} onClick={() => setTab(t.id)}
+              className={`pb-3 text-sm font-medium -mb-px border-b-2 transition ${tab === t.id ? "border-orange-500 text-[#202124]" : "border-transparent text-gray-500 hover:text-[#202124]"}`}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* ── Follow-ups ── */}
+        {tab === "followups" && (
+          <div className="space-y-4">
+            <button onClick={() => act({ action: "create", title: "New follow-up", source: "manual" })}
+              className="text-sm px-3 py-2 rounded-lg bg-[#202124] text-white font-medium hover:bg-black">+ Add follow-up</button>
+
+            {openFollowups.length === 0 && <p className="text-gray-500 text-sm">No open follow-ups. Completed calls drop in here automatically.</p>}
+            {openFollowups.map(f => (
+              <div key={f.id} className="bg-white border border-[#dadce0] rounded-xl p-4">
+                <div className="flex items-start justify-between gap-3 flex-wrap">
+                  <div>
+                    <div className="font-semibold">{f.title}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">
+                      {f.memberEmail ? f.memberEmail + " · " : ""}{f.source || "manual"}{f.createdAt ? " · " + new Date(f.createdAt).toLocaleDateString() : ""}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs px-2 py-1 rounded-full border ${f.assignedTo ? "bg-green-50 text-green-700 border-green-200" : "bg-gray-100 text-gray-500 border-gray-200"}`}>
+                      {f.assignedTo ? `👤 ${f.assignedTo}` : "unassigned"}
+                    </span>
+                    {!f.assignedTo && <button onClick={() => act({ action: "assign", id: f.id })} className="text-xs px-2.5 py-1 rounded-lg border border-[#dadce0] hover:bg-gray-50">Assign to me</button>}
+                    <button onClick={() => act({ action: "status", id: f.id, status: "done" })} className="text-xs px-2.5 py-1 rounded-lg bg-green-600 text-white hover:bg-green-700">✓ Done</button>
+                  </div>
+                </div>
+                {(f.notes || []).length > 0 && (
+                  <div className="mt-3 space-y-1">
+                    {(f.notes || []).map((n, i) => (
+                      <div key={i} className="text-xs text-gray-700 bg-[#f8f9fa] border border-[#e8eaed] rounded px-2 py-1"><span className="text-gray-400">{n.by}:</span> {n.text}</div>
+                    ))}
+                  </div>
+                )}
+                <div className="mt-3 flex gap-2">
+                  <input value={noteDraft[f.id] || ""} onChange={e => setNoteDraft(s => ({ ...s, [f.id]: e.target.value }))}
+                    placeholder="Add a note…" className="flex-1 bg-white border border-[#dadce0] rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-orange-500" />
+                  <button onClick={() => { if ((noteDraft[f.id] || "").trim()) { act({ action: "note", id: f.id, note: noteDraft[f.id] }); setNoteDraft(s => ({ ...s, [f.id]: "" })); } }}
+                    className="text-sm px-3 rounded-lg bg-[#202124] text-white font-medium">Note</button>
+                </div>
+              </div>
+            ))}
+
+            {doneFollowups.length > 0 && (
+              <details className="text-sm">
+                <summary className="text-gray-500 cursor-pointer">✓ {doneFollowups.length} completed</summary>
+                <div className="mt-2 space-y-1">
+                  {doneFollowups.map(f => (
+                    <div key={f.id} className="text-xs text-gray-500 flex items-center justify-between bg-white border border-[#e8eaed] rounded px-3 py-1.5">
+                      <span className="line-through">{f.title}</span>
+                      <button onClick={() => act({ action: "status", id: f.id, status: "open" })} className="text-orange-600 hover:underline">reopen</button>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            )}
+          </div>
+        )}
+
+        {/* ── Members ── */}
+        {tab === "members" && (
+          <div>
+            <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search name, email, tier, track…"
+              className="w-full bg-white border border-[#dadce0] rounded-lg px-4 py-2.5 text-sm mb-4 focus:outline-none focus:border-orange-500" />
+            <div className="bg-white border border-[#dadce0] rounded-xl overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="text-left text-xs text-gray-500 bg-[#f8f9fa]">
+                  <tr className="border-b border-[#e8eaed]">
+                    <th className="py-2.5 px-4 font-medium">Member</th><th className="px-3 font-medium">Tier</th><th className="px-3 font-medium">Tracks</th>
+                    <th className="px-3 font-medium">Payment</th><th className="px-3 font-medium">Access ends</th><th className="px-3 font-medium">Role</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredMembers.map(m => (
+                    <tr key={m.email} className="border-b border-[#f1f3f4] hover:bg-[#f8f9fa]">
+                      <td className="py-2.5 px-4">
+                        <div className="font-medium">{m.name || m.email}</div>
+                        <div className="text-xs text-gray-500">{m.email}{m.discordTag ? ` · ${m.discordTag}` : ""}</div>
+                      </td>
+                      <td className="px-3 text-gray-700">{m.tier || "—"}</td>
+                      <td className="px-3">{m.tracks.length ? m.tracks.map(t => <span key={t} className="inline-block text-[10px] mr-1 px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 text-gray-600">{t}</span>) : <span className="text-gray-400">—</span>}</td>
+                      <td className="px-3">
+                        <span className={`text-xs px-2 py-0.5 rounded-full border ${PILL[m.paymentStatus] || "bg-gray-100 text-gray-500 border-gray-200"}`}>{m.paymentStatus}</span>
+                        {m.invoiced && <span className="ml-1 text-[10px] text-gray-400">🧾</span>}
+                      </td>
+                      <td className="px-3 text-gray-500 text-xs">{m.accessEndDate ? m.accessEndDate.slice(0, 10) : "—"}</td>
+                      <td className="px-3">{m.rolesAssigned ? "✅" : "⚠️"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {filteredMembers.length === 0 && <p className="text-gray-500 text-sm py-6 text-center">No members match.</p>}
+            </div>
+            <p className="text-gray-400 text-xs mt-3">Prices are hidden by design — you see status (late / active / comp), invoices, and discounts, never dollar amounts.</p>
+          </div>
+        )}
+
+        {/* ── Schedule ── */}
+        {tab === "schedule" && (
+          <div className="space-y-5">
+            <p className="text-gray-500 text-sm">Set your weekly availability so the team knows when you&apos;re free. You can only edit your own row.</p>
+            <div className="bg-white border border-[#dadce0] rounded-xl overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="text-left text-xs text-gray-500 bg-[#f8f9fa]">
+                  <tr className="border-b border-[#e8eaed]">
+                    <th className="py-2.5 px-4 font-medium">Coach</th>
+                    {WEEKDAYS.map(d => <th key={d} className="px-3 font-medium">{d}</th>)}
+                    <th className="px-3 font-medium">Note</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {schedules.length === 0 && <tr><td colSpan={9} className="py-4 px-4 text-gray-500">No availability set yet.</td></tr>}
+                  {schedules.map(s => (
+                    <tr key={s.discordId} className="border-b border-[#f1f3f4]">
+                      <td className="py-2.5 px-4 font-medium">{s.name}{me && s.discordId === me.discordId && <span className="text-orange-600 text-xs ml-1">(you)</span>}</td>
+                      {WEEKDAYS.map(d => <td key={d} className="px-3 text-gray-600 text-xs">{s.days?.[d] || "—"}</td>)}
+                      <td className="px-3 text-gray-500 text-xs">{s.note || ""}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="bg-white border border-[#dadce0] rounded-xl p-4">
+              <div className="font-semibold mb-3">Your availability {me ? `— ${me.name}` : ""}</div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+                {WEEKDAYS.map(d => (
+                  <div key={d}>
+                    <label className="block text-xs text-gray-500 mb-1">{d}</label>
+                    <input value={schedDraft.days[d] || ""} onChange={e => setSchedDraft(s => ({ ...s, days: { ...s.days, [d]: e.target.value } }))}
+                      placeholder="e.g. 6–9pm ET" className="w-full bg-white border border-[#dadce0] rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-orange-500" />
+                  </div>
+                ))}
+              </div>
+              <input value={schedDraft.note} onChange={e => setSchedDraft(s => ({ ...s, note: e.target.value }))}
+                placeholder="Note (e.g. ET timezone, prefer evenings)" className="w-full bg-white border border-[#dadce0] rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:border-orange-500" />
+              <button onClick={saveSchedule} className="px-5 py-2 bg-[#202124] text-white font-medium rounded-lg text-sm hover:bg-black">Save my availability</button>
+            </div>
+          </div>
+        )}
+      </div>
     </main>
   );
 }
