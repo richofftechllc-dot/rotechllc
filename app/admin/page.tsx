@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, Fragment } from "react";
 import Image from "next/image";
 
 type Member = {
@@ -7,6 +7,7 @@ type Member = {
   tier: string; status: string; paymentStatus: string; invoiced: boolean;
   tracks: string[]; quizCode: string; accessEndDate: string; rolesAssigned: boolean;
   assignedTo: string; notes: string;
+  progress?: { domains: { domain: string; highScore: number; completed: boolean }[]; done: number; avg: number | null; weak: string[] };
 };
 type Note = { by: string; text: string; at: string };
 type Followup = {
@@ -37,6 +38,7 @@ export default function AdminCRM() {
   const [schedDraft, setSchedDraft] = useState<{ days: Record<string, string>; note: string }>({ days: {}, note: "" });
   const [q, setQ] = useState("");
   const [noteDraft, setNoteDraft] = useState<Record<string, string>>({});
+  const [expanded, setExpanded] = useState<string | null>(null);
 
   const loadMembers = useCallback(async () => {
     const r = await fetch("/api/admin/members");
@@ -82,7 +84,7 @@ export default function AdminCRM() {
       <Image src="/rot-logo.png" alt="Rich Off Tech" width={56} height={56} className="rounded-xl" />
       <h1 className="text-2xl font-bold">Rich Off Tech — CRM</h1>
       <p className="text-gray-500 max-w-sm">Coaches only. Sign in with the Discord account that holds the ROT Coach role.</p>
-      <a href="/api/auth/discord" className="px-6 py-3 font-semibold rounded-lg text-white" style={{ backgroundColor: "#5865F2" }}>Sign in with Discord</a>
+      <a href="/api/auth/discord?redirect=/admin" className="px-6 py-3 font-semibold rounded-lg text-white" style={{ backgroundColor: "#5865F2" }}>Sign in with Discord</a>
     </main>
   );
 
@@ -211,25 +213,46 @@ export default function AdminCRM() {
                 <thead className="text-left text-xs text-gray-500 bg-[#f8f9fa]">
                   <tr className="border-b border-[#e8eaed]">
                     <th className="py-2.5 px-4 font-medium">Member</th><th className="px-3 font-medium">Tier</th><th className="px-3 font-medium">Tracks</th>
-                    <th className="px-3 font-medium">Payment</th><th className="px-3 font-medium">Access ends</th><th className="px-3 font-medium">Role</th>
+                    <th className="px-3 font-medium">Payment</th><th className="px-3 font-medium">Access ends</th><th className="px-3 font-medium">Role</th><th className="px-3 font-medium">Progress</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredMembers.map(m => (
-                    <tr key={m.email} className="border-b border-[#f1f3f4] hover:bg-[#f8f9fa]">
-                      <td className="py-2.5 px-4">
-                        <div className="font-medium">{m.name || m.email}</div>
-                        <div className="text-xs text-gray-500">{m.email}{m.discordTag ? ` · ${m.discordTag}` : ""}</div>
-                      </td>
-                      <td className="px-3 text-gray-700">{m.tier || "—"}</td>
-                      <td className="px-3">{m.tracks.length ? m.tracks.map(t => <span key={t} className="inline-block text-[10px] mr-1 px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 text-gray-600">{t}</span>) : <span className="text-gray-400">—</span>}</td>
-                      <td className="px-3">
-                        <span className={`text-xs px-2 py-0.5 rounded-full border ${PILL[m.paymentStatus] || "bg-gray-100 text-gray-500 border-gray-200"}`}>{m.paymentStatus}</span>
-                        {m.invoiced && <span className="ml-1 text-[10px] text-gray-400">🧾</span>}
-                      </td>
-                      <td className="px-3 text-gray-500 text-xs">{m.accessEndDate ? m.accessEndDate.slice(0, 10) : "—"}</td>
-                      <td className="px-3">{m.rolesAssigned ? "✅" : "⚠️"}</td>
-                    </tr>
+                    <Fragment key={m.email}>
+                      <tr className="border-b border-[#f1f3f4] hover:bg-[#f8f9fa] cursor-pointer" onClick={() => setExpanded(expanded === m.email ? null : m.email)}>
+                        <td className="py-2.5 px-4">
+                          <div className="font-medium">{m.name || m.email}</div>
+                          <div className="text-xs text-gray-500">{m.email}{m.discordTag ? ` · ${m.discordTag}` : ""}</div>
+                        </td>
+                        <td className="px-3 text-gray-700">{m.tier || "—"}</td>
+                        <td className="px-3">{m.tracks.length ? m.tracks.map(t => <span key={t} className="inline-block text-[10px] mr-1 px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 text-gray-600">{t}</span>) : <span className="text-gray-400">—</span>}</td>
+                        <td className="px-3">
+                          <span className={`text-xs px-2 py-0.5 rounded-full border ${PILL[m.paymentStatus] || "bg-gray-100 text-gray-500 border-gray-200"}`}>{m.paymentStatus}</span>
+                          {m.invoiced && <span className="ml-1 text-[10px] text-gray-400">🧾</span>}
+                        </td>
+                        <td className="px-3 text-gray-500 text-xs">{m.accessEndDate ? m.accessEndDate.slice(0, 10) : "—"}</td>
+                        <td className="px-3">{m.rolesAssigned ? "✅" : "⚠️"}</td>
+                        <td className="px-3 text-xs">
+                          {m.progress && (m.progress.done > 0 || m.progress.avg != null)
+                            ? <span className="text-gray-700">{m.progress.done} done{m.progress.avg != null ? ` · ${m.progress.avg}%` : ""}</span>
+                            : <span className="text-gray-400">—</span>}
+                          {m.progress?.weak?.length ? <span className="ml-1 text-[10px] text-red-600">⚠{m.progress.weak.length}</span> : null}
+                        </td>
+                      </tr>
+                      {expanded === m.email && (
+                        <tr className="bg-[#f8f9fa]"><td colSpan={7} className="px-4 py-3">
+                          {m.progress?.domains?.length ? (
+                            <div className="flex flex-wrap gap-2">
+                              {m.progress.domains.map(d => (
+                                <span key={d.domain} className={`text-xs px-2 py-1 rounded border ${d.highScore >= 75 ? "bg-green-50 border-green-200 text-green-700" : d.highScore >= 50 ? "bg-amber-50 border-amber-200 text-amber-700" : d.completed ? "bg-red-50 border-red-200 text-red-700" : "bg-gray-100 border-gray-200 text-gray-500"}`}>
+                                  {d.domain}: {d.completed || d.highScore > 0 ? `${d.highScore}%` : "—"}
+                                </span>
+                              ))}
+                            </div>
+                          ) : <span className="text-gray-500 text-xs">No quiz progress yet for this member.</span>}
+                        </td></tr>
+                      )}
+                    </Fragment>
                   ))}
                 </tbody>
               </table>
