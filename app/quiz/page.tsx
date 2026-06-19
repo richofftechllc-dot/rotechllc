@@ -51,6 +51,12 @@ export default function Quiz() {
   const [autoSpeak, setAutoSpeak] = useState(false);
   const [speakingIdx, setSpeakingIdx] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  // Bo/Flo's personalized post-quiz debrief — the tutor reviews exactly what you
+  // missed and offers to drill you on just those. Generated once per finished run.
+  const [debrief, setDebrief] = useState("");
+  const [debriefBusy, setDebriefBusy] = useState(false);
+  const debriefRef = useRef(false);   // ensures the debrief generates exactly once per results landing
+  const drillRef = useRef(false);     // true while quizzing ONLY the missed questions — don't save partial progress
   const lastSpeakRef = useRef<{ text: string; t: number }>({ text: "", t: 0 });
   const speakGenRef = useRef(0);                // cancels in-flight speech so two voices never overlap
   const recogRef = useRef<{ stop: () => void } | null>(null);
@@ -140,11 +146,24 @@ export default function Quiz() {
     const total = domain.questions.length;
     const isDone = qIdx >= total && answers.length === total;
     const unansweredCount = answers.filter(a => a == null).length;
-    if (isDone && (finished || unansweredCount === 0) && !savedRef.current) {
+    if (isDone && (finished || unansweredCount === 0) && !savedRef.current && !drillRef.current) {
       savedRef.current = true;
       saveDomainResult(domain, answers);
     }
   }, [qIdx, finished, domain, answers]);
+
+  // Auto-generate Bo/Flo's debrief the moment the student lands on results. Reviews
+  // exactly what they missed and (if anything) offers to drill them on just those.
+  useEffect(() => {
+    if (!domain) return;
+    const total = domain.questions.length;
+    const isDone = qIdx >= total && answers.length === total;
+    const unansweredCount = answers.filter(a => a == null).length;
+    if (isDone && (finished || unansweredCount === 0) && !debriefRef.current) {
+      debriefRef.current = true;
+      runDebrief(domain, answers, persona);
+    }
+  }, [qIdx, finished, domain, answers]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!me) return <main className="max-w-2xl mx-auto px-6 py-24 text-center"><h1 className="text-4xl font-black">Loading...</h1></main>;
   if (!me.ok) { if (typeof window !== "undefined") window.location.href = "/login"; return null; }
@@ -160,8 +179,56 @@ export default function Quiz() {
   const allowed = allowedPrefixes(me.track);
   const visibleTracks = TRACKS.filter(t => allowed.has(t.id));
 
-  const reset = () => { setTrack(null); setDomain(null); setQIdx(0); setAnswers([]); setFinished(false); savedRef.current = false; setShowLesson(false); setChat([]); };
-  const start = (d: Domain) => { setDomain(d); setQIdx(0); setAnswers(Array(d.questions.length).fill(null)); setFinished(false); savedRef.current = false; setShowLesson(false); setChat([]); };
+  const reset = () => { setTrack(null); setDomain(null); setQIdx(0); setAnswers([]); setFinished(false); savedRef.current = false; setShowLesson(false); setChat([]); setDebrief(""); debriefRef.current = false; drillRef.current = false; };
+  const start = (d: Domain) => { drillRef.current = false; setDebrief(""); debriefRef.current = false; setDomain(d); setQIdx(0); setAnswers(Array(d.questions.length).fill(null)); setFinished(false); savedRef.current = false; setShowLesson(false); setChat([]); };
+
+  // "Drill me on those" — build a quiz from ONLY the questions the student just missed,
+  // so they retest exactly their weak spots. drillRef stops this partial run from
+  // overwriting their real high score for the domain.
+  function drillMissed() {
+    if (!domain) return;
+    const missedQs = domain.questions.filter((qq, i) => answers[i] != null && answers[i] !== qq.answer);
+    if (!missedQs.length) return;
+    const dd: Domain = { ...domain, name: `${domain.name} — Drill`, questions: missedQs };
+    drillRef.current = true;
+    setDebrief(""); debriefRef.current = false; setShowLesson(false); setChat([]);
+    setDomain(dd); setQIdx(0); setAnswers(Array(missedQs.length).fill(null)); setFinished(false); savedRef.current = false;
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // Bo/Flo reviews the finished run and speaks a short, personalized debrief — names the
+  // ONE theme connecting what they missed, not a question-by-question list.
+  async function runDebrief(d: Domain, finalAnswers: (number | null)[], p: "bo" | "flo") {
+    if (!me || !me.ok || !me.code) return;
+    const missed = d.questions
+      .map((qq, i) => (finalAnswers[i] != null && finalAnswers[i] !== qq.answer)
+        ? { q: qq.q, picked: finalAnswers[i] as number, correct: qq.answer, options: qq.options } : null)
+      .filter((m): m is { q: string; picked: number; correct: number; options: string[] } => m !== null);
+    const correct = finalAnswers.filter((a, i) => a === d.questions[i].answer).length;
+    const skipped = finalAnswers.filter(a => a == null).length;
+    const pct = Math.round((correct / d.questions.length) * 100);
+    setDebriefBusy(true);
+    try {
+      const missedText = missed.length
+        ? missed.map(m => `• "${m.q}" — picked ${String.fromCharCode(65 + m.picked)}) ${m.options[m.picked]}; correct ${String.fromCharCode(65 + m.correct)}) ${m.options[m.correct]}`).join("\n")
+        : "(none — got everything they answered correct)";
+      const msg = `[RESULTS DEBRIEF — ${me.name} just finished the "${d.name}" quiz: ${pct}% (${correct}/${d.questions.length} correct${skipped ? `, ${skipped} skipped` : ""}).
+Questions MISSED:
+${missedText}]
+
+(SYSTEM: Give a SHORT spoken-style debrief, 2-4 sentences, open by their first name. Name the ONE topic/theme connecting what they missed — don't list every question. Tell them the single most important thing to lock in. ${missed.length ? "End by offering to drill them on just the ones they missed." : "Hype them up and tell them they're ready for the next domain."} Stay fully in your voice. No markdown headers.)`;
+      const r = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg, domainId: d.id, persona: p }),
+      });
+      const data = await r.json();
+      const reply = data.reply || data.message || "";
+      setDebrief(reply);
+      if (reply && autoSpeak) speak(reply, -1, p);
+    } catch { setDebrief(""); }
+    setDebriefBusy(false);
+  }
 
   async function saveDomainResult(d: Domain, finalAnswers: (number | null)[]) {
     if (finalAnswers.length !== d.questions.length) return; // only save complete runs
@@ -412,6 +479,7 @@ export default function Quiz() {
     const correct = answers.filter((a, i) => a === domain.questions[i].answer).length;
     const skipped = answers.filter(a => a == null).length;
     const pct = Math.round((correct / domain.questions.length) * 100);
+    const missedCount = domain.questions.filter((qq, i) => answers[i] != null && answers[i] !== qq.answer).length;
     return (
       <main className="max-w-2xl mx-auto px-6 py-12 text-center">
         <h1 className="text-5xl font-black mb-4">Done</h1>
@@ -421,6 +489,36 @@ export default function Quiz() {
         {progress[domain.id]?.highScore !== undefined && progress[domain.id].highScore! > pct && (
           <p className="text-gray-500 text-xs mb-6">Best: {progress[domain.id].highScore}%</p>
         )}
+
+        {/* Bo/Flo's personalized debrief — the "this tutor knows ME" moment. */}
+        {(debrief || debriefBusy) && (
+          <div className="mt-8 mx-auto max-w-lg text-left bg-zinc-900 border border-orange-500/30 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-3">
+                {persona === "bo" ? (
+                  <Image src="/bo-avatar.png" alt="Bo" width={36} height={36} className="rounded-full border-2 border-orange-500" />
+                ) : (
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-fuchsia-400 bg-gradient-to-br from-fuchsia-500 to-purple-600 text-sm font-black text-white">F</div>
+                )}
+                <div>
+                  <div className="font-bold text-sm">{persona === "bo" ? "Bo Tech" : "Flo"}</div>
+                  <div className={`text-xs ${persona === "bo" ? "text-green-500" : "text-fuchsia-300"}`}>Your debrief</div>
+                </div>
+              </div>
+              {debrief && (
+                <button onClick={() => (speakingIdx === -1 ? stopSpeak() : speak(debrief, -1))} title="Hear it"
+                  className="text-xs rounded px-2 py-1 border border-white/10 text-gray-400 hover:text-white">{speakingIdx === -1 ? "⏹" : "🔊"}</button>
+              )}
+            </div>
+            {debriefBusy && !debrief
+              ? <div className="text-orange-400 text-xs animate-pulse">{persona === "bo" ? "Bo" : "Flo"}&apos;s reviewing your run…</div>
+              : <Markdown text={debrief} />}
+            {!debriefBusy && debrief && missedCount > 0 && (
+              <button onClick={drillMissed} className="mt-3 px-4 py-2 bg-orange-500 text-black font-bold text-sm rounded-lg">🎯 Drill me on those {missedCount} →</button>
+            )}
+          </div>
+        )}
+
         <div className="flex gap-3 justify-center flex-wrap mt-6">
           <button onClick={() => start(domain)} className="px-6 py-3 bg-orange-500 text-black font-bold rounded-lg">Retry</button>
           <button onClick={() => setDomain(null)} className="px-6 py-3 bg-zinc-800 text-white font-bold rounded-lg">Domains</button>
