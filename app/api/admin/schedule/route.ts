@@ -1,0 +1,52 @@
+import { NextResponse } from "next/server";
+import { coll } from "@/lib/firebase";
+import { getAuthedAdmin } from "@/lib/admin";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+// Team availability — coaches set their own weekly hours; everyone sees the team's.
+// In-platform for now (Firebase); a Google Calendar free/busy sync can layer on later.
+// Each coach = one doc in `crmSchedule` keyed by their Discord ID.
+
+// GET /api/admin/schedule — all coaches' availability + who you are (for edit rights).
+export async function GET(req: Request) {
+  const admin = await getAuthedAdmin(req);
+  if (!admin) return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 });
+  try {
+    const snap = await coll("crmSchedule").limit(100).get();
+    const schedules = snap.docs
+      .map((d) => ({ id: d.id, ...(d.data() as Record<string, unknown>) }))
+      .sort((a, b) => String((a as { name?: string }).name || "").localeCompare(String((b as { name?: string }).name || "")));
+    return NextResponse.json({ ok: true, schedules, me: admin });
+  } catch (e) {
+    return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : "error" }, { status: 500 });
+  }
+}
+
+// POST /api/admin/schedule — upsert ONLY the caller's own availability.
+// Body: { days: { Mon, Tue, ... }, note }
+export async function POST(req: Request) {
+  const admin = await getAuthedAdmin(req);
+  if (!admin) return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 });
+  let body: { days?: Record<string, string>; note?: string };
+  try { body = await req.json(); } catch { return NextResponse.json({ ok: false, error: "bad_json" }, { status: 400 }); }
+
+  const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const days: Record<string, string> = {};
+  for (const d of DAYS) days[d] = String(body.days?.[d] || "").slice(0, 60);
+
+  try {
+    // Keyed by the caller's Discord ID so a coach can only edit their own row.
+    await coll("crmSchedule").doc(admin.discordId).set({
+      discordId: admin.discordId,
+      name: admin.name,
+      days,
+      note: String(body.note || "").slice(0, 200),
+      updatedAt: new Date().toISOString(),
+    }, { merge: true });
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : "error" }, { status: 500 });
+  }
+}
