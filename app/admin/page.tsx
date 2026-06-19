@@ -41,6 +41,7 @@ export default function AdminCRM() {
   const [q, setQ] = useState("");
   const [noteDraft, setNoteDraft] = useState<Record<string, string>>({});
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [refDraft, setRefDraft] = useState<Record<string, string>>({});
 
   const loadMembers = useCallback(async () => {
     const r = await fetch("/api/admin/members");
@@ -78,6 +79,13 @@ export default function AdminCRM() {
   async function saveSchedule() {
     await fetch("/api/admin/schedule", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(schedDraft) });
     loadSchedule();
+  }
+  async function setReferrer(m: Member) {
+    await fetch("/api/admin/set-referrer", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ quizCode: m.quizCode, email: m.email, referredBy: refDraft[m.email] ?? m.referredBy ?? "" }),
+    });
+    loadMembers();
   }
 
   if (authed === "loading") return <main className="min-h-screen bg-[#f8f9fa] flex items-center justify-center text-gray-500">Loading CRM…</main>;
@@ -269,6 +277,14 @@ export default function AdminCRM() {
                             <div><span className="text-gray-400">Quiz code</span><div className="font-medium font-mono">{m.quizCode || "—"}</div></div>
                             <div><span className="text-gray-400">Tracks</span><div className="font-medium">{m.tracks.join(", ") || "—"}</div></div>
                             <div><span className="text-gray-400">Joined</span><div className="font-medium">{m.purchaseDate ? m.purchaseDate.slice(0, 10) : "—"}</div></div>
+                            <div>
+                              <span className="text-gray-400">Referred by</span>
+                              <div className="flex gap-1 mt-0.5">
+                                <input value={refDraft[m.email] ?? m.referredBy ?? ""} onChange={e => setRefDraft(s => ({ ...s, [m.email]: e.target.value }))}
+                                  placeholder="name or code" className="border border-[#dadce0] rounded px-2 py-0.5 text-xs w-32 focus:outline-none focus:border-orange-500" />
+                                <button onClick={() => setReferrer(m)} className="text-[10px] px-2 rounded bg-[#202124] text-white">Save</button>
+                              </div>
+                            </div>
                           </div>
                           <div className="text-xs text-gray-400 mb-1.5">Quiz scores by domain</div>
                           {m.progress?.domains?.length ? (
