@@ -5,20 +5,21 @@ import { getAuthedAdmin } from "@/lib/admin";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// GET /api/admin/members — admin-only roster for the CRM.
-// Returns each member's tracks/access + a payment STATUS (late/active/expired/comp)
-// but NEVER the dollar amount. Also counts comped/discounted members in aggregate.
+// GET /api/admin/members — coach-only roster for the CRM.
+// Primary source is `customers` (where every member actually lives — the quiz, login
+// and progress all key off it). Enriched with `members` (RAC payment/tier) by email
+// and `quizProgress` (scores) by quizCode. Shows payment STATUS, never dollar amounts.
 export async function GET(req: Request) {
   const admin = await getAuthedAdmin(req);
   if (!admin) return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 });
 
   try {
-    const snap = await coll("members").limit(1000).get();
+    const custSnap = await coll("customers").limit(2000).get();
 
-    // One read pulls everyone's quiz progress; map by code (the doc id) to join below.
+    // quiz progress by quizCode (doc id)
     const progByCode: Record<string, { domain: string; highScore: number; completed: boolean }[]> = {};
     try {
-      const progSnap = await coll("quizProgress").limit(2000).get();
+      const progSnap = await coll("quizProgress").limit(3000).get();
       progSnap.docs.forEach((p) => {
         const raw = (p.data() as { progress?: Record<string, { completed?: boolean; highScore?: number }> }).progress || {};
         progByCode[p.id] = Object.entries(raw).map(([k, v]) => ({
@@ -29,15 +30,38 @@ export async function GET(req: Request) {
       });
     } catch { /* progress is best-effort */ }
 
+    // RAC enrichment (payment tier/status/access window) keyed by email
+    const racByEmail: Record<string, Record<string, unknown>> = {};
+    try {
+      const racSnap = await coll("members").limit(3000).get();
+      racSnap.docs.forEach((d) => {
+        const m = d.data() as Record<string, unknown>;
+        if (m.email) racByEmail[String(m.email).toLowerCase()] = m;
+      });
+    } catch { /* enrichment is best-effort */ }
+
     const now = Date.now();
     let comped = 0;
-    const members = snap.docs.map((d) => {
-      const m = d.data() as Record<string, unknown>;
-      const end = typeof m.accessEndDate === "string" ? Date.parse(m.accessEndDate) : NaN;
-      const status = (m.status as string) || "unknown";
-      const tier = (m.accessTier as string) || "";
-      if (tier === "comp" || status === "comp") comped++;
-      const prog = progByCode[(m.quizCode as string) || ""] || [];
+    const members = custSnap.docs.map((d) => {
+      const c = d.data() as Record<string, unknown>;
+      const email = String(c.email || "").toLowerCase();
+      const rac = racByEmail[email] || {};
+      const tracks = (c.tracks as string[])?.length ? (c.tracks as string[])
+        : c.track ? [c.track as string]
+        : (rac.tracks as string[]) || [];
+      const tier = (rac.accessTier as string) || (c.productType as string) || "";
+      const racStatus = rac.status as string | undefined;
+      if (tier === "comp" || racStatus === "comp") comped++;
+      const end = typeof rac.accessEndDate === "string" ? Date.parse(rac.accessEndDate as string) : NaN;
+      const late = !isNaN(end) && end < now && racStatus !== "canceled" && racStatus !== "comp";
+      const paymentStatus = late ? "late"
+        : (racStatus === "comp" || tier === "comp") ? "comp"
+        : racStatus === "canceled" ? "canceled"
+        : racStatus === "expired" ? "expired"
+        : racStatus === "active" ? "active"
+        : c.rolesAssigned ? "active" : "pending";
+
+      const prog = progByCode[(c.quizCode as string) || ""] || [];
       const scored = prog.filter((p) => p.completed || p.highScore > 0);
       const progress = {
         domains: prog,
@@ -45,37 +69,31 @@ export async function GET(req: Request) {
         avg: scored.length ? Math.round(scored.reduce((s, p) => s + p.highScore, 0) / scored.length) : null,
         weak: prog.filter((p) => p.completed && p.highScore < 70).map((p) => p.domain),
       };
-      const late = !isNaN(end) && end < now && status !== "canceled" && status !== "comp";
-      // payment status WITHOUT price — what the team is allowed to see
-      const paymentStatus = late ? "late"
-        : status === "comp" || tier === "comp" ? "comp"
-        : status === "canceled" ? "canceled"
-        : status === "expired" ? "expired"
-        : status === "active" ? "active"
-        : status;
+
       return {
-        email: m.email as string,
-        name: (m.fullName as string) || (m.name as string) || "",
-        discordTag: (m.discordTag as string) || "",
-        discordId: (m.discordId as string) || "",
+        email: (c.email as string) || "",
+        name: (c.name as string) || (c.firstName as string) || "",
+        discordTag: (c.discordTag as string) || (rac.discordTag as string) || "",
+        discordId: (c.discordId as string) || (rac.discordId as string) || "",
         tier,
-        status,
+        status: racStatus || (c.rolesAssigned ? "active" : "pending"),
         paymentStatus,
-        invoiced: !!m.lastInvoiceAt || !!(m as { invoiced?: boolean }).invoiced,
-        tracks: (m.tracks as string[]) || [],
-        quizCode: (m.quizCode as string) || "",
-        accessEndDate: (m.accessEndDate as string) || "",
-        rolesAssigned: !!m.rolesAssigned,
-        assignedTo: (m.assignedTo as string) || "",
-        notes: (m.crmNotes as string) || "",
+        invoiced: !!rac.lastInvoiceAt || !!(rac as { invoiced?: boolean }).invoiced,
+        tracks,
+        quizCode: (c.quizCode as string) || "",
+        accessEndDate: (rac.accessEndDate as string) || "",
+        purchaseDate: (c.purchaseDate as string) || "",
+        rolesAssigned: !!c.rolesAssigned,
+        assignedTo: (c.assignedTo as string) || (rac.assignedTo as string) || "",
+        notes: (c.crmNotes as string) || (rac.crmNotes as string) || "",
         progress,
       };
     });
-    // newest-expiring / late first is most useful; sort late → soonest end
+
     members.sort((a, b) => {
       if (a.paymentStatus === "late" && b.paymentStatus !== "late") return -1;
       if (b.paymentStatus === "late" && a.paymentStatus !== "late") return 1;
-      return (a.accessEndDate || "").localeCompare(b.accessEndDate || "");
+      return (a.name || a.email).localeCompare(b.name || b.email);
     });
     return NextResponse.json({ ok: true, members, stats: { total: members.length, comped } });
   } catch (e) {

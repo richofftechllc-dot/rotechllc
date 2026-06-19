@@ -6,7 +6,7 @@ type Member = {
   email: string; name: string; discordTag: string; discordId: string;
   tier: string; status: string; paymentStatus: string; invoiced: boolean;
   tracks: string[]; quizCode: string; accessEndDate: string; rolesAssigned: boolean;
-  assignedTo: string; notes: string;
+  assignedTo: string; notes: string; purchaseDate?: string;
   progress?: { domains: { domain: string; highScore: number; completed: boolean }[]; done: number; avg: number | null; weak: string[] };
 };
 type Note = { by: string; text: string; at: string };
@@ -240,7 +240,16 @@ export default function AdminCRM() {
                         </td>
                       </tr>
                       {expanded === m.email && (
-                        <tr className="bg-[#f8f9fa]"><td colSpan={7} className="px-4 py-3">
+                        <tr className="bg-[#f8f9fa]"><td colSpan={7} className="px-4 py-4">
+                          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-1.5 text-xs mb-4">
+                            <div><span className="text-gray-400">Name</span><div className="font-medium">{m.name || "—"}</div></div>
+                            <div><span className="text-gray-400">Email</span><div className="font-medium">{m.email || "—"}</div></div>
+                            <div><span className="text-gray-400">Discord</span><div className="font-medium">{m.discordTag || "—"} {m.discordId ? <span className="text-gray-400 font-mono">({m.discordId})</span> : ""}</div></div>
+                            <div><span className="text-gray-400">Quiz code</span><div className="font-medium font-mono">{m.quizCode || "—"}</div></div>
+                            <div><span className="text-gray-400">Tracks</span><div className="font-medium">{m.tracks.join(", ") || "—"}</div></div>
+                            <div><span className="text-gray-400">Joined</span><div className="font-medium">{m.purchaseDate ? m.purchaseDate.slice(0, 10) : "—"}</div></div>
+                          </div>
+                          <div className="text-xs text-gray-400 mb-1.5">Quiz scores by domain</div>
                           {m.progress?.domains?.length ? (
                             <div className="flex flex-wrap gap-2">
                               {m.progress.domains.map(d => (
