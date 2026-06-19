@@ -5,7 +5,7 @@ import Image from "next/image";
 type Member = {
   email: string; name: string; discordTag: string; discordId: string;
   tier: string; status: string; paymentStatus: string; invoiced: boolean;
-  tracks: string[]; quizCode: string; accessEndDate: string; rolesAssigned: boolean;
+  tracks: string[]; quizCode: string; accessEndDate: string; daysLeft?: number | null; plan?: string; referredBy?: string; rolesAssigned: boolean;
   assignedTo: string; notes: string; purchaseDate?: string;
   progress?: { domains: { domain: string; highScore: number; completed: boolean }[]; done: number; avg: number | null; weak: string[] };
 };
@@ -19,6 +19,8 @@ const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 // Light, professional palette (Google Admin / Zoho feel): white surfaces, near-black
 // text, gray borders, status pills in muted tones, one orange accent for the brand.
+// Referral payout per paid referral (configurable). Drives the "owed" total.
+const REFERRAL_PAYOUT = 20;
 const PILL: Record<string, string> = {
   late: "bg-red-50 text-red-700 border-red-200",
   active: "bg-green-50 text-green-700 border-green-200",
@@ -29,9 +31,9 @@ const PILL: Record<string, string> = {
 
 export default function AdminCRM() {
   const [authed, setAuthed] = useState<"loading" | "yes" | "no">("loading");
-  const [tab, setTab] = useState<"followups" | "members" | "schedule">("followups");
+  const [tab, setTab] = useState<"followups" | "members" | "schedule" | "referrals">("followups");
   const [members, setMembers] = useState<Member[]>([]);
-  const [stats, setStats] = useState<{ total: number; comped: number } | null>(null);
+  const [stats, setStats] = useState<{ total: number; comped: number; expiringSoon: number } | null>(null);
   const [followups, setFollowups] = useState<Followup[]>([]);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [me, setMe] = useState<{ discordId: string; name: string } | null>(null);
@@ -92,12 +94,22 @@ export default function AdminCRM() {
   const doneFollowups = followups.filter(f => f.status === "done");
   const filteredMembers = members.filter(m =>
     !q || [m.name, m.email, m.discordTag, m.tier, m.tracks.join(",")].join(" ").toLowerCase().includes(q.toLowerCase()));
-  const lateCount = members.filter(m => m.paymentStatus === "late").length;
+  const lateCount = members.filter(m => m.paymentStatus === "late" || m.paymentStatus === "expired").length;
+
+  // Referral rollup: group by who referred them, count paid, compute payout owed.
+  const referrerMap: Record<string, Member[]> = {};
+  members.forEach(m => { if (m.referredBy) (referrerMap[m.referredBy] ||= []).push(m); });
+  const referrers = Object.entries(referrerMap).map(([ref, list]) => ({
+    ref, count: list.length,
+    paid: list.filter(x => x.paymentStatus === "active" || x.paymentStatus === "comp").length,
+  })).sort((a, b) => b.count - a.count);
+  const totalOwed = referrers.reduce((s, r) => s + r.paid * REFERRAL_PAYOUT, 0);
 
   const TABS: { id: typeof tab; label: string }[] = [
     { id: "followups", label: "Follow-ups" },
     { id: "members", label: "Members" },
     { id: "schedule", label: "Schedule" },
+    { id: "referrals", label: "Referrals" },
   ];
 
   return (
@@ -123,12 +135,13 @@ export default function AdminCRM() {
 
       <div className="max-w-6xl mx-auto px-6 py-6">
         {/* Stat cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
           {[
             { label: "Members", value: stats?.total ?? members.length, tone: "text-[#202124]" },
-            { label: "Late / overdue", value: lateCount, tone: "text-red-600" },
+            { label: "Expiring ≤30d", value: stats?.expiringSoon ?? 0, tone: "text-amber-600" },
+            { label: "Late / expired", value: lateCount, tone: "text-red-600" },
             { label: "Comped", value: stats?.comped ?? 0, tone: "text-blue-600" },
-            { label: "Open follow-ups", value: openFollowups.length, tone: "text-amber-600" },
+            { label: "Open follow-ups", value: openFollowups.length, tone: "text-[#202124]" },
           ].map(c => (
             <div key={c.label} className="bg-white border border-[#dadce0] rounded-xl p-4">
               <div className={`text-3xl font-semibold ${c.tone}`}>{c.value}</div>
@@ -230,7 +243,15 @@ export default function AdminCRM() {
                           <span className={`text-xs px-2 py-0.5 rounded-full border ${PILL[m.paymentStatus] || "bg-gray-100 text-gray-500 border-gray-200"}`}>{m.paymentStatus}</span>
                           {m.invoiced && <span className="ml-1 text-[10px] text-gray-400">🧾</span>}
                         </td>
-                        <td className="px-3 text-gray-500 text-xs">{m.accessEndDate ? m.accessEndDate.slice(0, 10) : "—"}</td>
+                        <td className="px-3 text-xs whitespace-nowrap">
+                          {m.accessEndDate ? <span className="text-gray-600">{m.accessEndDate.slice(0, 10)}</span> : <span className="text-gray-400">—</span>}
+                          {typeof m.daysLeft === "number" && (
+                            <span className={`ml-1 px-1.5 py-0.5 rounded-full border text-[10px] ${m.daysLeft < 0 ? "bg-red-50 text-red-700 border-red-200" : m.daysLeft <= 30 ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}>
+                              {m.daysLeft < 0 ? `${Math.abs(m.daysLeft)}d over` : `${m.daysLeft}d`}
+                            </span>
+                          )}
+                          {m.plan === "monthly" && <span className="ml-1 text-[10px] text-gray-400">mo</span>}
+                        </td>
                         <td className="px-3">{m.rolesAssigned ? "✅" : "⚠️"}</td>
                         <td className="px-3 text-xs">
                           {m.progress && (m.progress.done > 0 || m.progress.avg != null)
@@ -312,6 +333,39 @@ export default function AdminCRM() {
                 placeholder="Note (e.g. ET timezone, prefer evenings)" className="w-full bg-white border border-[#dadce0] rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:border-orange-500" />
               <button onClick={saveSchedule} className="px-5 py-2 bg-[#202124] text-white font-medium rounded-lg text-sm hover:bg-black">Save my availability</button>
             </div>
+          </div>
+        )}
+
+        {/* ── Referrals ── */}
+        {tab === "referrals" && (
+          <div>
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+              <p className="text-gray-500 text-sm">Who referred whom and what&apos;s owed. Payout = ${REFERRAL_PAYOUT} per paid referral.</p>
+              <span className="text-sm font-semibold">Total owed: ${totalOwed}</span>
+            </div>
+            {referrers.length === 0 ? (
+              <div className="bg-white border border-[#dadce0] rounded-xl p-6 text-sm text-gray-500">
+                No referrals recorded yet. To track them, signups need to capture a <code className="bg-gray-100 px-1 rounded">referredBy</code> code — I can wire that into the join flow so this fills automatically.
+              </div>
+            ) : (
+              <div className="bg-white border border-[#dadce0] rounded-xl overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="text-left text-xs text-gray-500 bg-[#f8f9fa]"><tr className="border-b border-[#e8eaed]">
+                    <th className="py-2.5 px-4 font-medium">Referrer</th><th className="px-3 font-medium">Referred</th><th className="px-3 font-medium">Paid</th><th className="px-3 font-medium">Owed</th>
+                  </tr></thead>
+                  <tbody>
+                    {referrers.map(r => (
+                      <tr key={r.ref} className="border-b border-[#f1f3f4] hover:bg-[#f8f9fa]">
+                        <td className="py-2.5 px-4 font-medium">{r.ref}</td>
+                        <td className="px-3">{r.count}</td>
+                        <td className="px-3">{r.paid}</td>
+                        <td className="px-3 font-semibold">${r.paid * REFERRAL_PAYOUT}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
       </div>

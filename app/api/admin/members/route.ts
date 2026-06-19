@@ -42,6 +42,7 @@ export async function GET(req: Request) {
 
     const now = Date.now();
     let comped = 0;
+    let expiringSoon = 0;
     const members = custSnap.docs.map((d) => {
       const c = d.data() as Record<string, unknown>;
       const email = String(c.email || "").toLowerCase();
@@ -52,12 +53,22 @@ export async function GET(req: Request) {
       const tier = (rac.accessTier as string) || (c.productType as string) || "";
       const racStatus = rac.status as string | undefined;
       if (tier === "comp" || racStatus === "comp") comped++;
-      const end = typeof rac.accessEndDate === "string" ? Date.parse(rac.accessEndDate as string) : NaN;
-      const late = !isNaN(end) && end < now && racStatus !== "canceled" && racStatus !== "comp";
-      const paymentStatus = late ? "late"
-        : (racStatus === "comp" || tier === "comp") ? "comp"
+      // Expiry: prefer the RAC access window; else derive from the join/purchase date.
+      // Founding members = 12 months; monthly plans ≈ 30 days (ready for the switch).
+      const plan = (rac.billingCycle as string) || (c.billingCycle as string) || (c.plan as string) || "annual";
+      let accessEnd = (rac.accessEndDate as string) || "";
+      if (!accessEnd && c.purchaseDate) {
+        const start = Date.parse(c.purchaseDate as string);
+        if (!isNaN(start)) accessEnd = new Date(start + (plan === "monthly" ? 30 : 365) * 86400000).toISOString();
+      }
+      const endMs = accessEnd ? Date.parse(accessEnd) : NaN;
+      const daysLeft = !isNaN(endMs) ? Math.round((endMs - now) / 86400000) : null;
+      if (daysLeft !== null && daysLeft >= 0 && daysLeft <= 30) expiringSoon++;
+      const expired = daysLeft !== null && daysLeft < 0 && racStatus !== "comp" && racStatus !== "canceled";
+      const referredBy = (c.referredBy as string) || (c.referredByCode as string) || (c.referrer as string) || "";
+      const paymentStatus = (racStatus === "comp" || tier === "comp") ? "comp"
         : racStatus === "canceled" ? "canceled"
-        : racStatus === "expired" ? "expired"
+        : expired ? "expired"
         : racStatus === "active" ? "active"
         : c.rolesAssigned ? "active" : "pending";
 
@@ -81,7 +92,10 @@ export async function GET(req: Request) {
         invoiced: !!rac.lastInvoiceAt || !!(rac as { invoiced?: boolean }).invoiced,
         tracks,
         quizCode: (c.quizCode as string) || "",
-        accessEndDate: (rac.accessEndDate as string) || "",
+        accessEndDate: accessEnd,
+        daysLeft,
+        plan,
+        referredBy,
         purchaseDate: (c.purchaseDate as string) || "",
         rolesAssigned: !!c.rolesAssigned,
         assignedTo: (c.assignedTo as string) || (rac.assignedTo as string) || "",
@@ -95,7 +109,7 @@ export async function GET(req: Request) {
       if (b.paymentStatus === "late" && a.paymentStatus !== "late") return 1;
       return (a.name || a.email).localeCompare(b.name || b.email);
     });
-    return NextResponse.json({ ok: true, members, stats: { total: members.length, comped } });
+    return NextResponse.json({ ok: true, members, stats: { total: members.length, comped, expiringSoon } });
   } catch (e) {
     return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : "error" }, { status: 500 });
   }
