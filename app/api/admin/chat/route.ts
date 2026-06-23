@@ -17,7 +17,8 @@ export async function GET(req: Request) {
     const messages = snap.docs
       .map((d) => ({ id: d.id, ...(d.data() as Record<string, unknown>) }))
       .reverse(); // back to chronological order
-    return NextResponse.json({ ok: true, messages, me: admin });
+    const isOwner = admin.discordId === (process.env.RANDY_DISCORD_ID || "").trim();
+    return NextResponse.json({ ok: true, messages, me: { ...admin, isOwner } });
   } catch (e) {
     return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : "error" }, { status: 500 });
   }
@@ -40,6 +41,15 @@ export async function POST(req: Request) {
       text,
       createdAt: new Date().toISOString(),
     });
+    // Ping the other coaches in Discord so they actually see it (bot picks this up).
+    await coll("botCommands").add({
+      type: "teamPing",
+      payload: { fromId: admin.discordId, fromName: admin.name, text },
+      status: "pending",
+      requestedBy: admin.discordId,
+      requestedByName: admin.name,
+      createdAt: new Date().toISOString(),
+    }).catch(() => {});
     return NextResponse.json({ ok: true });
   } catch (e) {
     return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : "error" }, { status: 500 });

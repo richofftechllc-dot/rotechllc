@@ -94,6 +94,8 @@ export async function GET(req: Request) {
         tracks,
         roles: (c.roles as string[]) || (rac.roles as string[]) || [],
         quizCode: (c.quizCode as string) || "",
+        certs: (c.certs as string[]) || (rac.certs as string[]) || [],
+        phone: (c.phone as string) || (rac.phone as string) || "",
         accessEndDate: accessEnd,
         daysLeft,
         plan,
