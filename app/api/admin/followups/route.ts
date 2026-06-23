@@ -40,8 +40,9 @@ export async function POST(req: Request) {
         memberEmail: String(body.memberEmail || "").slice(0, 160),
         source: String(body.source || "manual"),
         status: "open",
-        assignedTo: "",
-        notes: [],
+        assignedTo: String(body.assignedTo || "").slice(0, 60),
+        ...(body.assignedTo ? { assignedAt: nowISO } : {}),
+        notes: body.note ? [{ by: admin.name, text: String(body.note).slice(0, 1000), at: nowISO }] : [],
         createdBy: admin.name,
         createdAt: nowISO,
       });
