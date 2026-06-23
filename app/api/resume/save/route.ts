@@ -1,13 +1,18 @@
 import { NextResponse } from "next/server";
 import { getAuthedCode } from "@/lib/session";
+import { coll } from "@/lib/firebase";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 // POST /api/resume/save
-// Auth: rot_session cookie required (members-only).
-// Body: { name?, resume }                — code is derived from session, NOT body.
-// Forwards to Zapier Catch Hook (ZAPIER_RESUME_SAVE_HOOK) which writes to Firestore.
+// Auth: rot_session cookie required (members-only). Code is derived from the session, NOT the body.
+// Body: { name?, resume }
+//
+// Writes directly to Firestore (members_resumes/<code>) via .set() — a true upsert, so re-saves
+// OVERWRITE the member's existing resume instead of erroring. This replaces the old Zapier
+// Catch-Hook path, whose Firestore "Create Document" action threw 409 "already exists" on every
+// re-save. No webhook, no Zap, no 409.
 export async function POST(req: Request) {
   const code = await getAuthedCode(req);
   if (!code) {
@@ -21,24 +26,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "bad_json" }, { status: 400 });
   }
 
-  const hook = process.env.ZAPIER_RESUME_SAVE_HOOK;
-  if (!hook) {
-    return NextResponse.json({ ok: true, persisted: false, reason: "no_webhook_configured" });
-  }
-
   try {
-    const payload = {
+    await coll("members_resumes").doc(code).set({
       code, // authoritative — from session, not request body
       name: body.name || "",
       resume_json: JSON.stringify(body.resume || {}),
       updated_at: new Date().toISOString(),
-    };
-    const r = await fetch(hook, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
     });
-    return NextResponse.json({ ok: r.ok, persisted: r.ok, status: r.status });
+    return NextResponse.json({ ok: true, persisted: true });
   } catch (e) {
     return NextResponse.json(
       { ok: false, persisted: false, error: e instanceof Error ? e.message : String(e) },
