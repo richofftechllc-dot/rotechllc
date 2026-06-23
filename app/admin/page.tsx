@@ -73,7 +73,8 @@ export default function AdminCRM() {
   const [actionMsg, setActionMsg] = useState<Record<string, string>>({});
   const [resumeView, setResumeView] = useState<Record<string, { name?: string; data: unknown; updatedAt?: string } | null>>({});
   const [invoiceFor, setInvoiceFor] = useState<string | null>(null);
-  const [invoiceService, setInvoiceService] = useState("sec-essential");
+  const [invoiceService, setInvoiceService] = useState("");
+  const [catalog, setCatalog] = useState<{ id: string; name: string; priceCents: number }[]>([]);
   const [scheduleType, setScheduleType] = useState<Record<string, string>>({});
   const [scheduleFor, setScheduleFor] = useState<string | null>(null);
 
@@ -117,6 +118,12 @@ export default function AdminCRM() {
     setAuthed("yes");
     const d = await r.json();
     if (d.ok) { setChat(d.messages); if (d.me) setMe(d.me); }
+  }, []);
+  const loadCatalog = useCallback(async () => {
+    const r = await fetch("/api/admin/catalog");
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d.ok) { setCatalog(d.items); if (d.items[0]) setInvoiceService(prev => prev || d.items[0].id); }
   }, []);
   async function sendChat() {
     const text = chatInput.trim();
@@ -162,8 +169,27 @@ export default function AdminCRM() {
     doAction(m.email, "dm", { email: m.email, discordId: m.discordId, message: `📅 ${blurb[type] || blurb.Intro} DM me the word **book** here and I'll show you open times (pick your coach + a slot). See you soon!` }, `✓ Sent them the ${type.toLowerCase()} booking prompt in Discord.`);
   }
   function sendInvoice(m: Member) {
-    doAction(m.email, "invoice", { clientName: m.name, clientEmail: m.email, service: invoiceService }, "✓ Invoice queued — Square will email it.");
+    const item = catalog.find(c => c.id === invoiceService);
+    if (!item) { setActionMsg(s => ({ ...s, [m.email]: "Pick a Square item first." })); return; }
+    doAction(m.email, "invoice", { clientName: m.name, clientEmail: m.email, label: item.name, amountCents: item.priceCents }, `✓ Invoice queued: ${item.name} ($${(item.priceCents / 100).toFixed(0)}).`);
     setInvoiceFor(null);
+  }
+  function revokeAccess(m: Member) {
+    if (!confirm(`Remove access for ${m.name || m.email}? They'll lose their tier + roles.`)) return;
+    doAction(m.email, "revoke", { email: m.email, notify: true }, "✓ Access removal queued.");
+  }
+  function changeTier(m: Member, tier: string) {
+    if (!tier) return;
+    doAction(m.email, "setTier", { email: m.email, tier }, `✓ Changing role → ${tier}.`);
+  }
+  async function removeCall(c: Call) {
+    if (!confirm(`Remove "${c.title}" from the CRM? It stays out on future syncs too.`)) return;
+    await fetch("/api/admin/call-exclude", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: c.id }) });
+    setCalls(cs => cs.filter(x => x.id !== c.id));
+  }
+  async function deleteChat(id: string) {
+    await fetch("/api/admin/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ delete: id }) });
+    setChat(c => c.filter(m => m.id !== id));
   }
   async function viewResume(m: Member) {
     if (resumeView[m.email]) { setResumeView(s => ({ ...s, [m.email]: null })); return; }
@@ -223,7 +249,7 @@ export default function AdminCRM() {
     if (d.ok) loadFollowups();
   }
 
-  useEffect(() => { loadMembers(); loadFollowups(); loadSchedule(); loadCalls(); loadChat(); }, [loadMembers, loadFollowups, loadSchedule, loadCalls, loadChat]);
+  useEffect(() => { loadMembers(); loadFollowups(); loadSchedule(); loadCalls(); loadChat(); loadCatalog(); }, [loadMembers, loadFollowups, loadSchedule, loadCalls, loadChat, loadCatalog]);
   // Live-ish team chat: refresh every 8s while the Team tab is open.
   useEffect(() => {
     if (tab !== "team") return;
@@ -360,6 +386,7 @@ export default function AdminCRM() {
                     </span>
                     {!f.assignedTo && <button onClick={() => act({ action: "assign", id: f.id })} className="text-xs px-2.5 py-1 rounded-lg border border-[#dadce0] hover:bg-gray-50">Assign to me</button>}
                     <button onClick={() => act({ action: "status", id: f.id, status: "done" })} className="text-xs px-2.5 py-1 rounded-lg bg-green-600 text-white hover:bg-green-700">✓ Done</button>
+                    <button onClick={() => { if (confirm("Delete this follow-up?")) act({ action: "delete", id: f.id }); }} className="text-xs px-2 py-1 rounded-lg border border-red-200 text-red-600 hover:bg-red-50">Delete</button>
                   </div>
                 </div>
                 {(f.notes || []).length > 0 && (
@@ -510,15 +537,20 @@ export default function AdminCRM() {
                                 placeholder="Send update (DMs them in Discord)…" className="flex-1 min-w-[220px] text-xs border border-[#dadce0] rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:border-orange-500" />
                               <button onClick={() => sendUpdate(m)} className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Send</button>
                             </div>
+                            <div className="flex flex-wrap items-center gap-2 mt-2">
+                              <span className="text-xs text-gray-500">Manage:</span>
+                              <select defaultValue="" onChange={e => { changeTier(m, e.target.value); e.target.value = ""; }} className="text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500">
+                                <option value="">Change role…</option>
+                                {["founding", "secplus", "csa", "aws", "secret", "ts", "tsci", "comp"].map(t => <option key={t} value={t}>{t}</option>)}
+                              </select>
+                              <button onClick={() => revokeAccess(m)} className="text-xs px-2.5 py-1.5 rounded-lg border border-red-300 bg-red-50 text-red-700 hover:bg-red-100">Remove access</button>
+                            </div>
                             {invoiceFor === m.email && me?.isOwner && (
                               <div className="flex flex-wrap items-center gap-2 mt-2 bg-orange-50 border border-orange-200 rounded-lg p-2">
                                 <span className="text-xs text-orange-800">Invoice {m.name || m.email}:</span>
-                                <select value={invoiceService} onChange={e => setInvoiceService(e.target.value)} className="text-xs border border-orange-200 rounded-lg px-2 py-1.5 bg-white">
-                                  <option value="sec-essential">Security+ — Essential</option>
-                                  <option value="sec-accelerated">Security+ — Accelerated</option>
-                                  <option value="csa-essential">ServiceNow CSA — Essential</option>
-                                  <option value="csa-accelerated">ServiceNow CSA — Accelerated</option>
-                                  <option value="aws">AWS Cloud Practitioner</option>
+                                <select value={invoiceService} onChange={e => setInvoiceService(e.target.value)} className="text-xs border border-orange-200 rounded-lg px-2 py-1.5 bg-white max-w-[260px]">
+                                  {catalog.length === 0 && <option value="">No Square items synced yet…</option>}
+                                  {catalog.map(it => <option key={it.id} value={it.id}>{it.name} — ${(it.priceCents / 100).toFixed(0)}</option>)}
                                 </select>
                                 <button onClick={() => sendInvoice(m)} className="text-xs px-3 py-1.5 rounded-lg bg-orange-600 text-white hover:bg-orange-700">Send invoice</button>
                               </div>
@@ -612,6 +644,7 @@ export default function AdminCRM() {
                   <div className="flex flex-wrap items-center gap-2 pt-1">
                     {c.transcriptUrl && <a href={c.transcriptUrl} target="_blank" rel="noreferrer" className="text-orange-600 hover:underline text-xs">Open transcript ↗</a>}
                     <button onClick={() => createFollowupFromCall(c)} className="text-xs px-2.5 py-1 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">+ Follow-up</button>
+                    <button onClick={() => removeCall(c)} className="text-xs px-2.5 py-1 rounded-lg border border-red-200 text-red-600 hover:bg-red-50">Remove</button>
                     <select value={callAssignee[c.id] || ""} onChange={e => setCallAssignee(s => ({ ...s, [c.id]: e.target.value }))} className="text-xs border border-[#dadce0] rounded-lg px-2 py-1 bg-white">
                       <option value="">Assign to…</option>
                       {["Randy", "Tyler", "Daquan"].map(n => <option key={n} value={n}>{n}</option>)}
@@ -684,7 +717,10 @@ export default function AdminCRM() {
                     <div className={`max-w-[75%] ${mine ? "items-end" : "items-start"} flex flex-col`}>
                       {!mine && <span className="text-[11px] text-gray-500 mb-0.5 px-1">{m.authorName}</span>}
                       <div className={`px-3 py-2 rounded-2xl text-sm whitespace-pre-wrap break-words ${mine ? "bg-[#202124] text-white rounded-br-sm" : "bg-[#f1f3f4] text-[#202124] rounded-bl-sm"}`}>{m.text}</div>
-                      <span className="text-[10px] text-gray-400 mt-0.5 px-1">{new Date(m.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</span>
+                      <span className="text-[10px] text-gray-400 mt-0.5 px-1">
+                        {new Date(m.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+                        <button onClick={() => deleteChat(m.id)} className="ml-2 text-red-400 hover:text-red-600">delete</button>
+                      </span>
                     </div>
                   </div>
                 );

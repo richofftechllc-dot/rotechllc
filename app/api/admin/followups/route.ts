@@ -63,6 +63,8 @@ export async function POST(req: Request) {
     } else if (action === "status") {
       const status = body.status === "done" ? "done" : "open";
       await ref.update({ status, ...(status === "done" ? { doneBy: admin.name, doneAt: nowISO } : {}) });
+    } else if (action === "delete") {
+      await ref.delete();
     } else {
       return NextResponse.json({ ok: false, error: "unknown_action" }, { status: 400 });
     }
