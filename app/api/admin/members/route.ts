@@ -43,7 +43,8 @@ export async function GET(req: Request) {
     const now = Date.now();
     let comped = 0;
     let expiringSoon = 0;
-    const members = custSnap.docs.map((d) => {
+    // Only real members — skip any stray/junk docs that have no email (e.g. a bad import).
+    const members = custSnap.docs.filter((d) => (d.data() as { email?: string }).email).map((d) => {
       const c = d.data() as Record<string, unknown>;
       const email = String(c.email || "").toLowerCase();
       const rac = racByEmail[email] || {};
