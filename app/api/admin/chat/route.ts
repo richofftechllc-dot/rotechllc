@@ -24,13 +24,19 @@ export async function GET(req: Request) {
   }
 }
 
-// POST /api/admin/chat — send a message as the signed-in coach.
-// Body: { text }
+// POST /api/admin/chat — send a message, or delete one ({ delete: <id> }).
+// Body: { text } | { delete: id }
 export async function POST(req: Request) {
   const admin = await getAuthedAdmin(req);
   if (!admin) return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 });
-  let body: { text?: string };
+  let body: { text?: string; delete?: string };
   try { body = await req.json(); } catch { return NextResponse.json({ ok: false, error: "bad_json" }, { status: 400 }); }
+
+  if (body.delete) {
+    try { await coll("crmChat").doc(String(body.delete)).delete(); return NextResponse.json({ ok: true }); }
+    catch (e) { return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : "error" }, { status: 500 }); }
+  }
+
   const text = String(body.text || "").trim().slice(0, 2000);
   if (!text) return NextResponse.json({ ok: false, error: "empty" }, { status: 400 });
 
