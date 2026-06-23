@@ -5,7 +5,7 @@ import Image from "next/image";
 type Member = {
   email: string; name: string; discordTag: string; discordId: string;
   tier: string; status: string; paymentStatus: string; invoiced: boolean;
-  tracks: string[]; quizCode: string; accessEndDate: string; daysLeft?: number | null; plan?: string; referredBy?: string; rolesAssigned: boolean;
+  tracks: string[]; roles: string[]; quizCode: string; accessEndDate: string; daysLeft?: number | null; plan?: string; referredBy?: string; rolesAssigned: boolean;
   assignedTo: string; notes: string; purchaseDate?: string;
   progress?: { domains: { domain: string; highScore: number; completed: boolean }[]; done: number; avg: number | null; weak: string[] };
 };
@@ -15,6 +15,7 @@ type Followup = {
   status: "open" | "done"; assignedTo?: string; notes?: Note[]; createdAt?: string; createdBy?: string;
 };
 type Schedule = { id?: string; discordId: string; name: string; days: Record<string, string>; note?: string; updatedAt?: string };
+type Call = { id: string; title: string; date: string | null; participants: string[]; grade: string; transcriptUrl: string; gradedAt: number | null };
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 // Light, professional palette (Google Admin / Zoho feel): white surfaces, near-black
@@ -31,7 +32,11 @@ const PILL: Record<string, string> = {
 
 export default function AdminCRM() {
   const [authed, setAuthed] = useState<"loading" | "yes" | "no">("loading");
-  const [tab, setTab] = useState<"followups" | "members" | "schedule" | "referrals">("followups");
+  const [tab, setTab] = useState<"followups" | "members" | "calls" | "schedule" | "referrals">("followups");
+  const [calls, setCalls] = useState<Call[]>([]);
+  const [fTier, setFTier] = useState("");
+  const [fStatus, setFStatus] = useState("");
+  const [resetMsg, setResetMsg] = useState<Record<string, string>>({});
   const [members, setMembers] = useState<Member[]>([]);
   const [stats, setStats] = useState<{ total: number; comped: number; expiringSoon: number } | null>(null);
   const [followups, setFollowups] = useState<Followup[]>([]);
@@ -70,7 +75,22 @@ export default function AdminCRM() {
     }
   }, []);
 
-  useEffect(() => { loadMembers(); loadFollowups(); loadSchedule(); }, [loadMembers, loadFollowups, loadSchedule]);
+  const loadCalls = useCallback(async () => {
+    const r = await fetch("/api/admin/calls");
+    if (r.status === 403) { setAuthed("no"); return; }
+    setAuthed("yes");
+    const d = await r.json();
+    if (d.ok) setCalls(d.calls);
+  }, []);
+  async function resetCode(m: Member) {
+    setResetMsg(s => ({ ...s, [m.email]: "…" }));
+    const r = await fetch("/api/admin/reset-code", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: m.email }) });
+    const d = await r.json();
+    setResetMsg(s => ({ ...s, [m.email]: d.ok ? `New code: ${d.quizCode}` : `Error: ${d.error}` }));
+    if (d.ok) loadMembers();
+  }
+
+  useEffect(() => { loadMembers(); loadFollowups(); loadSchedule(); loadCalls(); }, [loadMembers, loadFollowups, loadSchedule, loadCalls]);
 
   async function act(body: Record<string, unknown>) {
     await fetch("/api/admin/followups", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -101,7 +121,9 @@ export default function AdminCRM() {
   const openFollowups = followups.filter(f => f.status === "open");
   const doneFollowups = followups.filter(f => f.status === "done");
   const filteredMembers = members.filter(m =>
-    !q || [m.name, m.email, m.discordTag, m.tier, m.tracks.join(",")].join(" ").toLowerCase().includes(q.toLowerCase()));
+    (!q || [m.name, m.email, m.discordTag, m.tier, m.tracks.join(",")].join(" ").toLowerCase().includes(q.toLowerCase())) &&
+    (!fTier || m.tier === fTier) &&
+    (!fStatus || m.paymentStatus === fStatus));
   const lateCount = members.filter(m => m.paymentStatus === "late" || m.paymentStatus === "expired").length;
 
   // Referral rollup: group by who referred them, count paid, compute payout owed.
@@ -116,9 +138,12 @@ export default function AdminCRM() {
   const TABS: { id: typeof tab; label: string }[] = [
     { id: "followups", label: "Follow-ups" },
     { id: "members", label: "Members" },
+    { id: "calls", label: "Calls" },
     { id: "schedule", label: "Schedule" },
     { id: "referrals", label: "Referrals" },
   ];
+  const tierOptions = Array.from(new Set(members.map(m => m.tier).filter(Boolean))).sort();
+  const statusOptions = Array.from(new Set(members.map(m => m.paymentStatus).filter(Boolean))).sort();
 
   return (
     <main className="min-h-screen bg-[#f8f9fa] text-[#202124]">
@@ -227,8 +252,20 @@ export default function AdminCRM() {
         {/* ── Members ── */}
         {tab === "members" && (
           <div>
-            <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search name, email, tier, track…"
-              className="w-full bg-white border border-[#dadce0] rounded-lg px-4 py-2.5 text-sm mb-4 focus:outline-none focus:border-orange-500" />
+            <div className="flex flex-wrap gap-2 mb-4">
+              <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search name, email, tier, track…"
+                className="flex-1 min-w-[200px] bg-white border border-[#dadce0] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-orange-500" />
+              <select value={fTier} onChange={e => setFTier(e.target.value)} className="bg-white border border-[#dadce0] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-orange-500">
+                <option value="">All tiers</option>
+                {tierOptions.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+              <select value={fStatus} onChange={e => setFStatus(e.target.value)} className="bg-white border border-[#dadce0] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-orange-500">
+                <option value="">All status</option>
+                {statusOptions.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+              {(q || fTier || fStatus) && <button onClick={() => { setQ(""); setFTier(""); setFStatus(""); }} className="text-sm px-3 rounded-lg border border-[#dadce0] text-gray-600 hover:bg-gray-50">Clear</button>}
+              <span className="text-xs text-gray-400 self-center ml-auto">{filteredMembers.length} shown</span>
+            </div>
             <div className="bg-white border border-[#dadce0] rounded-xl overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="text-left text-xs text-gray-500 bg-[#f8f9fa]">
@@ -274,8 +311,16 @@ export default function AdminCRM() {
                             <div><span className="text-gray-400">Name</span><div className="font-medium">{m.name || "—"}</div></div>
                             <div><span className="text-gray-400">Email</span><div className="font-medium">{m.email || "—"}</div></div>
                             <div><span className="text-gray-400">Discord</span><div className="font-medium">{m.discordTag || "—"} {m.discordId ? <span className="text-gray-400 font-mono">({m.discordId})</span> : ""}</div></div>
-                            <div><span className="text-gray-400">Quiz code</span><div className="font-medium font-mono">{m.quizCode || "—"}</div></div>
+                            <div>
+                              <span className="text-gray-400">Quiz code (login)</span>
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium font-mono">{m.quizCode || "—"}</span>
+                                <button onClick={() => resetCode(m)} className="text-[10px] px-2 py-0.5 rounded border border-[#dadce0] text-gray-600 hover:bg-gray-50">Reset</button>
+                              </div>
+                              {resetMsg[m.email] && <div className="text-[10px] text-green-700 mt-0.5 font-mono">{resetMsg[m.email]}</div>}
+                            </div>
                             <div><span className="text-gray-400">Tracks</span><div className="font-medium">{m.tracks.join(", ") || "—"}</div></div>
+                            <div><span className="text-gray-400">Roles</span><div className="font-medium">{m.roles?.length ? m.roles.join(", ") : "—"}</div></div>
                             <div><span className="text-gray-400">Joined</span><div className="font-medium">{m.purchaseDate ? m.purchaseDate.slice(0, 10) : "—"}</div></div>
                             <div>
                               <span className="text-gray-400">Referred by</span>
@@ -305,6 +350,32 @@ export default function AdminCRM() {
               {filteredMembers.length === 0 && <p className="text-gray-500 text-sm py-6 text-center">No members match.</p>}
             </div>
             <p className="text-gray-400 text-xs mt-3">Prices are hidden by design — you see status (late / active / comp), invoices, and discounts, never dollar amounts.</p>
+          </div>
+        )}
+
+        {/* ── Calls (Fireflies) ── */}
+        {tab === "calls" && (
+          <div className="space-y-3">
+            <p className="text-gray-500 text-sm">Coaching calls auto-graded by Bo from your Fireflies recordings. Newest first.</p>
+            {calls.length === 0 && <p className="text-gray-500 text-sm">No graded calls yet — they appear here automatically after a Fireflies call is transcribed.</p>}
+            {calls.map(c => (
+              <details key={c.id} className="bg-white border border-[#dadce0] rounded-xl overflow-hidden">
+                <summary className="px-4 py-3 cursor-pointer flex items-center justify-between gap-3 hover:bg-[#f8f9fa]">
+                  <div>
+                    <div className="font-semibold text-sm">{c.title}</div>
+                    <div className="text-xs text-gray-500">
+                      {c.date ? new Date(c.date).toLocaleString() : (c.gradedAt ? new Date(c.gradedAt).toLocaleDateString() : "")}
+                      {c.participants?.length ? ` · ${c.participants.join(", ").slice(0, 60)}` : ""}
+                    </div>
+                  </div>
+                  <span className="text-xs text-orange-600">view ▾</span>
+                </summary>
+                <div className="px-4 py-3 border-t border-[#e8eaed] text-sm text-gray-700 whitespace-pre-wrap">
+                  {c.grade || "No scorecard saved for this call."}
+                  {c.transcriptUrl && <div className="mt-2"><a href={c.transcriptUrl} target="_blank" rel="noreferrer" className="text-orange-600 hover:underline text-xs">Open transcript ↗</a></div>}
+                </div>
+              </details>
+            ))}
           </div>
         )}
 
