@@ -15,7 +15,7 @@ type Followup = {
   status: "open" | "done"; assignedTo?: string; notes?: Note[]; createdAt?: string; createdBy?: string;
 };
 type Schedule = { id?: string; discordId: string; name: string; days: Record<string, string>; note?: string; updatedAt?: string };
-type Call = { id: string; title: string; date: string | null; participants: string[]; grade: string; transcriptUrl: string; gradedAt: number | null };
+type Call = { id: string; title: string; date: string | null; type?: string; summary?: string; actionItems?: string; keywords?: string; participants: string[]; grade: string; transcriptUrl: string; gradedAt: number | null };
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 // Light, professional palette (Google Admin / Zoho feel): white surfaces, near-black
@@ -29,6 +29,14 @@ const PILL: Record<string, string> = {
   expired: "bg-amber-50 text-amber-700 border-amber-200",
   canceled: "bg-gray-100 text-gray-500 border-gray-200",
 };
+const CALL_PILL: Record<string, string> = {
+  coaching: "bg-green-50 text-green-700 border-green-200",
+  interview: "bg-purple-50 text-purple-700 border-purple-200",
+  discovery: "bg-blue-50 text-blue-700 border-blue-200",
+  voice: "bg-orange-50 text-orange-700 border-orange-200",
+  team: "bg-gray-100 text-gray-600 border-gray-200",
+  other: "bg-gray-50 text-gray-500 border-gray-200",
+};
 
 export default function AdminCRM() {
   const [authed, setAuthed] = useState<"loading" | "yes" | "no">("loading");
@@ -39,6 +47,9 @@ export default function AdminCRM() {
   const [boInput, setBoInput] = useState("");
   const [boBusy, setBoBusy] = useState(false);
   const [calls, setCalls] = useState<Call[]>([]);
+  const [callType, setCallType] = useState("all");
+  const [callAssignee, setCallAssignee] = useState<Record<string, string>>({});
+  const [callMsg, setCallMsg] = useState<Record<string, string>>({});
   const [fTier, setFTier] = useState("");
   const [fStatus, setFStatus] = useState("");
   const [resetMsg, setResetMsg] = useState<Record<string, string>>({});
@@ -58,6 +69,7 @@ export default function AdminCRM() {
   const [resumeView, setResumeView] = useState<Record<string, { name?: string; data: unknown; updatedAt?: string } | null>>({});
   const [invoiceFor, setInvoiceFor] = useState<string | null>(null);
   const [invoiceService, setInvoiceService] = useState("sec-essential");
+  const [scheduleType, setScheduleType] = useState<Record<string, string>>({});
 
   const loadMembers = useCallback(async () => {
     const r = await fetch("/api/admin/members");
@@ -134,7 +146,14 @@ export default function AdminCRM() {
     doAction(m.email, "addTrack", { email: m.email, tier, name: m.name }, `✓ Granting ${tier} — bot will apply it + notify them.`);
   }
   function scheduleCall(m: Member) {
-    doAction(m.email, "dm", { email: m.email, discordId: m.discordId, message: "📅 Let's get you on a 1-on-1. DM me the word **book** here and I'll show you open times (pick your coach + a slot). See you soon!" }, "✓ Sent them the booking prompt in Discord.");
+    const type = scheduleType[m.email] || "Intro";
+    const blurb: Record<string, string> = {
+      Intro: "Welcome aboard! Let's get you on a quick **intro call** so we can map your path.",
+      Coaching: "Time to lock in your **1-on-1 coaching call**.",
+      "Interview prep": "Let's get you ready — booking your **interview prep** session.",
+      "Project discovery": "Let's dig into your project — booking a **discovery call**.",
+    };
+    doAction(m.email, "dm", { email: m.email, discordId: m.discordId, message: `📅 ${blurb[type] || blurb.Intro} DM me the word **book** here and I'll show you open times (pick your coach + a slot). See you soon!` }, `✓ Sent them the ${type.toLowerCase()} booking prompt in Discord.`);
   }
   function sendInvoice(m: Member) {
     doAction(m.email, "invoice", { clientName: m.name, clientEmail: m.email, service: invoiceService }, "✓ Invoice queued — Square will email it.");
@@ -163,6 +182,17 @@ export default function AdminCRM() {
     } catch {
       setBoMsgs(m => [...m, { role: "assistant", content: "Couldn't reach Bo just now — try again." }]);
     } finally { setBoBusy(false); }
+  }
+
+  // Turn a call into a follow-up (optionally pre-assigned to a coach), straight from the Calls tab.
+  async function createFollowupFromCall(c: Call) {
+    const assignedTo = callAssignee[c.id] || "";
+    setCallMsg(s => ({ ...s, [c.id]: "…" }));
+    const r = await fetch("/api/admin/followups", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "create", title: `Follow-up: ${c.title}`, source: c.type || "call", assignedTo, note: c.actionItems ? c.actionItems.slice(0, 800) : "" }) });
+    const d = await r.json();
+    setCallMsg(s => ({ ...s, [c.id]: r.ok && d.ok ? `✓ Added${assignedTo ? ` for ${assignedTo}` : ""} — see Follow-ups` : `Error: ${d.error}` }));
+    if (d.ok) loadFollowups();
   }
 
   useEffect(() => { loadMembers(); loadFollowups(); loadSchedule(); loadCalls(); loadChat(); }, [loadMembers, loadFollowups, loadSchedule, loadCalls, loadChat]);
@@ -435,7 +465,12 @@ export default function AdminCRM() {
                           <div className="mt-4 pt-3 border-t border-[#e8eaed]">
                             <div className="text-xs text-gray-400 mb-2">Actions</div>
                             <div className="flex flex-wrap items-center gap-2">
-                              <button onClick={() => scheduleCall(m)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📅 Schedule call</button>
+                              <span className="inline-flex items-center gap-1">
+                                <select value={scheduleType[m.email] || "Intro"} onChange={e => setScheduleType(s => ({ ...s, [m.email]: e.target.value }))} className="text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500">
+                                  {["Intro", "Coaching", "Interview prep", "Project discovery"].map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                                <button onClick={() => scheduleCall(m)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📅 Schedule</button>
+                              </span>
                               <button onClick={() => viewResume(m)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📄 {resumeView[m.email] ? "Hide" : "View"} resume</button>
                               <span className="inline-flex items-center gap-1">
                                 <select value={trackDraft[m.email] || ""} onChange={e => setTrackDraft(s => ({ ...s, [m.email]: e.target.value }))} className="text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500">
@@ -490,23 +525,42 @@ export default function AdminCRM() {
         {/* ── Calls (Fireflies) ── */}
         {tab === "calls" && (
           <div className="space-y-3">
-            <p className="text-gray-500 text-sm">Coaching calls auto-graded by Bo from your Fireflies recordings. Newest first.</p>
-            {calls.length === 0 && <p className="text-gray-500 text-sm">No graded calls yet — they appear here automatically after a Fireflies call is transcribed.</p>}
-            {calls.map(c => (
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-gray-500 text-sm mr-auto">Every call from Fireflies — coaching, interview prep, project discovery, voice-agent. Newest first.</p>
+              {["all", "coaching", "interview", "discovery", "voice", "team", "other"].map(t => (
+                <button key={t} onClick={() => setCallType(t)} className={`text-xs px-2.5 py-1 rounded-full border ${callType === t ? "bg-[#202124] text-white border-[#202124]" : "bg-white text-gray-600 border-[#dadce0] hover:bg-gray-50"}`}>{t}</button>
+              ))}
+            </div>
+            {calls.length === 0 && <p className="text-gray-500 text-sm">No calls yet. If your calls aren&apos;t showing, add <span className="font-mono">FIREFLIES_API_KEY</span> in Vercel so the CRM can read them live.</p>}
+            {calls.filter(c => callType === "all" || (c.type || "other") === callType).map(c => (
               <details key={c.id} className="bg-white border border-[#dadce0] rounded-xl overflow-hidden">
                 <summary className="px-4 py-3 cursor-pointer flex items-center justify-between gap-3 hover:bg-[#f8f9fa]">
-                  <div>
-                    <div className="font-semibold text-sm">{c.title}</div>
+                  <div className="min-w-0">
+                    <div className="font-semibold text-sm flex items-center gap-2">
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${CALL_PILL[c.type || "other"] || "bg-gray-100 text-gray-600 border-gray-200"}`}>{c.type || "other"}</span>
+                      <span className="truncate">{c.title}</span>
+                    </div>
                     <div className="text-xs text-gray-500">
                       {c.date ? new Date(c.date).toLocaleString() : (c.gradedAt ? new Date(c.gradedAt).toLocaleDateString() : "")}
                       {c.participants?.length ? ` · ${c.participants.join(", ").slice(0, 60)}` : ""}
                     </div>
                   </div>
-                  <span className="text-xs text-orange-600">view ▾</span>
+                  <span className="text-xs text-orange-600 shrink-0">view ▾</span>
                 </summary>
-                <div className="px-4 py-3 border-t border-[#e8eaed] text-sm text-gray-700 whitespace-pre-wrap">
-                  {c.grade || "No scorecard saved for this call."}
-                  {c.transcriptUrl && <div className="mt-2"><a href={c.transcriptUrl} target="_blank" rel="noreferrer" className="text-orange-600 hover:underline text-xs">Open transcript ↗</a></div>}
+                <div className="px-4 py-3 border-t border-[#e8eaed] text-sm text-gray-700 space-y-3">
+                  {c.summary && <div><div className="text-xs text-gray-400 mb-0.5">Summary</div><div className="whitespace-pre-wrap">{c.summary}</div></div>}
+                  {c.actionItems && <div><div className="text-xs text-gray-400 mb-0.5">Action items</div><div className="whitespace-pre-wrap text-[13px]">{c.actionItems}</div></div>}
+                  {c.grade && <div><div className="text-xs text-gray-400 mb-0.5">Coaching scorecard</div><div className="whitespace-pre-wrap text-[13px]">{c.grade}</div></div>}
+                  {!c.summary && !c.actionItems && !c.grade && <div className="text-gray-500">No summary saved for this call.</div>}
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                    {c.transcriptUrl && <a href={c.transcriptUrl} target="_blank" rel="noreferrer" className="text-orange-600 hover:underline text-xs">Open transcript ↗</a>}
+                    <button onClick={() => createFollowupFromCall(c)} className="text-xs px-2.5 py-1 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">+ Follow-up</button>
+                    <select value={callAssignee[c.id] || ""} onChange={e => setCallAssignee(s => ({ ...s, [c.id]: e.target.value }))} className="text-xs border border-[#dadce0] rounded-lg px-2 py-1 bg-white">
+                      <option value="">Assign to…</option>
+                      {["Randy", "Tyler", "Daquan"].map(n => <option key={n} value={n}>{n}</option>)}
+                    </select>
+                    {callMsg[c.id] && <span className="text-[11px] text-green-700">{callMsg[c.id]}</span>}
+                  </div>
                 </div>
               </details>
             ))}
