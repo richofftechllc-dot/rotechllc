@@ -5,7 +5,7 @@ import Image from "next/image";
 type Member = {
   email: string; name: string; discordTag: string; discordId: string;
   tier: string; status: string; paymentStatus: string; invoiced: boolean;
-  tracks: string[]; roles: string[]; quizCode: string; accessEndDate: string; daysLeft?: number | null; plan?: string; referredBy?: string; rolesAssigned: boolean;
+  tracks: string[]; roles: string[]; certs?: string[]; phone?: string; quizCode: string; accessEndDate: string; daysLeft?: number | null; plan?: string; referredBy?: string; rolesAssigned: boolean;
   assignedTo: string; notes: string; purchaseDate?: string;
   progress?: { domains: { domain: string; highScore: number; completed: boolean }[]; done: number; avg: number | null; weak: string[] };
 };
@@ -32,9 +32,12 @@ const PILL: Record<string, string> = {
 
 export default function AdminCRM() {
   const [authed, setAuthed] = useState<"loading" | "yes" | "no">("loading");
-  const [tab, setTab] = useState<"followups" | "members" | "calls" | "schedule" | "referrals" | "team">("followups");
+  const [tab, setTab] = useState<"followups" | "members" | "calls" | "schedule" | "referrals" | "team" | "bo">("followups");
   const [chat, setChat] = useState<{ id: string; authorId: string; authorName: string; text: string; createdAt: string }[]>([]);
   const [chatInput, setChatInput] = useState("");
+  const [boMsgs, setBoMsgs] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
+  const [boInput, setBoInput] = useState("");
+  const [boBusy, setBoBusy] = useState(false);
   const [calls, setCalls] = useState<Call[]>([]);
   const [fTier, setFTier] = useState("");
   const [fStatus, setFStatus] = useState("");
@@ -43,12 +46,18 @@ export default function AdminCRM() {
   const [stats, setStats] = useState<{ total: number; comped: number; expiringSoon: number } | null>(null);
   const [followups, setFollowups] = useState<Followup[]>([]);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
-  const [me, setMe] = useState<{ discordId: string; name: string } | null>(null);
+  const [me, setMe] = useState<{ discordId: string; name: string; isOwner?: boolean } | null>(null);
   const [schedDraft, setSchedDraft] = useState<{ days: Record<string, string>; note: string }>({ days: {}, note: "" });
   const [q, setQ] = useState("");
   const [noteDraft, setNoteDraft] = useState<Record<string, string>>({});
   const [expanded, setExpanded] = useState<string | null>(null);
   const [refDraft, setRefDraft] = useState<Record<string, string>>({});
+  const [dmDraft, setDmDraft] = useState<Record<string, string>>({});
+  const [trackDraft, setTrackDraft] = useState<Record<string, string>>({});
+  const [actionMsg, setActionMsg] = useState<Record<string, string>>({});
+  const [resumeView, setResumeView] = useState<Record<string, { name?: string; data: unknown; updatedAt?: string } | null>>({});
+  const [invoiceFor, setInvoiceFor] = useState<string | null>(null);
+  const [invoiceService, setInvoiceService] = useState("sec-essential");
 
   const loadMembers = useCallback(async () => {
     const r = await fetch("/api/admin/members");
@@ -104,6 +113,56 @@ export default function AdminCRM() {
     const d = await r.json();
     setResetMsg(s => ({ ...s, [m.email]: d.ok ? `New code: ${d.quizCode}` : `Error: ${d.error}` }));
     if (d.ok) loadMembers();
+  }
+
+  // CRM → bot actions (the bot executes these from the botCommands queue).
+  async function doAction(email: string, type: string, payload: Record<string, unknown>, okMsg: string) {
+    setActionMsg(s => ({ ...s, [email]: "…" }));
+    const r = await fetch("/api/admin/action", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type, payload }) });
+    const d = await r.json();
+    setActionMsg(s => ({ ...s, [email]: r.ok && d.ok ? okMsg : `Error: ${d.error || r.status}` }));
+  }
+  function sendUpdate(m: Member) {
+    const msg = (dmDraft[m.email] || "").trim();
+    if (!msg) return;
+    doAction(m.email, "dm", { email: m.email, discordId: m.discordId, message: msg }, "✓ Update queued — bot will DM them.");
+    setDmDraft(s => ({ ...s, [m.email]: "" }));
+  }
+  function addTrack(m: Member) {
+    const tier = trackDraft[m.email];
+    if (!tier) return;
+    doAction(m.email, "addTrack", { email: m.email, tier, name: m.name }, `✓ Granting ${tier} — bot will apply it + notify them.`);
+  }
+  function scheduleCall(m: Member) {
+    doAction(m.email, "dm", { email: m.email, discordId: m.discordId, message: "📅 Let's get you on a 1-on-1. DM me the word **book** here and I'll show you open times (pick your coach + a slot). See you soon!" }, "✓ Sent them the booking prompt in Discord.");
+  }
+  function sendInvoice(m: Member) {
+    doAction(m.email, "invoice", { clientName: m.name, clientEmail: m.email, service: invoiceService }, "✓ Invoice queued — Square will email it.");
+    setInvoiceFor(null);
+  }
+  async function viewResume(m: Member) {
+    if (resumeView[m.email]) { setResumeView(s => ({ ...s, [m.email]: null })); return; }
+    setResumeView(s => ({ ...s, [m.email]: { data: "loading" } }));
+    const r = await fetch(`/api/admin/resume?code=${encodeURIComponent(m.quizCode)}`);
+    const d = await r.json();
+    setResumeView(s => ({ ...s, [m.email]: d.ok ? { name: d.name, data: d.resume, updatedAt: d.updatedAt } : { data: `Error: ${d.error}` } }));
+  }
+
+  // Bo Tech assistant — sends the roster snapshot + whoever's expanded for grounded answers.
+  async function askBo() {
+    const text = boInput.trim();
+    if (!text || boBusy) return;
+    const next = [...boMsgs, { role: "user" as const, content: text }];
+    setBoMsgs(next); setBoInput(""); setBoBusy(true);
+    try {
+      const roster = members.slice(0, 200).map(m => `${m.name || m.email} | ${m.tier || "—"} | ${m.paymentStatus} | ${m.daysLeft ?? "—"}d`).join("\n");
+      const focus = expanded ? members.find(m => m.email === expanded) : null;
+      const r = await fetch("/api/admin/assistant", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: next, roster, focus }) });
+      const reply = await r.text();
+      setBoMsgs(m => [...m, { role: "assistant", content: reply }]);
+    } catch {
+      setBoMsgs(m => [...m, { role: "assistant", content: "Couldn't reach Bo just now — try again." }]);
+    } finally { setBoBusy(false); }
   }
 
   useEffect(() => { loadMembers(); loadFollowups(); loadSchedule(); loadCalls(); loadChat(); }, [loadMembers, loadFollowups, loadSchedule, loadCalls, loadChat]);
@@ -164,6 +223,7 @@ export default function AdminCRM() {
     { id: "calls", label: "Calls" },
     { id: "schedule", label: "Schedule" },
     { id: "team", label: "Team Chat" },
+    { id: "bo", label: "Ask Bo" },
     { id: "referrals", label: "Referrals" },
   ];
   const tierOptions = Array.from(new Set(members.map(m => m.tier).filter(Boolean))).sort();
@@ -348,6 +408,8 @@ export default function AdminCRM() {
                             </div>
                             <div><span className="text-gray-400">Tracks</span><div className="font-medium">{m.tracks.join(", ") || "—"}</div></div>
                             <div><span className="text-gray-400">Roles</span><div className="font-medium">{m.roles?.length ? m.roles.join(", ") : "—"}</div></div>
+                            <div><span className="text-gray-400">Certs</span><div className="font-medium">{m.certs?.length ? m.certs.join(", ") : "—"}</div></div>
+                            <div><span className="text-gray-400">Phone</span><div className="font-medium">{m.phone || "—"}</div></div>
                             <div><span className="text-gray-400">Joined</span><div className="font-medium">{m.purchaseDate ? m.purchaseDate.slice(0, 10) : "—"}</div></div>
                             <div>
                               <span className="text-gray-400">Referred by</span>
@@ -368,6 +430,51 @@ export default function AdminCRM() {
                               ))}
                             </div>
                           ) : <span className="text-gray-500 text-xs">No quiz progress yet for this member.</span>}
+
+                          {/* ── Actions: everything the bot can do, right here ── */}
+                          <div className="mt-4 pt-3 border-t border-[#e8eaed]">
+                            <div className="text-xs text-gray-400 mb-2">Actions</div>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <button onClick={() => scheduleCall(m)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📅 Schedule call</button>
+                              <button onClick={() => viewResume(m)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📄 {resumeView[m.email] ? "Hide" : "View"} resume</button>
+                              <span className="inline-flex items-center gap-1">
+                                <select value={trackDraft[m.email] || ""} onChange={e => setTrackDraft(s => ({ ...s, [m.email]: e.target.value }))} className="text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500">
+                                  <option value="">Add track…</option>
+                                  {["secplus", "csa", "aws", "secret", "ts", "tsci"].map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                                <button onClick={() => addTrack(m)} className="text-xs px-2.5 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Grant</button>
+                              </span>
+                              {me?.isOwner && <button onClick={() => setInvoiceFor(invoiceFor === m.email ? null : m.email)} className="text-xs px-2.5 py-1.5 rounded-lg border border-orange-300 bg-orange-50 text-orange-700 hover:bg-orange-100">🧾 Send invoice</button>}
+                            </div>
+                            <div className="flex flex-wrap items-center gap-2 mt-2">
+                              <input value={dmDraft[m.email] || ""} onChange={e => setDmDraft(s => ({ ...s, [m.email]: e.target.value }))}
+                                onKeyDown={e => { if (e.key === "Enter") sendUpdate(m); }}
+                                placeholder="Send update (DMs them in Discord)…" className="flex-1 min-w-[220px] text-xs border border-[#dadce0] rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:border-orange-500" />
+                              <button onClick={() => sendUpdate(m)} className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Send</button>
+                            </div>
+                            {invoiceFor === m.email && me?.isOwner && (
+                              <div className="flex flex-wrap items-center gap-2 mt-2 bg-orange-50 border border-orange-200 rounded-lg p-2">
+                                <span className="text-xs text-orange-800">Invoice {m.name || m.email}:</span>
+                                <select value={invoiceService} onChange={e => setInvoiceService(e.target.value)} className="text-xs border border-orange-200 rounded-lg px-2 py-1.5 bg-white">
+                                  <option value="sec-essential">Security+ — Essential</option>
+                                  <option value="sec-accelerated">Security+ — Accelerated</option>
+                                  <option value="csa-essential">ServiceNow CSA — Essential</option>
+                                  <option value="csa-accelerated">ServiceNow CSA — Accelerated</option>
+                                  <option value="aws">AWS Cloud Practitioner</option>
+                                </select>
+                                <button onClick={() => sendInvoice(m)} className="text-xs px-3 py-1.5 rounded-lg bg-orange-600 text-white hover:bg-orange-700">Send invoice</button>
+                              </div>
+                            )}
+                            {actionMsg[m.email] && <div className="text-[11px] mt-1.5 text-gray-700">{actionMsg[m.email]}</div>}
+                            {resumeView[m.email] && (
+                              <pre className="mt-2 text-[11px] bg-white border border-[#e8eaed] rounded-lg p-3 max-h-64 overflow-auto whitespace-pre-wrap break-words text-gray-700">
+                                {resumeView[m.email]?.data === "loading" ? "Loading…"
+                                  : resumeView[m.email]?.data == null ? "No resume saved for this member yet."
+                                  : typeof resumeView[m.email]?.data === "string" ? String(resumeView[m.email]?.data)
+                                  : JSON.stringify(resumeView[m.email]?.data, null, 2)}
+                              </pre>
+                            )}
+                          </div>
                         </td></tr>
                       )}
                     </Fragment>
@@ -477,6 +584,40 @@ export default function AdminCRM() {
                 onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChat(); } }}
                 placeholder="Message the team…" className="flex-1 bg-white border border-[#dadce0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500" />
               <button onClick={sendChat} className="px-5 py-2 bg-[#202124] text-white font-medium rounded-lg text-sm hover:bg-black">Send</button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Ask Bo (CRM assistant) ── */}
+        {tab === "bo" && (
+          <div className="bg-white border border-[#dadce0] rounded-xl flex flex-col" style={{ height: "70vh" }}>
+            <div className="px-4 py-3 border-b border-[#e8eaed] flex items-center justify-between">
+              <div className="font-semibold flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-orange-500" />Bo Tech — CRM Assistant</div>
+              <div className="text-xs text-gray-500">{expanded ? `Looking at: ${expanded}` : "Open a member for member-specific help"}</div>
+            </div>
+            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+              {boMsgs.length === 0 && (
+                <div className="text-gray-500 text-sm space-y-2">
+                  <p>Ask me anything about your members or the day&apos;s work. For example:</p>
+                  <ul className="list-disc pl-5 space-y-1 text-gray-600">
+                    <li>&quot;Who&apos;s expiring in the next 30 days and hasn&apos;t been contacted?&quot;</li>
+                    <li>&quot;Draft a check-in DM for the member I have open.&quot;</li>
+                    <li>&quot;Who&apos;s behind on their quiz tracks?&quot;</li>
+                  </ul>
+                </div>
+              )}
+              {boMsgs.map((m, i) => (
+                <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                  <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm whitespace-pre-wrap break-words ${m.role === "user" ? "bg-[#202124] text-white rounded-br-sm" : "bg-[#f1f3f4] text-[#202124] rounded-bl-sm"}`}>{m.content}</div>
+                </div>
+              ))}
+              {boBusy && <div className="text-xs text-gray-400">Bo is thinking…</div>}
+            </div>
+            <div className="border-t border-[#e8eaed] p-3 flex gap-2">
+              <input value={boInput} onChange={e => setBoInput(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); askBo(); } }}
+                placeholder="Ask Bo about your members…" className="flex-1 bg-white border border-[#dadce0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500" />
+              <button onClick={askBo} disabled={boBusy} className="px-5 py-2 bg-orange-600 text-white font-medium rounded-lg text-sm hover:bg-orange-700 disabled:opacity-50">Ask</button>
             </div>
           </div>
         )}

@@ -18,7 +18,8 @@ export async function GET(req: Request) {
     const schedules = snap.docs
       .map((d) => ({ id: d.id, ...(d.data() as Record<string, unknown>) }))
       .sort((a, b) => String((a as { name?: string }).name || "").localeCompare(String((b as { name?: string }).name || "")));
-    return NextResponse.json({ ok: true, schedules, me: admin });
+    const isOwner = admin.discordId === (process.env.RANDY_DISCORD_ID || "").trim();
+    return NextResponse.json({ ok: true, schedules, me: { ...admin, isOwner } });
   } catch (e) {
     return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : "error" }, { status: 500 });
   }
