@@ -23,20 +23,24 @@ export async function POST(req: Request) {
     return new Response("ElevenLabs key not set (add ELEVENLABS_API_KEY to .env.local).", { status: 501 });
   }
 
+  const key = process.env.ELEVENLABS_API_KEY;
+  async function tts(v: string) {
+    return fetch(`https://api.elevenlabs.io/v1/text-to-speech/${v}`, {
+      method: "POST",
+      headers: { "xi-api-key": key as string, "Content-Type": "application/json", Accept: "audio/mpeg" },
+      body: JSON.stringify({
+        text: clean,
+        model_id: "eleven_multilingual_v2",   // richer, less robotic than turbo
+        voice_settings: { stability: 0.32, similarity_boost: 0.85, style: 0.55, use_speaker_boost: true, speed: 1.12 },
+      }),
+    });
+  }
+
   const voice = String(voiceId || DEFAULT_VOICE);
-  const r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voice}`, {
-    method: "POST",
-    headers: {
-      "xi-api-key": process.env.ELEVENLABS_API_KEY,
-      "Content-Type": "application/json",
-      Accept: "audio/mpeg",
-    },
-    body: JSON.stringify({
-      text: clean,
-      model_id: "eleven_multilingual_v2",   // richer, less robotic than turbo
-      voice_settings: { stability: 0.32, similarity_boost: 0.85, style: 0.55, use_speaker_boost: true, speed: 1.12 }, // lively + a touch faster
-    }),
-  });
+  let r = await tts(voice);
+  // If a custom (Bo/Flo) voice id is invalid/unavailable on the account, fall back to a known-good voice
+  // so the student still hears something instead of silence.
+  if ((!r.ok || !r.body) && voice !== DEFAULT_VOICE) r = await tts(DEFAULT_VOICE);
 
   if (!r.ok || !r.body) {
     const err = await r.text().catch(() => "");

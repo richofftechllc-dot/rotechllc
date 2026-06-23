@@ -50,6 +50,7 @@ export default function Quiz() {
   const chatScrollRef = useRef<HTMLDivElement>(null);
   const [autoSpeak, setAutoSpeak] = useState(false);
   const [speakingIdx, setSpeakingIdx] = useState<number | null>(null);
+  const [voiceErr, setVoiceErr] = useState("");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   // Bo/Flo's personalized post-quiz debrief — the tutor reviews exactly what you
   // missed and offers to drill you on just those. Generated once per finished run.
@@ -71,7 +72,9 @@ export default function Quiz() {
     const gen = speakGenRef.current; // any newer speak/stop bumps this → this call aborts
     try {
       const r = await fetch("/api/bo/voice", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, voiceId: VOICE[p] }) });
-      if (gen !== speakGenRef.current || !r.ok) return;
+      if (gen !== speakGenRef.current) return;
+      if (!r.ok) { setVoiceErr((await r.text().catch(() => "")) || `voice unavailable (${r.status})`); setSpeakingIdx(null); return; }
+      setVoiceErr("");
       const url = URL.createObjectURL(await r.blob());
       if (gen !== speakGenRef.current) { URL.revokeObjectURL(url); return; }
       const a = new Audio(url); audioRef.current = a; setSpeakingIdx(idx);
@@ -357,7 +360,7 @@ ${missedText}]
           </div>
         </div>
         {visibleTracks.length === 0 ? (
-          <div className="bg-zinc-900 border border-orange-500/30 rounded-xl p-8 text-center">
+          <div className="bg-white border border-orange-500/30 rounded-xl p-8 text-center">
             <p className="text-gray-400">Your track <span className="text-orange-500 font-semibold">{me.track || "(unset)"}</span> doesn&apos;t match any quiz tracks yet. DM Bo in Discord.</p>
           </div>
         ) : (
@@ -365,7 +368,7 @@ ${missedText}]
             {visibleTracks.map(t => {
               const done = t.domains.filter(d => progress[d.id]?.completed).length;
               return (
-                <button key={t.id} onClick={() => setTrack(t)} className={`bg-zinc-900 border rounded-xl p-6 text-left transition hover:scale-[1.02] ${TRACK_COLORS[t.id] || "border-white/10"}`}>
+                <button key={t.id} onClick={() => setTrack(t)} className={`bg-white border rounded-xl p-6 text-left transition hover:scale-[1.02] ${TRACK_COLORS[t.id] || "border-gray-200"}`}>
                   <div className="text-3xl mb-2">{t.id === "sp" ? "🛡️" : t.id === "csa" ? "⚙️" : "🤖"}</div>
                   <div className={`font-bold text-xl mb-1 ${TRACK_TEXT[t.id] || ""}`}>{t.name}</div>
                   <div className="text-xs text-gray-500 font-mono">{t.domains.length} domains · {t.domains.reduce((s, d) => s + d.questions.length, 0)} questions</div>
@@ -391,7 +394,7 @@ ${missedText}]
             const completed = !!p?.completed;
             const hasLesson = !!LESSONS[d.id];
             return (
-              <div key={d.id} className={`w-full bg-zinc-900 border rounded-lg p-4 flex items-center justify-between transition ${completed ? "border-green-500/40" : "border-white/10 hover:border-orange-500"}`}>
+              <div key={d.id} className={`w-full bg-white border rounded-lg p-4 flex items-center justify-between transition ${completed ? "border-green-500/40" : "border-gray-200 hover:border-orange-500"}`}>
                 <div className="flex items-center gap-4">
                   <span className="text-2xl font-black text-gray-700">{String(i+1).padStart(2,"0")}</span>
                   <div>
@@ -416,7 +419,7 @@ ${missedText}]
                       </button>
                       <button
                         onClick={() => start(d)}
-                        className="px-3 py-1.5 text-xs border border-white/15 text-gray-400 rounded hover:border-orange-500/40 hover:text-orange-400"
+                        className="px-3 py-1.5 text-xs border border-gray-200 text-gray-400 rounded hover:border-orange-500/40 hover:text-orange-400"
                       >
                         Skip
                       </button>
@@ -461,7 +464,7 @@ ${missedText}]
     return (
       <main className="max-w-2xl mx-auto px-6 py-12 text-center">
         <h1 className="text-3xl font-black mb-3">Hold up ⚠️</h1>
-        <p className="text-gray-300 mb-1">
+        <p className="text-gray-600 mb-1">
           You left <span className="text-orange-400 font-bold">{unanswered.length}</span> question{unanswered.length > 1 ? "s" : ""} unanswered.
         </p>
         <p className="text-gray-500 text-sm mb-6">
@@ -469,7 +472,7 @@ ${missedText}]
         </p>
         <div className="flex gap-3 justify-center flex-wrap">
           <button onClick={() => setQIdx(unanswered[0])} className="px-6 py-3 bg-orange-500 text-black font-bold rounded-lg">Answer them →</button>
-          <button onClick={() => setFinished(true)} className="px-6 py-3 bg-zinc-800 text-white font-bold rounded-lg">Finish anyway</button>
+          <button onClick={() => setFinished(true)} className="px-6 py-3 bg-[#202124] text-white font-bold rounded-lg">Finish anyway</button>
         </div>
       </main>
     );
@@ -492,7 +495,7 @@ ${missedText}]
 
         {/* Bo/Flo's personalized debrief — the "this tutor knows ME" moment. */}
         {(debrief || debriefBusy) && (
-          <div className="mt-8 mx-auto max-w-lg text-left bg-zinc-900 border border-orange-500/30 rounded-xl p-4">
+          <div className="mt-8 mx-auto max-w-lg text-left bg-white border border-orange-500/30 rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
                 {persona === "bo" ? (
@@ -507,7 +510,7 @@ ${missedText}]
               </div>
               {debrief && (
                 <button onClick={() => (speakingIdx === -1 ? stopSpeak() : speak(debrief, -1))} title="Hear it"
-                  className="text-xs rounded px-2 py-1 border border-white/10 text-gray-400 hover:text-white">{speakingIdx === -1 ? "⏹" : "🔊"}</button>
+                  className="text-xs rounded px-2 py-1 border border-gray-200 text-gray-400 hover:text-[#202124]">{speakingIdx === -1 ? "⏹" : "🔊"}</button>
               )}
             </div>
             {debriefBusy && !debrief
@@ -521,8 +524,8 @@ ${missedText}]
 
         <div className="flex gap-3 justify-center flex-wrap mt-6">
           <button onClick={() => start(domain)} className="px-6 py-3 bg-orange-500 text-black font-bold rounded-lg">Retry</button>
-          <button onClick={() => setDomain(null)} className="px-6 py-3 bg-zinc-800 text-white font-bold rounded-lg">Domains</button>
-          <button onClick={reset} className="px-6 py-3 border border-white/20 text-white font-bold rounded-lg">Home</button>
+          <button onClick={() => setDomain(null)} className="px-6 py-3 bg-[#202124] text-white font-bold rounded-lg">Domains</button>
+          <button onClick={reset} className="px-6 py-3 border border-[#dadce0] text-[#202124] font-bold rounded-lg hover:bg-gray-50">Home</button>
         </div>
       </main>
     );
@@ -535,25 +538,31 @@ ${missedText}]
 
   return (
     <main className="max-w-7xl mx-auto px-6 py-12">
+      {voiceErr && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 max-w-md bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-lg px-3 py-2 shadow flex items-center gap-2">
+          <span>🔇 Bo&apos;s voice is off: {voiceErr.slice(0, 130)}</span>
+          <button onClick={() => setVoiceErr("")} className="text-amber-500 hover:text-amber-700 font-bold">✕</button>
+        </div>
+      )}
       <div className="flex items-center justify-between mb-4">
         <button onClick={() => setDomain(null)} className="text-gray-500 text-sm hover:text-orange-500">← {track.name}</button>
         <div className="text-xs font-mono text-gray-500">{qIdx+1} / {domain.questions.length} · {correctSoFar} correct</div>
       </div>
       <h2 className="text-2xl font-bold mb-1">{domain.name}</h2>
       {lesson && <button onClick={() => setShowLesson(s => !s)} className="text-orange-500 text-sm mb-6 hover:underline">{showLesson ? "Hide" : "📖 View"} lesson</button>}
-      {showLesson && lesson && <div className="bg-zinc-900 border border-orange-500/30 rounded-xl p-6 mb-6 prose prose-invert max-w-none text-sm" dangerouslySetInnerHTML={{ __html: lesson }} />}
+      {showLesson && lesson && <div className="bg-white border border-orange-500/30 rounded-xl p-6 mb-6 prose prose-invert max-w-none text-sm" dangerouslySetInnerHTML={{ __html: lesson }} />}
       <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-zinc-900 border border-white/10 rounded-xl p-6">
+        <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-6">
           <div className="text-lg font-bold mb-6">{q.q}</div>
           <div className="space-y-3">
             {q.options.map((opt, i) => {
               const isPicked = cur === i;
               const isCorrect = i === q.answer;
               const show = cur != null;
-              let cls = "border-white/10 hover:border-orange-500/50";
+              let cls = "border-gray-200 hover:border-orange-500/50";
               if (show && isCorrect) cls = "border-green-500 bg-green-500/10";
               else if (show && isPicked && !isCorrect) cls = "border-red-500 bg-red-500/10";
-              else if (show) cls = "border-white/5 opacity-50";
+              else if (show) cls = "border-gray-100 opacity-50";
               return (
                 <button key={i} onClick={() => cur == null && setAnswer(i)} disabled={cur != null} className={`w-full text-left p-4 border rounded-lg transition ${cls}`}>
                   <span className="font-mono text-xs text-gray-500 mr-3">{String.fromCharCode(65+i)}.</span>
@@ -563,11 +572,11 @@ ${missedText}]
             })}
           </div>
           {cur != null && (
-            <div className="mt-6 pt-6 border-t border-white/10 text-sm text-gray-300">{q.exp}</div>
+            <div className="mt-6 pt-6 border-t border-gray-200 text-sm text-gray-600">{q.exp}</div>
           )}
           <div className="mt-6 flex items-center gap-3 flex-wrap">
             {qIdx > 0 && (
-              <button onClick={() => setQIdx(qIdx - 1)} className="px-5 py-3 bg-zinc-800 text-white font-bold rounded-lg">← Prev</button>
+              <button onClick={() => setQIdx(qIdx - 1)} className="px-5 py-3 bg-[#202124] text-white font-bold rounded-lg">← Prev</button>
             )}
             {cur == null ? (
               <button onClick={() => setQIdx(qIdx + 1)} className="px-5 py-3 border border-orange-500/50 text-orange-400 font-bold rounded-lg">Skip →</button>
@@ -576,7 +585,7 @@ ${missedText}]
             )}
           </div>
         </div>
-        <div className="bg-zinc-900 border border-orange-500/30 rounded-xl p-4 h-fit sticky top-4">
+        <div className="bg-white border border-orange-500/30 rounded-xl p-4 h-fit sticky top-4">
           <div className="mb-3">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-3">
@@ -596,18 +605,18 @@ ${missedText}]
                     className="text-xs rounded px-2 py-1 border border-red-500/40 bg-red-500/10 text-red-300">⏹ Stop</button>
                 )}
                 <button onClick={toggleAutoSpeak} title="Speak replies aloud"
-                  className={`text-xs rounded px-2 py-1 border ${autoSpeak ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300" : "border-white/10 text-gray-400 hover:text-white"}`}>
+                  className={`text-xs rounded px-2 py-1 border ${autoSpeak ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300" : "border-gray-200 text-gray-400 hover:text-[#202124]"}`}>
                   {autoSpeak ? "🔊" : "🔈"}
                 </button>
                 <button onClick={clearChat} disabled={chatBusy} title="Start a new chat — your tutor keeps what they've learned about you"
-                  className="text-xs text-gray-400 hover:text-orange-400 border border-white/10 hover:border-orange-500/40 rounded px-2 py-1 disabled:opacity-40">
+                  className="text-xs text-gray-400 hover:text-orange-400 border border-gray-200 hover:border-orange-500/40 rounded px-2 py-1 disabled:opacity-40">
                   ↻ New
                 </button>
               </div>
             </div>
-            <div className="flex rounded-lg bg-zinc-800 p-0.5 text-xs">
-              <button onClick={() => switchPersona("bo")} disabled={chatBusy} className={`flex-1 rounded-md py-1 font-bold transition-colors disabled:opacity-50 ${persona === "bo" ? "bg-orange-500 text-black" : "text-gray-400 hover:text-white"}`}>Bo · plain talk</button>
-              <button onClick={() => switchPersona("flo")} disabled={chatBusy} className={`flex-1 rounded-md py-1 font-bold transition-colors disabled:opacity-50 ${persona === "flo" ? "bg-fuchsia-500 text-black" : "text-gray-400 hover:text-white"}`}>Flo · technical</button>
+            <div className="flex rounded-lg bg-[#202124] p-0.5 text-xs">
+              <button onClick={() => switchPersona("bo")} disabled={chatBusy} className={`flex-1 rounded-md py-1 font-bold transition-colors disabled:opacity-50 ${persona === "bo" ? "bg-orange-500 text-black" : "text-gray-400 hover:text-[#202124]"}`}>Bo · plain talk</button>
+              <button onClick={() => switchPersona("flo")} disabled={chatBusy} className={`flex-1 rounded-md py-1 font-bold transition-colors disabled:opacity-50 ${persona === "flo" ? "bg-fuchsia-500 text-black" : "text-gray-400 hover:text-[#202124]"}`}>Flo · technical</button>
             </div>
           </div>
           <div ref={chatScrollRef} className="space-y-2 max-h-96 overflow-y-auto mb-3 text-sm">
@@ -627,11 +636,11 @@ ${missedText}]
               </div>
             )}
             {chat.map((m, i) => (
-              <div key={i} className={m.role === "user" ? "bg-zinc-800 rounded p-2 text-gray-300" : "bg-orange-500/10 border border-orange-500/20 rounded p-2 text-gray-200"}>
+              <div key={i} className={m.role === "user" ? "bg-[#202124] rounded p-2 text-gray-600" : "bg-orange-500/10 border border-orange-500/20 rounded p-2 text-gray-200"}>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs text-gray-500">{m.role === "user" ? "You" : (persona === "bo" ? "Bo" : "Flo")}</span>
                   {m.role === "assistant" && m.content && (
-                    <button onClick={() => (speakingIdx === i ? stopSpeak() : speak(m.content, i))} title="Hear it" className="text-xs text-gray-500 hover:text-white">{speakingIdx === i ? "⏹" : "🔊"}</button>
+                    <button onClick={() => (speakingIdx === i ? stopSpeak() : speak(m.content, i))} title="Hear it" className="text-xs text-gray-500 hover:text-[#202124]">{speakingIdx === i ? "⏹" : "🔊"}</button>
                   )}
                 </div>
                 {m.role === "assistant"
@@ -649,9 +658,9 @@ ${missedText}]
               onKeyDown={e => e.key === "Enter" && askBo(chatInput)}
               placeholder={listening ? "Listening…" : `Ask ${persona === "bo" ? "Bo" : "Flo"}…`}
               disabled={chatBusy}
-              className="flex-1 bg-zinc-800 border border-white/10 rounded px-3 py-2 text-sm focus:outline-none focus:border-orange-500"
+              className="flex-1 bg-white border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-orange-500"
             />
-            <button onClick={toggleMic} title="Talk to your tutor" className={`px-3 rounded font-bold ${listening ? "bg-red-500 text-white animate-pulse" : "bg-zinc-800 text-gray-300 hover:text-white border border-white/10"}`}>🎤</button>
+            <button onClick={toggleMic} title="Talk to your tutor" className={`px-3 rounded font-bold ${listening ? "bg-red-500 text-white animate-pulse" : "bg-[#202124] text-gray-600 hover:text-[#202124] border border-gray-200"}`}>🎤</button>
             <button onClick={() => askBo(chatInput)} disabled={chatBusy || !chatInput.trim()} className="px-3 bg-orange-500 text-black font-bold rounded disabled:opacity-40">→</button>
           </div>
         </div>
@@ -697,7 +706,7 @@ function SidePanel({ domain, onStart }: { domain: Domain; onStart: () => void })
         </div>
       )}
 
-      <div className="bg-zinc-900 border border-white/10 rounded-xl p-4">
+      <div className="bg-white border border-gray-200 rounded-xl p-4">
         <div className="text-orange-500 font-bold tracking-widest text-[10px] mb-3">🧪 LABS — {domain.id.toUpperCase()}</div>
         {labs.length === 0 ? (
           <p className="text-gray-500 text-xs italic">No hands-on labs for this domain yet.</p>
@@ -716,7 +725,7 @@ function SidePanel({ domain, onStart }: { domain: Domain; onStart: () => void })
         )}
       </div>
 
-      <div className="bg-zinc-900 border border-white/10 rounded-xl p-4">
+      <div className="bg-white border border-gray-200 rounded-xl p-4">
         <div className="text-orange-500 font-bold tracking-widest text-[10px] mb-3">READY?</div>
         <p className="text-xs text-gray-400 mb-3">When you&apos;ve absorbed the lesson, take the quiz to lock it in.</p>
         <button onClick={onStart} className="w-full px-4 py-2.5 bg-orange-500 text-black font-bold text-sm rounded">Start Quiz →</button>
