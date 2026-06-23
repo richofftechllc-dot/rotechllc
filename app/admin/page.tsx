@@ -59,6 +59,7 @@ export default function AdminCRM() {
   const [payoutDraft, setPayoutDraft] = useState("");
   const [igText, setIgText] = useState("");
   const [igStatus, setIgStatus] = useState("");
+  const [igDrafts, setIgDrafts] = useState<{ id: string; imageUrl: string; caption: string; status: string }[]>([]);
   const [calls, setCalls] = useState<Call[]>([]);
   const [callType, setCallType] = useState("all");
   const [callAssignee, setCallAssignee] = useState<Record<string, string>>({});
@@ -171,13 +172,16 @@ export default function AdminCRM() {
     await fetch("/api/admin/sops", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ delete: id }) });
     loadSops();
   }
+  async function loadIgDrafts() {
+    try { const r = await fetch("/api/admin/ig-latest"); const d = await r.json(); if (d.ok) setIgDrafts(d.drafts); } catch { /* ignore */ }
+  }
   async function postIg() {
     const intelText = igText.trim();
-    setIgStatus("…");
+    setIgStatus("Building the graphic… (~15s)");
     const r = await fetch("/api/admin/action", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "igdraft", payload: { intelText } }) });
     const d = await r.json();
-    setIgStatus(r.ok && d.ok ? "✓ Draft sent to #ig-drafts — approve there to post." : `Error: ${d.error}`);
-    if (r.ok && d.ok) setIgText("");
+    setIgStatus(r.ok && d.ok ? "✓ Generating — the image appears below + in #ig-drafts to approve." : `Error: ${d.error}`);
+    if (r.ok && d.ok) { setIgText(""); setTimeout(loadIgDrafts, 12000); setTimeout(loadIgDrafts, 22000); }
   }
   async function savePayout() {
     const v = Number(payoutDraft);
@@ -310,7 +314,7 @@ export default function AdminCRM() {
     if (d.ok) loadFollowups();
   }
 
-  useEffect(() => { loadMembers(); loadFollowups(); loadSchedule(); loadCalls(); loadChat(); loadCatalog(); loadBookings(); loadSops(); loadConfig(); }, [loadMembers, loadFollowups, loadSchedule, loadCalls, loadChat, loadCatalog, loadBookings, loadSops, loadConfig]);
+  useEffect(() => { loadMembers(); loadFollowups(); loadSchedule(); loadCalls(); loadChat(); loadCatalog(); loadBookings(); loadSops(); loadConfig(); loadIgDrafts(); }, [loadMembers, loadFollowups, loadSchedule, loadCalls, loadChat, loadCatalog, loadBookings, loadSops, loadConfig]);
   // Live-ish team chat: refresh every 8s while the Team tab is open.
   useEffect(() => {
     if (tab !== "team") return;
@@ -824,6 +828,20 @@ export default function AdminCRM() {
                 <button onClick={postIg} className="text-xs px-3 py-1.5 rounded-lg bg-orange-600 text-white hover:bg-orange-700">Build IG draft</button>
               </div>
               {igStatus && <div className="text-[11px] text-gray-600 mt-1">{igStatus}</div>}
+              <div className="flex items-center justify-between mt-2">
+                <span className="text-[11px] text-gray-400">Recent graphics (approve/post in #ig-drafts):</span>
+                <button onClick={loadIgDrafts} className="text-[11px] text-orange-600 hover:underline">↻ Refresh</button>
+              </div>
+              {igDrafts.length === 0 ? <div className="text-[11px] text-gray-400 mt-1">None yet — build one above.</div> : (
+                <div className="flex gap-2 mt-2 overflow-x-auto pb-1">
+                  {igDrafts.map(d => (
+                    <a key={d.id} href={d.imageUrl} target="_blank" rel="noreferrer" title={d.caption} className="shrink-0">
+                      <img src={d.imageUrl} alt="IG draft" className="h-28 w-auto rounded-lg border border-[#dadce0] hover:border-orange-500" />
+                      <div className="text-[10px] text-gray-400 mt-0.5 text-center">{d.status}</div>
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
               {chat.length === 0 && <p className="text-gray-500 text-sm">No messages yet. Say something — the team will see it here.</p>}
