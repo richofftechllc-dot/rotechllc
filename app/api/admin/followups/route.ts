@@ -64,7 +64,10 @@ export async function POST(req: Request) {
       const status = body.status === "done" ? "done" : "open";
       await ref.update({ status, ...(status === "done" ? { doneBy: admin.name, doneAt: nowISO } : {}) });
     } else if (action === "delete") {
-      await ref.delete();
+      // SOFT delete — never actually remove the doc, so nothing can disappear.
+      await ref.update({ archived: true, archivedBy: admin.name, archivedAt: nowISO });
+    } else if (action === "restore") {
+      await ref.update({ archived: false, restoredAt: nowISO });
     } else {
       return NextResponse.json({ ok: false, error: "unknown_action" }, { status: 400 });
     }

@@ -12,7 +12,7 @@ type Member = {
 type Note = { by: string; text: string; at: string };
 type Followup = {
   id: string; title: string; memberEmail?: string; source?: string;
-  status: "open" | "done"; assignedTo?: string; notes?: Note[]; createdAt?: string; createdBy?: string;
+  status: "open" | "done"; assignedTo?: string; notes?: Note[]; createdAt?: string; createdBy?: string; archived?: boolean;
 };
 type Schedule = { id?: string; discordId: string; name: string; days: Record<string, string>; note?: string; updatedAt?: string };
 type Call = { id: string; title: string; date: string | null; type?: string; summary?: string; actionItems?: string; keywords?: string; participants: string[]; grade: string; transcriptUrl: string; gradedAt: number | null };
@@ -345,8 +345,9 @@ export default function AdminCRM() {
     </main>
   );
 
-  const openFollowups = followups.filter(f => f.status === "open");
-  const doneFollowups = followups.filter(f => f.status === "done");
+  const openFollowups = followups.filter(f => f.status === "open" && !f.archived);
+  const doneFollowups = followups.filter(f => f.status === "done" && !f.archived);
+  const archivedFollowups = followups.filter(f => f.archived);
   const filteredMembers = members.filter(m =>
     (!q || [m.name, m.email, m.discordTag, m.tier, m.tracks.join(",")].join(" ").toLowerCase().includes(q.toLowerCase())) &&
     (!fTier || m.tier === fTier) &&
@@ -448,7 +449,7 @@ export default function AdminCRM() {
                     </span>
                     {!f.assignedTo && <button onClick={() => act({ action: "assign", id: f.id })} className="text-xs px-2.5 py-1 rounded-lg border border-[#dadce0] hover:bg-gray-50">Assign to me</button>}
                     <button onClick={() => act({ action: "status", id: f.id, status: "done" })} className="text-xs px-2.5 py-1 rounded-lg bg-green-600 text-white hover:bg-green-700">✓ Done</button>
-                    <button onClick={() => { if (confirm("Delete this follow-up?")) act({ action: "delete", id: f.id }); }} className="text-xs px-2 py-1 rounded-lg border border-red-200 text-red-600 hover:bg-red-50">Delete</button>
+                    <button onClick={() => act({ action: "delete", id: f.id })} className="text-xs px-2 py-1 rounded-lg border border-[#dadce0] text-gray-500 hover:bg-gray-50" title="Archives it — restore anytime, never deleted">Archive</button>
                   </div>
                 </div>
                 {(f.notes || []).length > 0 && (
@@ -475,6 +476,20 @@ export default function AdminCRM() {
                     <div key={f.id} className="text-xs text-gray-500 flex items-center justify-between bg-white border border-[#e8eaed] rounded px-3 py-1.5">
                       <span className="line-through">{f.title}</span>
                       <button onClick={() => act({ action: "status", id: f.id, status: "open" })} className="text-orange-600 hover:underline">reopen</button>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            )}
+
+            {archivedFollowups.length > 0 && (
+              <details className="text-sm">
+                <summary className="text-gray-500 cursor-pointer">🗄 {archivedFollowups.length} archived (nothing is ever deleted — restore anytime)</summary>
+                <div className="mt-2 space-y-1">
+                  {archivedFollowups.map(f => (
+                    <div key={f.id} className="text-xs text-gray-500 flex items-center justify-between bg-white border border-[#e8eaed] rounded px-3 py-1.5">
+                      <span>{f.title}{f.assignedTo ? ` · ${f.assignedTo}` : ""}</span>
+                      <button onClick={() => act({ action: "restore", id: f.id })} className="text-green-600 hover:underline font-medium">Restore</button>
                     </div>
                   ))}
                 </div>
