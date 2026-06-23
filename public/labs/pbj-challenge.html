@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The PB&J Challenge — Rich Off Tech · Business Analyst Track</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
+<style>
+  /* Rich Off Tech — CRM "Everything Hub" admin look: white surfaces, near-black ink,
+     thin gray lines, single blue accent. Matches /admin so a client-sent resource
+     feels like part of the platform. */
+  :root{
+    --bg:#f4f5f7;
+    --surface:#ffffff;
+    --panel:#f7f8fa;
+    --line:#e5e7eb;
+    --line-2:#d6dae1;
+    --ink:#0f172a;
+    --ink-2:#334155;
+    --muted:#64748b;
+    --accent:#2563eb;
+    --accent-soft:#eff4ff;
+    --accent-line:#bfd2fe;
+    --ok:#0a7d2e;
+    --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.05);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,sans-serif;line-height:1.55;
+  }
+  .wrap{max-width:780px;margin:0 auto;padding:0 18px 72px}
+
+  /* top bar — mirrors the CRM header */
+  .topbar{display:flex;align-items:center;gap:12px;padding:16px 2px;margin-bottom:6px}
+  .logo{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:var(--ink);color:#fff;font-weight:800;font-size:15px;letter-spacing:-.02em}
+  .brand{font-weight:800;letter-spacing:-.01em;font-size:15px}
+  .brand span{color:var(--muted);font-weight:600}
+  .chip{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-line);padding:5px 10px;border-radius:999px}
+
+  .hero{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:30px 28px;margin:8px 0 22px}
+  .hero h1{font-weight:800;font-size:clamp(26px,5.4vw,40px);line-height:1.05;letter-spacing:-.025em;margin:0 0 10px}
+  .hero h1 .amp{color:var(--accent)}
+  .hero .lede{font-size:clamp(15px,2.3vw,17px);color:var(--muted);max-width:60ch;margin:0}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px;margin:0 0 16px}
+  .card h2{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  .card p{margin:0 0 10px;color:var(--ink-2)}
+  .card p:last-child{margin-bottom:0}
+  .task{border-left:3px solid var(--accent)}
+  .task .catch{color:var(--accent);font-weight:700}
+
+  .field{margin:16px 0}
+  label.fl{display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin:0 0 7px}
+  label.fl .sub{font-weight:400;color:var(--muted)}
+  input[type=text]{width:100%;background:var(--surface);border:1px solid var(--line-2);border-radius:9px;color:var(--ink);font:inherit;padding:11px 13px}
+  input[type=text]::placeholder{color:#9aa3b2}
+  input[type=text]:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+
+  .steps-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:30px 0 12px}
+  .steps-head h2{font-size:19px;font-weight:800;letter-spacing:-.01em;margin:0;color:var(--ink)}
+  .steps-head .hint{font-size:13px;color:var(--muted)}
+
+  ol.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+  .step{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:10px 10px 10px 8px;box-shadow:var(--shadow);transition:border-color .15s,box-shadow .15s}
+  .step.dragging{opacity:.55;border-color:var(--accent)}
+  .step.over{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+  .grip{cursor:grab;color:#aab2c0;font-size:18px;line-height:1;padding:9px 4px;user-select:none;touch-action:none}
+  .grip:active{cursor:grabbing}
+  .num{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--accent);min-width:26px;text-align:center;padding-top:11px;font-size:13px}
+  .step textarea{flex:1;background:transparent;border:none;color:var(--ink);font:inherit;resize:none;padding:9px 4px;min-height:42px;line-height:1.5}
+  .step-side{display:flex;flex-direction:column;gap:4px;padding-top:2px}
+  .iconbtn{background:var(--panel);border:1px solid var(--line-2);color:var(--muted);border-radius:7px;width:30px;height:25px;cursor:pointer;font-size:13px;line-height:1;display:flex;align-items:center;justify-content:center}
+  .iconbtn:hover{color:var(--ink);border-color:#b9c0cc}
+  .iconbtn.del:hover{color:#fff;background:#dc2626;border-color:#dc2626}
+
+  .addbtn{margin-top:12px;width:100%;background:var(--accent-soft);border:1px dashed var(--accent-line);color:var(--accent);border-radius:11px;padding:12px;font:inherit;font-weight:600;cursor:pointer}
+  .addbtn:hover{background:#e3edff;border-color:var(--accent)}
+
+  .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+  .btn{flex:1;min-width:150px;border-radius:10px;padding:12px 16px;font:inherit;font-weight:600;cursor:pointer;border:1px solid var(--line-2);background:var(--surface);color:var(--ink)}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn.primary:hover{filter:brightness(1.05)}
+  .btn:hover{border-color:#b9c0cc}
+  .copied{color:var(--ok);font-size:13px;text-align:center;margin-top:10px;min-height:18px;font-weight:600}
+
+  .withtyler{margin-top:16px;font-size:14px;color:var(--ink-2);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .withtyler b{color:var(--ink)}
+
+  details.reveal{margin-top:22px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  details.reveal summary{cursor:pointer;list-style:none;padding:17px 20px;font-weight:600;color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:10px}
+  details.reveal summary::-webkit-details-marker{display:none}
+  details.reveal summary .tag{font-size:12px;color:var(--muted);font-weight:400}
+  details.reveal[open] summary{border-bottom:1px solid var(--line)}
+  .reveal-body{padding:6px 20px 22px}
+  .reveal-body p{color:var(--ink-2);margin:12px 0 0}
+  .reveal-body .pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:var(--accent);padding:3px 10px;border-radius:999px;margin:14px 8px 0 0}
+  .reveal-body .pill.alt{background:var(--ink)}
+
+  footer{margin-top:40px;text-align:center;color:#9aa3b2;font-size:12px;font-family:'JetBrains Mono',monospace;letter-spacing:.05em}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <span class="logo">RT</span>
+    <span class="brand">Rich Off Tech <span>· Business Analyst Track</span></span>
+    <span class="chip">Requirements Lab</span>
+  </div>
+
+  <div class="hero">
+    <h1>The Peanut Butter <span class="amp">&amp;</span> Jelly Challenge</h1>
+    <p class="lede">Write the instructions. The machine follows them exactly — no guessing, no filling in the blanks.</p>
+  </div>
+
+  <div class="card">
+    <h2>Why you're doing this</h2>
+    <p>This is how a Business Analyst earns. A BA takes something people "just know how to do" and writes it down so precisely that a computer — or a developer who's never seen it — can do it the same way every time.</p>
+    <p>In ServiceNow, that's the whole job: turn a messy human process into clean, ordered steps the platform can run. You already do this. Every SOP you've followed or written is requirements work. This just makes the skill visible.</p>
+  </div>
+
+  <div class="card task">
+    <h2>The task</h2>
+    <p>Write the steps to make a peanut butter and jelly sandwich.</p>
+    <p><span class="catch">The catch:</span> a machine follows your steps literally, top to bottom. It has never made a sandwich. It assumes nothing. If a step is missing, out of order, or unclear — the sandwich fails.</p>
+    <p>Don't rush to "finish." Add as many steps as you need. Drag them until the order is true. There's no set number — figuring that out <em>is</em> the work.</p>
+  </div>
+
+  <div class="card">
+    <div class="field">
+      <label class="fl" for="name">Your name</label>
+      <input type="text" id="name" placeholder="Who's submitting this">
+    </div>
+    <div class="field" style="margin-bottom:0">
+      <label class="fl" for="given">What's on the table to start with? <span class="sub">(optional — what does the machine already have?)</span></label>
+      <input type="text" id="given" placeholder="e.g. bread, a jar of peanut butter, a jar of jelly, a knife, a plate">
+    </div>
+  </div>
+
+  <div class="steps-head">
+    <h2>Your steps</h2>
+    <span class="hint">Drag the grip to reorder · or use the arrows</span>
+  </div>
+  <ol class="steps" id="steps"></ol>
+  <button class="addbtn" id="add">+ Add a step</button>
+
+  <div class="actions">
+    <button class="btn primary" id="copy">Copy my steps</button>
+    <button class="btn" id="download">Download as .txt</button>
+  </div>
+  <div class="copied" id="copied"></div>
+
+  <p class="withtyler">When you're done, you'll walk through it live with <b>Tyler</b> — she plays the machine and runs your steps exactly as written. Bring what you build here.</p>
+
+  <details class="reveal">
+    <summary><span>Open this after you've tried it — what a BA actually learns here</span><span class="tag">read after</span></summary>
+    <div class="reveal-body">
+      <p>If one of your steps says "spread the peanut butter," the machine stops and asks: with what? how much? on which side? Open the jar first — was that a step? The gaps you just found are the exact gaps a Business Analyst hunts for in real requirements, before a single thing gets built.</p>
+      <p>Strong requirements share three traits:</p>
+      <span class="pill">Complete</span><span class="pill alt">Ordered</span><span class="pill">Unambiguous</span>
+      <p style="margin-top:16px">Complete means nothing is assumed. Ordered means the sequence is true — step 4 can't depend on something you didn't do until step 7. Unambiguous means one meaning only, no "they'll figure it out."</p>
+      <p>That's the muscle behind every ServiceNow build: the platform does exactly what the steps say — not what you meant. Learn to write the sandwich and you can write the workflow.</p>
+    </div>
+  </details>
+
+  <footer>RICH OFF TECH · BUSINESS ANALYST TRACK · REQUIREMENTS LAB</footer>
+</div>
+
+<script>
+(function(){
+  // start with 3 blank steps — deliberately NOT the "right" number
+  var steps = [{text:""},{text:""},{text:""}];
+  var dragFrom = null;
+  var ol = document.getElementById('steps');
+
+  function render(){
+    ol.innerHTML = "";
+    steps.forEach(function(s, i){
+      var li = document.createElement('li');
+      li.className = 'step';
+      li.setAttribute('draggable','true');
+      li.dataset.i = i;
+
+      var grip = document.createElement('div');
+      grip.className = 'grip'; grip.textContent = '⠿'; grip.title = 'Drag to reorder';
+
+      var num = document.createElement('div');
+      num.className = 'num'; num.textContent = (i+1);
+
+      var ta = document.createElement('textarea');
+      ta.value = s.text;
+      ta.placeholder = 'Step ' + (i+1) + ' — what does the machine do?';
+      ta.addEventListener('input', function(){
+        steps[i].text = ta.value;
+        ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px';
+      });
+
+      var side = document.createElement('div');
+      side.className = 'step-side';
+      var up = mkIcon('↑','Move up', function(){ move(i,-1); });
+      var dn = mkIcon('↓','Move down', function(){ move(i, 1); });
+      var del = mkIcon('✕','Remove step', function(){ removeStep(i); });
+      del.classList.add('del');
+      if(i===0) up.disabled = true;
+      if(i===steps.length-1) dn.disabled = true;
+      side.appendChild(up); side.appendChild(dn); side.appendChild(del);
+
+      li.appendChild(grip); li.appendChild(num); li.appendChild(ta); li.appendChild(side);
+
+      li.addEventListener('dragstart', function(e){ dragFrom = i; li.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+      li.addEventListener('dragend', function(){ dragFrom = null; li.classList.remove('dragging'); clearOver(); });
+      li.addEventListener('dragover', function(e){ e.preventDefault(); li.classList.add('over'); });
+      li.addEventListener('dragleave', function(){ li.classList.remove('over'); });
+      li.addEventListener('drop', function(e){ e.preventDefault(); li.classList.remove('over'); drop(i); });
+
+      ol.appendChild(li);
+      ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px';
+    });
+  }
+
+  function mkIcon(label, title, fn){
+    var b = document.createElement('button');
+    b.className = 'iconbtn'; b.textContent = label; b.title = title; b.type='button';
+    b.addEventListener('click', fn);
+    return b;
+  }
+  function clearOver(){ Array.prototype.forEach.call(ol.children, function(c){ c.classList.remove('over'); }); }
+
+  function move(i, dir){
+    var j = i + dir;
+    if(j < 0 || j >= steps.length) return;
+    var tmp = steps[i]; steps[i] = steps[j]; steps[j] = tmp;
+    render();
+  }
+  function drop(to){
+    if(dragFrom === null || dragFrom === to) return;
+    var item = steps.splice(dragFrom,1)[0];
+    steps.splice(to,0,item);
+    render();
+  }
+  function removeStep(i){
+    if(steps.length <= 1){ steps[0] = {text:""}; }
+    else { steps.splice(i,1); }
+    render();
+  }
+  function addStep(){
+    steps.push({text:""});
+    render();
+    var tas = ol.querySelectorAll('textarea');
+    if(tas.length) tas[tas.length-1].focus();
+  }
+
+  function buildText(){
+    var name = document.getElementById('name').value.trim();
+    var given = document.getElementById('given').value.trim();
+    var lines = [];
+    lines.push('THE PB&J CHALLENGE — Rich Off Tech, Business Analyst Track');
+    if(name) lines.push('Submitted by: ' + name);
+    if(given) lines.push('Starting materials: ' + given);
+    lines.push('');
+    lines.push('STEPS:');
+    steps.forEach(function(s, i){
+      lines.push((i+1) + '. ' + (s.text.trim() || '(blank)'));
+    });
+    return lines.join('\n');
+  }
+
+  function flash(msg){
+    var c = document.getElementById('copied');
+    c.textContent = msg;
+    clearTimeout(flash._t);
+    flash._t = setTimeout(function(){ c.textContent=''; }, 2600);
+  }
+
+  document.getElementById('add').addEventListener('click', addStep);
+
+  document.getElementById('copy').addEventListener('click', function(){
+    var text = buildText();
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ flash('Copied — paste it to Tyler or Bo'); },
+        function(){ legacyCopy(text); });
+    } else { legacyCopy(text); }
+  });
+  function legacyCopy(text){
+    var t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select();
+    try{ document.execCommand('copy'); flash('Copied — paste it to Tyler or Bo'); }catch(e){ flash('Press Ctrl/Cmd+C to copy'); }
+    document.body.removeChild(t);
+  }
+
+  document.getElementById('download').addEventListener('click', function(){
+    var name = document.getElementById('name').value.trim().replace(/[^a-z0-9]+/gi,'-').toLowerCase();
+    var blob = new Blob([buildText()], {type:'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'pbj-challenge' + (name ? '-' + name : '') + '.txt';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+    flash('Downloaded');
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
