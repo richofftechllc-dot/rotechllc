@@ -43,8 +43,12 @@ export async function GET(req: Request) {
     const now = Date.now();
     let comped = 0;
     let expiringSoon = 0;
-    // Only real members — skip any stray/junk docs that have no email (e.g. a bad import).
-    const members = custSnap.docs.filter((d) => (d.data() as { email?: string }).email).map((d) => {
+    // Skip ONLY truly-empty junk docs (e.g. a bad Zapier write). A real member has at
+    // least one identifier; the stray doc had only clientName/subject/assignedTo.
+    const members = custSnap.docs.filter((d) => {
+      const c = d.data() as Record<string, unknown>;
+      return c.email || c.name || c.firstName || c.quizCode || c.discordId;
+    }).map((d) => {
       const c = d.data() as Record<string, unknown>;
       const email = String(c.email || "").toLowerCase();
       const rac = racByEmail[email] || {};

@@ -26,9 +26,10 @@ export async function POST(req: Request) {
     "You help coaches manage members: who's expiring, who's behind, what to follow up on, and you DRAFT outreach (DMs, check-ins) in a real, grounded, hype-but-not-corny voice.",
     "When you draft a member message, keep it tight and human. After drafting, tell the coach: 'Use Send Update on their card to send it.'",
     "Actions available in the CRM: Send Update (DMs the member), Add Track (grants a cert track), Schedule Call, View Resume" + (isOwner ? ", Send Invoice (owner-only)." : " (Send Invoice is owner-only — you can't trigger it)."),
-    "Be concise and practical. Use the data you're given; if you don't have something, say so plainly — don't invent member details.",
+    "You CAN see each member's tier, payment status, days left, cert TRACKS, and quiz PROGRESS (quizzes done, average score, weak domains) — it's in the roster below. Use it to answer 'who's behind' (e.g. paid but no quiz activity, low averages, or weak domains) — don't claim you lack the data.",
+    "Be concise and practical. If something genuinely isn't in the data, say so plainly — don't invent member details.",
     body.focus ? `MEMBER THE COACH IS LOOKING AT:\n${JSON.stringify(body.focus).slice(0, 4000)}` : "",
-    body.roster ? `ROSTER SNAPSHOT (name | tier | status | days left):\n${String(body.roster).slice(0, 6000)}` : "",
+    body.roster ? `ROSTER (name | tier | payment | days left | tracks | quiz progress):\n${String(body.roster).slice(0, 9000)}` : "",
   ].filter(Boolean).join("\n\n");
 
   if (!process.env.ANTHROPIC_API_KEY) {
