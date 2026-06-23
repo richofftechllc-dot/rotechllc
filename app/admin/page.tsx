@@ -180,7 +180,11 @@ export default function AdminCRM() {
     const next = [...boMsgs, { role: "user" as const, content: text }];
     setBoMsgs(next); setBoInput(""); setBoBusy(true);
     try {
-      const roster = members.slice(0, 200).map(m => `${m.name || m.email} | ${m.tier || "—"} | ${m.paymentStatus} | ${m.daysLeft ?? "—"}d`).join("\n");
+      const roster = members.slice(0, 200).map(m => {
+        const pr = m.progress;
+        const prog = pr ? `${pr.done} quizzes done${pr.avg != null ? `, avg ${pr.avg}%` : ""}${pr.weak?.length ? `, weak: ${pr.weak.join("/")}` : ""}` : "no quiz activity";
+        return `${m.name || m.email} | ${m.tier || "—"} | ${m.paymentStatus} | ${m.daysLeft ?? "—"}d left | tracks: ${m.tracks.join("/") || "none"} | ${prog}`;
+      }).join("\n");
       const focus = expanded ? members.find(m => m.email === expanded) : null;
       const r = await fetch("/api/admin/assistant", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: next, roster, focus }) });
       const reply = await r.text();

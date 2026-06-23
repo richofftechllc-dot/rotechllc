@@ -43,8 +43,17 @@ export async function GET(req: Request) {
     const now = Date.now();
     let comped = 0;
     let expiringSoon = 0;
-    // Only real members — skip any stray/junk docs that have no email (e.g. a bad import).
-    const members = custSnap.docs.filter((d) => (d.data() as { email?: string }).email).map((d) => {
+    // Skip ONLY truly-empty junk docs (e.g. a bad Zapier write). A real member has at
+    // least one identifier; the stray doc had only clientName/subject/assignedTo.
+    const realDocs = custSnap.docs.filter((d) => {
+      const c = d.data() as Record<string, unknown>;
+      return c.email || c.name || c.firstName || c.quizCode || c.discordId;
+    });
+    // SAFETY NET — the junk filter must only ever drop a stray doc or two. If it would
+    // remove more than 5, the heuristic is wrong: show EVERYONE rather than ever let the
+    // member count silently collapse again.
+    const keptDocs = (custSnap.docs.length - realDocs.length) > 5 ? custSnap.docs : realDocs;
+    const members = keptDocs.map((d) => {
       const c = d.data() as Record<string, unknown>;
       const email = String(c.email || "").toLowerCase();
       const rac = racByEmail[email] || {};
