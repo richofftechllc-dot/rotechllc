@@ -50,6 +50,7 @@ export default function Quiz() {
   const chatScrollRef = useRef<HTMLDivElement>(null);
   const [autoSpeak, setAutoSpeak] = useState(false);
   const [speakingIdx, setSpeakingIdx] = useState<number | null>(null);
+  const [voiceErr, setVoiceErr] = useState("");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   // Bo/Flo's personalized post-quiz debrief — the tutor reviews exactly what you
   // missed and offers to drill you on just those. Generated once per finished run.
@@ -71,7 +72,9 @@ export default function Quiz() {
     const gen = speakGenRef.current; // any newer speak/stop bumps this → this call aborts
     try {
       const r = await fetch("/api/bo/voice", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, voiceId: VOICE[p] }) });
-      if (gen !== speakGenRef.current || !r.ok) return;
+      if (gen !== speakGenRef.current) return;
+      if (!r.ok) { setVoiceErr((await r.text().catch(() => "")) || `voice unavailable (${r.status})`); setSpeakingIdx(null); return; }
+      setVoiceErr("");
       const url = URL.createObjectURL(await r.blob());
       if (gen !== speakGenRef.current) { URL.revokeObjectURL(url); return; }
       const a = new Audio(url); audioRef.current = a; setSpeakingIdx(idx);
@@ -535,6 +538,12 @@ ${missedText}]
 
   return (
     <main className="max-w-7xl mx-auto px-6 py-12">
+      {voiceErr && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 max-w-md bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-lg px-3 py-2 shadow flex items-center gap-2">
+          <span>🔇 Bo&apos;s voice is off: {voiceErr.slice(0, 130)}</span>
+          <button onClick={() => setVoiceErr("")} className="text-amber-500 hover:text-amber-700 font-bold">✕</button>
+        </div>
+      )}
       <div className="flex items-center justify-between mb-4">
         <button onClick={() => setDomain(null)} className="text-gray-500 text-sm hover:text-orange-500">← {track.name}</button>
         <div className="text-xs font-mono text-gray-500">{qIdx+1} / {domain.questions.length} · {correctSoFar} correct</div>
