@@ -32,7 +32,9 @@ const PILL: Record<string, string> = {
 
 export default function AdminCRM() {
   const [authed, setAuthed] = useState<"loading" | "yes" | "no">("loading");
-  const [tab, setTab] = useState<"followups" | "members" | "calls" | "schedule" | "referrals">("followups");
+  const [tab, setTab] = useState<"followups" | "members" | "calls" | "schedule" | "referrals" | "team">("followups");
+  const [chat, setChat] = useState<{ id: string; authorId: string; authorName: string; text: string; createdAt: string }[]>([]);
+  const [chatInput, setChatInput] = useState("");
   const [calls, setCalls] = useState<Call[]>([]);
   const [fTier, setFTier] = useState("");
   const [fStatus, setFStatus] = useState("");
@@ -82,6 +84,20 @@ export default function AdminCRM() {
     const d = await r.json();
     if (d.ok) setCalls(d.calls);
   }, []);
+  const loadChat = useCallback(async () => {
+    const r = await fetch("/api/admin/chat");
+    if (r.status === 403) { setAuthed("no"); return; }
+    setAuthed("yes");
+    const d = await r.json();
+    if (d.ok) { setChat(d.messages); if (d.me) setMe(d.me); }
+  }, []);
+  async function sendChat() {
+    const text = chatInput.trim();
+    if (!text) return;
+    setChatInput("");
+    await fetch("/api/admin/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
+    loadChat();
+  }
   async function resetCode(m: Member) {
     setResetMsg(s => ({ ...s, [m.email]: "…" }));
     const r = await fetch("/api/admin/reset-code", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: m.email }) });
@@ -90,7 +106,14 @@ export default function AdminCRM() {
     if (d.ok) loadMembers();
   }
 
-  useEffect(() => { loadMembers(); loadFollowups(); loadSchedule(); loadCalls(); }, [loadMembers, loadFollowups, loadSchedule, loadCalls]);
+  useEffect(() => { loadMembers(); loadFollowups(); loadSchedule(); loadCalls(); loadChat(); }, [loadMembers, loadFollowups, loadSchedule, loadCalls, loadChat]);
+  // Live-ish team chat: refresh every 8s while the Team tab is open.
+  useEffect(() => {
+    if (tab !== "team") return;
+    loadChat();
+    const t = setInterval(loadChat, 8000);
+    return () => clearInterval(t);
+  }, [tab, loadChat]);
 
   async function act(body: Record<string, unknown>) {
     await fetch("/api/admin/followups", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -140,6 +163,7 @@ export default function AdminCRM() {
     { id: "members", label: "Members" },
     { id: "calls", label: "Calls" },
     { id: "schedule", label: "Schedule" },
+    { id: "team", label: "Team Chat" },
     { id: "referrals", label: "Referrals" },
   ];
   const tierOptions = Array.from(new Set(members.map(m => m.tier).filter(Boolean))).sort();
@@ -159,7 +183,10 @@ export default function AdminCRM() {
           </div>
           {me && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span className="hidden sm:inline">{me.name}</span>
+              <div className="hidden sm:flex flex-col items-end leading-tight">
+                <span className="flex items-center gap-1.5 font-medium text-[#202124]"><span className="w-2 h-2 rounded-full bg-green-500" />Signed in</span>
+                <span className="text-[11px] text-gray-500">{me.name}</span>
+              </div>
               <span className="w-8 h-8 rounded-full bg-[#202124] text-white grid place-items-center text-xs font-semibold">{me.name.slice(0, 2).toUpperCase()}</span>
             </div>
           )}
@@ -419,6 +446,37 @@ export default function AdminCRM() {
               <input value={schedDraft.note} onChange={e => setSchedDraft(s => ({ ...s, note: e.target.value }))}
                 placeholder="Note (e.g. ET timezone, prefer evenings)" className="w-full bg-white border border-[#dadce0] rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:border-orange-500" />
               <button onClick={saveSchedule} className="px-5 py-2 bg-[#202124] text-white font-medium rounded-lg text-sm hover:bg-black">Save my availability</button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Team Chat ── */}
+        {tab === "team" && (
+          <div className="bg-white border border-[#dadce0] rounded-xl flex flex-col" style={{ height: "70vh" }}>
+            <div className="px-4 py-3 border-b border-[#e8eaed] flex items-center justify-between">
+              <div className="font-semibold">Team Chat</div>
+              <div className="text-xs text-gray-500">Just the coaches — Randy, Tyler &amp; Daquan</div>
+            </div>
+            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+              {chat.length === 0 && <p className="text-gray-500 text-sm">No messages yet. Say something — the team will see it here.</p>}
+              {chat.map(m => {
+                const mine = me && m.authorId === me.discordId;
+                return (
+                  <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+                    <div className={`max-w-[75%] ${mine ? "items-end" : "items-start"} flex flex-col`}>
+                      {!mine && <span className="text-[11px] text-gray-500 mb-0.5 px-1">{m.authorName}</span>}
+                      <div className={`px-3 py-2 rounded-2xl text-sm whitespace-pre-wrap break-words ${mine ? "bg-[#202124] text-white rounded-br-sm" : "bg-[#f1f3f4] text-[#202124] rounded-bl-sm"}`}>{m.text}</div>
+                      <span className="text-[10px] text-gray-400 mt-0.5 px-1">{new Date(m.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="border-t border-[#e8eaed] p-3 flex gap-2">
+              <input value={chatInput} onChange={e => setChatInput(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChat(); } }}
+                placeholder="Message the team…" className="flex-1 bg-white border border-[#dadce0] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500" />
+              <button onClick={sendChat} className="px-5 py-2 bg-[#202124] text-white font-medium rounded-lg text-sm hover:bg-black">Send</button>
             </div>
           </div>
         )}
