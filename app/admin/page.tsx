@@ -51,6 +51,8 @@ export default function AdminCRM() {
   const [newSop, setNewSop] = useState({ title: "", body: "" });
   const [referralPayout, setReferralPayoutState] = useState(20);
   const [payoutDraft, setPayoutDraft] = useState("");
+  const [igText, setIgText] = useState("");
+  const [igStatus, setIgStatus] = useState("");
   const [calls, setCalls] = useState<Call[]>([]);
   const [callType, setCallType] = useState("all");
   const [callAssignee, setCallAssignee] = useState<Record<string, string>>({});
@@ -162,6 +164,14 @@ export default function AdminCRM() {
     if (!confirm("Delete this SOP?")) return;
     await fetch("/api/admin/sops", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ delete: id }) });
     loadSops();
+  }
+  async function postIg() {
+    const intelText = igText.trim();
+    setIgStatus("…");
+    const r = await fetch("/api/admin/action", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "igdraft", payload: { intelText } }) });
+    const d = await r.json();
+    setIgStatus(r.ok && d.ok ? "✓ Draft sent to #ig-drafts — approve there to post." : `Error: ${d.error}`);
+    if (r.ok && d.ok) setIgText("");
   }
   async function savePayout() {
     const v = Number(payoutDraft);
@@ -770,6 +780,15 @@ export default function AdminCRM() {
             <div className="px-4 py-3 border-b border-[#e8eaed] flex items-center justify-between">
               <div className="font-semibold">Team Chat</div>
               <div className="text-xs text-gray-500">Just the coaches — Randy, Tyler &amp; Daquan</div>
+            </div>
+            {/* Post tech intel to Instagram (goes to #ig-drafts for approval — never auto-posts) */}
+            <div className="px-4 py-3 border-b border-[#e8eaed] bg-[#f8f9fa]">
+              <div className="text-xs font-semibold text-[#202124] mb-1.5">📣 Post tech intel to Instagram</div>
+              <div className="flex flex-wrap gap-2">
+                <input value={igText} onChange={e => setIgText(e.target.value)} placeholder="Optional: paste/short the intel (blank = auto from latest tech-news)" className="flex-1 min-w-[220px] text-xs border border-[#dadce0] rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:border-orange-500" />
+                <button onClick={postIg} className="text-xs px-3 py-1.5 rounded-lg bg-orange-600 text-white hover:bg-orange-700">Build IG draft</button>
+              </div>
+              {igStatus && <div className="text-[11px] text-gray-600 mt-1">{igStatus}</div>}
             </div>
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
               {chat.length === 0 && <p className="text-gray-500 text-sm">No messages yet. Say something — the team will see it here.</p>}
