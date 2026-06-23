@@ -70,6 +70,7 @@ export async function GET(req: Request) {
         : racStatus === "canceled" ? "canceled"
         : expired ? "expired"
         : racStatus === "active" ? "active"
+        : tier === "founding" ? "active"   // Founding = paid $96 — never show as "pending" in the coach CRM
         : c.rolesAssigned ? "active" : "pending";
 
       const prog = progByCode[(c.quizCode as string) || ""] || [];
@@ -91,6 +92,7 @@ export async function GET(req: Request) {
         paymentStatus,
         invoiced: !!rac.lastInvoiceAt || !!(rac as { invoiced?: boolean }).invoiced,
         tracks,
+        roles: (c.roles as string[]) || (rac.roles as string[]) || [],
         quizCode: (c.quizCode as string) || "",
         accessEndDate: accessEnd,
         daysLeft,
