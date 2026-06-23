@@ -45,7 +45,7 @@ const CALL_PILL: Record<string, string> = {
 
 export default function AdminCRM() {
   const [authed, setAuthed] = useState<"loading" | "yes" | "no">("loading");
-  const [tab, setTab] = useState<"followups" | "members" | "calls" | "schedule" | "referrals" | "team" | "bo" | "sops">("followups");
+  const [tab, setTab] = useState<"followups" | "members" | "calls" | "schedule" | "referrals" | "team" | "bo" | "sops" | "resources">("followups");
   const [chat, setChat] = useState<{ id: string; authorId: string; authorName: string; text: string; createdAt: string }[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [boMsgs, setBoMsgs] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
@@ -375,6 +375,7 @@ export default function AdminCRM() {
     { id: "team", label: "Team Chat" },
     { id: "bo", label: "Ask Bo" },
     { id: "sops", label: "SOPs" },
+    { id: "resources", label: "Resources" },
     { id: "referrals", label: "Referrals" },
   ];
   const tierOptions = Array.from(new Set(members.map(m => m.tier).filter(Boolean))).sort();
@@ -965,6 +966,28 @@ export default function AdminCRM() {
                 </table>
               </div>
             )}
+          </div>
+        )}
+
+        {tab === "resources" && (
+          <div>
+            <p className="text-gray-500 text-sm mb-4">Send-to-client resources. Open to preview, or copy the link to send a client (Discord, email, text). These are the things we hand clients by hand until the bot delivers them automatically — more get added here as we build them.</p>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {[
+                { title: "PB&J Challenge", tag: "Business Analyst · Requirements Lab", desc: "Interactive lab that teaches how a BA writes requirements. The client builds the steps, then runs it live with a coach (who plays the “machine”). No answer included — the lesson is them finding their own gaps.", path: "/labs/pbj-challenge.html" },
+              ].map(r => (
+                <div key={r.path} className="bg-white border border-[#dadce0] rounded-xl p-4 flex flex-col">
+                  <div className="text-[11px] uppercase tracking-wide text-orange-600 font-medium">{r.tag}</div>
+                  <div className="font-semibold text-[15px] mt-0.5">{r.title}</div>
+                  <p className="text-sm text-gray-600 mt-1 flex-1">{r.desc}</p>
+                  <div className="flex gap-2 mt-3">
+                    <a href={r.path} target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">Open / preview</a>
+                    <button onClick={(e) => { const url = `${window.location.origin}${r.path}`; navigator.clipboard?.writeText(url); const b = e.currentTarget; const t = b.textContent; b.textContent = "Copied link!"; setTimeout(() => { b.textContent = t; }, 1500); }}
+                      className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white font-medium hover:bg-black">Copy link to send</button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
