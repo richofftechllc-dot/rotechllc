@@ -63,7 +63,24 @@ export async function GET(req: Request) {
   if (!admin) return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 });
 
   try {
-    const fireflies = await fetchFireflies();
+    // Primary source: `allCalls` synced by the bot (no Vercel key needed). Fall back to
+    // a live Fireflies pull if FIREFLIES_API_KEY happens to be set here too.
+    let fireflies: Call[] = [];
+    try {
+      const cs = await coll("allCalls").limit(200).get();
+      fireflies = cs.docs.map((d) => {
+        const c = d.data() as Record<string, unknown>;
+        const dateMs = typeof c.date === "number" ? c.date : Number(c.date) || null;
+        const title = String(c.title || "Untitled call");
+        return {
+          id: d.id, title, date: dateMs ? new Date(dateMs).toISOString() : (typeof c.date === "string" ? (c.date as string) : null),
+          type: classify(title), summary: String(c.summary || ""), actionItems: String(c.actionItems || ""),
+          keywords: String(c.keywords || ""), participants: (c.participants as string[]) || [],
+          transcriptUrl: String(c.transcriptUrl || ""), grade: "", gradedAt: null,
+        };
+      });
+    } catch { /* allCalls best-effort */ }
+    if (!fireflies.length) fireflies = await fetchFireflies();
     const byTitle = new Map(fireflies.map((c) => [c.title.toLowerCase().trim(), c]));
 
     // Merge the bot's graded scorecards onto matching calls; keep any not in Fireflies.

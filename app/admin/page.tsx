@@ -50,6 +50,11 @@ export default function AdminCRM() {
   const [callType, setCallType] = useState("all");
   const [callAssignee, setCallAssignee] = useState<Record<string, string>>({});
   const [callMsg, setCallMsg] = useState<Record<string, string>>({});
+  const [newCall, setNewCall] = useState(false);
+  const [newCallKind, setNewCallKind] = useState("Community");
+  const [newCallEmail, setNewCallEmail] = useState("");
+  const [newCallText, setNewCallText] = useState("");
+  const [newCallStatus, setNewCallStatus] = useState("");
   const [fTier, setFTier] = useState("");
   const [fStatus, setFStatus] = useState("");
   const [resetMsg, setResetMsg] = useState<Record<string, string>>({});
@@ -70,6 +75,7 @@ export default function AdminCRM() {
   const [invoiceFor, setInvoiceFor] = useState<string | null>(null);
   const [invoiceService, setInvoiceService] = useState("sec-essential");
   const [scheduleType, setScheduleType] = useState<Record<string, string>>({});
+  const [scheduleFor, setScheduleFor] = useState<string | null>(null);
 
   const loadMembers = useCallback(async () => {
     const r = await fetch("/api/admin/members");
@@ -182,6 +188,24 @@ export default function AdminCRM() {
     } catch {
       setBoMsgs(m => [...m, { role: "assistant", content: "Couldn't reach Bo just now — try again." }]);
     } finally { setBoBusy(false); }
+  }
+
+  // Schedule a call from the Calls tab — a community announcement, or a booking invite to one person.
+  async function scheduleNewCall() {
+    setNewCallStatus("…");
+    if (newCallKind === "Community") {
+      const msg = newCallText.trim() || "📣 Community call coming up! Drop in — details soon.";
+      const r = await fetch("/api/admin/action", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "announce", payload: { message: msg } }) });
+      const d = await r.json();
+      setNewCallStatus(r.ok && d.ok ? "✓ Posted to the announcements channel." : `Error: ${d.error}`);
+    } else {
+      const email = newCallEmail.trim();
+      if (!email) { setNewCallStatus("Enter the person's email."); return; }
+      const msg = `📅 Let's get you on a ${newCallKind.toLowerCase()} call. DM me the word **book** here and pick a coach + an open time. ${newCallText.trim()}`.trim();
+      const r = await fetch("/api/admin/action", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "dm", payload: { email, message: msg } }) });
+      const d = await r.json();
+      setNewCallStatus(r.ok && d.ok ? `✓ Booking invite queued for ${email}.` : `Error: ${d.error}`);
+    }
   }
 
   // Turn a call into a follow-up (optionally pre-assigned to a coach), straight from the Calls tab.
@@ -465,12 +489,7 @@ export default function AdminCRM() {
                           <div className="mt-4 pt-3 border-t border-[#e8eaed]">
                             <div className="text-xs text-gray-400 mb-2">Actions</div>
                             <div className="flex flex-wrap items-center gap-2">
-                              <span className="inline-flex items-center gap-1">
-                                <select value={scheduleType[m.email] || "Intro"} onChange={e => setScheduleType(s => ({ ...s, [m.email]: e.target.value }))} className="text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500">
-                                  {["Intro", "Coaching", "Interview prep", "Project discovery"].map(t => <option key={t} value={t}>{t}</option>)}
-                                </select>
-                                <button onClick={() => scheduleCall(m)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📅 Schedule</button>
-                              </span>
+                              <button onClick={() => setScheduleFor(scheduleFor === m.email ? null : m.email)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📅 Schedule call</button>
                               <button onClick={() => viewResume(m)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📄 {resumeView[m.email] ? "Hide" : "View"} resume</button>
                               <span className="inline-flex items-center gap-1">
                                 <select value={trackDraft[m.email] || ""} onChange={e => setTrackDraft(s => ({ ...s, [m.email]: e.target.value }))} className="text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500">
@@ -500,6 +519,19 @@ export default function AdminCRM() {
                                 <button onClick={() => sendInvoice(m)} className="text-xs px-3 py-1.5 rounded-lg bg-orange-600 text-white hover:bg-orange-700">Send invoice</button>
                               </div>
                             )}
+                            {scheduleFor === m.email && (
+                              <div className="mt-2 bg-[#f8f9fa] border border-[#dadce0] rounded-lg p-3">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <span className="text-xs text-gray-700">Meeting type:</span>
+                                  <select value={scheduleType[m.email] || "Intro"} onChange={e => setScheduleType(s => ({ ...s, [m.email]: e.target.value }))} className="text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500">
+                                    {["Intro", "Coaching", "Interview prep", "Project discovery"].map(t => <option key={t} value={t}>{t}</option>)}
+                                  </select>
+                                  <button onClick={() => { scheduleCall(m); setScheduleFor(null); }} className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Send booking invite</button>
+                                  <button onClick={() => setScheduleFor(null)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] text-gray-600 hover:bg-white">Cancel</button>
+                                </div>
+                                <p className="text-[11px] text-gray-500 mt-1.5">This DMs {m.name || "them"} in Discord to book a {(scheduleType[m.email] || "Intro").toLowerCase()} call — they pick a coach + an open time (tomorrow 11–5 ET) in the bot. It doesn&apos;t reserve a slot here or charge anything.</p>
+                              </div>
+                            )}
                             {actionMsg[m.email] && <div className="text-[11px] mt-1.5 text-gray-700">{actionMsg[m.email]}</div>}
                             {resumeView[m.email] && (
                               <pre className="mt-2 text-[11px] bg-white border border-[#e8eaed] rounded-lg p-3 max-h-64 overflow-auto whitespace-pre-wrap break-words text-gray-700">
@@ -527,11 +559,32 @@ export default function AdminCRM() {
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-gray-500 text-sm mr-auto">Every call from Fireflies — coaching, interview prep, project discovery, voice-agent. Newest first.</p>
+              <button onClick={() => { setNewCall(v => !v); setNewCallStatus(""); }} className="text-xs px-3 py-1.5 rounded-lg bg-orange-600 text-white font-medium hover:bg-orange-700">+ Schedule a call</button>
+            </div>
+            {newCall && (
+              <div className="bg-[#f8f9fa] border border-[#dadce0] rounded-xl p-3 space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <select value={newCallKind} onChange={e => setNewCallKind(e.target.value)} className="text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white">
+                    {["Community", "Intro", "Coaching", "Interview prep", "Project discovery"].map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                  {newCallKind !== "Community" && (
+                    <input value={newCallEmail} onChange={e => setNewCallEmail(e.target.value)} placeholder="member email" className="text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white min-w-[180px] focus:outline-none focus:border-orange-500" />
+                  )}
+                  <button onClick={scheduleNewCall} className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">{newCallKind === "Community" ? "Post community call" : "Send booking invite"}</button>
+                </div>
+                <textarea value={newCallText} onChange={e => setNewCallText(e.target.value)} rows={2}
+                  placeholder={newCallKind === "Community" ? "Community call message (posted to the announcements channel)…" : "Optional extra note for the booking invite…"}
+                  className="w-full text-xs border border-[#dadce0] rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-orange-500" />
+                <p className="text-[11px] text-gray-500">{newCallKind === "Community" ? "Posts an announcement to your Discord so the whole community sees it." : "DMs that member in Discord to book a coach + time. Doesn't reserve a slot here."}</p>
+                {newCallStatus && <div className="text-[11px] text-green-700">{newCallStatus}</div>}
+              </div>
+            )}
+            <div className="flex flex-wrap items-center gap-2">
               {["all", "coaching", "interview", "discovery", "voice", "team", "other"].map(t => (
                 <button key={t} onClick={() => setCallType(t)} className={`text-xs px-2.5 py-1 rounded-full border ${callType === t ? "bg-[#202124] text-white border-[#202124]" : "bg-white text-gray-600 border-[#dadce0] hover:bg-gray-50"}`}>{t}</button>
               ))}
             </div>
-            {calls.length === 0 && <p className="text-gray-500 text-sm">No calls yet. If your calls aren&apos;t showing, add <span className="font-mono">FIREFLIES_API_KEY</span> in Vercel so the CRM can read them live.</p>}
+            {calls.length === 0 && <p className="text-gray-500 text-sm">No calls synced yet. They appear here automatically once the bot syncs Fireflies (needs <span className="font-mono">FIREFLIES_API_KEY</span> on Railway). New calls land within the hour.</p>}
             {calls.filter(c => callType === "all" || (c.type || "other") === callType).map(c => (
               <details key={c.id} className="bg-white border border-[#dadce0] rounded-xl overflow-hidden">
                 <summary className="px-4 py-3 cursor-pointer flex items-center justify-between gap-3 hover:bg-[#f8f9fa]">
