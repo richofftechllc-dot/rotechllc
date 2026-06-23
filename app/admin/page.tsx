@@ -17,6 +17,12 @@ type Followup = {
 type Schedule = { id?: string; discordId: string; name: string; days: Record<string, string>; note?: string; updatedAt?: string };
 type Call = { id: string; title: string; date: string | null; type?: string; summary?: string; actionItems?: string; keywords?: string; participants: string[]; grade: string; transcriptUrl: string; gradedAt: number | null };
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const TIME_OPTS = ["", "7am", "8am", "9am", "10am", "11am", "12pm", "1pm", "2pm", "3pm", "4pm", "5pm", "6pm", "7pm", "8pm", "9pm", "10pm"];
+// Parse "9am–5pm ET" → {start, end}; compose back on change. Keeps the stored string format.
+function parseDay(s: string): { start: string; end: string } {
+  const [a, b] = (s || "").replace(/\s*ET\s*$/i, "").split(/[–-]/).map(x => x.trim());
+  return { start: a || "", end: b || "" };
+}
 
 // Light, professional palette (Google Admin / Zoho feel): white surfaces, near-black
 // text, gray borders, status pills in muted tones, one orange accent for the brand.
@@ -758,14 +764,28 @@ export default function AdminCRM() {
 
             <div className="bg-white border border-[#dadce0] rounded-xl p-4">
               <div className="font-semibold mb-3">Your availability {me ? `— ${me.name}` : ""}</div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
-                {WEEKDAYS.map(d => (
-                  <div key={d}>
-                    <label className="block text-xs text-gray-500 mb-1">{d}</label>
-                    <input value={schedDraft.days[d] || ""} onChange={e => setSchedDraft(s => ({ ...s, days: { ...s.days, [d]: e.target.value } }))}
-                      placeholder="e.g. 6–9pm ET" className="w-full bg-white border border-[#dadce0] rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:border-orange-500" />
-                  </div>
-                ))}
+              <div className="space-y-2 mb-3">
+                {WEEKDAYS.map(d => {
+                  const cur = parseDay(schedDraft.days[d] || "");
+                  const setPart = (part: "start" | "end", val: string) => setSchedDraft(s => {
+                    const next = { ...parseDay(s.days[d] || ""), [part]: val };
+                    const composed = next.start && next.end ? `${next.start}–${next.end} ET` : "";
+                    return { ...s, days: { ...s.days, [d]: composed } };
+                  });
+                  return (
+                    <div key={d} className="flex items-center gap-2 text-sm">
+                      <span className="w-10 text-gray-500">{d}</span>
+                      <select value={cur.start} onChange={e => setPart("start", e.target.value)} className="border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white text-sm focus:outline-none focus:border-orange-500">
+                        {TIME_OPTS.map(t => <option key={t} value={t}>{t || "Off"}</option>)}
+                      </select>
+                      <span className="text-gray-400">to</span>
+                      <select value={cur.end} onChange={e => setPart("end", e.target.value)} disabled={!cur.start} className="border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white text-sm disabled:opacity-40 focus:outline-none focus:border-orange-500">
+                        {TIME_OPTS.map(t => <option key={t} value={t}>{t || "—"}</option>)}
+                      </select>
+                      {cur.start && cur.end && <span className="text-xs text-green-600">✓</span>}
+                    </div>
+                  );
+                })}
               </div>
               <input value={schedDraft.note} onChange={e => setSchedDraft(s => ({ ...s, note: e.target.value }))}
                 placeholder="Note (e.g. ET timezone, prefer evenings)" className="w-full bg-white border border-[#dadce0] rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:border-orange-500" />
