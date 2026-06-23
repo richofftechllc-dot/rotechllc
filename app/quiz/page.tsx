@@ -63,7 +63,7 @@ export default function Quiz() {
   const recogRef = useRef<{ stop: () => void } | null>(null);
   const [listening, setListening] = useState(false);
   const VOICE = { bo: "CwhRBWXzGAHq8TQ4Fs17", flo: "XrExE9yKIg1WjnnlVkGX" }; // ElevenLabs (Roger laid-back / Matilda)
-  function stopSpeak() { speakGenRef.current++; if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; } setSpeakingIdx(null); }
+  function stopSpeak() { speakGenRef.current++; if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; } if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel(); setSpeakingIdx(null); }
   async function speak(text: string, idx: number, p: "bo" | "flo" = persona) {
     const now = Date.now();
     if (lastSpeakRef.current.text === text && now - lastSpeakRef.current.t < 2500) return;
@@ -73,7 +73,16 @@ export default function Quiz() {
     try {
       const r = await fetch("/api/bo/voice", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, voiceId: VOICE[p] }) });
       if (gen !== speakGenRef.current) return;
-      if (!r.ok) { setVoiceErr((await r.text().catch(() => "")) || `voice unavailable (${r.status})`); setSpeakingIdx(null); return; }
+      if (!r.ok) {
+        // ElevenLabs unavailable (e.g. free plan can't use API voices) → free browser TTS so it still talks.
+        if (typeof window !== "undefined" && "speechSynthesis" in window) {
+          window.speechSynthesis.cancel();
+          const u = new SpeechSynthesisUtterance(text.replace(/[*_#`>]/g, "").slice(0, 600));
+          u.rate = 1.05; setSpeakingIdx(idx); u.onend = () => setSpeakingIdx(null);
+          window.speechSynthesis.speak(u); setVoiceErr(""); return;
+        }
+        setVoiceErr((await r.text().catch(() => "")) || `voice unavailable (${r.status})`); setSpeakingIdx(null); return;
+      }
       setVoiceErr("");
       const url = URL.createObjectURL(await r.blob());
       if (gen !== speakGenRef.current) { URL.revokeObjectURL(url); return; }
