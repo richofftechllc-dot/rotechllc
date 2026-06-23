@@ -21,7 +21,6 @@ const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 // Light, professional palette (Google Admin / Zoho feel): white surfaces, near-black
 // text, gray borders, status pills in muted tones, one orange accent for the brand.
 // Referral payout per paid referral (configurable). Drives the "owed" total.
-const REFERRAL_PAYOUT = 20;
 const PILL: Record<string, string> = {
   late: "bg-red-50 text-red-700 border-red-200",
   active: "bg-green-50 text-green-700 border-green-200",
@@ -40,12 +39,18 @@ const CALL_PILL: Record<string, string> = {
 
 export default function AdminCRM() {
   const [authed, setAuthed] = useState<"loading" | "yes" | "no">("loading");
-  const [tab, setTab] = useState<"followups" | "members" | "calls" | "schedule" | "referrals" | "team" | "bo">("followups");
+  const [tab, setTab] = useState<"followups" | "members" | "calls" | "schedule" | "referrals" | "team" | "bo" | "sops">("followups");
   const [chat, setChat] = useState<{ id: string; authorId: string; authorName: string; text: string; createdAt: string }[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [boMsgs, setBoMsgs] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
   const [boInput, setBoInput] = useState("");
   const [boBusy, setBoBusy] = useState(false);
+  const [bookings, setBookings] = useState<{ id: string; coach: string; slot: string; label: string; topic: string; userName: string }[]>([]);
+  const [sops, setSops] = useState<{ id: string; title: string; body: string; updatedBy?: string }[]>([]);
+  const [sopDraft, setSopDraft] = useState<Record<string, string>>({});
+  const [newSop, setNewSop] = useState({ title: "", body: "" });
+  const [referralPayout, setReferralPayoutState] = useState(20);
+  const [payoutDraft, setPayoutDraft] = useState("");
   const [calls, setCalls] = useState<Call[]>([]);
   const [callType, setCallType] = useState("all");
   const [callAssignee, setCallAssignee] = useState<Record<string, string>>({});
@@ -125,6 +130,46 @@ export default function AdminCRM() {
     const d = await r.json();
     if (d.ok) { setCatalog(d.items); if (d.items[0]) setInvoiceService(prev => prev || d.items[0].id); }
   }, []);
+  const loadBookings = useCallback(async () => {
+    const r = await fetch("/api/admin/bookings");
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d.ok) setBookings(d.bookings);
+  }, []);
+  const loadSops = useCallback(async () => {
+    const r = await fetch("/api/admin/sops");
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d.ok) setSops(d.sops);
+  }, []);
+  const loadConfig = useCallback(async () => {
+    const r = await fetch("/api/admin/config");
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d.ok) setReferralPayoutState(d.referralPayout);
+  }, []);
+  async function saveSop(id: string, title: string) {
+    const bodyText = sopDraft[id] ?? sops.find(s => s.id === id)?.body ?? "";
+    await fetch("/api/admin/sops", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, title, body: bodyText }) });
+    loadSops();
+  }
+  async function addSop() {
+    if (!newSop.title.trim()) return;
+    await fetch("/api/admin/sops", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(newSop) });
+    setNewSop({ title: "", body: "" }); loadSops();
+  }
+  async function deleteSop(id: string) {
+    if (!confirm("Delete this SOP?")) return;
+    await fetch("/api/admin/sops", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ delete: id }) });
+    loadSops();
+  }
+  async function savePayout() {
+    const v = Number(payoutDraft);
+    if (isNaN(v)) return;
+    const r = await fetch("/api/admin/config", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ referralPayout: v }) });
+    const d = await r.json();
+    if (d.ok) { setReferralPayoutState(d.referralPayout); setPayoutDraft(""); }
+  }
   async function sendChat() {
     const text = chatInput.trim();
     if (!text) return;
@@ -249,7 +294,7 @@ export default function AdminCRM() {
     if (d.ok) loadFollowups();
   }
 
-  useEffect(() => { loadMembers(); loadFollowups(); loadSchedule(); loadCalls(); loadChat(); loadCatalog(); }, [loadMembers, loadFollowups, loadSchedule, loadCalls, loadChat, loadCatalog]);
+  useEffect(() => { loadMembers(); loadFollowups(); loadSchedule(); loadCalls(); loadChat(); loadCatalog(); loadBookings(); loadSops(); loadConfig(); }, [loadMembers, loadFollowups, loadSchedule, loadCalls, loadChat, loadCatalog, loadBookings, loadSops, loadConfig]);
   // Live-ish team chat: refresh every 8s while the Team tab is open.
   useEffect(() => {
     if (tab !== "team") return;
@@ -299,7 +344,7 @@ export default function AdminCRM() {
     ref, count: list.length,
     paid: list.filter(x => x.paymentStatus === "active" || x.paymentStatus === "comp").length,
   })).sort((a, b) => b.count - a.count);
-  const totalOwed = referrers.reduce((s, r) => s + r.paid * REFERRAL_PAYOUT, 0);
+  const totalOwed = referrers.reduce((s, r) => s + r.paid * referralPayout, 0);
 
   const TABS: { id: typeof tab; label: string }[] = [
     { id: "followups", label: "Follow-ups" },
@@ -308,6 +353,7 @@ export default function AdminCRM() {
     { id: "schedule", label: "Schedule" },
     { id: "team", label: "Team Chat" },
     { id: "bo", label: "Ask Bo" },
+    { id: "sops", label: "SOPs" },
     { id: "referrals", label: "Referrals" },
   ];
   const tierOptions = Array.from(new Set(members.map(m => m.tier).filter(Boolean))).sort();
@@ -660,6 +706,23 @@ export default function AdminCRM() {
         {/* ── Schedule ── */}
         {tab === "schedule" && (
           <div className="space-y-5">
+            {/* Upcoming 1-on-1s booked via Bo's DM flow */}
+            <div className="bg-white border border-[#dadce0] rounded-xl p-4">
+              <div className="font-semibold mb-2">📅 Upcoming bookings</div>
+              {bookings.length === 0 ? <p className="text-gray-500 text-sm">No upcoming 1-on-1s. They show here the moment someone books via Bo.</p> : (
+                <div className="space-y-1.5">
+                  {bookings.map(b => (
+                    <div key={b.id} className="flex flex-wrap items-center gap-2 text-sm border-b border-[#f1f3f4] pb-1.5">
+                      <span className="font-medium">{b.userName || "Member"}</span>
+                      <span className="text-gray-400">→</span>
+                      <span>{b.coach}</span>
+                      <span className="text-gray-500">· {b.label}</span>
+                      {b.topic && <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">{b.topic}</span>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <p className="text-gray-500 text-sm">Set your weekly availability so the team knows when you&apos;re free. You can only edit your own row.</p>
             <div className="bg-white border border-[#dadce0] rounded-xl overflow-x-auto">
               <table className="w-full text-sm">
@@ -769,11 +832,42 @@ export default function AdminCRM() {
           </div>
         )}
 
+        {/* ── SOPs ── */}
+        {tab === "sops" && (
+          <div className="space-y-4">
+            <p className="text-gray-500 text-sm">Team guides for every service. Edit any SOP and save — everyone sees the latest.</p>
+            {sops.map(s => (
+              <div key={s.id} className="bg-white border border-[#dadce0] rounded-xl p-4">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="font-semibold">{s.title}</div>
+                  <div className="flex items-center gap-2">
+                    {s.updatedBy && <span className="text-[11px] text-gray-400">updated by {s.updatedBy}</span>}
+                    <button onClick={() => saveSop(s.id, s.title)} className="text-xs px-3 py-1 rounded-lg bg-[#202124] text-white hover:bg-black">Save</button>
+                    <button onClick={() => deleteSop(s.id)} className="text-xs px-2 py-1 rounded-lg border border-red-200 text-red-600 hover:bg-red-50">Delete</button>
+                  </div>
+                </div>
+                <textarea value={sopDraft[s.id] ?? s.body} onChange={e => setSopDraft(d => ({ ...d, [s.id]: e.target.value }))} rows={4}
+                  className="w-full text-sm border border-[#dadce0] rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-orange-500" />
+              </div>
+            ))}
+            <div className="bg-[#f8f9fa] border border-dashed border-[#dadce0] rounded-xl p-4 space-y-2">
+              <div className="font-semibold text-sm">+ New SOP</div>
+              <input value={newSop.title} onChange={e => setNewSop(s => ({ ...s, title: e.target.value }))} placeholder="Title (e.g. AWS Track)" className="w-full text-sm border border-[#dadce0] rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-orange-500" />
+              <textarea value={newSop.body} onChange={e => setNewSop(s => ({ ...s, body: e.target.value }))} rows={3} placeholder="The guide…" className="w-full text-sm border border-[#dadce0] rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-orange-500" />
+              <button onClick={addSop} className="text-xs px-4 py-1.5 rounded-lg bg-orange-600 text-white hover:bg-orange-700">Add SOP</button>
+            </div>
+          </div>
+        )}
+
         {/* ── Referrals ── */}
         {tab === "referrals" && (
           <div>
             <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-              <p className="text-gray-500 text-sm">Who referred whom and what&apos;s owed. Payout = ${REFERRAL_PAYOUT} per paid referral.</p>
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-gray-500 text-sm mr-auto">Who referred whom and what&apos;s owed. Payout = <b>${referralPayout}</b> per paid referral.</p>
+                <input value={payoutDraft} onChange={e => setPayoutDraft(e.target.value)} placeholder={`${referralPayout}`} type="number" className="w-24 text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500" />
+                <button onClick={savePayout} className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Set payout</button>
+              </div>
               <span className="text-sm font-semibold">Total owed: ${totalOwed}</span>
             </div>
             {referrers.length === 0 ? (
@@ -792,7 +886,7 @@ export default function AdminCRM() {
                         <td className="py-2.5 px-4 font-medium">{r.ref}</td>
                         <td className="px-3">{r.count}</td>
                         <td className="px-3">{r.paid}</td>
-                        <td className="px-3 font-semibold">${r.paid * REFERRAL_PAYOUT}</td>
+                        <td className="px-3 font-semibold">${r.paid * referralPayout}</td>
                       </tr>
                     ))}
                   </tbody>
