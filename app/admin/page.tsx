@@ -456,9 +456,9 @@ export default function AdminCRM() {
                     <button onClick={() => act({ action: "delete", id: f.id })} className="text-xs px-2 py-1 rounded-lg border border-[#dadce0] text-gray-500 hover:bg-gray-50" title="Archives it — restore anytime, never deleted">Archive</button>
                   </div>
                 </div>
-                {(f.notes || []).length > 0 && (
+                {(Array.isArray(f.notes) ? f.notes : []).length > 0 && (
                   <div className="mt-3 space-y-1">
-                    {(f.notes || []).map((n, i) => (
+                    {(Array.isArray(f.notes) ? f.notes : []).map((n, i) => (
                       <div key={i} className="text-xs text-gray-700 bg-[#f8f9fa] border border-[#e8eaed] rounded px-2 py-1"><span className="text-gray-400">{n.by}:</span> {n.text}</div>
                     ))}
                   </div>
