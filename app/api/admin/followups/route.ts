@@ -58,7 +58,8 @@ export async function POST(req: Request) {
     } else if (action === "note") {
       const note = { by: admin.name, text: String(body.note || "").slice(0, 1000), at: nowISO };
       const doc = await ref.get();
-      const prev = ((doc.data() as { notes?: unknown[] })?.notes) || [];
+      const rawPrev = (doc.data() as { notes?: unknown })?.notes;
+      const prev = Array.isArray(rawPrev) ? rawPrev : [];
       await ref.update({ notes: [...prev, note] });
     } else if (action === "status") {
       const status = body.status === "done" ? "done" : "open";

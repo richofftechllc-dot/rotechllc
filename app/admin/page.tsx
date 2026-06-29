@@ -45,7 +45,7 @@ const CALL_PILL: Record<string, string> = {
 
 export default function AdminCRM() {
   const [authed, setAuthed] = useState<"loading" | "yes" | "no">("loading");
-  const [tab, setTab] = useState<"home" | "followups" | "members" | "calls" | "schedule" | "referrals" | "team" | "bo" | "sops">("home");
+  const [tab, setTab] = useState<"home" | "followups" | "members" | "calls" | "schedule" | "referrals" | "team" | "bo" | "sops" | "resources">("home");
   const [chat, setChat] = useState<{ id: string; authorId: string; authorName: string; text: string; createdAt: string }[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [boMsgs, setBoMsgs] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
@@ -91,6 +91,11 @@ export default function AdminCRM() {
   const [catalog, setCatalog] = useState<{ id: string; name: string; priceCents: number }[]>([]);
   const [scheduleType, setScheduleType] = useState<Record<string, string>>({});
   const [scheduleFor, setScheduleFor] = useState<string | null>(null);
+  const [roleDraft, setRoleDraft] = useState<Record<string, string>>({});
+  const [bookFor, setBookFor] = useState<string | null>(null);
+  const [bookCoach, setBookCoach] = useState<Record<string, string>>({});
+  const [bookSlot, setBookSlot] = useState<Record<string, string>>({});
+  const [bookTopic, setBookTopic] = useState<Record<string, string>>({});
 
   const loadMembers = useCallback(async () => {
     const r = await fetch("/api/admin/members");
@@ -211,6 +216,24 @@ export default function AdminCRM() {
     const r = await fetch("/api/admin/action", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type, payload }) });
     const d = await r.json();
     setActionMsg(s => ({ ...s, [email]: r.ok && d.ok ? okMsg : `Error: ${d.error || r.status}` }));
+  }
+  function assignRole(m: Member) {
+    const roleName = roleDraft[m.email];
+    if (!roleName) return;
+    doAction(m.email, "assignRole", { email: m.email, discordId: m.discordId, roleName }, `✓ Assigning "${roleName}" — bot adds the Discord role.`);
+  }
+  async function bookMember(m: Member) {
+    const coach = bookCoach[m.email];
+    const slotLocal = bookSlot[m.email];
+    const topic = bookTopic[m.email] || "General / not sure yet";
+    if (!coach || !slotLocal) { setActionMsg(s => ({ ...s, [m.email]: "Pick a coach + time." })); return; }
+    const slot = `${slotLocal}:00-04:00`; // treat picked time as ET
+    const label = new Date(slot).toLocaleString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) + " ET";
+    setActionMsg(s => ({ ...s, [m.email]: "…" }));
+    const r = await fetch("/api/book", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ coach, slot, label, topic, name: m.name || m.email, email: m.email }) });
+    const d = await r.json();
+    setActionMsg(s => ({ ...s, [m.email]: r.ok && d.ok ? "✓ Booked — bot creates the Meet + emails them." : `Error: ${d.error || r.status}` }));
+    if (r.ok && d.ok) setBookFor(null);
   }
   function sendUpdate(m: Member) {
     const msg = (dmDraft[m.email] || "").trim();
@@ -386,6 +409,7 @@ export default function AdminCRM() {
     { id: "team", label: "Team Chat" },
     { id: "bo", label: "Ask Bo" },
     { id: "sops", label: "SOPs" },
+    { id: "resources", label: "Resources" },
     { id: "referrals", label: "Referrals" },
   ];
   const tierOptions = Array.from(new Set(members.map(m => m.tier).filter(Boolean))).sort();
@@ -543,9 +567,9 @@ export default function AdminCRM() {
                     <button onClick={() => act({ action: "delete", id: f.id })} className="text-xs px-2 py-1 rounded-lg border border-[#dadce0] text-gray-500 hover:bg-gray-50" title="Archives it — restore anytime, never deleted">Archive</button>
                   </div>
                 </div>
-                {(f.notes || []).length > 0 && (
+                {(Array.isArray(f.notes) ? f.notes : []).length > 0 && (
                   <div className="mt-3 space-y-1">
-                    {(f.notes || []).map((n, i) => (
+                    {(Array.isArray(f.notes) ? f.notes : []).map((n, i) => (
                       <div key={i} className="text-xs text-gray-700 bg-[#f8f9fa] border border-[#e8eaed] rounded px-2 py-1"><span className="text-gray-400">{n.by}:</span> {n.text}</div>
                     ))}
                   </div>
@@ -697,6 +721,14 @@ export default function AdminCRM() {
                                 </select>
                                 <button onClick={() => addTrack(m)} className="text-xs px-2.5 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Grant</button>
                               </span>
+                              <span className="inline-flex items-center gap-1">
+                                <select value={roleDraft[m.email] || ""} onChange={e => setRoleDraft(s => ({ ...s, [m.email]: e.target.value }))} className="text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500">
+                                  <option value="">Assign role…</option>
+                                  {["ROT Client", "Founding Member", "Security+", "ServiceNow CSA", "AWS AI Practitioner"].map(r => <option key={r} value={r}>{r}</option>)}
+                                </select>
+                                <button onClick={() => assignRole(m)} className="text-xs px-2.5 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Assign</button>
+                              </span>
+                              <button onClick={() => setBookFor(bookFor === m.email ? null : m.email)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📆 Book</button>
                               {me?.isOwner && <button onClick={() => setInvoiceFor(invoiceFor === m.email ? null : m.email)} className="text-xs px-2.5 py-1.5 rounded-lg border border-orange-300 bg-orange-50 text-orange-700 hover:bg-orange-100">🧾 Send invoice</button>}
                             </div>
                             <div className="flex flex-wrap items-center gap-2 mt-2">
@@ -734,6 +766,24 @@ export default function AdminCRM() {
                                   <button onClick={() => setScheduleFor(null)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] text-gray-600 hover:bg-white">Cancel</button>
                                 </div>
                                 <p className="text-[11px] text-gray-500 mt-1.5">This DMs {m.name || "them"} in Discord to book a {(scheduleType[m.email] || "Intro").toLowerCase()} call — they pick a coach + an open time (tomorrow 11–5 ET) in the bot. It doesn&apos;t reserve a slot here or charge anything.</p>
+                              </div>
+                            )}
+                            {bookFor === m.email && (
+                              <div className="mt-2 bg-[#f8f9fa] border border-[#dadce0] rounded-lg p-3">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <span className="text-xs text-gray-700">Book a 1-on-1:</span>
+                                  <select value={bookCoach[m.email] || ""} onChange={e => setBookCoach(s => ({ ...s, [m.email]: e.target.value }))} className="text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white">
+                                    <option value="">Coach…</option>
+                                    {[["randy", "Randy"], ["tyler", "Tyler"], ["daquan", "Daquan"]].map(([k, n]) => <option key={k} value={k}>{n}</option>)}
+                                  </select>
+                                  <input type="datetime-local" value={bookSlot[m.email] || ""} onChange={e => setBookSlot(s => ({ ...s, [m.email]: e.target.value }))} className="text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white" />
+                                  <select value={bookTopic[m.email] || ""} onChange={e => setBookTopic(s => ({ ...s, [m.email]: e.target.value }))} className="text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white">
+                                    {["General / not sure yet", "Certifications / studying", "Career / resume", "Clearance"].map(t => <option key={t} value={t}>{t}</option>)}
+                                  </select>
+                                  <button onClick={() => bookMember(m)} className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Book it</button>
+                                  <button onClick={() => setBookFor(null)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] text-gray-600 hover:bg-white">Cancel</button>
+                                </div>
+                                <p className="text-[11px] text-gray-500 mt-1.5">Creates the booking (ET) → the bot makes the Google Meet, adds Fireflies to record, and emails {m.name || "them"} the link.</p>
                               </div>
                             )}
                             {actionMsg[m.email] && <div className="text-[11px] mt-1.5 text-gray-700">{actionMsg[m.email]}</div>}
@@ -1052,6 +1102,28 @@ export default function AdminCRM() {
                 </table>
               </div>
             )}
+          </div>
+        )}
+
+        {tab === "resources" && (
+          <div>
+            <p className="text-gray-500 text-sm mb-4">Send-to-client resources. Open to preview, or copy the link to send a client (Discord, email, text). These are the things we hand clients by hand until the bot delivers them automatically — more get added here as we build them.</p>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {[
+                { title: "PB&J Challenge", tag: "Business Analyst · Requirements Lab", desc: "Interactive lab that teaches how a BA writes requirements. The client builds the steps, then runs it live with a coach (who plays the “machine”). No answer included — the lesson is them finding their own gaps.", path: "/labs/pbj-challenge.html" },
+              ].map(r => (
+                <div key={r.path} className="bg-white border border-[#dadce0] rounded-xl p-4 flex flex-col">
+                  <div className="text-[11px] uppercase tracking-wide text-orange-600 font-medium">{r.tag}</div>
+                  <div className="font-semibold text-[15px] mt-0.5">{r.title}</div>
+                  <p className="text-sm text-gray-600 mt-1 flex-1">{r.desc}</p>
+                  <div className="flex gap-2 mt-3">
+                    <a href={r.path} target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">Open / preview</a>
+                    <button onClick={(e) => { const url = `${window.location.origin}${r.path}`; navigator.clipboard?.writeText(url); const b = e.currentTarget; const t = b.textContent; b.textContent = "Copied link!"; setTimeout(() => { b.textContent = t; }, 1500); }}
+                      className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white font-medium hover:bg-black">Copy link to send</button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
