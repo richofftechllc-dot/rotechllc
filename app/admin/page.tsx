@@ -45,7 +45,7 @@ const CALL_PILL: Record<string, string> = {
 
 export default function AdminCRM() {
   const [authed, setAuthed] = useState<"loading" | "yes" | "no">("loading");
-  const [tab, setTab] = useState<"followups" | "members" | "calls" | "schedule" | "referrals" | "team" | "bo" | "sops">("followups");
+  const [tab, setTab] = useState<"home" | "followups" | "members" | "calls" | "schedule" | "referrals" | "team" | "bo" | "sops">("home");
   const [chat, setChat] = useState<{ id: string; authorId: string; authorName: string; text: string; createdAt: string }[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [boMsgs, setBoMsgs] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
@@ -367,7 +367,18 @@ export default function AdminCRM() {
   })).sort((a, b) => b.count - a.count);
   const totalOwed = referrers.reduce((s, r) => s + r.paid * referralPayout, 0);
 
+  // ── Coach Home (command center) — derived from already-loaded state, no new fetch ──
+  const homeOpenFollowups = followups.filter(f => f.status === "open" && !f.archived);
+  const atRiskMembers = members
+    .filter(m => m.daysLeft != null && m.daysLeft >= 0 && m.daysLeft <= 7)
+    .sort((a, b) => (a.daysLeft ?? 999) - (b.daysLeft ?? 999));
+  const todayStr = new Date().toDateString();
+  const todayBookings = bookings
+    .filter(b => b.slot && new Date(b.slot).toDateString() === todayStr)
+    .sort((a, b) => Date.parse(a.slot) - Date.parse(b.slot));
+
   const TABS: { id: typeof tab; label: string }[] = [
+    { id: "home", label: "Home" },
     { id: "followups", label: "Follow-ups" },
     { id: "members", label: "Members" },
     { id: "calls", label: "Calls" },
@@ -430,6 +441,82 @@ export default function AdminCRM() {
             </button>
           ))}
         </div>
+
+        {/* ── Home / Command Center ── */}
+        {tab === "home" && (
+          <div className="space-y-6">
+            <div className="grid sm:grid-cols-3 gap-3">
+              <button onClick={() => setTab("followups")} className="text-left bg-white border border-[#dadce0] rounded-xl p-5 hover:border-[#202124] transition">
+                <div className="text-3xl font-semibold text-[#202124]">{homeOpenFollowups.length}</div>
+                <div className="text-sm text-gray-600 mt-1">Open follow-ups</div>
+                <div className="text-xs text-orange-600 mt-2 font-medium">Work the list →</div>
+              </button>
+              <button onClick={() => setTab("members")} className="text-left bg-white border border-[#dadce0] rounded-xl p-5 hover:border-[#202124] transition">
+                <div className="text-3xl font-semibold text-amber-600">{atRiskMembers.length}</div>
+                <div className="text-sm text-gray-600 mt-1">Expiring ≤ 7 days</div>
+                <div className="text-xs text-orange-600 mt-2 font-medium">Save the revenue →</div>
+              </button>
+              <button onClick={() => setTab("referrals")} className="text-left bg-white border border-[#dadce0] rounded-xl p-5 hover:border-[#202124] transition">
+                <div className="text-3xl font-semibold text-green-600">${totalOwed}</div>
+                <div className="text-sm text-gray-600 mt-1">Referral payouts due</div>
+                <div className="text-xs text-orange-600 mt-2 font-medium">Review payouts →</div>
+              </button>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-5">
+              <div className="bg-white border border-[#dadce0] rounded-xl p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold text-[#202124]">Today&rsquo;s 1-on-1s</h3>
+                  <button onClick={() => setTab("schedule")} className="text-xs text-gray-500 hover:text-[#202124]">Schedule →</button>
+                </div>
+                {todayBookings.length > 0 ? (
+                  <div className="space-y-2">
+                    {todayBookings.map(b => (
+                      <div key={b.id} className="flex items-center justify-between text-sm border border-[#e8eaed] rounded-lg px-3 py-2">
+                        <span className="font-medium text-[#202124]">{new Date(b.slot).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })} · {b.userName || "Member"}</span>
+                        <span className="text-gray-500">{b.topic || b.label || ""}{b.coach ? ` · ${b.coach}` : ""}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : <p className="text-sm text-gray-400">Nothing booked today.</p>}
+              </div>
+
+              <div className="bg-white border border-[#dadce0] rounded-xl p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold text-[#202124]">Revenue at risk</h3>
+                  <button onClick={() => setTab("members")} className="text-xs text-gray-500 hover:text-[#202124]">Members →</button>
+                </div>
+                {atRiskMembers.length > 0 ? (
+                  <div className="space-y-2">
+                    {atRiskMembers.slice(0, 6).map(m => (
+                      <div key={m.email} className="flex items-center justify-between text-sm border border-[#e8eaed] rounded-lg px-3 py-2">
+                        <span className="font-medium text-[#202124]">{m.name || m.email}</span>
+                        <span className="text-amber-600 font-medium">{m.daysLeft}d left</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : <p className="text-sm text-gray-400">No one expiring this week. 🎉</p>}
+              </div>
+            </div>
+
+            <div className="bg-white border border-[#dadce0] rounded-xl p-5">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-[#202124]">Follow-ups to work</h3>
+                <button onClick={() => setTab("followups")} className="text-xs text-gray-500 hover:text-[#202124]">All follow-ups →</button>
+              </div>
+              {homeOpenFollowups.length > 0 ? (
+                <div className="space-y-2">
+                  {homeOpenFollowups.slice(0, 5).map(f => (
+                    <div key={f.id} className="flex items-center justify-between text-sm border border-[#e8eaed] rounded-lg px-3 py-2">
+                      <span className="text-[#202124]">{f.title}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full border ${f.assignedTo ? "bg-green-50 text-green-700 border-green-200" : "bg-gray-100 text-gray-500 border-gray-200"}`}>{f.assignedTo || "unassigned"}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : <p className="text-sm text-gray-400">Inbox zero — nothing open.</p>}
+            </div>
+          </div>
+        )}
 
         {/* ── Follow-ups ── */}
         {tab === "followups" && (

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 type Me = { ok: true; code: string; name: string } | { ok: false };
 
 const LINKS: Array<{ href: string; label: string; external?: boolean; authOnly?: boolean }> = [
+  { href: "/home", label: "Home", authOnly: true },
   { href: "/roster", label: "Community" },
   { href: "/#about", label: "About" },
   { href: "/quiz", label: "Quiz", authOnly: true },
