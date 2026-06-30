@@ -62,6 +62,12 @@ export default function BookPage() {
 
   // Prefill identity from the session (logged-in members), and pull coach availability.
   useEffect(() => {
+    // Preselect coach/topic from a shared link (e.g. /book?coach=randy&topic=...).
+    const sp = new URLSearchParams(window.location.search);
+    const qCoach = sp.get("coach");
+    if (qCoach && COACHES.some(c => c.key === qCoach)) setCoach(qCoach);
+    const qTopic = sp.get("topic");
+    if (qTopic && TOPICS.includes(qTopic)) setTopic(qTopic);
     fetch("/api/book/me").then(r => r.json()).then(d => {
       if (d?.ok && (d.name || d.email)) { if (d.name) setName(d.name); if (d.email) setEmail(d.email); setLoggedIn(true); }
     }).catch(() => {});
