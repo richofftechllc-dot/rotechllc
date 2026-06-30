@@ -781,9 +781,19 @@ export default function AdminCRM() {
                                     {["General / not sure yet", "Certifications / studying", "Career / resume", "Clearance"].map(t => <option key={t} value={t}>{t}</option>)}
                                   </select>
                                   <button onClick={() => bookMember(m)} className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Book it</button>
+                                  <button onClick={() => {
+                                    const params = new URLSearchParams();
+                                    if (bookCoach[m.email]) params.set("coach", bookCoach[m.email]);
+                                    if (bookTopic[m.email]) params.set("topic", bookTopic[m.email]);
+                                    const url = `${window.location.origin}/book${params.toString() ? `?${params}` : ""}`;
+                                    navigator.clipboard?.writeText(url).then(
+                                      () => setActionMsg(s => ({ ...s, [m.email]: `📋 Booking link copied — paste it to ${m.name || "them"} (they pick their own time).` })),
+                                      () => setActionMsg(s => ({ ...s, [m.email]: url })),
+                                    );
+                                  }} className="text-xs px-3 py-1.5 rounded-lg border border-orange-500 text-orange-600 hover:bg-orange-50">📋 Copy send-link</button>
                                   <button onClick={() => setBookFor(null)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] text-gray-600 hover:bg-white">Cancel</button>
                                 </div>
-                                <p className="text-[11px] text-gray-500 mt-1.5">Creates the booking (ET) → the bot makes the Google Meet, adds Fireflies to record, and emails {m.name || "them"} the link.</p>
+                                <p className="text-[11px] text-gray-500 mt-1.5"><b>Book it</b> = you set the time now. <b>Copy send-link</b> = send {m.name || "them"} a link (preset to the coach) so they pick their own time. Either way the bot makes the Meet, adds Fireflies, and emails the link.</p>
                               </div>
                             )}
                             {actionMsg[m.email] && <div className="text-[11px] mt-1.5 text-gray-700">{actionMsg[m.email]}</div>}
