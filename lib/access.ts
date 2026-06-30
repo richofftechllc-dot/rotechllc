@@ -6,15 +6,17 @@
 // This is the EXACT logic the quiz already uses — do not fork it.
 //   sp = Security+ · csa = ServiceNow CSA · ai = AWS AI
 export function allowedPrefixes(trackStr: string | null): Set<string> {
-  const all = new Set(["sp", "csa", "ai"]);
-  if (!trackStr) return all;
+  // AWS AI Practitioner ("ai") is FREE for every member — always granted.
+  // Security+ ("sp") and ServiceNow CSA ("csa") are PAID — they unlock only when the
+  // member's track explicitly names them. An empty/unknown track no longer grants
+  // everything (the old hole); it just gets the free AWS AI baseline.
+  const out = new Set<string>(["ai"]);
+  if (!trackStr) return out;
   const t = trackStr.toLowerCase();
-  const out = new Set<string>();
+  if (t.includes("full") || t.includes("admin") || t.includes("all access")) return new Set(["sp", "csa", "ai"]);
   if (t.includes("security+") || t.includes("sec+") || t.includes("comptia security")) out.add("sp");
   if (t.includes("servicenow") || t.includes("csa")) out.add("csa");
-  if (t.includes("aws ai") || t.includes("ai practitioner")) out.add("ai");
-  if (t.includes("full") || t.includes("admin") || t.includes("all access")) return all;
-  return out.size > 0 ? out : all;
+  return out;
 }
 
 // Normalize a lesson's requiredAccess into a prefix (sp | csa | ai), so docs can be
@@ -31,6 +33,25 @@ export function normalizeRequired(requiredAccess: string): string {
 // a null/empty track is DENIED (a track-less / Discord-only session must not unlock
 // paid video). Returns true only if the user's track grants the lesson's required prefix.
 export function accessAllows(track: string | null, requiredAccess: string): boolean {
-  if (!track || !track.trim()) return false; // closes the "no track = all access" hole for video
+  // AWS AI Practitioner video is free for everyone; CSA/Security+ need the paid track.
+  // allowedPrefixes() always includes "ai" and never over-grants, so trust it directly
+  // (a null/empty track resolves to AWS-AI-only, not "all").
   return allowedPrefixes(track).has(normalizeRequired(requiredAccess));
+}
+
+// Human labels per prefix, for tutor/member-facing copy.
+const TRACK_LABEL: Record<string, string> = { ai: "AWS AI Practitioner", csa: "ServiceNow CSA", sp: "Security+" };
+
+// One-paragraph access note injected into the AI tutors' system prompt so they only
+// teach what the member has unlocked: AWS AI Practitioner + general career help is free;
+// CSA / Security+ deep content is gated behind the paid track.
+export function buildAccessNote(track: string | null): string {
+  const has = allowedPrefixes(track);
+  const have = [...has].map((p) => TRACK_LABEL[p]).filter(Boolean);
+  const locked = (["csa", "sp"] as const).filter((p) => !has.has(p)).map((p) => TRACK_LABEL[p]);
+  let note = `MEMBER ACCESS — this member can learn: ${have.join(", ")} (AWS AI Practitioner is free for every member).`;
+  if (locked.length) {
+    note += ` They have NOT unlocked: ${locked.join(", ")}. For those locked tracks you may answer a general question or explain a concept at a high level, but do NOT deliver the full paid curriculum, step-by-step labs, module walkthroughs, or exam-specific answers — instead encourage them to unlock that track at rotechllc.com. Always help freely with AWS AI Practitioner, resume, and general tech-career questions.`;
+  }
+  return note;
 }

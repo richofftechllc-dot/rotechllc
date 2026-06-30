@@ -1,5 +1,8 @@
 import { getTutor, buildTutorSystem } from "@/lib/tutors";
 import { getAuthedAdmin } from "@/lib/admin";
+import { getAuthedCode } from "@/lib/session";
+import { coll } from "@/lib/firebase";
+import { buildAccessNote } from "@/lib/access";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -24,6 +27,18 @@ export async function POST(req: Request) {
   const messages = (body?.messages || []).filter((m) => m?.content?.trim()).slice(-12);
   if (!messages.length) return new Response("no messages", { status: 400 });
 
+  // Track-gate teaching: AWS AI + general help is free; CSA/Security+ deep content is
+  // only for members who unlocked that track. Look up the member's track from their session.
+  let track: string | null = null;
+  try {
+    const code = await getAuthedCode(req);
+    if (code) {
+      const snap = await coll("customers").where("quizCode", "==", code).limit(1).get();
+      if (!snap.empty) track = (snap.docs[0].data().track as string) || null;
+    }
+  } catch { /* anon / no session → AWS-AI-free baseline */ }
+  const accessNote = buildAccessNote(track);
+
   if (!process.env.ANTHROPIC_API_KEY) {
     return new Response(
       `(${tutor.name} is in local test mode — add ANTHROPIC_API_KEY to .env.local and I'll respond for real.)`,
@@ -37,7 +52,7 @@ export async function POST(req: Request) {
     body: JSON.stringify({
       model: "claude-sonnet-4-6",
       max_tokens: 1024,
-      system: buildTutorSystem(tutor),
+      system: buildTutorSystem(tutor) + "\n\n" + accessNote,
       messages: messages.map((m) => ({ role: m.role, content: m.content })),
       stream: true,
     }),
