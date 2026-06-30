@@ -6,6 +6,7 @@ import Link from "next/link";
 type HomeData = {
   ok: boolean;
   authType: "code" | "discord";
+  isCoach?: boolean;
   name: string;
   code: string | null;
   track: string | null;
@@ -76,6 +77,7 @@ export default function MemberHome() {
             <h1 className="text-3xl sm:text-4xl font-extrabold">Yo, {d.name.split(" ")[0]} 👋</h1>
           </div>
           <div className="flex items-center gap-2">
+            {d.isCoach && <Link href="/admin" className="text-xs px-3 py-1.5 rounded-full bg-white text-black font-semibold hover:bg-white/90 transition">🛠 Coach CRM →</Link>}
             {d.track && <span className="text-xs px-3 py-1.5 rounded-full border border-white/15 text-white/70">{d.track}</span>}
             <span className={`text-xs px-3 py-1.5 rounded-full border ${accessColor}`}>{accessLabel}</span>
           </div>
