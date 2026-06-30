@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { coll } from "@/lib/firebase";
+import { getAuthedAdmin } from "@/lib/admin";
 import crypto from "crypto";
 
 export const runtime = "nodejs";
@@ -122,9 +123,14 @@ export async function GET(req: NextRequest) {
         .map(({ coach, slot, topic, label }) => ({ coach, slot, topic, label }));
     } catch { /* bookings best-effort */ }
 
+    // Is this logged-in person also a coach/admin? If so, Home offers a jump to the CRM.
+    let isCoach = false;
+    try { isCoach = !!(await getAuthedAdmin(req)); } catch { /* non-fatal */ }
+
     return NextResponse.json({
       ok: true,
       authType: session.type,
+      isCoach,
       name,
       code: code || null,
       track,

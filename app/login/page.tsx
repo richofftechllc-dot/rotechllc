@@ -35,7 +35,7 @@ export default function Login() {
       const data = await r.json();
       if (!r.ok || !data.ok) { setErr(data.error || "Invalid code"); setLoading(false); return; }
       const from = new URLSearchParams(window.location.search).get("from");
-      window.location.href = from || "/quiz";
+      window.location.href = from || "/home";
     } catch {
       setErr("Network error");
       setLoading(false);
