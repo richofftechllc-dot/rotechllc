@@ -7,6 +7,14 @@ const DISCORD_LINK = "https://discord.gg/dtcYf8PTNa";
 // Shown when there's no community call on the calendar (e.g. Bo's away). Edit as needed.
 const AWAY_NOTE = "Bo's in Cancun this week 🌴 — no community call this Sunday. Back for the July Cohorts.";
 
+// A featured one-off community call, shown when the live calendar feed isn't available
+// (e.g. calendar creds aren't set in this environment). Set to null once it has passed.
+const FEATURED_EVENT: { topic: string; startISO: string; meetUrl?: string; description: string } | null = {
+  topic: "Claris (Apple AI) — Early-Access Community Call",
+  startISO: "2026-07-02T18:00:00-04:00",
+  description: "An early-access look at Claris (Apple AI), live in the ROT Discord. Open to all members — bring your questions.",
+};
+
 type NextSunday =
   | { status: "scheduled"; topic: string; startISO: string | null; meetUrl?: string; description?: string }
   | { status: "none" };
@@ -32,7 +40,8 @@ function fmt(iso: string | null): { date: string; time: string } {
 
 export default async function Calls() {
   const next = await getNextSunday();
-  const ev = next.status === "scheduled" ? next : null;
+  // Prefer the live calendar; fall back to a featured one-off event if set.
+  const ev = next.status === "scheduled" ? next : FEATURED_EVENT;
   const when = ev ? fmt(ev.startISO) : null;
 
   return (
@@ -44,7 +53,7 @@ export default async function Calls() {
 
       {/* THIS SUNDAY — live from the calendar */}
       <div className="border border-orange-500/30 rounded-2xl p-6 md:p-10 max-w-4xl mx-auto bg-gradient-to-br from-orange-500/5 to-red-500/5">
-        <div className="text-orange-500 text-sm font-bold tracking-widest text-center mb-3">THIS SUNDAY</div>
+        <div className="text-orange-500 text-sm font-bold tracking-widest text-center mb-3">NEXT COMMUNITY CALL</div>
         {ev ? (
           <>
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-2">{ev.topic}</h2>
