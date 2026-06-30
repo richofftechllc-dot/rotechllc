@@ -59,6 +59,7 @@ export default function BookPage() {
   const [msg, setMsg] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
   const [avail, setAvail] = useState<CoachAvail[]>([]);
+  const [booked, setBooked] = useState<Record<string, string[]>>({});
 
   // Prefill identity from the session (logged-in members), and pull coach availability.
   useEffect(() => {
@@ -71,7 +72,10 @@ export default function BookPage() {
     fetch("/api/book/me").then(r => r.json()).then(d => {
       if (d?.ok && (d.name || d.email)) { if (d.name) setName(d.name); if (d.email) setEmail(d.email); setLoggedIn(true); }
     }).catch(() => {});
-    fetch("/api/availability").then(r => r.json()).then(d => { if (d?.ok && Array.isArray(d.coaches)) setAvail(d.coaches); }).catch(() => {});
+    fetch("/api/availability").then(r => r.json()).then(d => {
+      if (d?.ok && Array.isArray(d.coaches)) setAvail(d.coaches);
+      if (d?.booked && typeof d.booked === "object") setBooked(d.booked);
+    }).catch(() => {});
   }, []);
 
   async function submit() {
@@ -92,6 +96,9 @@ export default function BookPage() {
   const homeHref = loggedIn ? "/home" : "/";
   const coachAvail = avail.find(c => c.slug === coach);
   const availDays = coachAvail ? DAY_ORDER.filter(d => coachAvail.days[d]) : [];
+  // Hide times already taken for the picked coach, so a member never lands on a booked slot.
+  const takenForCoach = new Set(coach ? (booked[coach] || []) : []);
+  const openSlots = slots.filter(s => !takenForCoach.has(s.value));
 
   if (state === "done") {
     return (
@@ -149,7 +156,7 @@ export default function BookPage() {
         <select value={slot} onChange={(e) => setSlot(e.target.value)}
           style={{ width: "100%", padding: 12, borderRadius: 9, border: "1px solid #dadce0", background: "#fff", fontSize: 15 }}>
           <option value="">Pick a time…</option>
-          {slots.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+          {openSlots.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
         </select>
 
         <label style={{ display: "block", fontWeight: 600, fontSize: 13, margin: "20px 0 8px" }}>Topic</label>

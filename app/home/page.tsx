@@ -114,6 +114,9 @@ export default function MemberHome() {
             {d.progress.strong.length > 0 && <p className="text-sm text-green-400 mt-3">💪 Strong: {d.progress.strong.slice(0, 3).join(", ")}</p>}
             {d.progress.weak.length > 0 && <p className="text-sm text-amber-400 mt-1">🎯 Focus: {d.progress.weak.slice(0, 3).join(", ")}</p>}
             {readiness === null && <p className="text-sm text-white/40 mt-3">Take a quiz and your readiness shows up here.</p>}
+            {d.progress.weak.length > 0
+              ? <Link href={`/quiz?focus=${encodeURIComponent(d.progress.weak[0])}`} className="inline-block mt-4 px-3 py-1.5 rounded-lg bg-amber-500 text-black font-semibold text-sm hover:bg-amber-400 transition">Drill {d.progress.weak[0]} →</Link>
+              : <Link href="/quiz" className="inline-block mt-4 px-3 py-1.5 rounded-lg border border-white/15 text-sm hover:bg-white/5 transition">{readiness !== null ? "Keep drilling →" : "Start a quiz →"}</Link>}
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <p className="text-xs uppercase tracking-wider text-white/40 font-bold mb-3">Upcoming 1-on-1s</p>

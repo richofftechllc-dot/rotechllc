@@ -26,8 +26,26 @@ export async function GET() {
         return { slug, name: s.name || slug, days: setDays, note: String(s.note || "").trim() };
       })
       .filter(Boolean);
-    return NextResponse.json({ ok: true, coaches });
+
+    // Already-booked FUTURE slots per coach, so the /book page can grey them out and
+    // a member never picks a time that's taken. Only slot timestamps are exposed — no
+    // names, emails, or topics (no PII).
+    const booked: Record<string, string[]> = {};
+    try {
+      const bsnap = await coll("bookings").limit(500).get();
+      const now = Date.now();
+      bsnap.docs.forEach((d) => {
+        const b = d.data() as { coach?: string; slot?: string; status?: string };
+        const slug = String(b.coach || "").toLowerCase().trim();
+        const slot = String(b.slot || "");
+        if (!slug || !slot || b.status === "canceled") return;
+        if (Date.parse(slot) < now) return; // past slots don't matter
+        (booked[slug] ||= []).push(slot);
+      });
+    } catch { /* booked is best-effort */ }
+
+    return NextResponse.json({ ok: true, coaches, booked });
   } catch (e) {
-    return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : "error", coaches: [] }, { status: 200 });
+    return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : "error", coaches: [], booked: {} }, { status: 200 });
   }
 }
