@@ -127,7 +127,7 @@ export default function MemberHome() {
             ) : (
               <p className="text-sm text-white/40">No sessions booked yet.</p>
             )}
-            <Link href="/calls" className="inline-block mt-4 px-3 py-1.5 rounded-lg border border-white/15 text-sm hover:bg-white/5 transition">Book a 1-on-1 →</Link>
+            <Link href="/book" className="inline-block mt-4 px-3 py-1.5 rounded-lg bg-orange-500 text-black font-semibold text-sm hover:bg-orange-400 transition">Book a 1-on-1 →</Link>
           </div>
         </div>
 
