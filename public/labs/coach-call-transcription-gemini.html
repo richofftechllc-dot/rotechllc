@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rich Off Tech — Coach Guide: Transcribe a Call with Gemini</title>
+<style>
+  :root{--bg:#f8f9fa;--surface:#fff;--ink:#202124;--muted:#5f6368;--line:#dadce0;--accent:#F97316;--f:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+  *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);line-height:1.6}
+  header{background:var(--surface);border-bottom:1px solid var(--line)}
+  .bar{max-width:840px;margin:0 auto;padding:18px 28px;display:flex;align-items:center;gap:12px}
+  .logo{font-weight:800;letter-spacing:.04em;border-bottom:3px solid #111;padding-bottom:4px}
+  .wrap{max-width:840px;margin:0 auto;padding:32px 28px 80px}
+  h1{font-size:28px;margin:0 0 6px}
+  .sub{color:var(--muted);margin:0 0 24px}
+  h2{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid #eee}
+  p,li{color:#3c4043}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
+  .prompt{background:#0f1115;color:#e8eaed;border-radius:10px;padding:14px 16px;font-family:ui-monospace,Menlo,monospace;font-size:13px;white-space:pre-wrap;line-height:1.5;margin:8px 0}
+  .tag{display:inline-block;font-size:11px;font-weight:700;color:#b45309;background:#fff7ed;border:1px solid #fad9bd;border-radius:6px;padding:1px 8px}
+  .note{background:#fff8f1;border:1px solid #fad9bd;border-radius:10px;padding:12px 16px;color:#8a4b14}
+  button{font:inherit;cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600}
+  button:hover{background:#f1f3f4}
+</style>
+</head>
+<body>
+<header><div class="bar"><span class="logo">RICH OFF TECH</span><span style="color:var(--muted);font-size:13px">Coach Guide — Transcribe &amp; scope a call with Gemini</span></div></header>
+<div class="wrap">
+  <h1>Transcribe a call with Gemini</h1>
+  <p class="sub">For any coach — use this when <b>Fireflies wasn't on the call</b> (phone call, in-person, dropped audio, an ad-hoc convo). It turns a raw recording into a clean, scoped summary you can drop into the CRM.</p>
+
+  <div class="note"><b>First choice is still Fireflies.</b> Every call booked through the platform auto-records with Fireflies and posts to the CRM. Only reach for this when there was no Fireflies bot on the call.</div>
+
+  <h2>Step 1 — Capture the audio</h2>
+  <div class="card">
+    <ul>
+      <li><b>Phone call:</b> use your phone's call recorder (or speaker + a second device). Save the audio file.</li>
+      <li><b>In-person / Meet without Fireflies:</b> record with your phone's Voice Memos or the meeting's own record button.</li>
+      <li>Get the file onto your computer (or keep it on your phone if using the Gemini app).</li>
+    </ul>
+  </div>
+
+  <h2>Step 2 — Get the transcript</h2>
+  <div class="card">
+    <ol>
+      <li>Open <b>Gemini</b> (gemini.google.com or the app) signed into your Rich Off Tech Google account.</li>
+      <li>Upload the audio file (paperclip / + button).</li>
+      <li>First, just get the raw transcript: <i>"Transcribe this call word-for-word. Label each speaker as Coach or Client."</i></li>
+      <li>Then run the matching <b>scoping prompt</b> below for the type of call.</li>
+    </ol>
+  </div>
+
+  <h2>Step 3 — Scope it (copy the prompt for the call type)</h2>
+  <p>Paste the audio (or the transcript) plus one of these. Each returns the same CRM-ready shape: <b>summary · action items · grade · follow-up</b>.</p>
+
+  <div class="card">
+    <div class="tag">Discovery / Intake</div>
+    <div class="prompt" id="p1">You are a Rich Off Tech coaching assistant. From this call recording/transcript, produce:
+1) SUMMARY (5-7 sentences): who the client is, where they are in their tech journey, their goal, timeline, and biggest blocker.
+2) FIT: which track fits best (ServiceNow CSA, Security+, AWS AI Practitioner) and why, in one line.
+3) PLAN: recommend a 30, 60, or 90-day plan (NEVER longer than 90 — we break people into tech fast) based on the hours per week they said they can study. Name the lane and one sentence why.
+4) ACTION ITEMS: a checklist of next steps, each tagged [coach] or [client].
+5) MONEY: any pricing, payment, or voucher topics discussed and what was agreed.
+6) GRADE (A-F): how likely they are to enroll/start, with one sentence why.
+7) FOLLOW-UP: fill in the "Discovery / Intake" follow-up template (below) using this call.
+Keep it tight and factual. Do not invent anything not in the call.</div>
+    <button onclick="copyP('p1',this)">Copy prompt</button>
+  </div>
+
+  <div class="card">
+    <div class="tag">Coaching / Cert check-in</div>
+    <div class="prompt" id="p2">You are a Rich Off Tech coaching assistant. This is a study/coaching call for a certification client. Produce:
+1) SUMMARY (5-7 sentences): what cert/track, where they are in the modules, what was covered today.
+2) PROGRESS: domains/topics they're strong on vs. struggling with.
+3) PLAN CHECK: confirm or adjust their 30/60/90-day plan based on today's pace and any schedule change they mentioned. NEVER push past 90 days — if they're behind, tighten the load, don't extend.
+4) ACTION ITEMS: study tasks before next session, each tagged [coach] or [client], with the quiz domain to drill.
+5) BLOCKERS: anything slowing them down (time, access, a confusing topic) + the fix.
+6) GRADE (A-F): momentum/exam-readiness, one sentence why.
+7) FOLLOW-UP: fill in the "Coaching / Cert" follow-up template (below) using this call.
+Keep it tight and factual. Do not invent anything not in the call.</div>
+    <button onclick="copyP('p2',this)">Copy prompt</button>
+  </div>
+
+  <div class="card">
+    <div class="tag">Interview Prep</div>
+    <div class="prompt" id="p3">You are a Rich Off Tech interview coach. This was a mock/interview-prep call. Produce:
+1) SUMMARY (5-7 sentences): the role they're targeting and how the practice went.
+2) STRENGTHS: what landed well (specific answers/stories).
+3) GAPS: weak answers, filler, or missing STAR structure — with the exact moment.
+4) ACTION ITEMS: drills before next time, each tagged [coach] or [client].
+5) GRADE (A-F): interview-readiness, one sentence why.
+6) FOLLOW-UP: fill in the "Interview Prep" follow-up template (below) using this call — include 2-3 questions to rehearse next.
+Keep it tight and factual. Do not invent anything not in the call.</div>
+    <button onclick="copyP('p3',this)">Copy prompt</button>
+  </div>
+
+  <div class="card">
+    <div class="tag">Clearance</div>
+    <div class="prompt" id="p4">You are a Rich Off Tech clearance-readiness assistant. This call covered the client's security-clearance situation. Produce:
+1) SUMMARY (5-7 sentences): their current status, target clearance level, and the path discussed.
+2) FLAGS: anything that could affect eligibility that was raised (factual only — do NOT speculate or give legal advice).
+3) ACTION ITEMS: documents to gather and steps to take, each tagged [coach] or [client].
+4) TIMELINE: any dates or windows mentioned.
+5) GRADE (A-F): how ready/positioned they are, one sentence why.
+6) FOLLOW-UP: fill in the "Clearance" follow-up template (below) using this call.
+Keep it strictly factual. Note where the client should consult an official source rather than us.</div>
+    <button onclick="copyP('p4',this)">Copy prompt</button>
+  </div>
+
+  <h2>Step 4 — Send the follow-up (consistent templates)</h2>
+  <p>Every client gets a same-day follow-up in the <b>same Rich Off Tech voice</b>, no matter which coach ran the call. Gemini drafts it from the call; you tidy the <span style="background:#fff7ed;border:1px solid #fad9bd;border-radius:4px;padding:0 4px">[brackets]</span> and send.</p>
+
+  <div class="card">
+    <div class="tag">Discovery / Intake — follow-up</div>
+    <div class="prompt" id="f1">Hey [first name] — great talking today. Here's the lane we mapped:
+
+• Your goal: [goal, e.g. break into ServiceNow / land a tech role]
+• Your track: [ServiceNow CSA / Security+ / AWS AI]
+• Your plan: [30 / 60 / 90]-day — built around the [X hrs/week] you've got
+• First move: [the one next step]
+
+To lock your start: [payment link]. The second that's in, your modules unlock on code [CODE] and I'll connect you with your coach to set the schedule.
+
+Anything before you start, just reply.
+— [coach], Rich Off Tech</div>
+    <button onclick="copyP('f1',this)">Copy template</button>
+  </div>
+
+  <div class="card">
+    <div class="tag">Coaching / Cert — follow-up</div>
+    <div class="prompt" id="f2">[first name] — solid session today. Recap:
+
+• Covered: [topics / module]
+• You're strong on: [domain(s)]
+• We're tightening: [weak domain(s)]
+• Before next time: [action items]
+• Plan: still on your [30/60/90]-day track — next exam-ready check [date]
+
+Drill [quiz domain] to 85%+ this week and message me if anything gets stuck.
+— [coach], Rich Off Tech</div>
+    <button onclick="copyP('f2',this)">Copy template</button>
+  </div>
+
+  <div class="card">
+    <div class="tag">Interview Prep — follow-up</div>
+    <div class="prompt" id="f3">[first name] — good reps today. What landed: [strengths]. What we're sharpening: [gaps].
+
+Rehearse these before next time:
+1) [question 1]
+2) [question 2]
+3) [question 3]
+
+Use the STAR structure on each. You're [grade-level] ready — keep going.
+— [coach], Rich Off Tech</div>
+    <button onclick="copyP('f3',this)">Copy template</button>
+  </div>
+
+  <div class="card">
+    <div class="tag">Clearance — follow-up</div>
+    <div class="prompt" id="f4">[first name] — here's where we landed on clearance:
+
+• Target: [level]
+• Next steps: [documents / actions]
+• Timeline: [dates discussed]
+
+For anything official (eligibility specifics), go through [official source] — I'll keep you moving on everything on our side.
+— [coach], Rich Off Tech</div>
+    <button onclick="copyP('f4',this)">Copy template</button>
+  </div>
+
+  <h2>Step 5 — Put it in the CRM</h2>
+  <div class="card">
+    <p style="margin-top:0">Take Gemini's output and add it to the client's record in the CRM (Calls tab → add the summary + action items; or turn an action item into a follow-up). This keeps every call — Fireflies or Gemini — in one place.</p>
+    <p style="margin-bottom:0;color:var(--muted);font-size:13px"><b>Coming:</b> a one-click "paste a transcript" button in the CRM Calls tab so Gemini output drops straight onto the client's timeline.</p>
+  </div>
+
+  <p style="margin-top:28px;color:var(--muted);font-size:13px">Rich Off Tech — cleared tech, no shortcuts.</p>
+</div>
+<script>
+  function copyP(id,btn){var t=document.getElementById(id).innerText;navigator.clipboard&&navigator.clipboard.writeText(t).then(function(){var o=btn.textContent;btn.textContent="Copied!";setTimeout(function(){btn.textContent=o;},1500);});}
+</script>
+</body>
+</html>

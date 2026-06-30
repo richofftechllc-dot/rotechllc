@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rich Off Tech — ServiceNow CSA Study Guide</title>
+<style>
+  :root{--bg:#f8f9fa;--surface:#fff;--ink:#202124;--muted:#5f6368;--line:#dadce0;--accent:#F97316;--f:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+  *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);line-height:1.6}
+  header{background:var(--surface);border-bottom:1px solid var(--line)}
+  .bar{max-width:840px;margin:0 auto;padding:18px 28px;display:flex;align-items:center;gap:12px}
+  .logo{font-weight:800;letter-spacing:.04em;border-bottom:3px solid #111;padding-bottom:4px}
+  .wrap{max-width:840px;margin:0 auto;padding:32px 28px 80px}
+  h1{font-size:30px;margin:0 0 6px}
+  .sub{color:var(--muted);margin:0 0 24px}
+  h2{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid #eee}
+  h3{font-size:17px;margin:20px 0 6px}
+  p,li{color:#3c4043}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:10px 0}
+  .mod{display:flex;gap:14px;align-items:flex-start}
+  .num{flex:none;width:34px;height:34px;border-radius:9px;background:#fff7ed;border:1px solid #fad9bd;color:#b45309;font-weight:800;display:grid;place-items:center}
+  .pill{display:inline-block;font-size:11px;font-weight:700;color:#b45309;background:#fff7ed;border:1px solid #fad9bd;border-radius:6px;padding:1px 8px;margin-left:6px}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:8px 12px;text-align:left}th{background:#f8f9fa}
+  a{color:#1a73e8}
+  .note{background:#fff8f1;border:1px solid #fad9bd;border-radius:10px;padding:12px 16px;color:#8a4b14}
+  @media print{header{position:static}.wrap{padding-top:10px}}
+</style>
+</head>
+<body>
+<header><div class="bar"><span class="logo">RICH OFF TECH</span><span style="color:var(--muted);font-size:13px">ServiceNow CSA — Study Guide</span></div></header>
+<div class="wrap">
+  <h1>Your ServiceNow CSA Study Guide</h1>
+  <p class="sub">The exact path to Certified System Administrator — mapped to your Rich Off Tech course + practice quiz, module by module.</p>
+
+  <div class="note"><b>What CSA proves:</b> that you can run the ServiceNow platform — users, roles, data, forms, workflows, and the updates that keep it live. It's your front door into ServiceNow admin, help-desk, and business-process/analyst roles. The exam is taken from home with remote proctoring; your program includes the exam voucher <b>plus a retake voucher</b>.</p>
+
+  <h2>Step 1 — Set up your lab (PDI)</h2>
+  <p>Before anything else, get your own free ServiceNow instance — a <b>Personal Developer Instance (PDI)</b>. This is where you do every hands-on lab. It's free and yours.</p>
+  <div class="card">
+    <ol>
+      <li>Go to <a href="https://developer.servicenow.com" target="_blank" rel="noreferrer">developer.servicenow.com</a> and click <b>Sign up</b> (free ServiceNow ID).</li>
+      <li>Verify your email, sign in, then open the top-right menu → <b>Request Instance</b>.</li>
+      <li>Pick the latest release when asked. In a minute you'll get your instance URL, admin username, and password — <b>save all three</b>.</li>
+      <li>Log in. You're now the admin of your own ServiceNow. (Heads up: an unused PDI hibernates after ~10 days — just wake it from the developer site.)</li>
+      <li>Always study on a <b>desktop/laptop browser</b>, not mobile — the labs need the full interface.</li>
+    </ol>
+  </div>
+
+  <h2>Step 2 — The 8 modules (and where to drill each)</h2>
+  <p>Your course is 8 modules. Each one maps to a domain on your Rich Off Tech practice quiz — study the module, then drill that exact domain until you're scoring 85%+ before you move on.</p>
+
+  <div class="card mod"><div class="num">1</div><div>
+    <h3 style="margin-top:0">UI &amp; Navigation <span class="pill">Quiz: UI &amp; Navigation</span></h3>
+    <p style="margin:4px 0">The landing page (UI16/Next Experience), application navigator, lists vs. forms, global search, breadcrumbs, favorites, tabs, and the banner. Learn to move fast — everything else sits on top of this.</p>
+  </div></div>
+  <div class="card mod"><div class="num">2</div><div>
+    <h3 style="margin-top:0">Lists &amp; Filters <span class="pill">Quiz: Lists &amp; Filters</span></h3>
+    <p style="margin:4px 0">List views, the condition builder, sorting/grouping, personalizing columns, list edits, exporting, and dot-walking through reference fields. This is your daily driver as an admin.</p>
+  </div></div>
+  <div class="card mod"><div class="num">3</div><div>
+    <h3 style="margin-top:0">Forms, Fields &amp; Applications <span class="pill">Quiz: Forms, Fields &amp; Applications</span></h3>
+    <p style="margin:4px 0">Form layout, field types (choice, reference, true/false), mandatory fields, the dictionary, tables &amp; the data model, applications vs. modules, and how records are stored.</p>
+  </div></div>
+  <div class="card mod"><div class="num">4</div><div>
+    <h3 style="margin-top:0">Flow Designer &amp; Automation <span class="pill">Quiz: Flow Designer &amp; Automation</span></h3>
+    <p style="margin:4px 0">Flow Designer (triggers, actions, flow logic), notifications, SLAs, and the idea of no-code automation. Know when a flow fires and what it can do.</p>
+  </div></div>
+  <div class="card mod"><div class="num">5</div><div>
+    <h3 style="margin-top:0">Reporting &amp; Dashboards <span class="pill">Quiz: Reporting &amp; Dashboards</span></h3>
+    <p style="margin:4px 0">Building reports (bar, pie, list, trend), sharing them, dashboards, and Performance Analytics at a high level. Turning data into something a manager can read.</p>
+  </div></div>
+  <div class="card mod"><div class="num">6</div><div>
+    <h3 style="margin-top:0">User Administration <span class="pill">Quiz: User Administration</span></h3>
+    <p style="margin:4px 0">Users, groups, and roles; how access is granted; ACLs at a high level; impersonation for testing. A heavily-tested domain — know how a role flows to a user through a group.</p>
+  </div></div>
+  <div class="card mod"><div class="num">7</div><div>
+    <h3 style="margin-top:0">ITSM Fundamentals <span class="pill">Quiz: ITSM Fundamentals</span></h3>
+    <p style="margin:4px 0">Incident, Problem, Change, and Request management — the core ServiceNow processes — plus the CMDB and Knowledge basics. This is the "what the platform is actually used for" module.</p>
+  </div></div>
+  <div class="card mod"><div class="num">8</div><div>
+    <h3 style="margin-top:0">Platform Administration <span class="pill">Quiz: Platform Administration</span></h3>
+    <p style="margin:4px 0">Importing data (import sets &amp; transform maps), update sets, system properties, plugins, and keeping the instance healthy. The "keep it running" admin work.</p>
+  </div></div>
+
+  <h2>Step 3 — Pick your pace: 30, 60, or 90 days</h2>
+  <p>Rich Off Tech is a <b>break-into-tech-fast</b> program — no plan runs longer than <b>90 days</b>. You and your coach pick the lane that fits your schedule, timeline, and goal on your first call. Same 8 modules, same 85%+ target per quiz domain — just a different daily load.</p>
+  <div class="card mod"><div class="num" style="background:#fee2e2;border-color:#fca5a5;color:#b91c1c">30</div><div>
+    <h3 style="margin-top:0">30-Day Sprint <span class="pill">~2–3 hrs/day</span></h3>
+    <p style="margin:4px 0">All-in. For when you have the time now and want to test fast. ~2–3 modules a week, daily quiz drilling, exam at the end of the month.</p>
+  </div></div>
+  <div class="card mod"><div class="num">60</div><div>
+    <h3 style="margin-top:0">60-Day Standard <span class="pill">~1–1.5 hrs/day</span></h3>
+    <p style="margin:4px 0">The balanced lane most people take. ~1 module every 5–7 days with room to re-drill weak domains before the exam.</p>
+  </div></div>
+  <div class="card mod"><div class="num" style="background:#dcfce7;border-color:#86efac;color:#15803d">90</div><div>
+    <h3 style="margin-top:0">90-Day Around-Life <span class="pill">~3–4 hrs/week</span></h3>
+    <p style="margin:4px 0">The longest we go — built around full-time work and family. ~1 module every 1.5–2 weeks, steady, no burnout. Still certified inside one quarter.</p>
+  </div></div>
+  <div class="note" style="margin-top:14px">Whatever lane you pick, the rhythm is the same: <b>study the module → drill that quiz domain to 85%+ → next module.</b> Hit 85% across all 8 domains and you're exam-ready. Your coach can adjust your plan anytime your schedule changes — it just never stretches past 90 days.</div>
+
+  <h2>Step 4 — When you're ready</h2>
+  <ul>
+    <li>You're ready when you're hitting <b>85%+ across all 8 quiz domains</b> and can do the labs from memory.</li>
+    <li>Your <b>exam voucher</b> is included; you also get a <b>retake voucher</b> as a safety net.</li>
+    <li>Exam is online + remotely proctored — quiet room, clear desk, webcam. Bo &amp; Flo (your AI tutors) stay with you through the studying.</li>
+    <li>Stuck on anything? Ask Bo in the platform, or book time with your coach.</li>
+  </ul>
+
+  <p style="margin-top:28px;color:var(--muted);font-size:13px">Rich Off Tech — cleared tech, no shortcuts.</p>
+</div>
+</body>
+</html>
