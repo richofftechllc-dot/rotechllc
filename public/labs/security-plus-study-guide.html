@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rich Off Tech — CompTIA Security+ Study Guide</title>
+<style>
+  :root{--bg:#f8f9fa;--surface:#fff;--ink:#202124;--muted:#5f6368;--line:#dadce0;--accent:#F97316;--f:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+  *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);line-height:1.6}
+  header{background:var(--surface);border-bottom:1px solid var(--line)}
+  .bar{max-width:840px;margin:0 auto;padding:18px 28px;display:flex;align-items:center;gap:12px}
+  .logo{font-weight:800;letter-spacing:.04em;border-bottom:3px solid #111;padding-bottom:4px}
+  .wrap{max-width:840px;margin:0 auto;padding:32px 28px 80px}
+  h1{font-size:30px;margin:0 0 6px}
+  .sub{color:var(--muted);margin:0 0 24px}
+  h2{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin:34px 0 12px;padding-bottom:6px;border-bottom:1px solid #eee}
+  h3{font-size:17px;margin:20px 0 6px}
+  p,li{color:#3c4043}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:10px 0}
+  .mod{display:flex;gap:14px;align-items:flex-start}
+  .num{flex:none;width:34px;height:34px;border-radius:9px;background:#fff7ed;border:1px solid #fad9bd;color:#b45309;font-weight:800;display:grid;place-items:center}
+  .pill{display:inline-block;font-size:11px;font-weight:700;color:#b45309;background:#fff7ed;border:1px solid #fad9bd;border-radius:6px;padding:1px 8px;margin-left:6px}
+  .wt{font-size:11px;color:var(--muted);margin-left:6px}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:8px 12px;text-align:left}th{background:#f8f9fa}
+  a{color:#1a73e8}
+  .note{background:#fff8f1;border:1px solid #fad9bd;border-radius:10px;padding:12px 16px;color:#8a4b14}
+  @media print{header{position:static}.wrap{padding-top:10px}}
+</style>
+</head>
+<body>
+<header><div class="bar"><span class="logo">RICH OFF TECH</span><span style="color:var(--muted);font-size:13px">CompTIA Security+ (SY0-701) — Study Guide</span></div></header>
+<div class="wrap">
+  <h1>Your CompTIA Security+ Study Guide</h1>
+  <p class="sub">The exact path to Security+ (SY0-701) — mapped to your Rich Off Tech course + practice quiz, domain by domain.</p>
+
+  <div class="note"><b>What Security+ proves:</b> that you can secure systems, spot and respond to threats, and speak the language of every security team. It's the baseline cert for cleared and federal cyber roles (DoD 8570/8140 approved) — the one that gets your resume past the filter. Exam: <b>SY0-701</b>, up to 90 questions (multiple-choice + performance-based), 90 minutes, <b>750/900 to pass</b>, taken from home with remote proctoring. Your program includes the exam voucher <b>plus a retake voucher</b>.</div>
+
+  <h2>Step 1 — Set up your practice</h2>
+  <p>Security+ is concept-heavy with hands-on performance questions. Three things to have ready before you start:</p>
+  <div class="card">
+    <ol>
+      <li><b>Your ROT practice quiz</b> — your main feedback loop. You're ready for a domain when you're scoring <b>85%+</b> on it.</li>
+      <li><b>Acronym + port flashcards</b> — Security+ lives on acronyms (CIA, AAA, GRC, SIEM, IDS/IPS) and common ports (22, 53, 80/443, 389/636, 3389). Drill them daily from day one.</li>
+      <li><b>A little hands-on</b> — a free TryHackMe or a home VM (Kali + a Windows target) makes the performance-based questions click. Optional but it sticks faster.</li>
+    </ol>
+  </div>
+
+  <h2>Step 2 — The 5 domains (and where to drill each)</h2>
+  <p>SY0-701 is 5 domains. Study the domain, then drill that exact domain on your Rich Off Tech quiz until you're at 85%+ before moving on. The % is how heavily each is weighted on the exam.</p>
+
+  <div class="card mod"><div class="num">1</div><div>
+    <h3 style="margin-top:0">General Security Concepts <span class="pill">Quiz: General Security Concepts</span><span class="wt">~12% of exam</span></h3>
+    <p style="margin:4px 0">The CIA triad, AAA, security controls (technical/managerial/operational/physical and preventive/detective/corrective…), zero trust, the basics of cryptography (symmetric vs asymmetric, hashing, PKI, certificates), and change management. The vocabulary the rest of the exam is built on.</p>
+  </div></div>
+  <div class="card mod"><div class="num">2</div><div>
+    <h3 style="margin-top:0">Threats, Vulnerabilities &amp; Mitigations <span class="pill">Quiz: Threats, Vulnerabilities &amp; Mitigations</span><span class="wt">~22%</span></h3>
+    <p style="margin:4px 0">Threat actors and motivations, attack surfaces and vectors, malware types, social engineering, application/network/cloud vulnerabilities, indicators of an attack, and the mitigations that shut each down. The heaviest "know your enemy" domain.</p>
+  </div></div>
+  <div class="card mod"><div class="num">3</div><div>
+    <h3 style="margin-top:0">Security Architecture <span class="pill">Quiz: Security Architecture</span><span class="wt">~18%</span></h3>
+    <p style="margin:4px 0">Securing the architecture: cloud vs on-prem, network design (segmentation, DMZ, VPN, firewalls, zero-trust), secure protocols, data protection (encryption at rest/in transit, classification, DLP), and resilience/recovery (backups, redundancy, high availability).</p>
+  </div></div>
+  <div class="card mod"><div class="num">4</div><div>
+    <h3 style="margin-top:0">Security Operations <span class="pill">Quiz: Security Operations</span><span class="wt">~28% — the biggest</span></h3>
+    <p style="margin:4px 0">The day-to-day: hardening, identity &amp; access management (MFA, SSO, least privilege), monitoring (SIEM, logging, alerting), vulnerability management, incident response, digital forensics, and automation. This is the largest domain — give it the most time.</p>
+  </div></div>
+  <div class="card mod"><div class="num">5</div><div>
+    <h3 style="margin-top:0">Security Program Management &amp; Oversight <span class="pill">Quiz: Security Program Management</span><span class="wt">~20%</span></h3>
+    <p style="margin:4px 0">Governance, risk management (risk assessment, treatment, registers), third-party/vendor risk, compliance and audits, security policies and standards, and security awareness. The "running the program" / GRC domain — heavy on definitions.</p>
+  </div></div>
+
+  <h2>Step 3 — Pick your pace: 30, 60, or 90 days</h2>
+  <p>Rich Off Tech is a <b>break-into-tech-fast</b> program — no plan runs longer than <b>90 days</b>. You and your coach pick the lane that fits your schedule on your first call. Same 5 domains, same 85%+ target per quiz domain.</p>
+  <div class="card mod"><div class="num" style="background:#fee2e2;border-color:#fca5a5;color:#b91c1c">30</div><div>
+    <h3 style="margin-top:0">30-Day Sprint <span class="pill">~2–3 hrs/day</span></h3>
+    <p style="margin:4px 0">All-in. ~1 domain every 4–5 days + daily flashcards, then a week of full practice exams. Exam at the end of the month.</p>
+  </div></div>
+  <div class="card mod"><div class="num">60</div><div>
+    <h3 style="margin-top:0">60-Day Standard <span class="pill">~1–1.5 hrs/day</span></h3>
+    <p style="margin:4px 0">The balanced lane. ~1 domain every 8–10 days with time to re-drill weak spots and run 2–3 timed practice exams before you sit.</p>
+  </div></div>
+  <div class="card mod"><div class="num" style="background:#dcfce7;border-color:#86efac;color:#15803d">90</div><div>
+    <h3 style="margin-top:0">90-Day Around-Life <span class="pill">~3–4 hrs/week</span></h3>
+    <p style="margin:4px 0">Built around full-time work and family. ~1 domain every 2 weeks, steady, no burnout. Still certified inside one quarter.</p>
+  </div></div>
+  <div class="note" style="margin-top:14px">Whatever lane you pick: <b>study the domain → drill that quiz domain to 85%+ → next domain.</b> Hit 85% across all 5 and you're exam-ready. Your coach adjusts your plan anytime your schedule changes — it never stretches past 90 days.</div>
+
+  <h2>Step 4 — When you're ready</h2>
+  <ul>
+    <li>You're ready when you're at <b>85%+ across all 5 quiz domains</b>, your acronyms/ports are automatic, and you're passing full timed practice exams.</li>
+    <li>Your <b>exam voucher</b> is included; you also get a <b>retake voucher</b> as a safety net.</li>
+    <li>SY0-701 is online + remotely proctored — quiet room, clear desk, webcam. Watch the performance-based questions: don't get stuck, flag and return.</li>
+    <li>Stuck on anything? Ask Bo in the platform, or book time with your coach.</li>
+  </ul>
+
+  <p style="margin-top:28px;color:var(--muted);font-size:13px">Rich Off Tech — cleared tech, no shortcuts.</p>
+</div>
+</body>
+</html>
