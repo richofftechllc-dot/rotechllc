@@ -10,9 +10,9 @@ const AWAY_NOTE = "Bo's in Cancun this week 🌴 — no community call this Sund
 // A featured one-off community call, shown when the live calendar feed isn't available
 // (e.g. calendar creds aren't set in this environment). Set to null once it has passed.
 const FEATURED_EVENT: { topic: string; startISO: string; meetUrl?: string; description: string } | null = {
-  topic: "Claris (Apple AI) — Early-Access Community Call",
-  startISO: "2026-07-02T18:00:00-04:00",
-  description: "An early-access look at Claris (Apple AI), live in the ROT Discord. Open to all members — bring your questions.",
+  topic: "Apple's Unreleased AI — Early Access (Live)",
+  startISO: "2026-07-02T18:30:00-04:00",
+  description: "Rich Off Tech is going live with Apple on their unreleased AI — early access, live in the ROT Discord. Whoever joins gets access. Be in the Discord and hop on.",
 };
 
 type NextSunday =
