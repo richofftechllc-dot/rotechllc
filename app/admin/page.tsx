@@ -1111,6 +1111,8 @@ export default function AdminCRM() {
             <div className="grid sm:grid-cols-2 gap-3">
               {[
                 { title: "PB&J Challenge", tag: "Business Analyst · Requirements Lab", desc: "Interactive lab that teaches how a BA writes requirements. The client builds the steps, then runs it live with a coach (who plays the “machine”). No answer included — the lesson is them finding their own gaps.", path: "/labs/pbj-challenge.html" },
+                { title: "ServiceNow CSA Study Guide", tag: "ServiceNow CSA · Client Study Plan", desc: "The full CSA path, mapped to our 8 quiz domains + free PDI (developer instance) setup. 30/60/90-day pace the client picks with their coach on the call — never longer. Send it right after the intro/intake.", path: "/labs/servicenow-csa-study-guide.html" },
+                { title: "Transcribe a Call with Gemini", tag: "Coach Tool · Call notes + follow-ups", desc: "For any coach when Fireflies wasn't on the call. Ready-to-paste Gemini prompts that scope each call type (intake, coaching, interview prep, clearance) + consistent follow-up templates so every client gets the same Rich Off Tech voice.", path: "/labs/coach-call-transcription-gemini.html" },
               ].map(r => (
                 <div key={r.path} className="bg-white border border-[#dadce0] rounded-xl p-4 flex flex-col">
                   <div className="text-[11px] uppercase tracking-wide text-orange-600 font-medium">{r.tag}</div>
