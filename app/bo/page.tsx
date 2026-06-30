@@ -23,6 +23,7 @@ function Avatar({ t, size = 40 }: { t: Tutor; size?: number }) {
 
 export default function BoFrontFace() {
   const [tutorId, setTutorId] = useState<string>("bo");
+  const [isCoach, setIsCoach] = useState(false); // K-12 tutors are staff-only; everyone else gets Bo + Flo.
   const [menuOpen, setMenuOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -39,6 +40,15 @@ export default function BoFrontFace() {
   const [listening, setListening] = useState(false);
   const recogRef = useRef<{ stop: () => void } | null>(null);
   const tutor = getTutor(tutorId);
+
+  // Only staff/coaches see the K-12 tutors. Anon + members get Bo + Flo only.
+  useEffect(() => {
+    fetch("/api/whoami").then(r => r.json()).then(d => setIsCoach(!!d?.isCoach)).catch(() => {});
+  }, []);
+  // If a non-coach somehow lands on a K-12 tutor, snap them back to Bo.
+  useEffect(() => {
+    if (!isCoach && getTutor(tutorId).category === "K-12") setTutorId("bo");
+  }, [isCoach, tutorId]);
 
   function toggleMic() {
     if (listening) { recogRef.current?.stop(); setListening(false); return; }
@@ -152,6 +162,11 @@ export default function BoFrontFace() {
   const newChat = () => { stopSpeak(); setMessages([]); setInput(""); };
   const career = TUTORS.filter((t) => t.category === "Career & Tech");
   const k12 = TUTORS.filter((t) => t.category === "K-12");
+  // Public/members only see Bo + Flo; staff see the K-12 roster too.
+  const visibleTutors = isCoach ? TUTORS : career;
+  const tutorGroups: [string, Tutor[]][] = isCoach
+    ? [["Career & Tech", career], ["K-12", k12]]
+    : [["Career & Tech", career]];
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#0a0a0a] text-white">
@@ -163,7 +178,7 @@ export default function BoFrontFace() {
         </button>
         <div className="mb-1 px-1 text-[11px] uppercase tracking-wide text-gray-600">Tutors</div>
         <div className="space-y-1 overflow-y-auto">
-          {TUTORS.map((t) => (
+          {visibleTutors.map((t) => (
             <button key={t.id} onClick={() => { setTutorId(t.id); setMenuOpen(false); }}
               className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm hover:bg-zinc-900 ${t.id === tutorId ? "bg-zinc-900" : ""}`}>
               <Avatar t={t} size={24} />
@@ -197,7 +212,7 @@ export default function BoFrontFace() {
 
           {menuOpen && (
             <div className="absolute left-4 top-14 z-20 w-80 rounded-xl border border-white/10 bg-zinc-900 p-1.5 shadow-2xl">
-              {[["Career & Tech", career], ["K-12", k12]].map(([label, list]) => (
+              {tutorGroups.map(([label, list]) => (
                 <div key={label as string}>
                   <div className="px-2 py-1 text-[10px] uppercase tracking-wide text-gray-600">{label as string}</div>
                   {(list as Tutor[]).map((t) => (
