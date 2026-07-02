@@ -1023,6 +1023,7 @@ export default function AdminCRM() {
             <p className="text-gray-500 text-sm mb-4">Send-to-client resources. Open to preview, or copy the link to send a client (Discord, email, text). These are the things we hand clients by hand until the bot delivers them automatically — more get added here as we build them.</p>
             <div className="grid sm:grid-cols-2 gap-3">
               {[
+                { title: "ROT July 2026 Offers", tag: "July Promo · Bo's 30th Birthday Drop", desc: "The full July offer sheet — membership, ServiceNow CSA, Security+ ($850), and the clearance birthday-drop pricing, plus the referral program. Client-facing — send it to a warm lead or pull it up on a call.", path: "/resources/rot-july-2026-offers.html" },
                 { title: "PB&J Challenge", tag: "Business Analyst · Requirements Lab", desc: "Interactive lab that teaches how a BA writes requirements. The client builds the steps, then runs it live with a coach (who plays the “machine”). No answer included — the lesson is them finding their own gaps.", path: "/labs/pbj-challenge.html" },
               ].map(r => (
                 <div key={r.path} className="bg-white border border-[#dadce0] rounded-xl p-4 flex flex-col">
