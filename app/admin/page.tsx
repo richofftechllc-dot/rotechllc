@@ -1024,6 +1024,8 @@ export default function AdminCRM() {
             <div className="grid sm:grid-cols-2 gap-3">
               {[
                 { title: "ROT July 2026 Offers", tag: "July Promo · Bo's 30th Birthday Drop", desc: "The full July offer sheet — membership, ServiceNow CSA, Security+ ($850), and the clearance birthday-drop pricing, plus the referral program. Client-facing — send it to a warm lead or pull it up on a call.", path: "/resources/rot-july-2026-offers.html" },
+                { title: "ServiceNow CSA — Study Plan + PDI Setup", tag: "ServiceNow · Client Study Plan", desc: "The full CSA study roadmap: how to set up their free PDI (developer instance), the exam domains, a 6-week plan, and exam-day tips. Send to any CSA client.", path: "/resources/rot-csa-study-plan.html" },
+                { title: "Security+ — Study Plan", tag: "CompTIA · Client Study Plan", desc: "The Security+ (SY0-701) roadmap: the 5 domains with weights, a 5-6 week plan, acronym drills, and PBQ exam tips. Send to any Sec+ client.", path: "/resources/rot-secplus-study-plan.html" },
                 { title: "PB&J Challenge", tag: "Business Analyst · Requirements Lab", desc: "Interactive lab that teaches how a BA writes requirements. The client builds the steps, then runs it live with a coach (who plays the “machine”). No answer included — the lesson is them finding their own gaps.", path: "/labs/pbj-challenge.html" },
               ].map(r => (
                 <div key={r.path} className="bg-white border border-[#dadce0] rounded-xl p-4 flex flex-col">
