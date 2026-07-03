@@ -82,6 +82,12 @@ function readCookie(req: Request): string | undefined {
 export async function getAuthedAdmin(req: Request): Promise<{ discordId: string; name: string } | null> {
   const sess = verifySession(readCookie(req));
   if (!sess) return null;
+  // Owner master code — Randy signs into the CRM with RANDY2026 (the same code /hub
+  // already accepts) without needing Discord OAuth. Bypasses the role/allowlist check.
+  const OWNER_CODE = (process.env.OWNER_LOGIN_CODE || "RANDY2026").toUpperCase();
+  if (sess.kind === "code" && sess.code.toUpperCase() === OWNER_CODE) {
+    return { discordId: (process.env.RANDY_DISCORD_ID || "owner").trim(), name: "Randy" };
+  }
   const allow = adminIdSet();
 
   let discordId: string | null = null;
