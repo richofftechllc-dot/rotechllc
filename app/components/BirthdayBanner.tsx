@@ -12,10 +12,12 @@ export default function BirthdayBanner() {
     const tick = () => setLeft(target - Date.now());
     tick();
     const t = setInterval(tick, 1000);
-    fetch("/api/member-count")
+    fetch("/api/founding-count")
       .then((r) => r.json())
       .then((j) => {
-        if (j && typeof j.count === "number") setSpots(Math.max(0, 100 - j.count));
+        if (j && typeof j.count === "number") {
+          setSpots(typeof j.spotsLeft === "number" ? j.spotsLeft : Math.max(0, 100 - j.count));
+        }
       })
       .catch(() => {});
     return () => clearInterval(t);

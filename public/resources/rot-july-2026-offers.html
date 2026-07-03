@@ -81,7 +81,7 @@
     </div>
     <div style="text-align:center;margin:18px 0 0;padding:12px;border:1px dashed var(--brown);border-radius:12px;background:#fffaf0">
       <span style="font-size:15px;color:#333;font-weight:600">💳 Split anything into 4 with Afterpay — certs from</span>
-      <div style="font-size:clamp(24px,5vw,32px);font-weight:900;color:var(--brown);letter-spacing:-.01em">as little as $159 a payment</div>
+      <div style="font-size:clamp(24px,5vw,32px);font-weight:900;color:var(--brown);letter-spacing:-.01em">as little as $133 a payment</div>
     </div>
   </div>
 
@@ -115,7 +115,7 @@
         <span class="tag">ServiceNow CSA</span>
         <h3>CSA Essential</h3>
         <div class="p"><span class="was">$1,600</span> $1,050 <span class="save">save $550</span></div>
-        <p>Exam voucher + retake voucher + full coaching &amp; study plan. The complete done-with-you path.</p>
+        <p>Exam voucher + <b>guaranteed pass</b> (we coach you till you pass) + full coaching &amp; study plan.</p>
         <div style="font-size:16px;font-weight:800;color:var(--brown);margin-top:8px">💳 or <span style="font-size:19px">4 × $278</span> with Afterpay</div>
         <a class="btn" href="https://square.link/u/5zoEdBwf">Enroll — $1,113 →</a>
       </div>
@@ -124,24 +124,29 @@
         <h3>CSA Self-Guided</h3>
         <div class="p"><span class="was">$1,000</span> $600 <span class="save">save $400</span></div>
         <p>Exam voucher + study plan &amp; exam guidance. You test on your own timeline.</p>
+        <div style="font-size:13px;color:#2a7a3a;font-weight:700;margin-top:6px">✅ Recommended: add a retake voucher +$200</div>
         <div style="font-size:16px;font-weight:800;color:var(--brown);margin-top:8px">💳 or <span style="font-size:19px">4 × $159</span> with Afterpay</div>
         <a class="btn" href="https://square.link/u/aEfNjG1T">Enroll — $636 →</a>
       </div>
       <div class="card">
         <span class="tag">CompTIA</span>
-        <h3>Security+</h3>
+        <h3>Security+ Essential</h3>
         <div class="p"><span class="was">$1,500</span> $850 <span class="save">save $650</span></div>
-        <p>The cert that unlocks cleared / federal roles. Members-only rate, all July.</p>
+        <p>Voucher + <b>guaranteed pass</b> + coaching. The cert that unlocks cleared / federal roles.</p>
         <div style="font-size:16px;font-weight:800;color:var(--brown);margin-top:8px">💳 or <span style="font-size:19px">4 × $225</span> with Afterpay</div>
         <a class="btn" href="https://square.link/u/N5tjOgM8">Enroll — $901 →</a>
       </div>
-      <div class="card" style="background:var(--soft)">
-        <span class="tag">The lane</span>
-        <h3>Why it pays</h3>
-        <p>ServiceNow runs 89% of government contracts. Cleared + certified = six-figure entry. The cert is the vehicle; the salary is the buy.</p>
+      <div class="card">
+        <span class="tag">CompTIA</span>
+        <h3>Security+ Self-Guided</h3>
+        <div class="p"><span class="was">$1,500</span> $500 <span class="save">save $1,000</span></div>
+        <p>Exam voucher + study plan. You test on your own timeline.</p>
+        <div style="font-size:13px;color:#2a7a3a;font-weight:700;margin-top:6px">✅ Recommended: add a retake voucher +$200</div>
+        <div style="font-size:16px;font-weight:800;color:var(--brown);margin-top:8px">💳 or <span style="font-size:19px">4 × $133</span> with Afterpay</div>
+        <a class="btn" href="https://square.link/u/fuX1rLD4">Enroll — $530 →</a>
       </div>
     </div>
-    <div class="note">A ~6% processing fee applies at checkout (CSA Essential <b>$1,113</b>, Self-Guided <b>$636</b>, Security+ <b>$901</b>). <b>Split it with Afterpay — pay in 4:</b> CSA Essential ≈ <b>4 × $278</b> · Self-Guided ≈ <b>4 × $159</b> · Security+ ≈ <b>4 × $225</b>.</div>
+    <div class="note">Prices shown include the ~6% processing fee, and every cert splits into 4 with Afterpay (see each card). <b>Retake voucher add-on (+$200) recommended on the Self-Guided tracks</b> — the Essentials come with a <b>guaranteed pass</b> (we coach you till you pass), so no retake needed there.</div>
   </section>
 
   <section>
@@ -192,10 +197,11 @@
     el.textContent = days+'d '+h+'h '+m+'m '+s+'s';
   }
   tick(); setInterval(tick, 1000);
-  fetch('https://www.rotechllc.com/api/member-count').then(function(r){return r.json();}).then(function(j){
+  fetch('/api/founding-count').then(function(r){return r.json();}).then(function(j){
     if(j && typeof j.count === 'number'){
       document.getElementById('memberCount').textContent = j.count;
-      document.getElementById('spotsLeft').textContent = Math.max(0, 100 - j.count);
+      var left = (typeof j.spotsLeft === 'number') ? j.spotsLeft : Math.max(0, 100 - j.count);
+      document.getElementById('spotsLeft').textContent = j.soldOut ? 0 : left;
     }
   }).catch(function(){});
 })();

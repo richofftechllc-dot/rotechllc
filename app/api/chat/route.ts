@@ -29,19 +29,19 @@ const FLO_VOICE = `You are Flo, the ServiceNow + process instructor for Rich Off
 
 const SHARED_FACTS = `
 
-ROT facts — JULY 2026 "Bo's 30th Birthday Drop" (hard deadline JULY 27, 2026; founding closes at 100 members). NEVER say "$96". Two clocks always: July 27 + only a few founding spots left.
+ROT facts — JULY 2026 "Bo's 30th Birthday Drop" (hard deadline JULY 27, 2026; founding closes at 100 members). Two clocks always: July 27 + only a few founding spots left.
 
 MEMBERSHIP (Discord all-access — AI tutors, quizzes, job drops, coaching):
-- Next 7 founding members: $27 covers your FIRST 2 MONTHS (a free month), then $27/mo.
-- Lock $27/mo by July 27 and it never goes up; after the 27th new members pay $40/mo.
-- Yearly $227 (best value — saves ~$97 vs paying monthly; includes $100 toward any service). Yearly deal ends July 27.
-- The old $96/12-month founding rate ENDS at 100 members and is not coming back.
-- Join monthly link: https://square.link/u/Xa7WOVqE   ·   Go yearly link: https://square.link/u/wI4DjXjx
+- RIGHT NOW while under 100 members: $96 for 12 months (the founding steal, one-time) → https://square.link/u/Fpz8OFT4
+- Prefer monthly: $27/mo, first 2 months for just $27 → https://square.link/u/Xa7WOVqE
+- Yearly $227 (saves ~$97; includes $100 toward any service) → https://square.link/u/wI4DjXjx
+- At 100 members the $96 is GONE → entry becomes $227/yr (through July 27) or $40/mo. After July 27: $375/yr.
 
-CERTIFICATIONS (July pricing; Afterpay pay-in-4 available):
-- ServiceNow CSA Essential (voucher + retake + coaching): $1,050 (reg $1,600) → https://square.link/u/5zoEdBwf
-- ServiceNow CSA Self-Guided (voucher + plan): $600 (reg $1,000) → https://square.link/u/aEfNjG1T
-- Security+ (unlocks cleared/federal roles): $850 (reg $1,500) → https://square.link/u/N5tjOgM8
+CERTIFICATIONS (Afterpay pay-in-4 — payments as little as $133). Essential = voucher + GUARANTEED PASS (coached till you pass) + coaching. Self-Guided = voucher + plan; recommend adding a retake voucher (+$200 add-on):
+- ServiceNow CSA Essential: $1,050 (reg $1,600) → https://square.link/u/5zoEdBwf
+- ServiceNow CSA Self-Guided: $600 (reg $1,000) → https://square.link/u/aEfNjG1T
+- Security+ Essential: $850 (reg $1,500) → https://square.link/u/N5tjOgM8
+- Security+ Self-Guided: $500 → https://square.link/u/fuX1rLD4
 
 CLEARANCE COACHING (birthday cuts, end July 27) — requires the FREE Clearance Qualifier call FIRST, no instant checkout:
 - Secret $3,600 (10% off) · TS $4,250 (15% off) · TS/SCI $4,400 (20% off)
