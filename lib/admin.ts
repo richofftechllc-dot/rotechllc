@@ -31,13 +31,13 @@ async function hasCoachRole(discordId: string): Promise<boolean> {
   if (!token) return false;
   try {
     const memRes = await fetch(`https://discord.com/api/v10/guilds/${GUILD_ID}/members/${discordId}`, {
-      headers: { Authorization: `Bot ${token}` },
+      headers: { Authorization: `Bot ${token}` }, next: { revalidate: 120 },
     });
     if (!memRes.ok) return false;
     const roleIds = new Set(((await memRes.json()) as { roles?: string[] }).roles || []);
     if (!roleIds.size) return false;
     const rolesRes = await fetch(`https://discord.com/api/v10/guilds/${GUILD_ID}/roles`, {
-      headers: { Authorization: `Bot ${token}` },
+      headers: { Authorization: `Bot ${token}` }, next: { revalidate: 300 },
     });
     if (!rolesRes.ok) return false;
     const roles = (await rolesRes.json()) as { id: string; name: string }[];
