@@ -29,12 +29,12 @@ const COACH_ROLE_NAMES = (process.env.ADMIN_ROLE_NAMES || "ROT Coach,Founder,Adm
 // Discord GET with retry-on-429. The /admin page fires ~10 API calls at once and each
 // re-checks the coach role, which bursts Discord and trips its rate limit → random 403s.
 // Retrying (honoring Retry-After, with jitter) lets every call succeed.
-async function discordGet(url: string, token: string, tries = 4): Promise<Response | null> {
+async function discordGet(url: string, token: string, tries = 2): Promise<Response | null> {
   for (let i = 0; i < tries; i++) {
     const res = await fetch(url, { headers: { Authorization: `Bot ${token}` }, cache: "no-store" });
     if (res.status !== 429) return res;
-    const ra = Number(res.headers.get("retry-after")) || 1;
-    await new Promise((r) => setTimeout(r, Math.min(ra * 1000, 4000) + Math.floor(Math.random() * 400)));
+    // one short retry only — never long enough to hit the function timeout
+    await new Promise((r) => setTimeout(r, 350 + Math.floor(Math.random() * 250)));
   }
   return null;
 }
