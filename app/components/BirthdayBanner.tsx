@@ -53,9 +53,6 @@ export default function BirthdayBanner() {
         {!soldOut && (
           <a href="https://square.link/u/Xa7WOVqE" className={btn + " bg-gradient-to-r from-orange-500 to-red-500 text-white hover:opacity-90"}>Or $27/mo · 2 months for $27</a>
         )}
-        {soldOut && (
-          <a href="https://square.link/u/wI4DjXjx" className={btn + " bg-white text-black hover:opacity-90"}>Go Yearly — $227</a>
-        )}
         <a href="/resources/rot-july-2026-offers.html" className={btn + " border border-white/30 text-white hover:bg-white/10"}>See the full deal →</a>
       </div>
     </div>
