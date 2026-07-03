@@ -1,12 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
 
-// Birthday-drop banner: live countdown to July 27, 2026 (Bo's 30th) + live founding
-// spots left (from /api/member-count). Links to the July offer sheet.
+// Birthday-drop banner on the homepage: live countdown to July 27 + live PAID founding
+// spots (from /api/founding-count) + the join buttons.
+// RULE: $96/12mo and $27/mo (2-for-$27) are ONLY available while under 100 members.
+// The instant the paid count hits 100 (soldOut), those buttons disappear and it flips
+// to the yearly ($227) offer — so the front page can never show a closed deal.
 export default function BirthdayBanner() {
   const target = new Date("2026-07-27T23:59:59-04:00").getTime();
   const [left, setLeft] = useState<number>(target - Date.now());
   const [spots, setSpots] = useState<number | null>(null);
+  const [soldOut, setSoldOut] = useState(false);
 
   useEffect(() => {
     const tick = () => setLeft(target - Date.now());
@@ -16,7 +20,9 @@ export default function BirthdayBanner() {
       .then((r) => r.json())
       .then((j) => {
         if (j && typeof j.count === "number") {
-          setSpots(typeof j.spotsLeft === "number" ? j.spotsLeft : Math.max(0, 100 - j.count));
+          const s = typeof j.spotsLeft === "number" ? j.spotsLeft : Math.max(0, 100 - j.count);
+          setSpots(s);
+          setSoldOut(!!j.soldOut || s <= 0);
         }
       })
       .catch(() => {});
@@ -28,20 +34,30 @@ export default function BirthdayBanner() {
   const m = Math.floor((left % 3600000) / 60000);
   const s = Math.floor((left % 60000) / 1000);
   const cd = left <= 0 ? "It's the 27th 🎂" : `${d}d ${h}h ${m}m ${s}s`;
+  const btn = "inline-block px-4 py-2 rounded-lg font-bold text-sm";
 
   return (
-    <a
-      href="/resources/rot-july-2026-offers.html"
-      className="block mb-6 rounded-xl border border-orange-500/40 bg-gradient-to-r from-orange-500/10 to-red-500/10 px-5 py-4 hover:border-orange-500/70 transition-colors"
-    >
+    <div className="mb-6 rounded-xl border border-orange-500/40 bg-gradient-to-r from-orange-500/10 to-red-500/10 px-5 py-4">
       <div className="text-orange-400 font-bold text-xs tracking-widest uppercase">🎂 Bo&apos;s 30th Birthday Drop · ends July 27</div>
       <div className="text-white text-2xl md:text-3xl font-black mt-1 tabular-nums">
         {cd}
-        {spots !== null && (
+        {spots !== null && !soldOut && (
           <span className="text-gray-400 text-base font-semibold"> · {spots} founding spots left</span>
         )}
+        {soldOut && <span className="text-gray-400 text-base font-semibold"> · founding closed</span>}
       </div>
-      <div className="text-gray-300 text-sm mt-1">$27 = your first 2 months → then $27/mo · certs up to $650 off · <span className="text-orange-400 font-semibold">tap to see the deal →</span></div>
-    </a>
+      <div className="flex flex-wrap gap-2 mt-3">
+        {!soldOut && (
+          <a href="https://square.link/u/Fpz8OFT4" className={btn + " bg-white text-black hover:opacity-90"}>Founding — $96 / 12 months</a>
+        )}
+        {!soldOut && (
+          <a href="https://square.link/u/Xa7WOVqE" className={btn + " bg-gradient-to-r from-orange-500 to-red-500 text-white hover:opacity-90"}>Or $27/mo · 2 months for $27</a>
+        )}
+        {soldOut && (
+          <a href="https://square.link/u/wI4DjXjx" className={btn + " bg-white text-black hover:opacity-90"}>Go Yearly — $227</a>
+        )}
+        <a href="/resources/rot-july-2026-offers.html" className={btn + " border border-white/30 text-white hover:bg-white/10"}>See the full deal →</a>
+      </div>
+    </div>
   );
 }
