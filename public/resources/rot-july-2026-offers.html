@@ -48,6 +48,11 @@
   ul.clean{margin:8px 0 0;padding-left:18px;color:var(--muted);font-size:13.5px}
   ul.clean li{margin-bottom:5px}
   footer{margin-top:40px;border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:12.5px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .btn{display:inline-block;background:var(--brown);color:#fff;text-decoration:none;font-weight:700;font-size:14px;padding:10px 18px;border-radius:9px;margin-top:12px}
+  .btn:hover{background:#5a3a22}
+  .btn.alt{background:#fff;color:var(--brown);border:1.5px solid var(--brown)}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
   @media (max-width:640px){.cards{grid-template-columns:1fr}}
 </style>
 </head>
@@ -64,8 +69,15 @@
     <h1>The July Move.<br>Locked rates, real clocks.</h1>
     <p class="lede">Randy turns 30 this month — so the whole community eats. Everything below runs on two clocks: the last <b>founding seats</b>, and the <b>birthday deadline</b>. Whichever hits first, closes it.</p>
     <div class="clocks">
-      <div class="clock"><div class="k">10 spots left</div><div class="s">Founding closes at 100 members, then the price jumps.</div></div>
-      <div class="clock"><div class="k">Ends July 27</div><div class="s">Bo's 30th birthday — hard deadline on the deals.</div></div>
+      <div class="clock" style="text-align:center">
+        <div class="s" style="opacity:.9;margin-bottom:4px">🎂 Deal ends — Bo's 30th</div>
+        <div class="k" id="countdown" style="font-size:clamp(22px,4vw,28px);font-variant-numeric:tabular-nums;letter-spacing:.01em">—d —h —m —s</div>
+        <div class="s" style="opacity:.85">counting down to July 27, 2026</div>
+      </div>
+      <div class="clock" style="text-align:center">
+        <div class="k" style="font-size:clamp(24px,5vw,32px)"><span id="memberCount">93</span> / 100</div>
+        <div class="s">founding members — <b><span id="spotsLeft">7</span> spots left</b> before it jumps</div>
+      </div>
     </div>
   </div>
 
@@ -83,6 +95,10 @@
     <div class="note">🔒 <b>Lock $27/mo by July 27 and it never goes up</b> — after the 27th, new members pay $40/mo. The <b>next 7</b> get a free month on top ($27 covers 2). Billed clean, no processing fee.</div>
     <div class="note" style="border-left-color:#b8862f;background:#fffaf0;margin-top:12px">💰 <b>Best value — Yearly <span class="was">$375</span> $227</b> <span style="color:#8a5a38">(until July 27)</span>. Monthly runs $27×12 = <b>$324/yr</b>; going yearly saves you <b>$97 — like 3.5 months free</b> (≈ $18.92/mo). Yearly also gets <b>$100 toward any service</b>. Split it with <b>Afterpay — 4 × ~$57</b>.</div>
     <div class="note" style="margin-top:12px">⏳ <b>Heads up:</b> the old <b>$96 / 12-month</b> founding rate is <b>gone once we hit 100 members</b> — after that it's monthly ($40/mo) or the yearly plan. Lock in now.</div>
+    <div class="cta-row">
+      <a class="btn" href="https://square.link/u/Xa7WOVqE">Join — $27 (first 2 months) →</a>
+      <a class="btn alt" href="https://square.link/u/wI4DjXjx">Go Yearly — $227 →</a>
+    </div>
   </section>
 
   <section>
@@ -94,18 +110,21 @@
         <h3>CSA Essential</h3>
         <div class="p"><span class="was">$1,600</span> $1,050 <span class="save">save $550</span></div>
         <p>Exam voucher + retake voucher + full coaching &amp; study plan. The complete done-with-you path.</p>
+        <a class="btn" href="https://square.link/u/5zoEdBwf">Enroll — $1,113 · or 4× w/ Afterpay →</a>
       </div>
       <div class="card">
         <span class="tag">ServiceNow CSA</span>
         <h3>CSA Self-Guided</h3>
         <div class="p"><span class="was">$1,000</span> $600 <span class="save">save $400</span></div>
         <p>Exam voucher + study plan &amp; exam guidance. You test on your own timeline.</p>
+        <a class="btn" href="https://square.link/u/aEfNjG1T">Enroll — $636 →</a>
       </div>
       <div class="card">
         <span class="tag">CompTIA</span>
         <h3>Security+</h3>
         <div class="p"><span class="was">$1,500</span> $850 <span class="save">save $650</span></div>
         <p>The cert that unlocks cleared / federal roles. Members-only rate, all July.</p>
+        <a class="btn" href="https://square.link/u/N5tjOgM8">Enroll — $901 →</a>
       </div>
       <div class="card" style="background:var(--soft)">
         <span class="tag">The lane</span>
@@ -127,6 +146,8 @@
         <tr><td><b>TS/SCI</b> Clearance Coaching</td><td class="was">$5,500</td><td class="price">$4,400 &nbsp;<span class="save">20% off</span></td></tr>
       </tbody>
     </table>
+    <div class="note">🔒 <b>Clearance is different — no instant checkout.</b> You must finish the free <b>Clearance Qualifier call</b> first so we can confirm eligibility, then we set your plan. Book the qualifier below.</div>
+    <div class="cta-row"><a class="btn ghost" href="https://agents.fireflies.ai/connect-to-agent?id=69e6d89a462191c47e54e17a">Book the Clearance Qualifier →</a></div>
   </section>
 
   <section>
@@ -150,5 +171,24 @@
   </footer>
 
 </div>
+<script>
+(function(){
+  var target = new Date('2026-07-27T23:59:59-04:00').getTime();
+  var el = document.getElementById('countdown');
+  function tick(){
+    var d = target - Date.now();
+    if(d < 0){ el.textContent = "It's the 27th 🎂"; return; }
+    var days=Math.floor(d/86400000), h=Math.floor(d%86400000/3600000), m=Math.floor(d%3600000/60000), s=Math.floor(d%60000/1000);
+    el.textContent = days+'d '+h+'h '+m+'m '+s+'s';
+  }
+  tick(); setInterval(tick, 1000);
+  fetch('https://www.rotechllc.com/api/member-count').then(function(r){return r.json();}).then(function(j){
+    if(j && typeof j.count === 'number'){
+      document.getElementById('memberCount').textContent = j.count;
+      document.getElementById('spotsLeft').textContent = Math.max(0, 100 - j.count);
+    }
+  }).catch(function(){});
+})();
+</script>
 </body>
 </html>
