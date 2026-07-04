@@ -33,7 +33,7 @@ ROT facts — JULY 2026 "Bo's 30th Birthday Drop" (hard deadline JULY 27, 2026; 
 
 MEMBERSHIP (Discord all-access — AI tutors, quizzes, job drops, coaching):
 - RIGHT NOW while under 100 members: $96 for 12 months (the founding steal, one-time) → https://square.link/u/Fpz8OFT4
-- Prefer monthly: $27/mo, first 2 months for just $27 → https://square.link/u/Xa7WOVqE
+- Prefer monthly: $27/mo, first 2 months for just $27 → https://square.link/u/4mPoXJAk
 - Yearly $227 (saves ~$97; includes $100 toward any service) → https://square.link/u/wI4DjXjx
 - At 100 members the $96 is GONE → entry becomes $227/yr (through July 27) or $40/mo. After July 27: $375/yr.
 
