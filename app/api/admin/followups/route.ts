@@ -15,7 +15,18 @@ export async function GET(req: Request) {
   if (!admin) return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 });
   try {
     const snap = await coll("crmFollowups").limit(500).get();
-    const items = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Record<string, unknown>) }));
+    const items = snap.docs.map((d) => {
+      const data = d.data() as Record<string, unknown>;
+      // The bot sometimes writes `notes` as a plain string; the UI expects Note[].
+      // Normalize so a bad shape can never crash the whole CRM.
+      const raw = data.notes;
+      const notes = Array.isArray(raw)
+        ? raw
+        : raw
+          ? [{ by: "system", text: String(raw), at: (data.createdAt as string) || "" }]
+          : [];
+      return { id: d.id, ...data, notes };
+    });
     items.sort((a, b) => String((b as { createdAt?: string }).createdAt || "").localeCompare(String((a as { createdAt?: string }).createdAt || "")));
     return NextResponse.json({ ok: true, items });
   } catch (e) {
