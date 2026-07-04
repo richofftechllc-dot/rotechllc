@@ -66,7 +66,10 @@ export async function GET(req: Request) {
       // Expiry: prefer the RAC access window; else derive from the join/purchase date.
       // Founding members = 12 months; monthly plans ≈ 30 days (ready for the switch).
       const plan = (rac.billingCycle as string) || (c.billingCycle as string) || (c.plan as string) || "annual";
-      let accessEnd = (rac.accessEndDate as string) || "";
+      // Prefer an explicit accessEndDate from either collection — the bot stamps a
+      // 60-day window on the $27 founding first cycle so the free 2nd month isn't
+      // shown as expired. Fall back to deriving from the purchase date.
+      let accessEnd = (rac.accessEndDate as string) || (c.accessEndDate as string) || "";
       if (!accessEnd && c.purchaseDate) {
         const start = Date.parse(c.purchaseDate as string);
         if (!isNaN(start)) accessEnd = new Date(start + (plan === "monthly" ? 30 : 365) * 86400000).toISOString();
