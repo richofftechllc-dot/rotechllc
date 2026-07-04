@@ -92,6 +92,7 @@ export default function AdminCRM() {
   const [scheduleType, setScheduleType] = useState<Record<string, string>>({});
   const [scheduleFor, setScheduleFor] = useState<string | null>(null);
   const [roleDraft, setRoleDraft] = useState<Record<string, string>>({});
+  const [paceDraft, setPaceDraft] = useState<Record<string, string>>({});
   const [bookFor, setBookFor] = useState<string | null>(null);
   const [bookCoach, setBookCoach] = useState<Record<string, string>>({});
   const [bookSlot, setBookSlot] = useState<Record<string, string>>({});
@@ -245,6 +246,15 @@ export default function AdminCRM() {
     const tier = trackDraft[m.email];
     if (!tier) return;
     doAction(m.email, "addTrack", { email: m.email, tier, name: m.name }, `✓ Granting ${tier} — bot will apply it + notify them.`);
+  }
+  async function setPace(m: Member) {
+    const pace = Number(paceDraft[m.email]);
+    if (!pace) return;
+    setActionMsg(s => ({ ...s, [m.email]: "…" }));
+    const trackId = m.tracks[0] || undefined;
+    const r = await fetch("/api/admin/set-pace", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: m.email, pace, trackId }) });
+    const d = await r.json();
+    setActionMsg(s => ({ ...s, [m.email]: r.ok && d.ok ? `✓ ${pace}-day plan set — they see the dated roadmap on /plan.` : `Error: ${d.error || r.status}` }));
   }
   function scheduleCall(m: Member) {
     const type = scheduleType[m.email] || "Intro";
@@ -640,6 +650,15 @@ export default function AdminCRM() {
                                   {["ROT Client", "Founding Member", "Security+", "ServiceNow CSA", "AWS AI Practitioner"].map(r => <option key={r} value={r}>{r}</option>)}
                                 </select>
                                 <button onClick={() => assignRole(m)} className="text-xs px-2.5 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Assign</button>
+                              </span>
+                              <span className="inline-flex items-center gap-1">
+                                <select value={paceDraft[m.email] || ""} onChange={e => setPaceDraft(s => ({ ...s, [m.email]: e.target.value }))} className="text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500">
+                                  <option value="">Study pace…</option>
+                                  <option value="30">30-day</option>
+                                  <option value="60">60-day</option>
+                                  <option value="90">90-day</option>
+                                </select>
+                                <button onClick={() => setPace(m)} className="text-xs px-2.5 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Set plan</button>
                               </span>
                               <button onClick={() => setBookFor(bookFor === m.email ? null : m.email)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📆 Book</button>
                               {me?.isOwner && <button onClick={() => setInvoiceFor(invoiceFor === m.email ? null : m.email)} className="text-xs px-2.5 py-1.5 rounded-lg border border-orange-300 bg-orange-50 text-orange-700 hover:bg-orange-100">🧾 Send invoice</button>}
