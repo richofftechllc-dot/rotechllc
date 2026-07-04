@@ -48,7 +48,7 @@ export default function BirthdayBanner() {
       </div>
       <div className="flex flex-wrap gap-2 mt-3">
         {!soldOut && (
-          <a href="https://square.link/u/Fpz8OFT4" className={btn + " bg-white text-black hover:opacity-90"}>Founding — $96 / 12 months</a>
+          <a href="https://square.link/u/qwyrxuwi" className={btn + " bg-white text-black hover:opacity-90"}>Founding — $96 / 12 months</a>
         )}
         {!soldOut && (
           <a href="https://square.link/u/Xa7WOVqE" className={btn + " bg-gradient-to-r from-orange-500 to-red-500 text-white hover:opacity-90"}>Or $27/mo · 2 months for $27</a>
