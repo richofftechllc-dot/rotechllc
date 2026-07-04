@@ -46,6 +46,13 @@ export async function POST(req: Request) {
       note: String(body.note || "").slice(0, 200),
       updatedAt: new Date().toISOString(),
     }, { merge: true });
+    // Tell the bot to (re)post the booking card ONCE — replaces the old morning
+    // auto-send. It posts within a few minutes, then clears this flag. No update = no post.
+    try {
+      await coll("jobMeta").doc("scheduleAnnounce").set({
+        pending: true, by: admin.name, at: new Date().toISOString(),
+      }, { merge: true });
+    } catch { /* non-fatal */ }
     return NextResponse.json({ ok: true });
   } catch (e) {
     return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : "error" }, { status: 500 });
