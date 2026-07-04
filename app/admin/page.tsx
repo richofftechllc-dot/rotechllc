@@ -93,6 +93,8 @@ export default function AdminCRM() {
   const [scheduleFor, setScheduleFor] = useState<string | null>(null);
   const [roleDraft, setRoleDraft] = useState<Record<string, string>>({});
   const [paceDraft, setPaceDraft] = useState<Record<string, string>>({});
+  const [adminCode, setAdminCode] = useState("");
+  const [adminCodeErr, setAdminCodeErr] = useState("");
   const [bookFor, setBookFor] = useState<string | null>(null);
   const [bookCoach, setBookCoach] = useState<Record<string, string>>({});
   const [bookSlot, setBookSlot] = useState<Record<string, string>>({});
@@ -377,8 +379,33 @@ export default function AdminCRM() {
     <main className="min-h-screen bg-[#f8f9fa] flex flex-col items-center justify-center gap-4 px-6 text-center text-[#202124]">
       <Image src="/rot-logo.png" alt="Rich Off Tech" width={56} height={56} className="rounded-xl" />
       <h1 className="text-2xl font-bold">Rich Off Tech — CRM</h1>
-      <p className="text-gray-500 max-w-sm">Coaches only. Sign in with the Discord account that holds the ROT Coach role.</p>
+      <p className="text-gray-500 max-w-sm">Coaches only. Sign in with your Discord coach account, or your access code.</p>
       <a href="/api/auth/discord?redirect=/admin" className="px-6 py-3 font-semibold rounded-lg text-white" style={{ backgroundColor: "#5865F2" }}>Sign in with Discord</a>
+      <div className="flex items-center gap-3 w-full max-w-xs my-1"><div className="flex-1 h-px bg-gray-300" /><span className="text-gray-400 text-xs">or access code</span><div className="flex-1 h-px bg-gray-300" /></div>
+      <div className="flex gap-2 w-full max-w-xs">
+        <input
+          value={adminCode}
+          onChange={(e) => setAdminCode(e.target.value)}
+          onKeyDown={async (e) => {
+            if (e.key !== "Enter" || !adminCode.trim()) return;
+            setAdminCodeErr("");
+            const r = await fetch("/api/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: adminCode.trim().toUpperCase() }) });
+            if (r.ok) window.location.reload(); else setAdminCodeErr("Invalid code");
+          }}
+          placeholder="ACCESS CODE"
+          className="flex-1 border border-[#dadce0] rounded-lg px-3 py-2.5 text-sm uppercase tracking-wide focus:outline-none focus:border-orange-500"
+        />
+        <button
+          onClick={async () => {
+            if (!adminCode.trim()) return;
+            setAdminCodeErr("");
+            const r = await fetch("/api/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: adminCode.trim().toUpperCase() }) });
+            if (r.ok) window.location.reload(); else setAdminCodeErr("Invalid code");
+          }}
+          className="px-4 py-2.5 rounded-lg bg-[#202124] text-white font-semibold text-sm hover:bg-black"
+        >Sign In</button>
+      </div>
+      {adminCodeErr && <div className="text-red-500 text-sm">{adminCodeErr}</div>}
     </main>
   );
 
