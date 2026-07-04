@@ -39,6 +39,22 @@ export async function POST(req: Request) {
   const roles = (await rolesRes.json()) as { id: string; name: string }[];
   const roleId = (n?: string) => roles.find((r) => r.name.toLowerCase() === (n || "").toLowerCase())?.id;
 
+  if (body.action === "recent") {
+    // Newest joins first — to find someone whose Discord handle doesn't match their name.
+    const r = await dfetch(`/guilds/${GUILD}/members?limit=1000`);
+    if (!r.ok) return NextResponse.json({ ok: false, error: `members_${r.status}` }, { status: 502 });
+    const arr = (await r.json()) as (Member & { joined_at?: string })[];
+    const roleName = (id: string) => roles.find((rr) => rr.id === id)?.name;
+    const sorted = arr.filter((m) => m.joined_at).sort((a, b) => (b.joined_at || "").localeCompare(a.joined_at || "")).slice(0, 15);
+    return NextResponse.json({
+      ok: true,
+      recent: sorted.map((m) => ({
+        id: m.user.id, username: m.user.username, display: m.user.global_name,
+        joined: m.joined_at, roles: m.roles.map(roleName).filter(Boolean),
+      })),
+    });
+  }
+
   if (body.action === "search") {
     const terms = (body.queries || []).filter(Boolean);
     const seen: Record<string, Member> = {};
