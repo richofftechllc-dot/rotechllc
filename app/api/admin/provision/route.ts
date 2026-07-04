@@ -30,7 +30,7 @@ export async function POST(req: Request) {
   if (!admin) return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 });
   if (!TOKEN) return NextResponse.json({ ok: false, error: "no_bot_token" }, { status: 500 });
 
-  let body: { action?: string; queries?: string[]; userId?: string; roleName?: string; removeRole?: string; email?: string; name?: string; quizCode?: string; tracks?: string[] };
+  let body: { action?: string; queries?: string[]; userId?: string; roleName?: string; removeRole?: string; email?: string; name?: string; quizCode?: string; tracks?: string[]; discordUsername?: string };
   try { body = await req.json(); } catch { return NextResponse.json({ ok: false, error: "bad_json" }, { status: 400 }); }
 
   // Look up the guild's roles once (for name→id).
@@ -38,6 +38,16 @@ export async function POST(req: Request) {
   if (!rolesRes.ok) return NextResponse.json({ ok: false, error: `roles_${rolesRes.status}` }, { status: 502 });
   const roles = (await rolesRes.json()) as { id: string; name: string }[];
   const roleId = (n?: string) => roles.find((r) => r.name.toLowerCase() === (n || "").toLowerCase())?.id;
+
+  if (body.action === "setusername") {
+    // Backfill the checkout Discord username on a paid record (for buyers who paid
+    // before auto-capture existed) so the bot auto-links them the moment they join.
+    if (!body.email || !body.discordUsername) return NextResponse.json({ ok: false, error: "need email + discordUsername" }, { status: 400 });
+    const snap = await coll("customers").where("email", "==", body.email.toLowerCase()).limit(1).get();
+    if (snap.empty) return NextResponse.json({ ok: false, error: "member not found" }, { status: 404 });
+    await snap.docs[0].ref.update({ discordUsername: body.discordUsername.toLowerCase().replace(/^@/, "") });
+    return NextResponse.json({ ok: true, set: body.discordUsername.toLowerCase().replace(/^@/, "") });
+  }
 
   if (body.action === "recent") {
     // Newest joins first — to find someone whose Discord handle doesn't match their name.
