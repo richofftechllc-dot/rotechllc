@@ -61,6 +61,7 @@ export default function AdminCRM() {
   const [referralPayout, setReferralPayoutState] = useState(20);
   const [payoutDraft, setPayoutDraft] = useState("");
   const [copied, setCopied] = useState("");
+  const [referralBlastMsg, setReferralBlastMsg] = useState("");
   const [igText, setIgText] = useState("");
   const [igStatus, setIgStatus] = useState("");
   const [igDrafts, setIgDrafts] = useState<{ id: string; imageUrl: string; caption: string; status: string }[]>([]);
@@ -198,6 +199,14 @@ export default function AdminCRM() {
   async function genReferralCodes() {
     await fetch("/api/admin/gen-referral-codes", { method: "POST" });
     loadMembers();
+  }
+  async function blastReferralLinks() {
+    const referrers = eligibleReferrers.filter(m => m.discordId && m.referralCode).map(m => ({ discordId: m.discordId, name: m.name || m.email, code: m.referralCode }));
+    if (!referrers.length) { setReferralBlastMsg("No eligible referrers with a linked Discord + code yet. Click 'Generate links' first."); return; }
+    setReferralBlastMsg(`Sending ${referrers.length} links…`);
+    const r = await fetch("/api/admin/action", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "referralBlast", payload: { referrers } }) });
+    const d = await r.json();
+    setReferralBlastMsg(r.ok && d.ok ? `✓ Queued — the bot is DMing ${referrers.length} referrers their links now.` : `Error: ${d.error || r.status}`);
   }
   async function blockReferrer(m: Member) {
     await fetch("/api/admin/referral-block", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: m.email, name: m.name, blocked: true }) });
@@ -1067,8 +1076,12 @@ export default function AdminCRM() {
             <div className="bg-white border border-[#dadce0] rounded-xl p-4 mb-5">
               <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
                 <div className="font-semibold text-sm">✅ Eligible referrers <span className="text-gray-400 font-normal">({eligibleReferrers.length}) — each gets a unique link</span></div>
-                <button onClick={genReferralCodes} className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Generate links</button>
+                <div className="flex gap-2">
+                  <button onClick={genReferralCodes} className="text-xs px-3 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">Generate links</button>
+                  <button onClick={blastReferralLinks} className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">📨 DM everyone their link</button>
+                </div>
               </div>
+              {referralBlastMsg && <div className="text-xs text-green-700 mb-2">{referralBlastMsg}</div>}
               <p className="text-xs text-gray-500 mb-3">Paid founding members + coaches. Each person&apos;s <b>rotechllc.com/r/[code]</b> link auto-credits them by the buyer&apos;s email — no typing, bulletproof. Click a link to copy it and send it to them.</p>
               {eligibleReferrers.length === 0 ? (
                 <div className="text-xs text-gray-400">No eligible referrers yet.</div>
