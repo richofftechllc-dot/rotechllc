@@ -10,15 +10,19 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const snap = await coll("customers").get();
-    let paid = 0, canceled = 0;
+    let paid = 0, canceled = 0, comped = 0;
     snap.docs.forEach((d) => {
-      const c = d.data() as { paymentStatus?: string; status?: string; rolesAssigned?: boolean };
+      const c = d.data() as { paymentStatus?: string; status?: string; purchaseDate?: string; lastPurchaseDate?: string; productType?: string; productTypes?: unknown[] };
       const st = (c.paymentStatus || c.status || "").toLowerCase();
       if (st === "canceled" || st === "refunded") { canceled++; return; }
-      paid++;
+      // Count ONLY real payers — a record tied to an actual purchase (purchaseDate or a
+      // product/track set on payment). Hand-seeded demo/comped codes (no purchase) don't
+      // count toward the founding 100.
+      const isRealPayer = !!(c.purchaseDate || c.lastPurchaseDate || c.productType || (Array.isArray(c.productTypes) && c.productTypes.length));
+      if (isRealPayer) paid++; else comped++;
     });
     const cap = 100;
-    return Response.json({ count: paid, total: snap.size, canceled, cap, spotsLeft: Math.max(0, cap - paid), soldOut: paid >= cap });
+    return Response.json({ count: paid, total: snap.size, canceled, comped, cap, spotsLeft: Math.max(0, cap - paid), soldOut: paid >= cap });
   } catch (e) {
     return Response.json({ count: null, error: e instanceof Error ? e.message : "error" }, { status: 500 });
   }

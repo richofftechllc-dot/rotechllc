@@ -79,12 +79,19 @@ export async function GET(req: Request) {
       if (daysLeft !== null && daysLeft >= 0 && daysLeft <= 30) expiringSoon++;
       const expired = daysLeft !== null && daysLeft < 0 && racStatus !== "comp" && racStatus !== "canceled";
       const referredBy = (c.referredBy as string) || (c.referredByCode as string) || (c.referrer as string) || "";
+      // A record tied to an actual purchase (a product/tier or a purchase date) is a
+      // real paying member. A record with only a hand-assigned code and no purchase is
+      // comped/demo (not "pending payment"). Cert + clearance tiers count as paid, not
+      // just "founding".
+      const hasProduct = !!(tier || c.productType || (Array.isArray(c.productTypes) && (c.productTypes as unknown[]).length) || c.purchaseDate || c.lastPurchaseDate);
       const paymentStatus = (racStatus === "comp" || tier === "comp") ? "comp"
         : racStatus === "canceled" ? "canceled"
         : expired ? "expired"
         : racStatus === "active" ? "active"
-        : tier === "founding" ? "active"   // Founding = paid $96 — never show as "pending" in the coach CRM
-        : c.rolesAssigned ? "active" : "pending";
+        : hasProduct ? "active"            // any real product/purchase (founding, cert, clearance) = paid
+        : c.rolesAssigned ? "active"
+        : c.quizCode ? "comp"              // has access code but no purchase = comped/demo, not pending
+        : "pending";
 
       const prog = progByCode[(c.quizCode as string) || ""] || [];
       const scored = prog.filter((p) => p.completed || p.highScore > 0);
