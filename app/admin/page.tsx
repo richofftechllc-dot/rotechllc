@@ -6,6 +6,7 @@ type Member = {
   email: string; name: string; discordTag: string; discordId: string;
   tier: string; status: string; paymentStatus: string; invoiced: boolean;
   tracks: string[]; roles: string[]; certs?: string[]; phone?: string; quizCode: string; accessEndDate: string; daysLeft?: number | null; plan?: string; referredBy?: string; rolesAssigned: boolean;
+  sentLog?: { type?: string; title?: string; detail?: string; at?: string }[];
   assignedTo: string; notes: string; purchaseDate?: string;
   progress?: { domains: { domain: string; highScore: number; completed: boolean }[]; done: number; avg: number | null; weak: string[] };
 };
@@ -655,6 +656,18 @@ export default function AdminCRM() {
                               </div>
                             </div>
                           </div>
+                          <div className="text-xs text-gray-400 mb-1.5">What was sent to this member</div>
+                          {m.sentLog?.length ? (
+                            <div className="space-y-1 mb-4">
+                              {[...m.sentLog].reverse().slice(0, 12).map((e, i) => (
+                                <div key={i} className="text-xs bg-[#f8f9fa] border border-[#e8eaed] rounded px-2 py-1 flex items-center justify-between gap-2">
+                                  <span><span className="inline-block px-1.5 py-0.5 rounded bg-gray-200 text-gray-600 text-[10px] mr-1.5">{e.type === "email" ? "✉️ email" : e.type === "dm" ? "💬 DM" : e.type}</span>{e.title}{e.detail ? <span className="text-gray-400"> — {e.detail}</span> : ""}</span>
+                                  <span className="text-gray-400 whitespace-nowrap">{e.at ? new Date(e.at).toLocaleDateString() : ""}</span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : <div className="text-gray-500 text-xs mb-4">Nothing logged yet — welcome emails + onboarding DMs will appear here as they go out.</div>}
+
                           <div className="text-xs text-gray-400 mb-1.5">Quiz scores by domain</div>
                           {m.progress?.domains?.length ? (
                             <div className="flex flex-wrap gap-2">

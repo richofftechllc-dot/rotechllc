@@ -124,6 +124,7 @@ export async function GET(req: Request) {
         rolesAssigned: !!c.rolesAssigned,
         assignedTo: (c.assignedTo as string) || (rac.assignedTo as string) || "",
         notes: (c.crmNotes as string) || (rac.crmNotes as string) || "",
+        sentLog: (Array.isArray(c.sentLog) ? c.sentLog : []) as { type?: string; title?: string; detail?: string; at?: string }[],
         progress,
       };
     });
