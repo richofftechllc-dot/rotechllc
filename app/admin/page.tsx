@@ -7,6 +7,7 @@ type Member = {
   tier: string; status: string; paymentStatus: string; invoiced: boolean;
   tracks: string[]; roles: string[]; certs?: string[]; phone?: string; quizCode: string; accessEndDate: string; daysLeft?: number | null; plan?: string; referredBy?: string; rolesAssigned: boolean;
   sentLog?: { type?: string; title?: string; detail?: string; at?: string }[];
+  referralEligible?: boolean;
   assignedTo: string; notes: string; purchaseDate?: string;
   progress?: { domains: { domain: string; highScore: number; completed: boolean }[]; done: number; avg: number | null; weak: string[] };
 };
@@ -434,6 +435,7 @@ export default function AdminCRM() {
     return { ref, count: list.length, paid, owed, capped: owedRaw > CAP_PER_PERSON, creditOption: owed >= CAP_PER_PERSON ? 1000 : owed * 2 };
   }).sort((a, b) => b.owed - a.owed || b.count - a.count);
   const totalOwed = referrers.reduce((s, r) => s + r.owed, 0);
+  const eligibleReferrers = members.filter(m => m.referralEligible).sort((a, b) => (a.name || a.email).localeCompare(b.name || b.email));
 
   const TABS: { id: typeof tab; label: string }[] = [
     { id: "followups", label: "Follow-ups" },
@@ -1051,6 +1053,23 @@ export default function AdminCRM() {
         {/* ── Referrals ── */}
         {tab === "referrals" && (
           <div>
+            {/* Who is allowed to refer — active founding members + coaches. Share the $127 link with these people. */}
+            <div className="bg-white border border-[#dadce0] rounded-xl p-4 mb-5">
+              <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+                <div className="font-semibold text-sm">✅ Eligible referrers <span className="text-gray-400 font-normal">({eligibleReferrers.length}) — can send the $127 link</span></div>
+                <a href="https://square.link/u/jSF7J4zp" target="_blank" rel="noopener" className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Copy their $127 link →</a>
+              </div>
+              <p className="text-xs text-gray-500 mb-2">Paid founding members + coaches. Cert/clearance-only buyers and comps are excluded.</p>
+              {eligibleReferrers.length === 0 ? (
+                <div className="text-xs text-gray-400">No eligible referrers yet.</div>
+              ) : (
+                <div className="flex flex-wrap gap-1.5">
+                  {eligibleReferrers.map(m => (
+                    <span key={m.email} className="text-xs px-2 py-1 rounded-full bg-green-50 border border-green-200 text-green-800">{m.name || m.email}</span>
+                  ))}
+                </div>
+              )}
+            </div>
             <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-gray-500 text-sm mr-auto">Auto-captured from the $127 referral link. <b>${referralPayout}</b>/cleared referral, <b>capped at $500/person</b> (or $1,000 store credit). Only active (non-refunded) referrals count — pay out after 5 business days.</p>

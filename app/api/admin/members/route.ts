@@ -120,6 +120,11 @@ export async function GET(req: Request) {
         daysLeft,
         plan,
         referredBy,
+        // Who can send referrals: an active FOUNDING-membership payer (not comp, not
+        // cert/clearance-only, not a $27 record without founding) OR a coach.
+        referralEligible: (paymentStatus === "active" && (tier === "founding" || c.productType === "founding" || (Array.isArray(c.productTypes) && (c.productTypes as string[]).includes("founding"))))
+          || ["theelinuxgirl@gmail.com", "daquanhundreds@gmail.com"].includes(email)
+          || /\b(tyler|daquan)\b/i.test(String((c.name as string) || "")),
         purchaseDate: (c.purchaseDate as string) || "",
         rolesAssigned: !!c.rolesAssigned,
         assignedTo: (c.assignedTo as string) || (rac.assignedTo as string) || "",
