@@ -421,11 +421,18 @@ export default function AdminCRM() {
   // Referral rollup: group by who referred them, count paid, compute payout owed.
   const referrerMap: Record<string, Member[]> = {};
   members.forEach(m => { if (m.referredBy) (referrerMap[m.referredBy] ||= []).push(m); });
-  const referrers = Object.entries(referrerMap).map(([ref, list]) => ({
-    ref, count: list.length,
-    paid: list.filter(x => x.paymentStatus === "active" || x.paymentStatus === "comp").length,
-  })).sort((a, b) => b.count - a.count);
-  const totalOwed = referrers.reduce((s, r) => s + r.paid * referralPayout, 0);
+  // Only ACTIVE/COMP referrals count toward payout — a refunded or churned referral
+  // flips to expired/canceled and drops out, so you never pay on money you gave back.
+  // Cash is capped at $500/person ($50 × 10). At the cap they can take $1,000 store
+  // credit instead; below it, credit = 2× the cash owed.
+  const CAP_PER_PERSON = 500;
+  const referrers = Object.entries(referrerMap).map(([ref, list]) => {
+    const paid = list.filter(x => x.paymentStatus === "active" || x.paymentStatus === "comp").length;
+    const owedRaw = paid * referralPayout;
+    const owed = Math.min(owedRaw, CAP_PER_PERSON);
+    return { ref, count: list.length, paid, owed, capped: owedRaw > CAP_PER_PERSON, creditOption: owed >= CAP_PER_PERSON ? 1000 : owed * 2 };
+  }).sort((a, b) => b.owed - a.owed || b.count - a.count);
+  const totalOwed = referrers.reduce((s, r) => s + r.owed, 0);
 
   const TABS: { id: typeof tab; label: string }[] = [
     { id: "followups", label: "Follow-ups" },
@@ -1032,7 +1039,7 @@ export default function AdminCRM() {
           <div>
             <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="text-gray-500 text-sm mr-auto">Who referred whom and what&apos;s owed. Payout = <b>${referralPayout}</b> per paid referral.</p>
+                <p className="text-gray-500 text-sm mr-auto">Auto-captured from the $127 referral link. <b>${referralPayout}</b>/cleared referral, <b>capped at $500/person</b> (or $1,000 store credit). Only active (non-refunded) referrals count — pay out after 5 business days.</p>
                 <input value={payoutDraft} onChange={e => setPayoutDraft(e.target.value)} placeholder={`${referralPayout}`} type="number" className="w-24 text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500" />
                 <button onClick={savePayout} className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Set payout</button>
               </div>
@@ -1040,13 +1047,13 @@ export default function AdminCRM() {
             </div>
             {referrers.length === 0 ? (
               <div className="bg-white border border-[#dadce0] rounded-xl p-6 text-sm text-gray-500">
-                No referrals recorded yet. To track them, signups need to capture a <code className="bg-gray-100 px-1 rounded">referredBy</code> code — I can wire that into the join flow so this fills automatically.
+                No referrals yet. This fills <b>automatically</b> — anyone who buys through the <b>$127 referral link</b> (square.link/u/jSF7J4zp) and types who referred them shows up here, and the referrer gets DM&apos;d that their $50 is coming.
               </div>
             ) : (
               <div className="bg-white border border-[#dadce0] rounded-xl overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="text-left text-xs text-gray-500 bg-[#f8f9fa]"><tr className="border-b border-[#e8eaed]">
-                    <th className="py-2.5 px-4 font-medium">Referrer</th><th className="px-3 font-medium">Referred</th><th className="px-3 font-medium">Paid</th><th className="px-3 font-medium">Owed</th>
+                    <th className="py-2.5 px-4 font-medium">Referrer</th><th className="px-3 font-medium">Referred</th><th className="px-3 font-medium">Paid (cleared)</th><th className="px-3 font-medium">Cash owed</th><th className="px-3 font-medium">or Credit</th>
                   </tr></thead>
                   <tbody>
                     {referrers.map(r => (
@@ -1054,7 +1061,8 @@ export default function AdminCRM() {
                         <td className="py-2.5 px-4 font-medium">{r.ref}</td>
                         <td className="px-3">{r.count}</td>
                         <td className="px-3">{r.paid}</td>
-                        <td className="px-3 font-semibold">${r.paid * referralPayout}</td>
+                        <td className="px-3 font-semibold">${r.owed}{r.capped && <span className="ml-1 text-[10px] px-1 rounded bg-orange-100 text-orange-700">$500 cap</span>}</td>
+                        <td className="px-3 text-gray-600">${r.creditOption}</td>
                       </tr>
                     ))}
                   </tbody>
