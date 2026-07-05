@@ -199,6 +199,10 @@ export default function AdminCRM() {
     await fetch("/api/admin/gen-referral-codes", { method: "POST" });
     loadMembers();
   }
+  async function blockReferrer(m: Member) {
+    await fetch("/api/admin/referral-block", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: m.email, name: m.name, blocked: true }) });
+    loadMembers();
+  }
   async function savePayout() {
     const v = Number(payoutDraft);
     if (isNaN(v)) return;
@@ -1073,9 +1077,12 @@ export default function AdminCRM() {
                   {eligibleReferrers.map(m => (
                     <div key={m.email} className="flex items-center justify-between gap-2 text-xs border-b border-[#f1f3f4] py-1.5">
                       <span className="font-medium truncate">{m.name || m.email}</span>
-                      {m.referralCode ? (
-                        <button onClick={() => { navigator.clipboard.writeText(`https://rotechllc.com/r/${m.referralCode}`); setCopied(m.email); setTimeout(() => setCopied(""), 1500); }} className="text-[11px] px-2 py-1 rounded bg-gray-100 border border-gray-200 hover:border-orange-400 font-mono whitespace-nowrap">{copied === m.email ? "✓ copied!" : `rotechllc.com/r/${m.referralCode}`}</button>
-                      ) : <span className="text-gray-400 whitespace-nowrap">— click Generate links</span>}
+                      <div className="flex items-center gap-1.5 whitespace-nowrap">
+                        {m.referralCode ? (
+                          <button onClick={() => { navigator.clipboard.writeText(`https://rotechllc.com/r/${m.referralCode}`); setCopied(m.email); setTimeout(() => setCopied(""), 1500); }} className="text-[11px] px-2 py-1 rounded bg-gray-100 border border-gray-200 hover:border-orange-400 font-mono">{copied === m.email ? "✓ copied!" : `rotechllc.com/r/${m.referralCode}`}</button>
+                        ) : <span className="text-gray-400">— click Generate links</span>}
+                        <button onClick={() => blockReferrer(m)} title="Remove — they can't refer" className="text-[13px] px-1.5 py-0.5 rounded text-gray-400 hover:text-red-600 hover:bg-red-50">✕</button>
+                      </div>
                     </div>
                   ))}
                 </div>
