@@ -9,17 +9,28 @@ export const dynamic = "force-dynamic";
 // This is the single source of truth for "spots left" across the site, offer sheet, and Bo.
 export async function GET() {
   try {
+    // Comped members (given free access via RAC) never count toward the paid 100.
+    const compedEmails = new Set<string>();
+    try {
+      const rac = await coll("members").limit(3000).get();
+      rac.docs.forEach((d) => {
+        const m = d.data() as { email?: string; accessTier?: string; status?: string };
+        if ((m.accessTier === "comp" || m.status === "comp") && m.email) compedEmails.add(String(m.email).toLowerCase());
+      });
+    } catch { /* best-effort */ }
+
     const snap = await coll("customers").get();
     let paid = 0, canceled = 0, comped = 0;
     snap.docs.forEach((d) => {
-      const c = d.data() as { paymentStatus?: string; status?: string; purchaseDate?: string; lastPurchaseDate?: string; productType?: string; productTypes?: unknown[] };
+      const c = d.data() as { paymentStatus?: string; status?: string; email?: string; purchaseDate?: string; lastPurchaseDate?: string; productType?: string; productTypes?: unknown[] };
       const st = (c.paymentStatus || c.status || "").toLowerCase();
       if (st === "canceled" || st === "refunded") { canceled++; return; }
-      // Count ONLY real payers — a record tied to an actual purchase (purchaseDate or a
-      // product/track set on payment). Hand-seeded demo/comped codes (no purchase) don't
-      // count toward the founding 100.
+      const email = String(c.email || "").toLowerCase();
+      // Exclude comped/demo: an explicit RAC comp, a comp product, or a record with no
+      // real purchase at all (hand-seeded access code).
       const isRealPayer = !!(c.purchaseDate || c.lastPurchaseDate || c.productType || (Array.isArray(c.productTypes) && c.productTypes.length));
-      if (isRealPayer) paid++; else comped++;
+      if (compedEmails.has(email) || c.productType === "comp" || !isRealPayer) { comped++; return; }
+      paid++;
     });
     const cap = 100;
     return Response.json({ count: paid, total: snap.size, canceled, comped, cap, spotsLeft: Math.max(0, cap - paid), soldOut: paid >= cap });
