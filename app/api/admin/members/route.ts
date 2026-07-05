@@ -133,7 +133,16 @@ export async function GET(req: Request) {
       if (b.paymentStatus === "late" && a.paymentStatus !== "late") return 1;
       return (a.name || a.email).localeCompare(b.name || b.email);
     });
-    return NextResponse.json({ ok: true, members, stats: { total: members.length, comped, expiringSoon } });
+    const paidCount = members.filter((m) => m.paymentStatus === "active").length;
+    const compedCount = members.filter((m) => m.paymentStatus === "comp").length;
+    // Comped/demo members are OWNER-ONLY. Coaches only ever see real paying members.
+    const visible = admin.isOwner ? members : members.filter((m) => m.paymentStatus !== "comp");
+    return NextResponse.json({
+      ok: true,
+      members: visible,
+      isOwner: admin.isOwner,
+      stats: { total: members.length, paid: paidCount, comped: compedCount, expiringSoon },
+    });
   } catch (e) {
     return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : "error" }, { status: 500 });
   }

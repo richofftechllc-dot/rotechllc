@@ -33,7 +33,10 @@ export async function GET() {
       paid++;
     });
     const cap = 100;
-    return Response.json({ count: paid, total: snap.size, canceled, comped, cap, spotsLeft: Math.max(0, cap - paid), soldOut: paid >= cap });
+    // Public count = everyone in (paid + comped) → keeps the "spots left" urgency.
+    // paid/comped are the private breakdown (shown only to Randy in the CRM).
+    const count = paid + comped;
+    return Response.json({ count, paid, comped, total: snap.size, canceled, cap, spotsLeft: Math.max(0, cap - count), soldOut: count >= cap });
   } catch (e) {
     return Response.json({ count: null, error: e instanceof Error ? e.message : "error" }, { status: 500 });
   }

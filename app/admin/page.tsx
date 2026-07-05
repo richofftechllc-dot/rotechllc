@@ -73,7 +73,7 @@ export default function AdminCRM() {
   const [fStatus, setFStatus] = useState("");
   const [resetMsg, setResetMsg] = useState<Record<string, string>>({});
   const [members, setMembers] = useState<Member[]>([]);
-  const [stats, setStats] = useState<{ total: number; comped: number; expiringSoon: number } | null>(null);
+  const [stats, setStats] = useState<{ total: number; comped: number; paid?: number; expiringSoon: number } | null>(null);
   const [followups, setFollowups] = useState<Followup[]>([]);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [me, setMe] = useState<{ discordId: string; name: string; isOwner?: boolean } | null>(null);
@@ -105,7 +105,7 @@ export default function AdminCRM() {
     if (r.status === 403) { setAuthed("no"); return; }
     setAuthed("yes");
     const d = await r.json();
-    if (d.ok) { setMembers(d.members); setStats(d.stats); }
+    if (d.ok) { setMembers(d.members); setStats(d.stats); if (d.isOwner !== undefined) setMe(prev => ({ discordId: prev?.discordId ?? "", name: prev?.name ?? "Randy", isOwner: d.isOwner })); }
   }, []);
   const loadFollowups = useCallback(async () => {
     const r = await fetch("/api/admin/followups");
@@ -477,9 +477,10 @@ export default function AdminCRM() {
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
           {[
             { label: "Members", value: stats?.total ?? members.length, tone: "text-[#202124]" },
+            ...(me?.isOwner ? [{ label: "Paid", value: stats?.paid ?? 0, tone: "text-green-700" }] : []),
             { label: "Expiring ≤30d", value: stats?.expiringSoon ?? 0, tone: "text-amber-600" },
             { label: "Late / expired", value: lateCount, tone: "text-red-600" },
-            { label: "Comped", value: stats?.comped ?? 0, tone: "text-blue-600" },
+            ...(me?.isOwner ? [{ label: "Comped (you only)", value: stats?.comped ?? 0, tone: "text-blue-600" }] : []),
             { label: "Open follow-ups", value: openFollowups.length, tone: "text-[#202124]" },
           ].map(c => (
             <div key={c.label} className="bg-white border border-[#dadce0] rounded-xl p-4">
