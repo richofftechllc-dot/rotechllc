@@ -8,6 +8,7 @@ type Member = {
   tracks: string[]; roles: string[]; certs?: string[]; phone?: string; quizCode: string; accessEndDate: string; daysLeft?: number | null; plan?: string; referredBy?: string; rolesAssigned: boolean;
   sentLog?: { type?: string; title?: string; detail?: string; at?: string }[];
   referralEligible?: boolean;
+  referralCode?: string;
   assignedTo: string; notes: string; purchaseDate?: string;
   progress?: { domains: { domain: string; highScore: number; completed: boolean }[]; done: number; avg: number | null; weak: string[] };
 };
@@ -59,6 +60,7 @@ export default function AdminCRM() {
   const [newSop, setNewSop] = useState({ title: "", body: "" });
   const [referralPayout, setReferralPayoutState] = useState(20);
   const [payoutDraft, setPayoutDraft] = useState("");
+  const [copied, setCopied] = useState("");
   const [igText, setIgText] = useState("");
   const [igStatus, setIgStatus] = useState("");
   const [igDrafts, setIgDrafts] = useState<{ id: string; imageUrl: string; caption: string; status: string }[]>([]);
@@ -192,6 +194,10 @@ export default function AdminCRM() {
     const d = await r.json();
     setIgStatus(r.ok && d.ok ? "✓ Generating — the image appears below + in #ig-drafts to approve." : `Error: ${d.error}`);
     if (r.ok && d.ok) { setIgText(""); setTimeout(loadIgDrafts, 12000); setTimeout(loadIgDrafts, 22000); }
+  }
+  async function genReferralCodes() {
+    await fetch("/api/admin/gen-referral-codes", { method: "POST" });
+    loadMembers();
   }
   async function savePayout() {
     const v = Number(payoutDraft);
@@ -1056,16 +1062,21 @@ export default function AdminCRM() {
             {/* Who is allowed to refer — active founding members + coaches. Share the $127 link with these people. */}
             <div className="bg-white border border-[#dadce0] rounded-xl p-4 mb-5">
               <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
-                <div className="font-semibold text-sm">✅ Eligible referrers <span className="text-gray-400 font-normal">({eligibleReferrers.length}) — can send the $127 link</span></div>
-                <a href="https://square.link/u/jSF7J4zp" target="_blank" rel="noopener" className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Copy their $127 link →</a>
+                <div className="font-semibold text-sm">✅ Eligible referrers <span className="text-gray-400 font-normal">({eligibleReferrers.length}) — each gets a unique link</span></div>
+                <button onClick={genReferralCodes} className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Generate links</button>
               </div>
-              <p className="text-xs text-gray-500 mb-2">Paid founding members + coaches. Cert/clearance-only buyers and comps are excluded.</p>
+              <p className="text-xs text-gray-500 mb-3">Paid founding members + coaches. Each person&apos;s <b>rotechllc.com/r/[code]</b> link auto-credits them by the buyer&apos;s email — no typing, bulletproof. Click a link to copy it and send it to them.</p>
               {eligibleReferrers.length === 0 ? (
                 <div className="text-xs text-gray-400">No eligible referrers yet.</div>
               ) : (
-                <div className="flex flex-wrap gap-1.5">
+                <div className="space-y-1 max-h-72 overflow-y-auto">
                   {eligibleReferrers.map(m => (
-                    <span key={m.email} className="text-xs px-2 py-1 rounded-full bg-green-50 border border-green-200 text-green-800">{m.name || m.email}</span>
+                    <div key={m.email} className="flex items-center justify-between gap-2 text-xs border-b border-[#f1f3f4] py-1.5">
+                      <span className="font-medium truncate">{m.name || m.email}</span>
+                      {m.referralCode ? (
+                        <button onClick={() => { navigator.clipboard.writeText(`https://rotechllc.com/r/${m.referralCode}`); setCopied(m.email); setTimeout(() => setCopied(""), 1500); }} className="text-[11px] px-2 py-1 rounded bg-gray-100 border border-gray-200 hover:border-orange-400 font-mono whitespace-nowrap">{copied === m.email ? "✓ copied!" : `rotechllc.com/r/${m.referralCode}`}</button>
+                      ) : <span className="text-gray-400 whitespace-nowrap">— click Generate links</span>}
+                    </div>
                   ))}
                 </div>
               )}

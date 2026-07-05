@@ -125,6 +125,7 @@ export async function GET(req: Request) {
         referralEligible: (paymentStatus === "active" && (tier === "founding" || c.productType === "founding" || (Array.isArray(c.productTypes) && (c.productTypes as string[]).includes("founding"))))
           || ["theelinuxgirl@gmail.com", "daquanhundreds@gmail.com"].includes(email)
           || /\b(tyler|daquan)\b/i.test(String((c.name as string) || "")),
+        referralCode: (c.referralCode as string) || "",
         purchaseDate: (c.purchaseDate as string) || "",
         rolesAssigned: !!c.rolesAssigned,
         assignedTo: (c.assignedTo as string) || (rac.assignedTo as string) || "",
