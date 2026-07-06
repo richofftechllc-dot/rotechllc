@@ -1103,7 +1103,7 @@ export default function AdminCRM() {
             </div>
             <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="text-gray-500 text-sm mr-auto">Auto-captured from the $127 referral link. <b>${referralPayout}</b>/cleared referral, <b>capped at $500/person</b> (or $1,000 store credit). Only active (non-refunded) referrals count — pay out after 5 business days.</p>
+                <p className="text-gray-500 text-sm mr-auto">Auto-captured from referral links. <b>${referralPayout}</b>/cleared referral, <b>capped at $500/person</b> (or $1,000 store credit). Only active (non-refunded) referrals count — pay out after 5 business days. <b>Program runs until 200 members</b> {(stats?.total ?? members.length) >= 200 ? <span className="text-red-600 font-semibold">— ENDED (200 reached)</span> : <span className="text-gray-600">(currently {stats?.total ?? members.length}/200)</span>}.</p>
                 <input value={payoutDraft} onChange={e => setPayoutDraft(e.target.value)} placeholder={`${referralPayout}`} type="number" className="w-24 text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500" />
                 <button onClick={savePayout} className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Set payout</button>
               </div>
