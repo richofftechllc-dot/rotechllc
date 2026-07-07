@@ -103,6 +103,8 @@ export async function GET(req: Request) {
       };
 
       return {
+        id: d.id, // unique Firestore doc id — the CRM keys rows by this, NOT email
+                  // (72 members have a blank email, which collided → wrong-person-on-click).
         email: (c.email as string) || "",
         name: (c.name as string) || (c.firstName as string) || "",
         discordTag: (c.discordTag as string) || (rac.discordTag as string) || "",
@@ -128,6 +130,9 @@ export async function GET(req: Request) {
           || /\b(tyler|daquan)\b/i.test(String((c.name as string) || ""))
         ),
         referralCode: (c.referralCode as string) || "",
+        // Founding tier: 1 = first 100 ($50/referral), 2 = joined after the count filled
+        // ($25/referral). Existing members with no stamp are the original first-100 → T1.
+        foundingTier: (typeof c.foundingTier === "number" ? c.foundingTier : 1) as number,
         purchaseDate: (c.purchaseDate as string) || "",
         rolesAssigned: !!c.rolesAssigned,
         assignedTo: (c.assignedTo as string) || (rac.assignedTo as string) || "",

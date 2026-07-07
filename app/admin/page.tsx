@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback, Fragment } from "react";
 import Image from "next/image";
 
 type Member = {
-  email: string; name: string; discordTag: string; discordId: string;
+  id: string; email: string; name: string; discordTag: string; discordId: string;
   tier: string; status: string; paymentStatus: string; invoiced: boolean;
   tracks: string[]; roles: string[]; certs?: string[]; phone?: string; quizCode: string; accessEndDate: string; daysLeft?: number | null; plan?: string; referredBy?: string; rolesAssigned: boolean;
   sentLog?: { type?: string; title?: string; detail?: string; at?: string }[];
@@ -336,7 +336,7 @@ export default function AdminCRM() {
         const prog = pr ? `${pr.done} quizzes done${pr.avg != null ? `, avg ${pr.avg}%` : ""}${pr.weak?.length ? `, weak: ${pr.weak.join("/")}` : ""}` : "no quiz activity";
         return `${m.name || m.email} | ${m.tier || "—"} | ${m.paymentStatus} | ${m.daysLeft ?? "—"}d left | tracks: ${m.tracks.join("/") || "none"} | ${prog}`;
       }).join("\n");
-      const focus = expanded ? members.find(m => m.email === expanded) : null;
+      const focus = expanded ? members.find(m => m.id === expanded) : null;
       const r = await fetch("/api/admin/assistant", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: next, roster, focus }) });
       const reply = await r.text();
       setBoMsgs(m => [...m, { role: "assistant", content: reply }]);
@@ -632,8 +632,8 @@ export default function AdminCRM() {
                 </thead>
                 <tbody>
                   {filteredMembers.map(m => (
-                    <Fragment key={m.email}>
-                      <tr className="border-b border-[#f1f3f4] hover:bg-[#f8f9fa] cursor-pointer" onClick={() => setExpanded(expanded === m.email ? null : m.email)}>
+                    <Fragment key={m.id}>
+                      <tr className="border-b border-[#f1f3f4] hover:bg-[#f8f9fa] cursor-pointer" onClick={() => setExpanded(expanded === m.id ? null : m.id)}>
                         <td className="py-2.5 px-4">
                           <div className="font-medium">{m.name || m.email}</div>
                           <div className="text-xs text-gray-500">{m.email}{m.discordTag ? ` · ${m.discordTag}` : ""}</div>
@@ -661,7 +661,7 @@ export default function AdminCRM() {
                           {m.progress?.weak?.length ? <span className="ml-1 text-[10px] text-red-600">⚠{m.progress.weak.length}</span> : null}
                         </td>
                       </tr>
-                      {expanded === m.email && (
+                      {expanded === m.id && (
                         <tr className="bg-[#f8f9fa]"><td colSpan={7} className="px-4 py-4">
                           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-1.5 text-xs mb-4">
                             <div><span className="text-gray-400">Name</span><div className="font-medium">{m.name || "—"}</div></div>
@@ -716,7 +716,7 @@ export default function AdminCRM() {
                           <div className="mt-4 pt-3 border-t border-[#e8eaed]">
                             <div className="text-xs text-gray-400 mb-2">Actions</div>
                             <div className="flex flex-wrap items-center gap-2">
-                              <button onClick={() => setScheduleFor(scheduleFor === m.email ? null : m.email)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📅 Schedule call</button>
+                              <button onClick={() => setScheduleFor(scheduleFor === m.id ? null : m.id)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📅 Schedule call</button>
                               <button onClick={() => viewResume(m)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📄 {resumeView[m.email] ? "Hide" : "View"} resume</button>
                               <span className="inline-flex items-center gap-1">
                                 <select value={trackDraft[m.email] || ""} onChange={e => setTrackDraft(s => ({ ...s, [m.email]: e.target.value }))} className="text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500">
@@ -741,8 +741,8 @@ export default function AdminCRM() {
                                 </select>
                                 <button onClick={() => setPace(m)} className="text-xs px-2.5 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Set plan</button>
                               </span>
-                              <button onClick={() => setBookFor(bookFor === m.email ? null : m.email)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📆 Book</button>
-                              <button onClick={() => setInvoiceFor(invoiceFor === m.email ? null : m.email)} className="text-xs px-2.5 py-1.5 rounded-lg border border-orange-300 bg-orange-50 text-orange-700 hover:bg-orange-100">🧾 Send invoice</button>
+                              <button onClick={() => setBookFor(bookFor === m.id ? null : m.id)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📆 Book</button>
+                              <button onClick={() => setInvoiceFor(invoiceFor === m.id ? null : m.id)} className="text-xs px-2.5 py-1.5 rounded-lg border border-orange-300 bg-orange-50 text-orange-700 hover:bg-orange-100">🧾 Send invoice</button>
                             </div>
                             <div className="flex flex-wrap items-center gap-2 mt-2">
                               <input value={dmDraft[m.email] || ""} onChange={e => setDmDraft(s => ({ ...s, [m.email]: e.target.value }))}
@@ -758,7 +758,7 @@ export default function AdminCRM() {
                               </select>
                               <button onClick={() => revokeAccess(m)} className="text-xs px-2.5 py-1.5 rounded-lg border border-red-300 bg-red-50 text-red-700 hover:bg-red-100">Remove access</button>
                             </div>
-                            {invoiceFor === m.email && (
+                            {invoiceFor === m.id && (
                               <div className="flex flex-wrap items-center gap-2 mt-2 bg-orange-50 border border-orange-200 rounded-lg p-2">
                                 <span className="text-xs text-orange-800">Invoice {m.name || m.email}:</span>
                                 <select value={invoiceService} onChange={e => setInvoiceService(e.target.value)} className="text-xs border border-orange-200 rounded-lg px-2 py-1.5 bg-white max-w-[260px]">
@@ -769,7 +769,7 @@ export default function AdminCRM() {
                                 <button onClick={() => sendInvoice(m)} className="text-xs px-3 py-1.5 rounded-lg bg-orange-600 text-white hover:bg-orange-700">Send invoice</button>
                               </div>
                             )}
-                            {scheduleFor === m.email && (
+                            {scheduleFor === m.id && (
                               <div className="mt-2 bg-[#f8f9fa] border border-[#dadce0] rounded-lg p-3">
                                 <div className="flex flex-wrap items-center gap-2">
                                   <span className="text-xs text-gray-700">Meeting type:</span>
@@ -782,7 +782,7 @@ export default function AdminCRM() {
                                 <p className="text-[11px] text-gray-500 mt-1.5">This DMs {m.name || "them"} in Discord to book a {(scheduleType[m.email] || "Intro").toLowerCase()} call — they pick a coach + an open time (tomorrow 11–5 ET) in the bot. It doesn&apos;t reserve a slot here or charge anything.</p>
                               </div>
                             )}
-                            {bookFor === m.email && (
+                            {bookFor === m.id && (
                               <div className="mt-2 bg-[#f8f9fa] border border-[#dadce0] rounded-lg p-3">
                                 <div className="flex flex-wrap items-center gap-2">
                                   <span className="text-xs text-gray-700">Book a 1-on-1:</span>
@@ -1026,7 +1026,7 @@ export default function AdminCRM() {
           <div className="bg-white border border-[#dadce0] rounded-xl flex flex-col" style={{ height: "70vh" }}>
             <div className="px-4 py-3 border-b border-[#e8eaed] flex items-center justify-between">
               <div className="font-semibold flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-orange-500" />Bo Tech — CRM Assistant</div>
-              <div className="text-xs text-gray-500">{expanded ? `Looking at: ${expanded}` : "Open a member for member-specific help"}</div>
+              <div className="text-xs text-gray-500">{expanded ? `Looking at: ${members.find(m => m.id === expanded)?.name || members.find(m => m.id === expanded)?.email || "member"}` : "Open a member for member-specific help"}</div>
             </div>
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
               {boMsgs.length === 0 && (
