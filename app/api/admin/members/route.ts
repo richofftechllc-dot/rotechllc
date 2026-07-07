@@ -90,7 +90,9 @@ export async function GET(req: Request) {
         : racStatus === "active" ? "active"
         : hasProduct ? "active"            // any real product/purchase (founding, cert, clearance) = paid
         : c.rolesAssigned ? "active"
-        : c.quizCode ? "comp"              // has access code but no purchase = comped/demo, not pending
+        : c.quizCode ? "active"            // a minted quiz code (FIRSTNAME2026) = a confirmed PAID
+                                           // founder — the webhook only mints codes for paid buyers.
+                                           // Genuine comps are caught by the racStatus/tier check above.
         : "pending";
 
       const prog = progByCode[(c.quizCode as string) || ""] || [];
@@ -184,10 +186,21 @@ export async function GET(req: Request) {
       if (token) {
         const r = await fetch(`https://discord.com/api/v10/guilds/${guild}/members?limit=1000`, { headers: { Authorization: `Bot ${token}` }, cache: "no-store" });
         if (r.ok) {
-          const known = new Set(deduped.map((m) => m.discordId).filter(Boolean));
+          // Match a Discord person to a customer by ANY Discord identifier we have on
+          // file (id, checkout username, or tag) — so a founder whose customer doc isn't
+          // linked by discordId still isn't double-counted as "free".
+          const known = new Set<string>();
+          custSnap.docs.forEach((cd) => {
+            const cc = cd.data() as { discordId?: string; discordTag?: string; discordUsername?: string };
+            if (cc.discordId) known.add(String(cc.discordId));
+            if (cc.discordTag) known.add(String(cc.discordTag).toLowerCase());
+            if (cc.discordUsername) known.add(String(cc.discordUsername).toLowerCase());
+          });
           const arr = (await r.json()) as { user?: { id: string; username?: string; global_name?: string; bot?: boolean }; nick?: string }[];
           for (const gm of arr) {
-            if (!gm.user || gm.user.bot || known.has(gm.user.id)) continue;
+            if (!gm.user || gm.user.bot) continue;
+            const uname = (gm.user.username || "").toLowerCase();
+            if (known.has(gm.user.id) || (uname && known.has(uname))) continue;
             freeMembers.push({
               id: `discord_${gm.user.id}`, email: "",
               name: gm.nick || gm.user.global_name || gm.user.username || "Discord member",
