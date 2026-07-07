@@ -20,6 +20,14 @@ type Followup = {
 };
 type Schedule = { id?: string; discordId: string; name: string; days: Record<string, string>; note?: string; updatedAt?: string };
 type Call = { id: string; title: string; date: string | null; type?: string; summary?: string; actionItems?: string; keywords?: string; participants: string[]; grade: string; transcriptUrl: string; gradedAt: number | null };
+// Coach-invoice programs (mirror coachinvoice.SERVICES in the bot). Click one to invoice.
+const COACH_SERVICES = [
+  { key: "sec-essential", label: "Security+ Essential", amount: 150000 },
+  { key: "sec-accelerated", label: "Security+ Accelerated", amount: 240000 },
+  { key: "csa-essential", label: "CSA Essential", amount: 160000 },
+  { key: "csa-accelerated", label: "CSA Accelerated", amount: 280000 },
+  { key: "aws", label: "AWS Cloud Practitioner", amount: 100000 },
+];
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const TIME_OPTS = ["", "7am", "8am", "9am", "10am", "11am", "12pm", "1pm", "2pm", "3pm", "4pm", "5pm", "6pm", "7pm", "8pm", "9pm", "10pm"];
 // Parse "9am–5pm ET" → {start, end}; compose back on change. Keeps the stored string format.
@@ -291,12 +299,16 @@ export default function AdminCRM() {
     };
     doAction(m.email, "dm", { email: m.email, discordId: m.discordId, message: `📅 ${blurb[type] || blurb.Intro} DM me the word **book** here and I'll show you open times (pick your coach + a slot). See you soon!` }, `✓ Sent them the ${type.toLowerCase()} booking prompt in Discord.`);
   }
-  function sendInvoice(m: Member) {
-    const item = catalog.find(c => c.id === invoiceService);
-    if (!item) { setActionMsg(s => ({ ...s, [m.email]: "Pick a Square item first." })); return; }
+  function sendInvoice(m: Member, service: { key: string; label: string; amount: number }) {
+    if (!m.email) { setActionMsg(s => ({ ...s, [m.id]: "No email on file — add one before invoicing." })); return; }
     const discountCents = Math.max(0, Math.round((parseFloat(invoiceDiscount.replace(/[^0-9.]/g, "")) || 0) * 100));
+    if (discountCents >= service.amount) { setActionMsg(s => ({ ...s, [m.id]: "Discount can't be ≥ the price." })); return; }
+    const fee = Math.round((service.amount - discountCents) * 0.06);
+    const total = service.amount - discountCents + fee;
     const offNote = discountCents > 0 ? ` (−$${(discountCents / 100).toFixed(0)} off)` : "";
-    doAction(m.email, "invoice", { clientName: m.name, clientEmail: m.email, label: item.name, amountCents: item.priceCents, discountCents }, `✓ Invoice queued: ${item.name} ($${(item.priceCents / 100).toFixed(0)})${offNote}.`);
+    // Confirm step — prevents accidental / duplicate sends.
+    if (!confirm(`Send ${service.label}${offNote} to ${m.name || m.email}?\n\nThey'll be billed $${(total / 100).toFixed(2)} (includes 6% card fee).`)) return;
+    doAction(m.email, "invoice", { clientName: m.name || m.email, clientEmail: m.email, service: service.key, discountCents }, `✓ Invoice sent: ${service.label}${offNote} → ${m.name || m.email}.`);
     setInvoiceFor(null); setInvoiceDiscount("");
   }
   function revokeAccess(m: Member) {
@@ -759,14 +771,18 @@ export default function AdminCRM() {
                               <button onClick={() => revokeAccess(m)} className="text-xs px-2.5 py-1.5 rounded-lg border border-red-300 bg-red-50 text-red-700 hover:bg-red-100">Remove access</button>
                             </div>
                             {invoiceFor === m.id && (
-                              <div className="flex flex-wrap items-center gap-2 mt-2 bg-orange-50 border border-orange-200 rounded-lg p-2">
-                                <span className="text-xs text-orange-800">Invoice {m.name || m.email}:</span>
-                                <select value={invoiceService} onChange={e => setInvoiceService(e.target.value)} className="text-xs border border-orange-200 rounded-lg px-2 py-1.5 bg-white max-w-[260px]">
-                                  {catalog.length === 0 && <option value="">No Square items synced yet…</option>}
-                                  {catalog.map(it => <option key={it.id} value={it.id}>{it.name} — ${(it.priceCents / 100).toFixed(0)}</option>)}
-                                </select>
-                                <input value={invoiceDiscount} onChange={e => setInvoiceDiscount(e.target.value)} placeholder="$ off" title="Discount in dollars (coaches capped at $300)" className="text-xs border border-orange-200 rounded-lg px-2 py-1.5 bg-white w-20" />
-                                <button onClick={() => sendInvoice(m)} className="text-xs px-3 py-1.5 rounded-lg bg-orange-600 text-white hover:bg-orange-700">Send invoice</button>
+                              <div className="mt-2 bg-orange-50 border border-orange-200 rounded-lg p-2.5">
+                                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                  <span className="text-xs text-orange-800 font-medium">Invoice {m.name || m.email}</span>
+                                  {!m.email && <span className="text-[11px] text-red-600 font-medium">⚠ no email on file — add one first</span>}
+                                  <label className="ml-auto text-[11px] text-orange-800 flex items-center gap-1">$ off <input value={invoiceDiscount} onChange={e => setInvoiceDiscount(e.target.value)} placeholder="0" title="Discount in dollars (coaches capped at $300)" className="text-xs border border-orange-200 rounded-lg px-2 py-1 bg-white w-14" /></label>
+                                </div>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {COACH_SERVICES.map(s => (
+                                    <button key={s.key} disabled={!m.email} onClick={() => sendInvoice(m, s)} className="text-xs px-2.5 py-1.5 rounded-lg bg-white border border-orange-300 text-orange-800 hover:bg-orange-600 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed">{s.label} · ${(s.amount / 100).toFixed(0)}</button>
+                                  ))}
+                                </div>
+                                <p className="text-[11px] text-gray-500 mt-1.5">Click a program → confirm → sends (6% card fee added; coach discount ≤$300).</p>
                               </div>
                             )}
                             {scheduleFor === m.id && (
