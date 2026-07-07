@@ -3,9 +3,12 @@
 // Public "book a 1-on-1" page. Members pick a coach, an upcoming slot, a topic, and
 // leave name + email. Posts to /api/book → writes to `bookings` (source:"web"). The
 // Discord bot mints the Google Meet + Fireflies invite and emails the link. Public
-// route (middleware does not gate /book). ET business hours, next 7 days.
+// route (middleware does not gate /book).
+//
+// The times come STRAIGHT from the coach's CRM schedule (GET /api/book?coach=) — the same
+// source Discord reads. A coach with no schedule shows no times. One source of truth.
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 const COACHES = [
   { key: "randy", name: "Randy" },
@@ -16,42 +19,39 @@ const TOPICS = ["Certifications / studying", "Career / resume", "Clearance", "Ge
 
 type Slot = { value: string; label: string };
 
-// Build ET slots (11:00–16:30, every 30 min) for the next 7 days. value carries an
-// explicit -04:00 (EDT) offset so the time is unambiguous regardless of the visitor's TZ.
-function buildSlots(): Slot[] {
-  const out: Slot[] = [];
-  const now = Date.now();
-  for (let d = 0; d < 7; d++) {
-    const base = new Date();
-    base.setDate(base.getDate() + d);
-    const y = base.getFullYear(), m = base.getMonth(), day = base.getDate();
-    for (let h = 11; h <= 16; h++) {
-      for (const min of [0, 30]) {
-        const mm = String(min).padStart(2, "0");
-        const dd = String(day).padStart(2, "0");
-        const mo = String(m + 1).padStart(2, "0");
-        const value = `${y}-${mo}-${dd}T${String(h).padStart(2, "0")}:${mm}:00-04:00`;
-        const t = Date.parse(value);
-        if (isNaN(t) || t < now + 30 * 60 * 1000) continue; // skip past / too-soon
-        const label = new Date(value).toLocaleString("en-US", {
-          timeZone: "America/New_York", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
-        }) + " ET";
-        out.push({ value, label });
-      }
-    }
-  }
-  return out;
-}
-
 export default function BookPage() {
-  const slots = useMemo(buildSlots, []);
   const [coach, setCoach] = useState("");
+  const [slots, setSlots] = useState<Slot[]>([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
   const [slot, setSlot] = useState("");
   const [topic, setTopic] = useState(TOPICS[3]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [msg, setMsg] = useState("");
+  // Whether ANY coach has open times right now (drives the whole-page closed state).
+  const [gate, setGate] = useState<"checking" | "open" | "closed">("checking");
+
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/book")
+      .then((r) => r.json())
+      .then((d) => { if (alive) setGate(d?.open ? "open" : "closed"); })
+      .catch(() => { if (alive) setGate("closed"); });
+    return () => { alive = false; };
+  }, []);
+
+  // Load the selected coach's real slots from their CRM schedule.
+  useEffect(() => {
+    if (!coach) { setSlots([]); setSlot(""); return; }
+    let alive = true;
+    setSlotsLoading(true); setSlot("");
+    fetch(`/api/book?coach=${coach}`)
+      .then((r) => r.json())
+      .then((d) => { if (alive) { setSlots(Array.isArray(d?.slots) ? d.slots : []); setSlotsLoading(false); } })
+      .catch(() => { if (alive) { setSlots([]); setSlotsLoading(false); } });
+    return () => { alive = false; };
+  }, [coach]);
 
   async function submit() {
     setState("sending"); setMsg("");
@@ -63,7 +63,11 @@ export default function BookPage() {
       });
       const d = await r.json();
       if (d.ok) { setState("done"); }
-      else { setState("error"); setMsg(d.error || "Something went wrong — try again."); }
+      else {
+        setState("error"); setMsg(d.error || "Something went wrong — try again.");
+        // Time got taken or schedule changed — refresh this coach's slots.
+        if (d.closed) { setSlot(""); fetch(`/api/book?coach=${coach}`).then((x) => x.json()).then((x) => setSlots(Array.isArray(x?.slots) ? x.slots : [])).catch(() => {}); }
+      }
     } catch { setState("error"); setMsg("Couldn't reach the server — try again."); }
   }
 
@@ -80,6 +84,40 @@ export default function BookPage() {
       </main>
     );
   }
+
+  if (gate === "checking") {
+    return (
+      <main style={{ minHeight: "100vh", background: "#f8f9fa", color: "#5f6368", display: "grid", placeItems: "center", padding: 24, fontFamily: "-apple-system,Segoe UI,Roboto,sans-serif" }}>
+        <p>Loading…</p>
+      </main>
+    );
+  }
+
+  if (gate === "closed") {
+    return (
+      <main style={{ minHeight: "100vh", background: "#f8f9fa", color: "#202124", display: "grid", placeItems: "center", padding: 24, fontFamily: "-apple-system,Segoe UI,Roboto,sans-serif" }}>
+        <div style={{ background: "#fff", border: "1px solid #dadce0", borderRadius: 16, padding: 32, maxWidth: 460, textAlign: "center" }}>
+          <div style={{ fontSize: 40 }}>📅</div>
+          <h1 style={{ fontSize: 22, margin: "8px 0" }}>Booking is closed right now</h1>
+          <p style={{ color: "#5f6368" }}>1-on-1 slots open up when a coach posts their availability. Check back soon, or reach out in the Discord and we&apos;ll get you on the list.</p>
+        </div>
+      </main>
+    );
+  }
+
+  // Time-picker inner content depends on coach selection + that coach's slots.
+  const timePicker = () => {
+    if (!coach) return <p style={{ color: "#9aa0a6", fontSize: 14, margin: "8px 0 0" }}>Pick a coach first.</p>;
+    if (slotsLoading) return <p style={{ color: "#9aa0a6", fontSize: 14, margin: "8px 0 0" }}>Loading times…</p>;
+    if (slots.length === 0) return <p style={{ color: "#9aa0a6", fontSize: 14, margin: "8px 0 0" }}>No open times with {COACHES.find((c) => c.key === coach)?.name} right now — try another coach.</p>;
+    return (
+      <select value={slot} onChange={(e) => setSlot(e.target.value)}
+        style={{ width: "100%", padding: 12, borderRadius: 9, border: "1px solid #dadce0", background: "#fff", fontSize: 15 }}>
+        <option value="">Pick a time…</option>
+        {slots.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+      </select>
+    );
+  };
 
   return (
     <main style={{ minHeight: "100vh", background: "#f8f9fa", color: "#202124", padding: "32px 18px", fontFamily: "-apple-system,Segoe UI,Roboto,sans-serif" }}>
@@ -99,11 +137,7 @@ export default function BookPage() {
         </div>
 
         <label style={{ display: "block", fontWeight: 600, fontSize: 13, margin: "20px 0 8px" }}>Time (ET)</label>
-        <select value={slot} onChange={(e) => setSlot(e.target.value)}
-          style={{ width: "100%", padding: 12, borderRadius: 9, border: "1px solid #dadce0", background: "#fff", fontSize: 15 }}>
-          <option value="">Pick a time…</option>
-          {slots.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
-        </select>
+        {timePicker()}
 
         <label style={{ display: "block", fontWeight: 600, fontSize: 13, margin: "20px 0 8px" }}>Topic</label>
         <select value={topic} onChange={(e) => setTopic(e.target.value)}

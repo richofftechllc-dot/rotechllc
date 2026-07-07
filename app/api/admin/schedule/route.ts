@@ -39,10 +39,18 @@ export async function POST(req: Request) {
 
   // The OWNER (Randy) can set ANY coach's schedule; every other coach can only set their
   // own. A non-owner's targetDiscordId is ignored → they can never edit Randy's (or anyone
-  // else's) row.
-  const isOwner = admin.discordId === (process.env.RANDY_DISCORD_ID || "").trim();
+  // else's) row. Use the auth layer's isOwner (true for the RANDY2026 code login) so the
+  // owner works even when RANDY_DISCORD_ID isn't set on this host.
+  const isOwner = admin.isOwner;
   const targetId = (isOwner && body.targetDiscordId) ? String(body.targetDiscordId) : admin.discordId;
   const targetName = (isOwner && body.targetName) ? String(body.targetName) : admin.name;
+
+  // Stable coachKey so BOTH the bot and the website read this schedule the same way,
+  // regardless of how the doc is keyed (real Discord ID vs the literal "owner" for a
+  // code login). This is what keeps Discord !book, the CRM, and the site in sync.
+  const KEY_BY_ID: Record<string, string> = { "1465828992014876834": "tyler", "694452462676869122": "daquan" };
+  let coachKey: string | null = KEY_BY_ID[targetId] || null;
+  if (!coachKey && isOwner && (!body.targetDiscordId || body.targetDiscordId === admin.discordId)) coachKey = "randy";
 
   try {
     await coll("crmSchedule").doc(targetId).set({
@@ -50,6 +58,7 @@ export async function POST(req: Request) {
       name: targetName,
       days,
       note: String(body.note || "").slice(0, 200),
+      ...(coachKey ? { coachKey } : {}),
       updatedAt: new Date().toISOString(),
     }, { merge: true });
     // Tell the bot to (re)post the booking card ONCE — replaces the old morning
