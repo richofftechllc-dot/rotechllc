@@ -464,7 +464,7 @@ export default function AdminCRM() {
   // credit instead; below it, credit = 2× the cash owed.
   const CAP_PER_PERSON = 500;
   // Look up each referrer's founding tier by their code → tier-based rate.
-  // Tier 1 (first 100) = $50/referral · Tier 2 (joined after the count filled) = $25/referral.
+  // Tier 1 (first 100 paid founders) = $50/referral · Tier 2 (joined after) = $25/referral.
   const byRefCode: Record<string, Member> = {};
   members.forEach(m => { if (m.referralCode) byRefCode[m.referralCode.toLowerCase()] = m; });
   const referrers = Object.entries(referrerMap).map(([ref, list]) => {
