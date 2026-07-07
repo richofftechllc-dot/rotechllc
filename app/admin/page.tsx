@@ -92,6 +92,7 @@ export default function AdminCRM() {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [me, setMe] = useState<{ discordId: string; name: string; isOwner?: boolean } | null>(null);
   const [schedDraft, setSchedDraft] = useState<{ days: Record<string, string>; note: string }>({ days: {}, note: "" });
+  const [schedTarget, setSchedTarget] = useState<{ discordId: string; name: string } | null>(null); // owner editing another coach; null = self
   const [q, setQ] = useState("");
   const [noteDraft, setNoteDraft] = useState<Record<string, string>>({});
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -400,7 +401,8 @@ export default function AdminCRM() {
     loadFollowups();
   }
   async function saveSchedule() {
-    await fetch("/api/admin/schedule", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(schedDraft) });
+    const payload = schedTarget ? { ...schedDraft, targetDiscordId: schedTarget.discordId, targetName: schedTarget.name } : schedDraft;
+    await fetch("/api/admin/schedule", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
     loadSchedule();
   }
   async function setReferrer(m: Member) {
@@ -926,7 +928,7 @@ export default function AdminCRM() {
                 </div>
               )}
             </div>
-            <p className="text-gray-500 text-sm">Set your weekly availability so the team knows when you&apos;re free. You can only edit your own row.</p>
+            <p className="text-gray-500 text-sm">Set your weekly availability so the team knows when you&apos;re free.{me?.isOwner ? " As owner, you can edit any coach's row — hit Edit on their line. Coaches can only edit their own (not yours)." : " You can only edit your own row."}</p>
             <div className="bg-white border border-[#dadce0] rounded-xl overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="text-left text-xs text-gray-500 bg-[#f8f9fa]">
@@ -934,15 +936,17 @@ export default function AdminCRM() {
                     <th className="py-2.5 px-4 font-medium">Coach</th>
                     {WEEKDAYS.map(d => <th key={d} className="px-3 font-medium">{d}</th>)}
                     <th className="px-3 font-medium">Note</th>
+                    {me?.isOwner && <th className="px-3 font-medium">Edit</th>}
                   </tr>
                 </thead>
                 <tbody>
-                  {schedules.length === 0 && <tr><td colSpan={9} className="py-4 px-4 text-gray-500">No availability set yet.</td></tr>}
+                  {schedules.length === 0 && <tr><td colSpan={10} className="py-4 px-4 text-gray-500">No availability set yet.</td></tr>}
                   {schedules.map(s => (
                     <tr key={s.discordId} className="border-b border-[#f1f3f4]">
                       <td className="py-2.5 px-4 font-medium">{s.name}{me && s.discordId === me.discordId && <span className="text-orange-600 text-xs ml-1">(you)</span>}</td>
                       {WEEKDAYS.map(d => <td key={d} className="px-3 text-gray-600 text-xs">{s.days?.[d] || "—"}</td>)}
                       <td className="px-3 text-gray-500 text-xs">{s.note || ""}</td>
+                      {me?.isOwner && <td className="px-3"><button onClick={() => { setSchedTarget(s.discordId === me.discordId ? null : { discordId: s.discordId, name: s.name }); setSchedDraft({ days: { ...(s.days || {}) }, note: s.note || "" }); }} className="text-xs text-orange-600 hover:underline">Edit</button></td>}
                     </tr>
                   ))}
                 </tbody>
@@ -950,7 +954,10 @@ export default function AdminCRM() {
             </div>
 
             <div className="bg-white border border-[#dadce0] rounded-xl p-4">
-              <div className="font-semibold mb-3">Your availability {me ? `— ${me.name}` : ""}</div>
+              <div className="font-semibold mb-3 flex items-center gap-2 flex-wrap">
+                <span>{schedTarget ? `Editing ${schedTarget.name}'s availability` : `Your availability${me ? ` — ${me.name}` : ""}`}</span>
+                {schedTarget && <button onClick={() => { setSchedTarget(null); const mine = schedules.find(s => !!me && s.discordId === me.discordId); setSchedDraft(mine ? { days: { ...mine.days }, note: mine.note || "" } : { days: {}, note: "" }); }} className="text-xs text-gray-500 hover:text-orange-600 underline">← back to mine</button>}
+              </div>
               <div className="space-y-2 mb-3">
                 {WEEKDAYS.map(d => {
                   const cur = parseDay(schedDraft.days[d] || "");

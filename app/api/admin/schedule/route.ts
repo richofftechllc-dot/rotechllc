@@ -30,18 +30,24 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const admin = await getAuthedAdmin(req);
   if (!admin) return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 });
-  let body: { days?: Record<string, string>; note?: string };
+  let body: { days?: Record<string, string>; note?: string; targetDiscordId?: string; targetName?: string };
   try { body = await req.json(); } catch { return NextResponse.json({ ok: false, error: "bad_json" }, { status: 400 }); }
 
   const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const days: Record<string, string> = {};
   for (const d of DAYS) days[d] = String(body.days?.[d] || "").slice(0, 60);
 
+  // The OWNER (Randy) can set ANY coach's schedule; every other coach can only set their
+  // own. A non-owner's targetDiscordId is ignored → they can never edit Randy's (or anyone
+  // else's) row.
+  const isOwner = admin.discordId === (process.env.RANDY_DISCORD_ID || "").trim();
+  const targetId = (isOwner && body.targetDiscordId) ? String(body.targetDiscordId) : admin.discordId;
+  const targetName = (isOwner && body.targetName) ? String(body.targetName) : admin.name;
+
   try {
-    // Keyed by the caller's Discord ID so a coach can only edit their own row.
-    await coll("crmSchedule").doc(admin.discordId).set({
-      discordId: admin.discordId,
-      name: admin.name,
+    await coll("crmSchedule").doc(targetId).set({
+      discordId: targetId,
+      name: targetName,
       days,
       note: String(body.note || "").slice(0, 200),
       updatedAt: new Date().toISOString(),
