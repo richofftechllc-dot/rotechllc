@@ -7,14 +7,18 @@
 //   sp = Security+ · csa = ServiceNow CSA · ai = AWS AI
 export function allowedPrefixes(trackStr: string | null): Set<string> {
   const all = new Set(["sp", "csa", "ai"]);
-  if (!trackStr) return all;
-  const t = trackStr.toLowerCase();
+  const t = (trackStr || "").toLowerCase();
+  // Admin / demo / all-access tracks see every track.
+  if (t.includes("full") || t.includes("admin") || t.includes("all access") || t.includes("all-access")) return all;
   const out = new Set<string>();
+  // FOUNDING PERK (first 100 members): the AWS AI Practitioner track is FREE for every
+  // member. A blank / "General Access" / founding track = base founding → AWS AI only.
+  out.add("ai");
+  // Security+ and ServiceNow CSA are PAID add-on tracks — unlocked only when the member's
+  // track string names them (bot stamps "... + Security+ Track" / "... + ServiceNow CSA Track").
   if (t.includes("security+") || t.includes("sec+") || t.includes("comptia security")) out.add("sp");
   if (t.includes("servicenow") || t.includes("csa")) out.add("csa");
-  if (t.includes("aws ai") || t.includes("ai practitioner")) out.add("ai");
-  if (t.includes("full") || t.includes("admin") || t.includes("all access")) return all;
-  return out.size > 0 ? out : all;
+  return out;
 }
 
 // Normalize a lesson's requiredAccess into a prefix (sp | csa | ai), so docs can be

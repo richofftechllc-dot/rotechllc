@@ -16,7 +16,6 @@ async function getMemberCount() {
   }
 }
 
-const FOUNDING_LINK = "https://square.link/u/iAsbUg2Z";
 const DISCORD_LINK = "https://discord.gg/dtcYf8PTNa";
 
 const benefits = [
@@ -43,9 +42,9 @@ export default async function Pricing() {
   const count = await getMemberCount();
   return (
     <main className="max-w-6xl mx-auto px-6 py-16">
-      <h1 className="text-5xl md:text-7xl font-black text-center mb-4">Everything You Get<br /><span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">For $96 / 12 Months.</span></h1>
+      <h1 className="text-5xl md:text-7xl font-black text-center mb-4">Everything You Get<br /><span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">Now $227 / Year.</span></h1>
       <p className="text-gray-400 text-center mb-16 max-w-2xl mx-auto">
-        <b className="text-white">One-time $96.</b> Pays for a full year of access — no monthly charges, no recurring billing, nothing else gets billed to your card. After the <b className="text-white">first 100</b> spots fill, price moves to a monthly tier.
+        The <b className="text-white">first-100 founding seats ($96) are gone.</b> Membership is now <b className="text-white">$227/year</b> — full access for 12 months, one payment, no recurring surprises. Locked at $227 <b className="text-white">through July 27</b>; $375/year after.
       </p>
 
       <div className="border-2 border-orange-500/30 rounded-2xl p-8 md:p-12 relative">
@@ -55,12 +54,12 @@ export default async function Pricing() {
             {benefits.map(b => <li key={b} className="flex gap-3 text-gray-300"><span className="text-green-500">✓</span>{b}</li>)}
           </ul>
           <div className="bg-zinc-900 border border-white/10 rounded-xl p-8 text-center">
-            <div className="text-7xl font-black text-orange-500">$96</div>
-            <div className="text-orange-400 text-xs font-bold tracking-widest uppercase mt-1">One-time · 12 months access</div>
-            <div className="text-gray-500 text-xs mt-1 mb-6">No monthly charges · First 100 only</div>
-            <a href={FOUNDING_LINK} target="_blank" rel="noopener noreferrer" className="block w-full py-4 bg-gradient-to-r from-orange-500 to-red-500 font-bold rounded-lg">Lock In VIP Access</a>
-            <div className="text-green-500 text-sm mt-4">● {count} / 100 spots claimed</div>
-            <div className="text-gray-500 text-xs mt-2 italic">After 100 fill, price moves to a monthly tier.</div>
+            <div className="text-7xl font-black text-orange-500">$227</div>
+            <div className="text-orange-400 text-xs font-bold tracking-widest uppercase mt-1">Per year · 12 months full access</div>
+            <div className="text-gray-500 text-xs mt-1 mb-6">Founding ($96) sold out · one payment</div>
+            <a href="https://square.link/u/c8X7TC0z" target="_blank" rel="noopener noreferrer" className="block w-full py-4 bg-gradient-to-r from-orange-500 to-red-500 font-bold rounded-lg">Join — $227 / year</a>
+            <div className="text-gray-400 text-sm mt-4">🔒 Founding full — {Math.max(count, 100)} in the community</div>
+            <div className="text-gray-500 text-xs mt-2 italic">Locked at $227 through July 27 · $375/year after.</div>
           </div>
         </div>
       </div>

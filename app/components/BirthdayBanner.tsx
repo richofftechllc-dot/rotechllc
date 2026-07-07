@@ -44,17 +44,19 @@ export default function BirthdayBanner() {
         {spots !== null && !soldOut && (
           <span className="text-gray-400 text-base font-semibold"> · {spots} founding spots left</span>
         )}
-        {soldOut && left > 0 && <span className="text-gray-400 text-base font-semibold"> · founding full — $27 birthday rate still open til July 27</span>}
+        {soldOut && left > 0 && <span className="text-gray-400 text-base font-semibold"> · founding full — $227/yr now (new pricing after July 27)</span>}
       </div>
       <div className="flex flex-wrap gap-2 mt-3">
-        {/* $96 founding closes at 100 members. */}
+        {/* $96 founding closes at 100 members. DURABLE quick_pay link (reusable). */}
         {!soldOut && (
-          <a href="https://square.link/u/qwyrxuwi" className={btn + " bg-white text-black hover:opacity-90"}>Founding — $96 / 12 months</a>
+          <a href="https://square.link/u/7r9pO4c0" className={btn + " bg-white text-black hover:opacity-90"}>Founding — $96 / 12 months</a>
         )}
-        {/* $27 birthday rate stays live until July 27, even after 100 members. */}
-        {left > 0 && (
-          <a href="https://square.link/u/4mPoXJAk" className={btn + " bg-gradient-to-r from-orange-500 to-red-500 text-white hover:opacity-90"}>{soldOut ? "$27/mo · 2 months for $27 (birthday rate)" : "Or $27/mo · 2 months for $27"}</a>
+        {/* $96 sold out → the durable $227/yr link takes over. */}
+        {soldOut && (
+          <a href="https://square.link/u/c8X7TC0z" className={btn + " bg-white text-black hover:opacity-90"}>Founding — $227 / year</a>
         )}
+        {/* NOTE: the $27/mo birthday subscription link was single-use (bounced to /welcome
+            after the first subscriber) — pulled until a durable recurring link is rebuilt. */}
         <a href="/resources/rot-july-2026-offers.html" className={btn + " border border-white/30 text-white hover:bg-white/10"}>See the full deal →</a>
       </div>
     </div>

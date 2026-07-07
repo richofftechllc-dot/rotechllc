@@ -18,7 +18,7 @@ const SESSION_SECRET = process.env.SESSION_SECRET || "";
 const LOCKED_META: Record<string, { name: string; price: string; blurb: string; buyUrl: string }> = {
   sp:  { name: "CompTIA Security+", price: "$901", blurb: "Voucher + guaranteed-pass coaching. Unlocks the full Security+ quiz track.", buyUrl: "https://square.link/u/Lh7MBczC" },
   csa: { name: "ServiceNow CSA", price: "$1,113", blurb: "Voucher + retake + coaching. Unlocks the full ServiceNow CSA quiz track.", buyUrl: "https://square.link/u/Gas5gOVh" },
-  ai:  { name: "AWS AI Practitioner", price: "Included", blurb: "Free with founding membership.", buyUrl: "" },
+  ai:  { name: "AWS AI Practitioner", price: "$227/yr", blurb: "Join founding to unlock the AWS AI track — free with membership.", buyUrl: "https://square.link/u/c8X7TC0z" },
 };
 
 function verify(token: string | undefined): { kind: "code"; code: string } | { kind: "discord"; userId: string } | null {

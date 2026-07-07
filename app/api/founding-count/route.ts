@@ -32,7 +32,9 @@ export async function GET() {
       if (compedEmails.has(email) || c.productType === "comp" || !isRealPayer) { comped++; return; }
       paid++;
     });
-    const cap = 100;
+    // Founding is down to its final seat — cap set to 99 so "spots left" reads the last
+    // slot (currently 1). When it sells, soldOut flips true and the site shows the $227 rate.
+    const cap = 99;
     // Public count = everyone in (paid + comped) → keeps the "spots left" urgency.
     // paid/comped are the private breakdown (shown only to Randy in the CRM).
     const count = paid + comped;

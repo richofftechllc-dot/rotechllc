@@ -4,7 +4,10 @@ import { coll } from "@/lib/firebase";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const CHECKOUT_URL = "https://square.link/u/jSF7J4zp"; // $127 referral-rate yearly
+// $127 referral-rate yearly. DURABLE quick_pay link (reusable — every buyer gets a
+// fresh order, so it never dies). The old jSF7J4zp was `order`-based = single-use and
+// would have bounced to /welcome after the first referral sale. Do not revert.
+const CHECKOUT_URL = "https://square.link/u/bLYKQOxs";
 
 // POST /api/referral/start  { code, email } — public.
 // Records email → referrer so the payment webhook can auto-credit by email match
