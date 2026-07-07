@@ -9,6 +9,7 @@ type Member = {
   sentLog?: { type?: string; title?: string; detail?: string; at?: string }[];
   referralEligible?: boolean;
   referralCode?: string;
+  foundingTier?: number;
   assignedTo: string; notes: string; purchaseDate?: string;
   progress?: { domains: { domain: string; highScore: number; completed: boolean }[]; done: number; avg: number | null; weak: string[] };
 };
@@ -447,11 +448,18 @@ export default function AdminCRM() {
   // Cash is capped at $500/person ($50 × 10). At the cap they can take $1,000 store
   // credit instead; below it, credit = 2× the cash owed.
   const CAP_PER_PERSON = 500;
+  // Look up each referrer's founding tier by their code → tier-based rate.
+  // Tier 1 (first 100) = $50/referral · Tier 2 (joined after the count filled) = $25/referral.
+  const byRefCode: Record<string, Member> = {};
+  members.forEach(m => { if (m.referralCode) byRefCode[m.referralCode.toLowerCase()] = m; });
   const referrers = Object.entries(referrerMap).map(([ref, list]) => {
     const paid = list.filter(x => x.paymentStatus === "active" || x.paymentStatus === "comp").length;
-    const owedRaw = paid * referralPayout;
+    const refMember = byRefCode[String(ref).toLowerCase()];
+    const tier = refMember?.foundingTier === 2 ? 2 : 1;
+    const rate = tier === 2 ? 25 : 50;
+    const owedRaw = paid * rate;
     const owed = Math.min(owedRaw, CAP_PER_PERSON);
-    return { ref, count: list.length, paid, owed, capped: owedRaw > CAP_PER_PERSON, creditOption: owed >= CAP_PER_PERSON ? 1000 : owed * 2 };
+    return { ref, tier, rate, count: list.length, paid, owed, capped: owedRaw > CAP_PER_PERSON, creditOption: owed >= CAP_PER_PERSON ? 1000 : owed * 2 };
   }).sort((a, b) => b.owed - a.owed || b.count - a.count);
   const totalOwed = referrers.reduce((s, r) => s + r.owed, 0);
   const eligibleReferrers = members.filter(m => m.referralEligible).sort((a, b) => (a.name || a.email).localeCompare(b.name || b.email));
@@ -489,6 +497,7 @@ export default function AdminCRM() {
                 <span className="text-[11px] text-gray-500">{me.name}</span>
               </div>
               <span className="w-8 h-8 rounded-full bg-[#202124] text-white grid place-items-center text-xs font-semibold">{me.name.slice(0, 2).toUpperCase()}</span>
+              <button onClick={async () => { await fetch("/api/logout", { method: "POST" }); window.location.href = "/login"; }} className="text-[11px] text-gray-500 hover:text-red-600 border border-[#dadce0] rounded-lg px-2.5 py-1">Sign out</button>
             </div>
           )}
         </div>
@@ -626,7 +635,7 @@ export default function AdminCRM() {
                           <div className="font-medium">{m.name || m.email}</div>
                           <div className="text-xs text-gray-500">{m.email}{m.discordTag ? ` · ${m.discordTag}` : ""}</div>
                         </td>
-                        <td className="px-3 text-gray-700">{m.tier || "—"}</td>
+                        <td className="px-3 text-gray-700">{m.tier || "—"} <span className={`ml-1 text-[10px] px-1.5 py-0.5 rounded font-bold ${m.foundingTier === 2 ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`} title={m.foundingTier === 2 ? "Founding Tier 2 — joined after the first 100 ($25/referral)" : "Founding Tier 1 — first 100 ($50/referral)"}>Founding T{m.foundingTier || 1}</span></td>
                         <td className="px-3">{m.tracks.length ? m.tracks.map(t => <span key={t} className="inline-block text-[10px] mr-1 px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 text-gray-600">{t}</span>) : <span className="text-gray-400">—</span>}</td>
                         <td className="px-3">
                           <span className={`text-xs px-2 py-0.5 rounded-full border ${PILL[m.paymentStatus] || "bg-gray-100 text-gray-500 border-gray-200"}`}>{m.paymentStatus}</span>
@@ -1117,12 +1126,13 @@ export default function AdminCRM() {
               <div className="bg-white border border-[#dadce0] rounded-xl overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="text-left text-xs text-gray-500 bg-[#f8f9fa]"><tr className="border-b border-[#e8eaed]">
-                    <th className="py-2.5 px-4 font-medium">Referrer</th><th className="px-3 font-medium">Referred</th><th className="px-3 font-medium">Paid (cleared)</th><th className="px-3 font-medium">Cash owed</th><th className="px-3 font-medium">or Credit</th>
+                    <th className="py-2.5 px-4 font-medium">Referrer</th><th className="px-3 font-medium">Tier / rate</th><th className="px-3 font-medium">Referred</th><th className="px-3 font-medium">Paid (cleared)</th><th className="px-3 font-medium">Cash owed</th><th className="px-3 font-medium">or Credit</th>
                   </tr></thead>
                   <tbody>
                     {referrers.map(r => (
                       <tr key={r.ref} className="border-b border-[#f1f3f4] hover:bg-[#f8f9fa]">
                         <td className="py-2.5 px-4 font-medium">{r.ref}</td>
+                        <td className="px-3"><span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${r.tier === 2 ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>T{r.tier}</span> <span className="text-gray-500">${r.rate}/ref</span></td>
                         <td className="px-3">{r.count}</td>
                         <td className="px-3">{r.paid}</td>
                         <td className="px-3 font-semibold">${r.owed}{r.capped && <span className="ml-1 text-[10px] px-1 rounded bg-orange-100 text-orange-700">$500 cap</span>}</td>
