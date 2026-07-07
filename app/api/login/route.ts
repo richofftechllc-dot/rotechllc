@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { coll } from "@/lib/firebase";
+import { sessionCookieOptions } from "@/lib/session-cookie";
 import crypto from "crypto";
 
 export const runtime = "nodejs";
@@ -29,9 +30,7 @@ export async function POST(req: NextRequest) {
     if (c === OWNER_CODE) {
       const sig = sign(c);
       const res = NextResponse.json({ ok: true, name: "Randy" });
-      res.cookies.set("rot_session", c + "." + sig, {
-        httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 30,
-      });
+      res.cookies.set("rot_session", c + "." + sig, sessionCookieOptions(req.headers.get("host"), 60 * 60 * 24 * 30));
       return res;
     }
     const snap = await coll("customers").where("quizCode", "==", c).limit(1).get();
@@ -42,13 +41,7 @@ export async function POST(req: NextRequest) {
     const name = cust.name || cust.firstName || "Member";
     const sig = sign(c);
     const res = NextResponse.json({ ok: true, name });
-    res.cookies.set("rot_session", c + "." + sig, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 30,
-    });
+    res.cookies.set("rot_session", c + "." + sig, sessionCookieOptions(req.headers.get("host"), 60 * 60 * 24 * 30));
     return res;
   } catch (e) {
     return NextResponse.json({ ok: false, error: "Server error" }, { status: 500 });
