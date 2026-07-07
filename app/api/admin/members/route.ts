@@ -146,13 +146,16 @@ export async function GET(req: Request) {
     // into one row, so a member with multiple records shows ONCE. The doc with the most
     // quiz progress is the base; email/roles/tracks are unioned across the group. Nothing
     // is deleted — this is display-only.
-    const byDiscord: Record<string, typeof members> = {};
-    const deduped: typeof members = [];
+    // Identity = discordId, else email, else the doc's own id (so blank-email/no-discord
+    // strays stay DISTINCT and never wrongly merge). Docs sharing a discordId or a real
+    // email collapse into one row.
+    const byKey: Record<string, typeof members> = {};
     for (const m of members) {
-      if (m.discordId) (byDiscord[m.discordId] ||= []).push(m);
-      else deduped.push(m);
+      const key = m.discordId || m.email || `__id_${m.id}`;
+      (byKey[key] ||= []).push(m);
     }
-    for (const group of Object.values(byDiscord)) {
+    const deduped: typeof members = [];
+    for (const group of Object.values(byKey)) {
       if (group.length === 1) { deduped.push(group[0]); continue; }
       const primary = [...group].sort((a, b) => (b.progress?.done || 0) - (a.progress?.done || 0) || (b.quizCode ? 1 : 0) - (a.quizCode ? 1 : 0))[0];
       deduped.push({

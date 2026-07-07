@@ -38,22 +38,26 @@ export async function GET(req: NextRequest) {
 
   // Coach flag reuses the SAME detection the CRM uses (ROT Coach role / owner code /
   // admin allowlist) — role-based, never a special quiz code. Coaches → all tracks.
-  let isCoach = false;
-  try { isCoach = !!(await getAuthedAdmin(req)); } catch { isCoach = false; }
+  let isCoach = false, isOwner = false;
+  try { const admin = await getAuthedAdmin(req); isCoach = !!admin; isOwner = !!admin?.isOwner; } catch { isCoach = false; }
+  const OWNER_CODE = (process.env.OWNER_LOGIN_CODE || "RANDY2026").toUpperCase();
 
   if (session.type === "discord") {
-    // Resolve their member record by Discord ID so Discord logins get their real track
-    // (previously always null → wrongly fell through to full access).
+    // Owner via Discord → resolve to the OWNER record (RANDY2026) so it matches the code
+    // login exactly (same identity/progress no matter how Randy signs in). Everyone else
+    // resolves by their Discord ID so Discord logins get their real track.
     try {
-      const snap = await coll("customers").where("discordId", "==", session.userId).limit(1).get();
+      const snap = isOwner
+        ? await coll("customers").where("quizCode", "==", OWNER_CODE).limit(1).get()
+        : await coll("customers").where("discordId", "==", session.userId).limit(1).get();
       const c = snap.empty ? null : snap.docs[0].data();
       return NextResponse.json({
-        ok: true, code: (c?.quizCode as string) || null,
+        ok: true, code: (c?.quizCode as string) || (isOwner ? OWNER_CODE : null),
         name: c?.name || c?.firstName || session.name,
-        track: (c?.track as string) || null, authType: "discord", isCoach,
+        track: (c?.track as string) || null, authType: "discord", isCoach, isOwner,
       });
     } catch {
-      return NextResponse.json({ ok: true, code: null, name: session.name, track: null, authType: "discord", isCoach });
+      return NextResponse.json({ ok: true, code: null, name: session.name, track: null, authType: "discord", isCoach, isOwner });
     }
   }
   try {
@@ -63,7 +67,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       ok: true, code: session.code,
       name: c.name || c.firstName || "Member",
-      track: c.track || null, authType: "code", isCoach,
+      track: c.track || null, authType: "code", isCoach, isOwner,
     });
   } catch {
     return NextResponse.json({ ok: false }, { status: 500 });
