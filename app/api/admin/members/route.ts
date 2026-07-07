@@ -174,15 +174,44 @@ export async function GET(req: Request) {
       if (b.paymentStatus === "late" && a.paymentStatus !== "late") return 1;
       return (a.name || a.email).localeCompare(b.name || b.email);
     });
-    const paidCount = deduped.filter((m) => m.paymentStatus === "active").length;
-    const compedCount = deduped.filter((m) => m.paymentStatus === "comp").length;
-    // Comped/demo members are OWNER-ONLY. Coaches only ever see real paying members.
-    const visible = admin.isOwner ? deduped : deduped.filter((m) => m.paymentStatus !== "comp");
+    // Pull the LIVE Discord roster and add anyone who isn't already a customer as a FREE
+    // member — tracked in the CRM, zero access. Makes the count reflect the real community
+    // size (paid + comped + free), like Discord shows. Best-effort.
+    const freeMembers: typeof deduped = [];
+    try {
+      const token = process.env.DISCORD_BOT_TOKEN;
+      const guild = process.env.DISCORD_GUILD_ID || "1488597128329822369";
+      if (token) {
+        const r = await fetch(`https://discord.com/api/v10/guilds/${guild}/members?limit=1000`, { headers: { Authorization: `Bot ${token}` }, cache: "no-store" });
+        if (r.ok) {
+          const known = new Set(deduped.map((m) => m.discordId).filter(Boolean));
+          const arr = (await r.json()) as { user?: { id: string; username?: string; global_name?: string; bot?: boolean }; nick?: string }[];
+          for (const gm of arr) {
+            if (!gm.user || gm.user.bot || known.has(gm.user.id)) continue;
+            freeMembers.push({
+              id: `discord_${gm.user.id}`, email: "",
+              name: gm.nick || gm.user.global_name || gm.user.username || "Discord member",
+              discordTag: gm.user.username || "", discordId: gm.user.id,
+              tier: "free", status: "free", paymentStatus: "free", invoiced: false,
+              tracks: [], roles: [], certs: [], phone: "", quizCode: "", accessEndDate: "",
+              daysLeft: null, plan: "", referredBy: "", referralEligible: false, referralCode: "",
+              foundingTier: 0, purchaseDate: "", rolesAssigned: false, assignedTo: "", notes: "",
+              sentLog: [], progress: { domains: [], done: 0, avg: null, weak: [] },
+            });
+          }
+        }
+      }
+    } catch { /* Discord roster is best-effort */ }
+    const all = [...deduped, ...freeMembers];
+    const paidCount = all.filter((m) => m.paymentStatus === "active").length;
+    const compedCount = all.filter((m) => m.paymentStatus === "comp").length;
+    // Comped/demo members are OWNER-ONLY. Coaches see paying + free (community), not comped.
+    const visible = admin.isOwner ? all : all.filter((m) => m.paymentStatus !== "comp");
     return NextResponse.json({
       ok: true,
       members: visible,
       isOwner: admin.isOwner,
-      stats: { total: deduped.length, paid: paidCount, comped: compedCount, expiringSoon },
+      stats: { total: all.length, paid: paidCount, comped: compedCount, free: freeMembers.length, expiringSoon },
     });
   } catch (e) {
     return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : "error" }, { status: 500 });

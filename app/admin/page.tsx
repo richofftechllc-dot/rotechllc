@@ -87,7 +87,7 @@ export default function AdminCRM() {
   const [fStatus, setFStatus] = useState("");
   const [resetMsg, setResetMsg] = useState<Record<string, string>>({});
   const [members, setMembers] = useState<Member[]>([]);
-  const [stats, setStats] = useState<{ total: number; comped: number; paid?: number; expiringSoon: number } | null>(null);
+  const [stats, setStats] = useState<{ total: number; comped: number; paid?: number; free?: number; expiringSoon: number } | null>(null);
   const [followups, setFollowups] = useState<Followup[]>([]);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [me, setMe] = useState<{ discordId: string; name: string; isOwner?: boolean } | null>(null);
@@ -524,6 +524,7 @@ export default function AdminCRM() {
           {[
             { label: "Members", value: stats?.total ?? members.length, tone: "text-[#202124]" },
             ...(me?.isOwner ? [{ label: "Paid", value: stats?.paid ?? 0, tone: "text-green-700" }] : []),
+            ...(me?.isOwner ? [{ label: "Free (Discord)", value: stats?.free ?? 0, tone: "text-gray-500" }] : []),
             { label: "Expiring ≤30d", value: stats?.expiringSoon ?? 0, tone: "text-amber-600" },
             { label: "Late / expired", value: lateCount, tone: "text-red-600" },
             ...(me?.isOwner ? [{ label: "Comped (you only)", value: stats?.comped ?? 0, tone: "text-blue-600" }] : []),
