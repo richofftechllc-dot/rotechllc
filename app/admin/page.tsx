@@ -94,6 +94,7 @@ export default function AdminCRM() {
   const [resumeView, setResumeView] = useState<Record<string, { name?: string; data: unknown; updatedAt?: string } | null>>({});
   const [invoiceFor, setInvoiceFor] = useState<string | null>(null);
   const [invoiceService, setInvoiceService] = useState("");
+  const [invoiceDiscount, setInvoiceDiscount] = useState("");
   const [catalog, setCatalog] = useState<{ id: string; name: string; priceCents: number }[]>([]);
   const [scheduleType, setScheduleType] = useState<Record<string, string>>({});
   const [scheduleFor, setScheduleFor] = useState<string | null>(null);
@@ -293,8 +294,10 @@ export default function AdminCRM() {
   function sendInvoice(m: Member) {
     const item = catalog.find(c => c.id === invoiceService);
     if (!item) { setActionMsg(s => ({ ...s, [m.email]: "Pick a Square item first." })); return; }
-    doAction(m.email, "invoice", { clientName: m.name, clientEmail: m.email, label: item.name, amountCents: item.priceCents }, `✓ Invoice queued: ${item.name} ($${(item.priceCents / 100).toFixed(0)}).`);
-    setInvoiceFor(null);
+    const discountCents = Math.max(0, Math.round((parseFloat(invoiceDiscount.replace(/[^0-9.]/g, "")) || 0) * 100));
+    const offNote = discountCents > 0 ? ` (−$${(discountCents / 100).toFixed(0)} off)` : "";
+    doAction(m.email, "invoice", { clientName: m.name, clientEmail: m.email, label: item.name, amountCents: item.priceCents, discountCents }, `✓ Invoice queued: ${item.name} ($${(item.priceCents / 100).toFixed(0)})${offNote}.`);
+    setInvoiceFor(null); setInvoiceDiscount("");
   }
   function revokeAccess(m: Member) {
     if (!confirm(`Remove access for ${m.name || m.email}? They'll lose their tier + roles.`)) return;
@@ -739,7 +742,7 @@ export default function AdminCRM() {
                                 <button onClick={() => setPace(m)} className="text-xs px-2.5 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Set plan</button>
                               </span>
                               <button onClick={() => setBookFor(bookFor === m.email ? null : m.email)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📆 Book</button>
-                              {me?.isOwner && <button onClick={() => setInvoiceFor(invoiceFor === m.email ? null : m.email)} className="text-xs px-2.5 py-1.5 rounded-lg border border-orange-300 bg-orange-50 text-orange-700 hover:bg-orange-100">🧾 Send invoice</button>}
+                              <button onClick={() => setInvoiceFor(invoiceFor === m.email ? null : m.email)} className="text-xs px-2.5 py-1.5 rounded-lg border border-orange-300 bg-orange-50 text-orange-700 hover:bg-orange-100">🧾 Send invoice</button>
                             </div>
                             <div className="flex flex-wrap items-center gap-2 mt-2">
                               <input value={dmDraft[m.email] || ""} onChange={e => setDmDraft(s => ({ ...s, [m.email]: e.target.value }))}
@@ -755,13 +758,14 @@ export default function AdminCRM() {
                               </select>
                               <button onClick={() => revokeAccess(m)} className="text-xs px-2.5 py-1.5 rounded-lg border border-red-300 bg-red-50 text-red-700 hover:bg-red-100">Remove access</button>
                             </div>
-                            {invoiceFor === m.email && me?.isOwner && (
+                            {invoiceFor === m.email && (
                               <div className="flex flex-wrap items-center gap-2 mt-2 bg-orange-50 border border-orange-200 rounded-lg p-2">
                                 <span className="text-xs text-orange-800">Invoice {m.name || m.email}:</span>
                                 <select value={invoiceService} onChange={e => setInvoiceService(e.target.value)} className="text-xs border border-orange-200 rounded-lg px-2 py-1.5 bg-white max-w-[260px]">
                                   {catalog.length === 0 && <option value="">No Square items synced yet…</option>}
                                   {catalog.map(it => <option key={it.id} value={it.id}>{it.name} — ${(it.priceCents / 100).toFixed(0)}</option>)}
                                 </select>
+                                <input value={invoiceDiscount} onChange={e => setInvoiceDiscount(e.target.value)} placeholder="$ off" title="Discount in dollars (coaches capped at $300)" className="text-xs border border-orange-200 rounded-lg px-2 py-1.5 bg-white w-20" />
                                 <button onClick={() => sendInvoice(m)} className="text-xs px-3 py-1.5 rounded-lg bg-orange-600 text-white hover:bg-orange-700">Send invoice</button>
                               </div>
                             )}
