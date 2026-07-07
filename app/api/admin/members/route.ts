@@ -142,20 +142,44 @@ export async function GET(req: Request) {
       };
     });
 
-    members.sort((a, b) => {
+    // Collapse duplicate customer docs for the SAME person (same non-empty discordId)
+    // into one row, so a member with multiple records shows ONCE. The doc with the most
+    // quiz progress is the base; email/roles/tracks are unioned across the group. Nothing
+    // is deleted — this is display-only.
+    const byDiscord: Record<string, typeof members> = {};
+    const deduped: typeof members = [];
+    for (const m of members) {
+      if (m.discordId) (byDiscord[m.discordId] ||= []).push(m);
+      else deduped.push(m);
+    }
+    for (const group of Object.values(byDiscord)) {
+      if (group.length === 1) { deduped.push(group[0]); continue; }
+      const primary = [...group].sort((a, b) => (b.progress?.done || 0) - (a.progress?.done || 0) || (b.quizCode ? 1 : 0) - (a.quizCode ? 1 : 0))[0];
+      deduped.push({
+        ...primary,
+        email: group.map((g) => g.email).find(Boolean) || primary.email,
+        name: group.map((g) => g.name).find(Boolean) || primary.name,
+        roles: Array.from(new Set(group.flatMap((g) => g.roles || []))),
+        tracks: Array.from(new Set(group.flatMap((g) => g.tracks || []))),
+        referralCode: group.map((g) => g.referralCode).find(Boolean) || primary.referralCode,
+        foundingTier: Math.min(...group.map((g) => g.foundingTier || 1)),
+      });
+    }
+
+    deduped.sort((a, b) => {
       if (a.paymentStatus === "late" && b.paymentStatus !== "late") return -1;
       if (b.paymentStatus === "late" && a.paymentStatus !== "late") return 1;
       return (a.name || a.email).localeCompare(b.name || b.email);
     });
-    const paidCount = members.filter((m) => m.paymentStatus === "active").length;
-    const compedCount = members.filter((m) => m.paymentStatus === "comp").length;
+    const paidCount = deduped.filter((m) => m.paymentStatus === "active").length;
+    const compedCount = deduped.filter((m) => m.paymentStatus === "comp").length;
     // Comped/demo members are OWNER-ONLY. Coaches only ever see real paying members.
-    const visible = admin.isOwner ? members : members.filter((m) => m.paymentStatus !== "comp");
+    const visible = admin.isOwner ? deduped : deduped.filter((m) => m.paymentStatus !== "comp");
     return NextResponse.json({
       ok: true,
       members: visible,
       isOwner: admin.isOwner,
-      stats: { total: members.length, paid: paidCount, comped: compedCount, expiringSoon },
+      stats: { total: deduped.length, paid: paidCount, comped: compedCount, expiringSoon },
     });
   } catch (e) {
     return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : "error" }, { status: 500 });
