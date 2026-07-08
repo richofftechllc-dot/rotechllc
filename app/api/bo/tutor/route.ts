@@ -1,9 +1,43 @@
 import { getTutor, buildTutorSystem } from "@/lib/tutors";
+import { coll } from "@/lib/firebase";
+import { getAuthedAdmin } from "@/lib/admin";
+import { allowedPrefixes } from "@/lib/access";
+import crypto from "crypto";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 type Msg = { role: "user" | "assistant"; content: string };
+
+const SESSION_SECRET = process.env.SESSION_SECRET || "";
+const TRACK_NAMES: Record<string, string> = { sp: "Security+", csa: "ServiceNow CSA", ai: "AWS AI Practitioner" };
+
+// Resolve the member's OWNED tracks from their session server-side — never trust a
+// client-sent track. Returns the scope instruction appended to the tutor's system prompt.
+async function scopeForSession(req: Request): Promise<string> {
+  let isCoach = false;
+  try { isCoach = !!(await getAuthedAdmin(req)); } catch { isCoach = false; }
+  if (isCoach) return "\n\nSCOPE: This user is a ROT COACH — unrestricted. Help with any track, any depth.";
+
+  const cookie = req.headers.get("cookie") || "";
+  const m = cookie.match(/(?:^|;\s*)rot_session=([^;]+)/);
+  const token = m ? decodeURIComponent(m[1]) : "";
+  let track: string | null = null;
+  if (token && SESSION_SECRET) {
+    const i = token.lastIndexOf(".");
+    if (i > 0 && crypto.createHmac("sha256", SESSION_SECRET).update(token.slice(0, i)).digest("hex") === token.slice(i + 1)) {
+      const payload = token.slice(0, i);
+      try {
+        const snap = payload.startsWith("discord:")
+          ? await coll("customers").where("discordId", "==", payload.split(":")[1]).limit(1).get()
+          : await coll("customers").where("quizCode", "==", payload).limit(1).get();
+        if (!snap.empty) track = (snap.docs[0].data().track as string) || null;
+      } catch { /* no track */ }
+    }
+  }
+  const owned = [...allowedPrefixes(track)].map((p) => TRACK_NAMES[p]).filter(Boolean).join(", ");
+  return `\n\nSCOPE: This member has quiz access to: ${owned || "AWS AI Practitioner"}. Give full teaching/study content ONLY for those track(s). If they ask you to TEACH material for a track they haven't unlocked (e.g. Security+ or ServiceNow CSA when not owned), do NOT teach it — give a one-line career-level answer (which cert fits them, whether it's worth it) and tell them they can unlock that track from the quiz page. Light cross-track career questions are fine; off-track study content is not.`;
+}
 
 // Streaming tutor endpoint. Builds the system prompt from the tutor roster
 // (incl. kid-safe guardrails) and streams the model's reply as plain text.
@@ -31,7 +65,7 @@ export async function POST(req: Request) {
     body: JSON.stringify({
       model: "claude-sonnet-4-6",
       max_tokens: 1024,
-      system: buildTutorSystem(tutor),
+      system: buildTutorSystem(tutor) + (await scopeForSession(req)),
       messages: messages.map((m) => ({ role: m.role, content: m.content })),
       stream: true,
     }),

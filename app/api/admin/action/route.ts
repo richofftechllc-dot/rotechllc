@@ -7,11 +7,13 @@ export const dynamic = "force-dynamic";
 
 // POST /api/admin/action — the CRM tells the bot to do something.
 // Writes a doc to Firestore `botCommands`; the bot polls + executes it (see botcommands.js).
-// Types: dm | broadcast | addTrack | invoice (OWNER ONLY) | teamPing
+// Types: dm | broadcast | addTrack | invoice (COACHES, ≤$300 off) | teamPing
 //
 // This is how the CRM "does everything the bot can do" without holding the
 // Discord/Square credentials itself.
-const OWNER_ONLY = new Set(["invoice"]);
+// Invoicing is coach-accessible (mirrors the Discord !invoice flow) — attribution +
+// the $300 discount cap are enforced bot-side by coachinvoice. No owner-only types today.
+const OWNER_ONLY = new Set<string>([]);
 
 export async function POST(req: Request) {
   const admin = await getAuthedAdmin(req);

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiceNow CSA — Study Plan & PDI Setup · Rich Off Tech</title>
+<style>
+  :root{--ink:#151515;--muted:#5f5c58;--brown:#6b4226;--line:#e6e3df;--soft:#faf7f4}
+  *{box-sizing:border-box}body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);line-height:1.6}
+  .wrap{max-width:800px;margin:0 auto;padding:0 20px 60px}
+  header{border-bottom:3px solid var(--ink);padding:24px 0 12px;margin-bottom:8px}
+  .logo{font-weight:800;letter-spacing:.04em;font-size:18px}.logo b{color:var(--brown)}
+  h1{font-size:clamp(26px,5vw,40px);margin:20px 0 6px;letter-spacing:-.02em}
+  .lede{color:var(--muted);font-size:16px;margin:0 0 8px}
+  h2{font-size:20px;margin:32px 0 8px;display:flex;gap:8px;align-items:center}
+  h3{font-size:16px;margin:18px 0 4px}
+  .step{display:flex;gap:12px;margin:0 0 12px}
+  .n{flex:none;width:28px;height:28px;border-radius:8px;background:var(--brown);color:#fff;font-weight:700;display:grid;place-items:center;font-size:14px}
+  .card{border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0;background:#fff}
+  .soft{background:var(--soft)}
+  table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:14.5px;margin:12px 0}
+  th,td{text-align:left;padding:10px 14px;border-top:1px solid var(--line)}
+  thead th{background:var(--soft);border-top:none;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  ul{margin:6px 0;padding-left:20px}li{margin-bottom:5px}
+  a{color:var(--brown)}b{color:var(--ink)}
+  .tag{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--brown);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+  footer{margin-top:36px;border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><span class="logo">RICH OFF <b>TECH</b></span></header>
+  <span class="tag">ServiceNow · Study Plan</span>
+  <h1>ServiceNow CSA — Your Study Plan 🤎</h1>
+  <p class="lede">The Certified System Administrator path, start to exam. Follow it in order. Your AI tutors (Bo &amp; Flo) are in Discord the whole way.</p>
+
+  <h2>🎯 What the CSA proves</h2>
+  <p>You can run the ServiceNow platform: users, roles &amp; groups, forms &amp; UI policies, tables &amp; data, workflows, imports, and the update sets that ship changes. It's your front door into the six-figure ServiceNow lane (admin → business analyst → developer).</p>
+
+  <h2>🖥️ First move — Set up your PDI (Personal Developer Instance)</h2>
+  <p>Your PDI is your own free ServiceNow instance to practice in. Get it before you study anything else.</p>
+  <div class="card">
+    <div class="step"><div class="n">1</div><div>Go to <a href="https://developer.servicenow.com">developer.servicenow.com</a> and create a free account.</div></div>
+    <div class="step"><div class="n">2</div><div>Top-right → <b>Request Instance</b> → pick the latest release. Wait ~5 min for it to spin up.</div></div>
+    <div class="step"><div class="n">3</div><div>Save your <b>instance URL, admin username, and password</b> somewhere safe (you'll get a temp password — change it).</div></div>
+    <div class="step"><div class="n">4</div><div>Log in. In the top filter navigator, type <b>System Definition &gt; Tables</b> — if you see the table list, you're in. You're ready to build.</div></div>
+    <div class="step"><div class="n">5</div><div>⚠️ PDIs go to sleep after ~10 days of inactivity — log in weekly so it doesn't get reclaimed.</div></div>
+  </div>
+
+  <h2>📚 The exam domains (what to master)</h2>
+  <table>
+    <thead><tr><th>Area</th><th>What to know cold</th></tr></thead>
+    <tbody>
+      <tr><td>User Administration</td><td>Users, groups, roles, ACLs (access control), impersonation</td></tr>
+      <tr><td>Data &amp; Tables</td><td>Tables, fields, dictionary, references, the CMDB basics</td></tr>
+      <tr><td>Forms &amp; Lists</td><td>Form layout, UI policies, UI actions, list controls</td></tr>
+      <tr><td>Workflow / Flow Designer</td><td>Flows, approvals, notifications, the basics of automation</td></tr>
+      <tr><td>Import &amp; Transform</td><td>Import sets, transform maps, coalescing, data sources</td></tr>
+      <tr><td>Update Sets</td><td>Capturing changes and moving them between instances</td></tr>
+      <tr><td>Service Catalog</td><td>Catalog items, variables, record producers, order guides</td></tr>
+      <tr><td>Reporting &amp; Homepages</td><td>Reports, dashboards, gauges, scheduled reports</td></tr>
+    </tbody>
+  </table>
+
+  <h2>⏱️ Pick your pace (and the hours it takes)</h2>
+  <p style="color:var(--muted);font-size:14px;margin:0 0 8px">Same roadmap, three speeds. Set it yourself — or your coach sets it — at <b>rotechllc.com/plan</b>, and your dated roadmap shows up there.</p>
+  <table>
+    <thead><tr><th>Pace</th><th>Time commitment</th><th>Best for</th></tr></thead>
+    <tbody>
+      <tr><td><b>30 days</b></td><td>~2.5 hrs/day &nbsp;(≈70 hrs total)</td><td>Fast track — you've got time now (CSA is hands-on, budget PDI time)</td></tr>
+      <tr><td><b>60 days</b></td><td>~1 hr/day &nbsp;(≈60 hrs total)</td><td>Recommended — steady and it sticks</td></tr>
+      <tr><td><b>90 days</b></td><td>~40 min/day &nbsp;(≈55 hrs total)</td><td>Working full-time</td></tr>
+    </tbody>
+  </table>
+
+  <h2>🗓️ Your 30 / 60 / 90-day plan</h2>
+  <p>Three phases: <b>learn the platform</b>, <b>build in it</b>, then <b>drill &amp; pass</b>. Flex the days around your life — the order is what matters.</p>
+  <table>
+    <thead><tr><th>Phase</th><th>Focus</th></tr></thead>
+    <tbody>
+      <tr><td><b>Days 1–30<br>Foundation</b></td><td>Set up your PDI + platform tour. Master <b>User Administration</b> (users, groups, roles, ACLs, impersonation) and <b>Data &amp; Tables</b> (tables, fields, dictionary, references). Start CSA practice questions in the quiz engine. <i>Goal: you can navigate the platform and explain the data model.</i></td></tr>
+      <tr><td><b>Days 31–60<br>Build</b></td><td><b>Forms &amp; UI policies</b>, <b>Import Sets + Transform Maps</b> (coalesce + load data), <b>Update Sets</b> (capture + move a change), <b>Flow Designer</b> + notifications, and the <b>Service Catalog</b>. Build each one in your PDI, don't just read it. <i>Goal: you've actually shipped a change end-to-end.</i></td></tr>
+      <tr><td><b>Days 61–90<br>Drill &amp; Pass</b></td><td><b>Reporting, homepages &amp; dashboards</b>, then review every weak spot. Run <b>200+ practice questions</b> in the ROT quiz engine until you're steady at <b>75%+</b>. Schedule the exam for the back half of this window and <b>take it</b>. <i>Goal: booked and passed.</i></td></tr>
+    </tbody>
+  </table>
+  <p style="color:var(--muted);font-size:14px"><b>Moving faster?</b> Compress it — this same order works as a 6-week sprint if you can put in the hours. Slower is fine too; just don't skip the build phase.</p>
+
+  <h2>🧠 Inside ROT (use these)</h2>
+  <ul>
+    <li><b>Quiz engine</b> — CSA practice questions in Discord + the site, progress auto-saves. Aim for 75%+ before booking.</li>
+    <li><b>Bo &amp; Flo</b> — ask them anything, anytime. Flo teaches the platform paths; Bo keeps you moving.</li>
+    <li><b>Live sessions + 1-on-1s</b> — bring your PDI screen, we build together.</li>
+    <li><b>Resume + LinkedIn</b> — we reframe your experience for the business-analyst / admin lane as you go.</li>
+  </ul>
+
+  <h2>✅ Exam day</h2>
+  <ul>
+    <li>Remote proctored — quiet room, clean desk, webcam on.</li>
+    <li>Read every question twice; the platform path is usually the answer (e.g. <i>All &gt; System Definition &gt; Dictionary</i>).</li>
+    <li>Flag-and-return: don't burn time on one question. Come back.</li>
+  </ul>
+
+  <footer>🤎 Rich Off Tech LLC · rotechllc.com — your CSA coach + AI tutors are in the Discord. Let's get it. · Updated July 4, 2026</footer>
+</div>
+</body>
+</html>

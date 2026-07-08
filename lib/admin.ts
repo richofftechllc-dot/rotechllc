@@ -26,20 +26,29 @@ const GUILD_ID = process.env.DISCORD_GUILD_ID || "1488597128329822369";
 const COACH_ROLE_NAMES = (process.env.ADMIN_ROLE_NAMES || "ROT Coach,Founder,Admin")
   .split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
 
+// Discord GET with retry-on-429. The /admin page fires ~10 API calls at once and each
+// re-checks the coach role, which bursts Discord and trips its rate limit → random 403s.
+// Retrying (honoring Retry-After, with jitter) lets every call succeed.
+async function discordGet(url: string, token: string, tries = 2): Promise<Response | null> {
+  for (let i = 0; i < tries; i++) {
+    const res = await fetch(url, { headers: { Authorization: `Bot ${token}` }, cache: "no-store" });
+    if (res.status !== 429) return res;
+    // one short retry only — never long enough to hit the function timeout
+    await new Promise((r) => setTimeout(r, 350 + Math.floor(Math.random() * 250)));
+  }
+  return null;
+}
+
 async function hasCoachRole(discordId: string): Promise<boolean> {
   const token = process.env.DISCORD_BOT_TOKEN;
   if (!token) return false;
   try {
-    const memRes = await fetch(`https://discord.com/api/v10/guilds/${GUILD_ID}/members/${discordId}`, {
-      headers: { Authorization: `Bot ${token}` },
-    });
-    if (!memRes.ok) return false;
+    const memRes = await discordGet(`https://discord.com/api/v10/guilds/${GUILD_ID}/members/${discordId}`, token);
+    if (!memRes || !memRes.ok) return false;
     const roleIds = new Set(((await memRes.json()) as { roles?: string[] }).roles || []);
     if (!roleIds.size) return false;
-    const rolesRes = await fetch(`https://discord.com/api/v10/guilds/${GUILD_ID}/roles`, {
-      headers: { Authorization: `Bot ${token}` },
-    });
-    if (!rolesRes.ok) return false;
+    const rolesRes = await discordGet(`https://discord.com/api/v10/guilds/${GUILD_ID}/roles`, token);
+    if (!rolesRes || !rolesRes.ok) return false;
     const roles = (await rolesRes.json()) as { id: string; name: string }[];
     return roles.some((r) => roleIds.has(r.id) && COACH_ROLE_NAMES.includes(r.name.toLowerCase()));
   } catch { return false; }
@@ -70,9 +79,15 @@ function readCookie(req: Request): string | undefined {
 }
 
 // Returns { discordId, name } when the caller is an authorized admin, else null.
-export async function getAuthedAdmin(req: Request): Promise<{ discordId: string; name: string } | null> {
+export async function getAuthedAdmin(req: Request): Promise<{ discordId: string; name: string; isOwner: boolean } | null> {
   const sess = verifySession(readCookie(req));
   if (!sess) return null;
+  // Owner master code — Randy signs into the CRM with RANDY2026 (the same code /hub
+  // already accepts) without needing Discord OAuth. Bypasses the role/allowlist check.
+  const OWNER_CODE = (process.env.OWNER_LOGIN_CODE || "RANDY2026").toUpperCase();
+  if (sess.kind === "code" && sess.code.toUpperCase() === OWNER_CODE) {
+    return { discordId: (process.env.RANDY_DISCORD_ID || "owner").trim(), name: "Randy", isOwner: true };
+  }
   const allow = adminIdSet();
 
   let discordId: string | null = null;
@@ -93,7 +108,8 @@ export async function getAuthedAdmin(req: Request): Promise<{ discordId: string;
 
   if (!discordId) return null;
   // Allow by explicit ID list OR by the ROT Coach role (preferred).
-  if (allow.has(discordId)) return { discordId, name };
-  if (await hasCoachRole(discordId)) return { discordId, name };
+  const owner = !!process.env.RANDY_DISCORD_ID && discordId === process.env.RANDY_DISCORD_ID.trim();
+  if (allow.has(discordId)) return { discordId, name, isOwner: owner };
+  if (await hasCoachRole(discordId)) return { discordId, name, isOwner: owner };
   return null;
 }

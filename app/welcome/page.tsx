@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-const FOUNDING_LINK = "https://square.link/u/iAsbUg2Z";
+const FOUNDING_LINK = "https://square.link/u/7r9pO4c0"; // durable quick_pay $96 (reusable)
 const DISCORD_LINK = "https://discord.gg/dtcYf8PTNa";
 
 // Square appends order/transaction identifiers to the redirect URL after a

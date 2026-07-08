@@ -78,7 +78,7 @@ export default function Login() {
 
         {err && <div className="text-red-400 text-sm text-center mt-3">{err}</div>}
         <div className="text-center text-xs text-gray-500 mt-6">
-          Not a member? <a href="https://square.link/u/iAsbUg2Z" className="text-orange-500">Join ROT — $96</a>
+          Not a member? <a href="https://square.link/u/7r9pO4c0" className="text-orange-500">Join ROT — $96</a>
         </div>
       </div>
     </main>
