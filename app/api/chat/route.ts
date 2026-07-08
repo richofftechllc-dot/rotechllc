@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { coll } from "@/lib/firebase";
 import { getAuthedCode } from "@/lib/session";
 import { LESSONS } from "@/lib/quizData";
+import { buildAccessNote } from "@/lib/access";
 
 // Strip a lesson's HTML to plain text so Bo can be grounded in it via the system prompt.
 function lessonToText(html: string): string {
@@ -186,6 +187,10 @@ export async function POST(req: Request) {
       ? `\n\nLESSON MATERIAL — the student is studying the "${domainId}" module. This is the exact lesson they're working through; ground your tutoring in it, reuse its analogies and terms, and reinforce its cheat-sheet points. Don't contradict it:\n${lessonText}`
       : "";
 
+    // Track-gate teaching: AWS AI + general help is free; CSA/Security+ deep content is
+    // only for members who unlocked that track. (null track → AWS-AI-free baseline.)
+    const accessNote = "\n\n" + buildAccessNote(userInfo.track || null);
+
     const recent = history.slice(-CONTEXT_WINDOW).map(m => ({ role: m.role, content: m.content }));
     const messages = [...recent, { role: "user" as const, content: message }];
 
@@ -199,7 +204,7 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         model: "claude-opus-4-7",
         max_tokens: 512,
-        system: basePrompt(persona) + contextNote + memoryNote + lessonNote,
+        system: basePrompt(persona) + contextNote + memoryNote + lessonNote + accessNote,
         messages,
       }),
     });
