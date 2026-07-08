@@ -8,6 +8,7 @@
 // coach's real hours (set in the CRM / over Discord) are surfaced under the time picker.
 
 import { useEffect, useMemo, useState } from "react";
+import { slotsForWindow } from "@/lib/scheduleSlots";
 
 const COACHES = [
   { key: "randy", name: "Randy" },
@@ -19,37 +20,9 @@ const TOPICS = ["Certifications / studying", "Career / resume", "Clearance", "Ge
 type Slot = { value: string; label: string };
 type CoachAvail = { slug: string; name: string; days: Record<string, string>; note: string };
 
-// Build ET slots (11:00–16:30, every 30 min) for the next 7 days. value carries an
-// explicit -04:00 (EDT) offset so the time is unambiguous regardless of the visitor's TZ.
-function buildSlots(): Slot[] {
-  const out: Slot[] = [];
-  const now = Date.now();
-  for (let d = 0; d < 7; d++) {
-    const base = new Date();
-    base.setDate(base.getDate() + d);
-    const y = base.getFullYear(), m = base.getMonth(), day = base.getDate();
-    for (let h = 11; h <= 16; h++) {
-      for (const min of [0, 30]) {
-        const mm = String(min).padStart(2, "0");
-        const dd = String(day).padStart(2, "0");
-        const mo = String(m + 1).padStart(2, "0");
-        const value = `${y}-${mo}-${dd}T${String(h).padStart(2, "0")}:${mm}:00-04:00`;
-        const t = Date.parse(value);
-        if (isNaN(t) || t < now + 30 * 60 * 1000) continue; // skip past / too-soon
-        const label = new Date(value).toLocaleString("en-US", {
-          timeZone: "America/New_York", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
-        }) + " ET";
-        out.push({ value, label });
-      }
-    }
-  }
-  return out;
-}
-
 const DAY_ORDER = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export default function BookPage() {
-  const slots = useMemo(buildSlots, []);
   const [coach, setCoach] = useState("");
   const [slot, setSlot] = useState("");
   const [topic, setTopic] = useState(TOPICS[3]);
@@ -92,6 +65,12 @@ export default function BookPage() {
   const homeHref = loggedIn ? "/home" : "/";
   const coachAvail = avail.find(c => c.slug === coach);
   const availDays = coachAvail ? DAY_ORDER.filter(d => coachAvail.days[d]) : [];
+  // Real bookable times = the selected coach's CRM hours turned into 30-min slots. Same
+  // source Discord's !book reads. No coach picked / no hours set → nothing to book.
+  const slots = useMemo(() => (coachAvail ? slotsForWindow(coachAvail.days, 7) : []), [coachAvail]);
+
+  // Clear the picked time whenever the coach changes so we never submit coach A's slot for B.
+  useEffect(() => { setSlot(""); }, [coach]);
 
   if (state === "done") {
     return (
@@ -146,11 +125,17 @@ export default function BookPage() {
         )}
 
         <label style={{ display: "block", fontWeight: 600, fontSize: 13, margin: "20px 0 8px" }}>Time (ET)</label>
-        <select value={slot} onChange={(e) => setSlot(e.target.value)}
-          style={{ width: "100%", padding: 12, borderRadius: 9, border: "1px solid #dadce0", background: "#fff", fontSize: 15 }}>
-          <option value="">Pick a time…</option>
-          {slots.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
-        </select>
+        {!coach ? (
+          <p style={{ color: "#9aa0a6", fontSize: 14, margin: "8px 0 0" }}>Pick a coach first.</p>
+        ) : slots.length === 0 ? (
+          <p style={{ color: "#9aa0a6", fontSize: 14, margin: "8px 0 0" }}>No open times with {COACHES.find(c => c.key === coach)?.name} right now — try another coach.</p>
+        ) : (
+          <select value={slot} onChange={(e) => setSlot(e.target.value)}
+            style={{ width: "100%", padding: 12, borderRadius: 9, border: "1px solid #dadce0", background: "#fff", fontSize: 15 }}>
+            <option value="">Pick a time…</option>
+            {slots.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+          </select>
+        )}
 
         <label style={{ display: "block", fontWeight: 600, fontSize: 13, margin: "20px 0 8px" }}>Topic</label>
         <select value={topic} onChange={(e) => setTopic(e.target.value)}
