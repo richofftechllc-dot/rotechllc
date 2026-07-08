@@ -1,4 +1,5 @@
 import { getTutor, buildTutorSystem } from "@/lib/tutors";
+import { getAuthedAdmin } from "@/lib/admin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,7 +15,12 @@ export async function POST(req: Request) {
   } catch {
     return new Response("bad json", { status: 400 });
   }
-  const tutor = getTutor(body?.tutorId);
+  let tutor = getTutor(body?.tutorId);
+  // K-12 (kid-safe) tutors are staff-only. Anyone who isn't a coach gets Bo Tech instead.
+  if (tutor.kidSafe) {
+    const admin = await getAuthedAdmin(req).catch(() => null);
+    if (!admin) tutor = getTutor("bo");
+  }
   const messages = (body?.messages || []).filter((m) => m?.content?.trim()).slice(-12);
   if (!messages.length) return new Response("no messages", { status: 400 });
 
