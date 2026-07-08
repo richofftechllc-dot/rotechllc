@@ -1,11 +1,12 @@
 const cmds = [
-  { cmd: "!start", desc: "Unlock everything after joining" },
-  { cmd: "!quiz", desc: "Get your personal quiz link" },
-  { cmd: "!book", desc: "Schedule a 1-on-1 with Bo" },
-  { cmd: "!consult", desc: "Free 30-min strategy call" },
-  { cmd: "!payment", desc: "Get the Founding Member payment link" },
+  { cmd: "!start", desc: "Get set up + confirm your access after joining" },
+  { cmd: "!quiz", desc: "Your personal quiz link (Security+, CSA, AWS AI)" },
   { cmd: "!progress", desc: "See your quiz progress" },
-  { cmd: "!leaderboard", desc: "Top quiz scores this month" },
+  { cmd: "!learn", desc: "Guided lessons with Flo (course engine)" },
+  { cmd: "!book", desc: "Schedule a 1-on-1 with a coach" },
+  { cmd: "!consult", desc: "Free 30-min strategy call" },
+  { cmd: "!resources", desc: "Study guides + resources" },
+  { cmd: "!salary", desc: "Salary intel by role / clearance" },
   { cmd: "!help", desc: "Full list of commands" },
 ];
 

@@ -7,6 +7,8 @@ type Me = { ok: true; code: string; name: string } | { ok: false };
 
 const LINKS: Array<{ href: string; label: string; external?: boolean; authOnly?: boolean }> = [
   { href: "/home", label: "Home", authOnly: true },
+  { href: "/plan", label: "My Plan", authOnly: true },
+  { href: "/account", label: "Profile", authOnly: true },
   { href: "/roster", label: "Community" },
   { href: "/#about", label: "About" },
   { href: "/quiz", label: "Quiz", authOnly: true },

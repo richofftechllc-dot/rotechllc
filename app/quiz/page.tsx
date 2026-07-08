@@ -1,14 +1,17 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
-import { TRACKS, LESSONS, LIVE_SESSION, type Track, type Domain } from "@/lib/quizData";
+// TYPES ONLY from quizData — the questions/lessons never ship to the client bundle;
+// they come from the server-gated /api/quiz/content so locked tracks leak nothing.
+import { type Track, type Domain } from "@/lib/quizData";
 import LessonVideo from "@/app/components/LessonVideo";
 import InteractiveLesson from "@/app/components/InteractiveLesson";
 import Markdown from "@/app/components/Markdown";
 import { labsForDomain } from "@/lib/labs";
-import { allowedPrefixes } from "@/lib/access";
 
-type Me = | { ok: true; code: string | null; name: string; track: string | null; authType: string } | { ok: false };
+type Me = | { ok: true; code: string | null; name: string; track: string | null; authType: string; isCoach?: boolean } | { ok: false };
+type LockedCard = { id: string; name: string; price: string; blurb: string; buyUrl: string };
+type QuizContent = { ok: true; isCoach: boolean; tracks: Track[]; lockedCards: LockedCard[]; lessons: Record<string, string>; liveSession: { active: boolean; url?: string; title?: string; host?: string } };
 type ChatMsg = { role: "user" | "assistant"; content: string };
 type DomainProgress = { completed?: boolean; highScore?: number };
 
@@ -32,6 +35,7 @@ function progKey(domainId: string): string {
 
 export default function Quiz() {
   const [me, setMe] = useState<Me | null>(null);
+  const [content, setContent] = useState<QuizContent | null>(null);
   const [track, setTrack] = useState<Track | null>(null);
   const [domain, setDomain] = useState<Domain | null>(null);
   const [qIdx, setQIdx] = useState(0);
@@ -118,6 +122,8 @@ export default function Quiz() {
 
   useEffect(() => { stopSpeak(); }, [qIdx]); // moving to another question stops the voice
   useEffect(() => { fetch("/api/me").then(r => r.json()).then(setMe).catch(() => setMe({ ok: false })); }, []);
+  // Gated content — server decides which tracks' questions/lessons we even receive.
+  useEffect(() => { fetch("/api/quiz/content").then(r => r.ok ? r.json() : null).then(setContent).catch(() => setContent(null)); }, []);
 
   const [progressStatus, setProgressStatus] = useState<"loading" | "loaded" | "empty" | "unauth" | "error">("loading");
   const [progressMeta, setProgressMeta] = useState<{ rawKeys: number; normalizedKeys: number } | null>(null);
@@ -176,7 +182,7 @@ export default function Quiz() {
     }
   }, [qIdx, finished, domain, answers]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!me) return <main className="max-w-2xl mx-auto px-6 py-24 text-center"><h1 className="text-4xl font-black">Loading...</h1></main>;
+  if (!me || (me.ok && !content)) return <main className="max-w-2xl mx-auto px-6 py-24 text-center"><h1 className="text-4xl font-black">Loading...</h1></main>;
   if (!me.ok) { if (typeof window !== "undefined") window.location.href = "/login"; return null; }
   if (!me.code) return (
     <main className="max-w-2xl mx-auto px-6 py-24 text-center">
@@ -187,8 +193,9 @@ export default function Quiz() {
     </main>
   );
 
-  const allowed = allowedPrefixes(me.track);
-  const visibleTracks = TRACKS.filter(t => allowed.has(t.id));
+  // Server already gated these — full content only for owned/coached tracks.
+  const visibleTracks = content?.tracks || [];
+  const lockedCards = content?.lockedCards || [];
 
   const reset = () => { setTrack(null); setDomain(null); setQIdx(0); setAnswers([]); setFinished(false); savedRef.current = false; setShowLesson(false); setChat([]); setDebrief(""); debriefRef.current = false; drillRef.current = false; };
   const start = (d: Domain) => { drillRef.current = false; setDebrief(""); debriefRef.current = false; setDomain(d); setQIdx(0); setAnswers(Array(d.questions.length).fill(null)); setFinished(false); savedRef.current = false; setShowLesson(false); setChat([]); };
@@ -386,6 +393,27 @@ ${missedText}]
             })}
           </div>
         )}
+        {lockedCards.length > 0 && (
+          <div className="mt-8">
+            <div className="text-xs uppercase tracking-widest text-gray-500 mb-3">Add a track</div>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {lockedCards.map(lc => (
+                <div key={lc.id} className="relative bg-zinc-900/60 border border-white/10 rounded-xl p-6">
+                  <div className="absolute top-3 right-3 text-lg">🔒</div>
+                  <div className="text-3xl mb-2 opacity-50">{lc.id === "sp" ? "🛡️" : lc.id === "csa" ? "⚙️" : "🤖"}</div>
+                  <div className="font-bold text-xl mb-1 text-gray-300">{lc.name}</div>
+                  <div className="text-xs text-gray-500 mb-3">{lc.blurb}</div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-black text-lg text-white">{lc.price}</span>
+                    {lc.buyUrl && (
+                      <a href={lc.buyUrl} className="text-xs font-bold px-3 py-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 text-white uppercase tracking-wide">Unlock →</a>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
     );
   }
@@ -400,7 +428,7 @@ ${missedText}]
             const p = progress[d.id];
             const score = p?.highScore || 0;
             const completed = !!p?.completed;
-            const hasLesson = !!LESSONS[d.id];
+            const hasLesson = !!content?.lessons?.[d.id];
             return (
               <div key={d.id} className={`w-full bg-zinc-900 border rounded-lg p-4 flex items-center justify-between transition ${completed ? "border-green-500/40" : "border-white/10 hover:border-orange-500"}`}>
                 <div className="flex items-center gap-4">
@@ -446,7 +474,7 @@ ${missedText}]
 
   const q = domain.questions[qIdx];
   const done = qIdx >= domain.questions.length;
-  const lesson = LESSONS[domain.id];
+  const lesson = content?.lessons?.[domain.id];
   const unanswered = answers.map((a, i) => (a == null ? i : -1)).filter(i => i >= 0);
 
   if (done && showLesson && lesson && answers.length === 0) {
@@ -461,7 +489,7 @@ ${missedText}]
             <InteractiveLesson html={lesson} />
             <button onClick={() => start(domain)} className="px-6 py-3 bg-orange-500 text-black font-bold rounded-lg">Start Quiz →</button>
           </div>
-          <SidePanel domain={domain} onStart={() => start(domain)} />
+          <SidePanel domain={domain} onStart={() => start(domain)} liveSession={content?.liveSession} />
         </div>
       </main>
     );
@@ -677,31 +705,32 @@ function extractYouTubeIdSimple(url: string): string | null {
   return null;
 }
 
-function SidePanel({ domain, onStart }: { domain: Domain; onStart: () => void }) {
+function SidePanel({ domain, onStart, liveSession }: { domain: Domain; onStart: () => void; liveSession?: QuizContent["liveSession"] }) {
   const labs = labsForDomain(domain.id);
-  const liveYouTubeId = LIVE_SESSION.url ? extractYouTubeIdSimple(LIVE_SESSION.url) : null;
+  const LIVE = liveSession || { active: false, url: undefined, title: undefined, host: undefined };
+  const liveYouTubeId = LIVE.url ? extractYouTubeIdSimple(LIVE.url) : null;
   return (
     <aside className="space-y-4 h-fit lg:sticky lg:top-4">
-      {LIVE_SESSION.active && (
+      {LIVE.active && (
         <div className="bg-red-500/10 border border-red-500/40 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">
             <span className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />
             <span className="text-red-400 font-bold text-xs tracking-widest uppercase">Live Now</span>
           </div>
-          <div className="font-bold text-sm mb-1">{LIVE_SESSION.title || "Community Session"}</div>
-          {LIVE_SESSION.host && <div className="text-xs text-gray-400 mb-3">with {LIVE_SESSION.host}</div>}
+          <div className="font-bold text-sm mb-1">{LIVE.title || "Community Session"}</div>
+          {LIVE.host && <div className="text-xs text-gray-400 mb-3">with {LIVE.host}</div>}
           {liveYouTubeId ? (
             <div className="aspect-video rounded-lg overflow-hidden bg-black">
               <iframe
                 src={`https://www.youtube.com/embed/${liveYouTubeId}?autoplay=0&rel=0`}
-                title={LIVE_SESSION.title || "Live"}
+                title={LIVE.title || "Live"}
                 className="w-full h-full"
                 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
             </div>
-          ) : LIVE_SESSION.url ? (
-            <a href={LIVE_SESSION.url} target="_blank" rel="noopener noreferrer" className="block w-full text-center px-3 py-2 bg-red-500 text-white font-bold text-xs rounded uppercase tracking-wider">
+          ) : LIVE.url ? (
+            <a href={LIVE.url} target="_blank" rel="noopener noreferrer" className="block w-full text-center px-3 py-2 bg-red-500 text-white font-bold text-xs rounded uppercase tracking-wider">
               Join Now ↗
             </a>
           ) : null}

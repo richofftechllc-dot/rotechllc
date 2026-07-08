@@ -3,9 +3,13 @@ import { useEffect, useState, useCallback, Fragment } from "react";
 import Image from "next/image";
 
 type Member = {
-  email: string; name: string; discordTag: string; discordId: string;
+  id: string; email: string; name: string; discordTag: string; discordId: string;
   tier: string; status: string; paymentStatus: string; invoiced: boolean;
   tracks: string[]; roles: string[]; certs?: string[]; phone?: string; quizCode: string; accessEndDate: string; daysLeft?: number | null; plan?: string; referredBy?: string; rolesAssigned: boolean;
+  sentLog?: { type?: string; title?: string; detail?: string; at?: string }[];
+  referralEligible?: boolean;
+  referralCode?: string;
+  foundingTier?: number;
   assignedTo: string; notes: string; purchaseDate?: string;
   progress?: { domains: { domain: string; highScore: number; completed: boolean }[]; done: number; avg: number | null; weak: string[] };
 };
@@ -16,6 +20,14 @@ type Followup = {
 };
 type Schedule = { id?: string; discordId: string; name: string; days: Record<string, string>; note?: string; updatedAt?: string };
 type Call = { id: string; title: string; date: string | null; type?: string; summary?: string; actionItems?: string; keywords?: string; participants: string[]; grade: string; transcriptUrl: string; gradedAt: number | null };
+// Coach-invoice programs (mirror coachinvoice.SERVICES in the bot). Click one to invoice.
+const COACH_SERVICES = [
+  { key: "sec-essential", label: "Security+ Essential", amount: 150000 },
+  { key: "sec-accelerated", label: "Security+ Accelerated", amount: 240000 },
+  { key: "csa-essential", label: "CSA Essential", amount: 160000 },
+  { key: "csa-accelerated", label: "CSA Accelerated", amount: 280000 },
+  { key: "aws", label: "AWS Cloud Practitioner", amount: 100000 },
+];
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const TIME_OPTS = ["", "7am", "8am", "9am", "10am", "11am", "12pm", "1pm", "2pm", "3pm", "4pm", "5pm", "6pm", "7pm", "8pm", "9pm", "10pm"];
 // Parse "9am–5pm ET" → {start, end}; compose back on change. Keeps the stored string format.
@@ -57,6 +69,8 @@ export default function AdminCRM() {
   const [newSop, setNewSop] = useState({ title: "", body: "" });
   const [referralPayout, setReferralPayoutState] = useState(20);
   const [payoutDraft, setPayoutDraft] = useState("");
+  const [copied, setCopied] = useState("");
+  const [referralBlastMsg, setReferralBlastMsg] = useState("");
   const [igText, setIgText] = useState("");
   const [igStatus, setIgStatus] = useState("");
   const [igDrafts, setIgDrafts] = useState<{ id: string; imageUrl: string; caption: string; status: string }[]>([]);
@@ -73,11 +87,12 @@ export default function AdminCRM() {
   const [fStatus, setFStatus] = useState("");
   const [resetMsg, setResetMsg] = useState<Record<string, string>>({});
   const [members, setMembers] = useState<Member[]>([]);
-  const [stats, setStats] = useState<{ total: number; comped: number; expiringSoon: number } | null>(null);
+  const [stats, setStats] = useState<{ total: number; comped: number; paid?: number; free?: number; expiringSoon: number } | null>(null);
   const [followups, setFollowups] = useState<Followup[]>([]);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [me, setMe] = useState<{ discordId: string; name: string; isOwner?: boolean } | null>(null);
   const [schedDraft, setSchedDraft] = useState<{ days: Record<string, string>; note: string }>({ days: {}, note: "" });
+  const [schedTarget, setSchedTarget] = useState<{ discordId: string; name: string } | null>(null); // owner editing another coach; null = self
   const [q, setQ] = useState("");
   const [noteDraft, setNoteDraft] = useState<Record<string, string>>({});
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -88,10 +103,14 @@ export default function AdminCRM() {
   const [resumeView, setResumeView] = useState<Record<string, { name?: string; data: unknown; updatedAt?: string } | null>>({});
   const [invoiceFor, setInvoiceFor] = useState<string | null>(null);
   const [invoiceService, setInvoiceService] = useState("");
+  const [invoiceDiscount, setInvoiceDiscount] = useState("");
   const [catalog, setCatalog] = useState<{ id: string; name: string; priceCents: number }[]>([]);
   const [scheduleType, setScheduleType] = useState<Record<string, string>>({});
   const [scheduleFor, setScheduleFor] = useState<string | null>(null);
   const [roleDraft, setRoleDraft] = useState<Record<string, string>>({});
+  const [paceDraft, setPaceDraft] = useState<Record<string, string>>({});
+  const [adminCode, setAdminCode] = useState("");
+  const [adminCodeErr, setAdminCodeErr] = useState("");
   const [bookFor, setBookFor] = useState<string | null>(null);
   const [bookCoach, setBookCoach] = useState<Record<string, string>>({});
   const [bookSlot, setBookSlot] = useState<Record<string, string>>({});
@@ -102,7 +121,7 @@ export default function AdminCRM() {
     if (r.status === 403) { setAuthed("no"); return; }
     setAuthed("yes");
     const d = await r.json();
-    if (d.ok) { setMembers(d.members); setStats(d.stats); }
+    if (d.ok) { setMembers(d.members); setStats(d.stats); if (d.isOwner !== undefined) setMe(prev => ({ discordId: prev?.discordId ?? "", name: prev?.name ?? "Randy", isOwner: d.isOwner })); }
   }, []);
   const loadFollowups = useCallback(async () => {
     const r = await fetch("/api/admin/followups");
@@ -188,6 +207,22 @@ export default function AdminCRM() {
     setIgStatus(r.ok && d.ok ? "✓ Generating — the image appears below + in #ig-drafts to approve." : `Error: ${d.error}`);
     if (r.ok && d.ok) { setIgText(""); setTimeout(loadIgDrafts, 12000); setTimeout(loadIgDrafts, 22000); }
   }
+  async function genReferralCodes() {
+    await fetch("/api/admin/gen-referral-codes", { method: "POST" });
+    loadMembers();
+  }
+  async function blastReferralLinks() {
+    const referrers = eligibleReferrers.filter(m => m.discordId && m.referralCode).map(m => ({ discordId: m.discordId, name: m.name || m.email, code: m.referralCode }));
+    if (!referrers.length) { setReferralBlastMsg("No eligible referrers with a linked Discord + code yet. Click 'Generate links' first."); return; }
+    setReferralBlastMsg(`Sending ${referrers.length} links…`);
+    const r = await fetch("/api/admin/action", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "referralBlast", payload: { referrers } }) });
+    const d = await r.json();
+    setReferralBlastMsg(r.ok && d.ok ? `✓ Queued — the bot is DMing ${referrers.length} referrers their links now.` : `Error: ${d.error || r.status}`);
+  }
+  async function blockReferrer(m: Member) {
+    await fetch("/api/admin/referral-block", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: m.email, name: m.name, blocked: true }) });
+    loadMembers();
+  }
   async function savePayout() {
     const v = Number(payoutDraft);
     if (isNaN(v)) return;
@@ -246,6 +281,15 @@ export default function AdminCRM() {
     if (!tier) return;
     doAction(m.email, "addTrack", { email: m.email, tier, name: m.name }, `✓ Granting ${tier} — bot will apply it + notify them.`);
   }
+  async function setPace(m: Member) {
+    const pace = Number(paceDraft[m.email]);
+    if (!pace) return;
+    setActionMsg(s => ({ ...s, [m.email]: "…" }));
+    const trackId = m.tracks[0] || undefined;
+    const r = await fetch("/api/admin/set-pace", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: m.email, pace, trackId }) });
+    const d = await r.json();
+    setActionMsg(s => ({ ...s, [m.email]: r.ok && d.ok ? `✓ ${pace}-day plan set — they see the dated roadmap on /plan.` : `Error: ${d.error || r.status}` }));
+  }
   function scheduleCall(m: Member) {
     const type = scheduleType[m.email] || "Intro";
     const blurb: Record<string, string> = {
@@ -256,11 +300,17 @@ export default function AdminCRM() {
     };
     doAction(m.email, "dm", { email: m.email, discordId: m.discordId, message: `📅 ${blurb[type] || blurb.Intro} DM me the word **book** here and I'll show you open times (pick your coach + a slot). See you soon!` }, `✓ Sent them the ${type.toLowerCase()} booking prompt in Discord.`);
   }
-  function sendInvoice(m: Member) {
-    const item = catalog.find(c => c.id === invoiceService);
-    if (!item) { setActionMsg(s => ({ ...s, [m.email]: "Pick a Square item first." })); return; }
-    doAction(m.email, "invoice", { clientName: m.name, clientEmail: m.email, label: item.name, amountCents: item.priceCents }, `✓ Invoice queued: ${item.name} ($${(item.priceCents / 100).toFixed(0)}).`);
-    setInvoiceFor(null);
+  function sendInvoice(m: Member, service: { key: string; label: string; amount: number }) {
+    if (!m.email) { setActionMsg(s => ({ ...s, [m.id]: "No email on file — add one before invoicing." })); return; }
+    const discountCents = Math.max(0, Math.round((parseFloat(invoiceDiscount.replace(/[^0-9.]/g, "")) || 0) * 100));
+    if (discountCents >= service.amount) { setActionMsg(s => ({ ...s, [m.id]: "Discount can't be ≥ the price." })); return; }
+    const fee = Math.round((service.amount - discountCents) * 0.06);
+    const total = service.amount - discountCents + fee;
+    const offNote = discountCents > 0 ? ` (−$${(discountCents / 100).toFixed(0)} off)` : "";
+    // Confirm step — prevents accidental / duplicate sends.
+    if (!confirm(`Send ${service.label}${offNote} to ${m.name || m.email}?\n\nThey'll be billed $${(total / 100).toFixed(2)} (includes 6% card fee).`)) return;
+    doAction(m.email, "invoice", { clientName: m.name || m.email, clientEmail: m.email, service: service.key, discountCents }, `✓ Invoice sent: ${service.label}${offNote} → ${m.name || m.email}.`);
+    setInvoiceFor(null); setInvoiceDiscount("");
   }
   function revokeAccess(m: Member) {
     if (!confirm(`Remove access for ${m.name || m.email}? They'll lose their tier + roles.`)) return;
@@ -299,7 +349,7 @@ export default function AdminCRM() {
         const prog = pr ? `${pr.done} quizzes done${pr.avg != null ? `, avg ${pr.avg}%` : ""}${pr.weak?.length ? `, weak: ${pr.weak.join("/")}` : ""}` : "no quiz activity";
         return `${m.name || m.email} | ${m.tier || "—"} | ${m.paymentStatus} | ${m.daysLeft ?? "—"}d left | tracks: ${m.tracks.join("/") || "none"} | ${prog}`;
       }).join("\n");
-      const focus = expanded ? members.find(m => m.email === expanded) : null;
+      const focus = expanded ? members.find(m => m.id === expanded) : null;
       const r = await fetch("/api/admin/assistant", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: next, roster, focus }) });
       const reply = await r.text();
       setBoMsgs(m => [...m, { role: "assistant", content: reply }]);
@@ -351,7 +401,8 @@ export default function AdminCRM() {
     loadFollowups();
   }
   async function saveSchedule() {
-    await fetch("/api/admin/schedule", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(schedDraft) });
+    const payload = schedTarget ? { ...schedDraft, targetDiscordId: schedTarget.discordId, targetName: schedTarget.name } : schedDraft;
+    await fetch("/api/admin/schedule", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
     loadSchedule();
   }
   async function setReferrer(m: Member) {
@@ -367,8 +418,33 @@ export default function AdminCRM() {
     <main className="min-h-screen bg-[#f8f9fa] flex flex-col items-center justify-center gap-4 px-6 text-center text-[#202124]">
       <Image src="/rot-logo.png" alt="Rich Off Tech" width={56} height={56} className="rounded-xl" />
       <h1 className="text-2xl font-bold">Rich Off Tech — CRM</h1>
-      <p className="text-gray-500 max-w-sm">Coaches only. Sign in with the Discord account that holds the ROT Coach role.</p>
+      <p className="text-gray-500 max-w-sm">Coaches only. Sign in with your Discord coach account, or your access code.</p>
       <a href="/api/auth/discord?redirect=/admin" className="px-6 py-3 font-semibold rounded-lg text-white" style={{ backgroundColor: "#5865F2" }}>Sign in with Discord</a>
+      <div className="flex items-center gap-3 w-full max-w-xs my-1"><div className="flex-1 h-px bg-gray-300" /><span className="text-gray-400 text-xs">or access code</span><div className="flex-1 h-px bg-gray-300" /></div>
+      <div className="flex gap-2 w-full max-w-xs">
+        <input
+          value={adminCode}
+          onChange={(e) => setAdminCode(e.target.value)}
+          onKeyDown={async (e) => {
+            if (e.key !== "Enter" || !adminCode.trim()) return;
+            setAdminCodeErr("");
+            const r = await fetch("/api/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: adminCode.trim().toUpperCase() }) });
+            if (r.ok) window.location.reload(); else setAdminCodeErr("Invalid code");
+          }}
+          placeholder="ACCESS CODE"
+          className="flex-1 border border-[#dadce0] rounded-lg px-3 py-2.5 text-sm uppercase tracking-wide focus:outline-none focus:border-orange-500"
+        />
+        <button
+          onClick={async () => {
+            if (!adminCode.trim()) return;
+            setAdminCodeErr("");
+            const r = await fetch("/api/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: adminCode.trim().toUpperCase() }) });
+            if (r.ok) window.location.reload(); else setAdminCodeErr("Invalid code");
+          }}
+          className="px-4 py-2.5 rounded-lg bg-[#202124] text-white font-semibold text-sm hover:bg-black"
+        >Sign In</button>
+      </div>
+      {adminCodeErr && <div className="text-red-500 text-sm">{adminCodeErr}</div>}
     </main>
   );
 
@@ -384,11 +460,26 @@ export default function AdminCRM() {
   // Referral rollup: group by who referred them, count paid, compute payout owed.
   const referrerMap: Record<string, Member[]> = {};
   members.forEach(m => { if (m.referredBy) (referrerMap[m.referredBy] ||= []).push(m); });
-  const referrers = Object.entries(referrerMap).map(([ref, list]) => ({
-    ref, count: list.length,
-    paid: list.filter(x => x.paymentStatus === "active" || x.paymentStatus === "comp").length,
-  })).sort((a, b) => b.count - a.count);
-  const totalOwed = referrers.reduce((s, r) => s + r.paid * referralPayout, 0);
+  // Only ACTIVE/COMP referrals count toward payout — a refunded or churned referral
+  // flips to expired/canceled and drops out, so you never pay on money you gave back.
+  // Cash is capped at $500/person ($50 × 10). At the cap they can take $1,000 store
+  // credit instead; below it, credit = 2× the cash owed.
+  const CAP_PER_PERSON = 500;
+  // Look up each referrer's founding tier by their code → tier-based rate.
+  // Tier 1 (first 100 paid founders) = $50/referral · Tier 2 (joined after) = $25/referral.
+  const byRefCode: Record<string, Member> = {};
+  members.forEach(m => { if (m.referralCode) byRefCode[m.referralCode.toLowerCase()] = m; });
+  const referrers = Object.entries(referrerMap).map(([ref, list]) => {
+    const paid = list.filter(x => x.paymentStatus === "active" || x.paymentStatus === "comp").length;
+    const refMember = byRefCode[String(ref).toLowerCase()];
+    const tier = refMember?.foundingTier === 2 ? 2 : 1;
+    const rate = tier === 2 ? 25 : 50;
+    const owedRaw = paid * rate;
+    const owed = Math.min(owedRaw, CAP_PER_PERSON);
+    return { ref, tier, rate, count: list.length, paid, owed, capped: owedRaw > CAP_PER_PERSON, creditOption: owed >= CAP_PER_PERSON ? 1000 : owed * 2 };
+  }).sort((a, b) => b.owed - a.owed || b.count - a.count);
+  const totalOwed = referrers.reduce((s, r) => s + r.owed, 0);
+  const eligibleReferrers = members.filter(m => m.referralEligible).sort((a, b) => (a.name || a.email).localeCompare(b.name || b.email));
 
   // ── Coach Home (command center) — derived from already-loaded state, no new fetch ──
   const homeOpenFollowups = followups.filter(f => f.status === "open" && !f.archived);
@@ -434,6 +525,7 @@ export default function AdminCRM() {
                 <span className="text-[11px] text-gray-500">{me.name}</span>
               </div>
               <span className="w-8 h-8 rounded-full bg-[#202124] text-white grid place-items-center text-xs font-semibold">{me.name.slice(0, 2).toUpperCase()}</span>
+              <button onClick={async () => { await fetch("/api/logout", { method: "POST" }); window.location.href = "/login"; }} className="text-[11px] text-gray-500 hover:text-red-600 border border-[#dadce0] rounded-lg px-2.5 py-1">Sign out</button>
             </div>
           )}
         </div>
@@ -444,9 +536,11 @@ export default function AdminCRM() {
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
           {[
             { label: "Members", value: stats?.total ?? members.length, tone: "text-[#202124]" },
+            ...(me?.isOwner ? [{ label: "Paid", value: stats?.paid ?? 0, tone: "text-green-700" }] : []),
+            ...(me?.isOwner ? [{ label: "Free (Discord)", value: stats?.free ?? 0, tone: "text-gray-500" }] : []),
             { label: "Expiring ≤30d", value: stats?.expiringSoon ?? 0, tone: "text-amber-600" },
             { label: "Late / expired", value: lateCount, tone: "text-red-600" },
-            { label: "Comped", value: stats?.comped ?? 0, tone: "text-blue-600" },
+            ...(me?.isOwner ? [{ label: "Comped (you only)", value: stats?.comped ?? 0, tone: "text-blue-600" }] : []),
             { label: "Open follow-ups", value: openFollowups.length, tone: "text-[#202124]" },
           ].map(c => (
             <div key={c.label} className="bg-white border border-[#dadce0] rounded-xl p-4">
@@ -640,13 +734,13 @@ export default function AdminCRM() {
                 </thead>
                 <tbody>
                   {filteredMembers.map(m => (
-                    <Fragment key={m.email}>
-                      <tr className="border-b border-[#f1f3f4] hover:bg-[#f8f9fa] cursor-pointer" onClick={() => setExpanded(expanded === m.email ? null : m.email)}>
+                    <Fragment key={m.id}>
+                      <tr className="border-b border-[#f1f3f4] hover:bg-[#f8f9fa] cursor-pointer" onClick={() => setExpanded(expanded === m.id ? null : m.id)}>
                         <td className="py-2.5 px-4">
                           <div className="font-medium">{m.name || m.email}</div>
                           <div className="text-xs text-gray-500">{m.email}{m.discordTag ? ` · ${m.discordTag}` : ""}</div>
                         </td>
-                        <td className="px-3 text-gray-700">{m.tier || "—"}</td>
+                        <td className="px-3 text-gray-700">{m.tier || "—"} <span className={`ml-1 text-[10px] px-1.5 py-0.5 rounded font-bold ${m.foundingTier === 2 ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`} title={m.foundingTier === 2 ? "Founding Tier 2 — joined after the first 100 ($25/referral)" : "Founding Tier 1 — first 100 ($50/referral)"}>Founding T{m.foundingTier || 1}</span></td>
                         <td className="px-3">{m.tracks.length ? m.tracks.map(t => <span key={t} className="inline-block text-[10px] mr-1 px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 text-gray-600">{t}</span>) : <span className="text-gray-400">—</span>}</td>
                         <td className="px-3">
                           <span className={`text-xs px-2 py-0.5 rounded-full border ${PILL[m.paymentStatus] || "bg-gray-100 text-gray-500 border-gray-200"}`}>{m.paymentStatus}</span>
@@ -669,7 +763,7 @@ export default function AdminCRM() {
                           {m.progress?.weak?.length ? <span className="ml-1 text-[10px] text-red-600">⚠{m.progress.weak.length}</span> : null}
                         </td>
                       </tr>
-                      {expanded === m.email && (
+                      {expanded === m.id && (
                         <tr className="bg-[#f8f9fa]"><td colSpan={7} className="px-4 py-4">
                           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-1.5 text-xs mb-4">
                             <div><span className="text-gray-400">Name</span><div className="font-medium">{m.name || "—"}</div></div>
@@ -697,6 +791,18 @@ export default function AdminCRM() {
                               </div>
                             </div>
                           </div>
+                          <div className="text-xs text-gray-400 mb-1.5">What was sent to this member</div>
+                          {m.sentLog?.length ? (
+                            <div className="space-y-1 mb-4">
+                              {[...m.sentLog].reverse().slice(0, 12).map((e, i) => (
+                                <div key={i} className="text-xs bg-[#f8f9fa] border border-[#e8eaed] rounded px-2 py-1 flex items-center justify-between gap-2">
+                                  <span><span className="inline-block px-1.5 py-0.5 rounded bg-gray-200 text-gray-600 text-[10px] mr-1.5">{e.type === "email" ? "✉️ email" : e.type === "dm" ? "💬 DM" : e.type}</span>{e.title}{e.detail ? <span className="text-gray-400"> — {e.detail}</span> : ""}</span>
+                                  <span className="text-gray-400 whitespace-nowrap">{e.at ? new Date(e.at).toLocaleDateString() : ""}</span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : <div className="text-gray-500 text-xs mb-4">Nothing logged yet — welcome emails + onboarding DMs will appear here as they go out.</div>}
+
                           <div className="text-xs text-gray-400 mb-1.5">Quiz scores by domain</div>
                           {m.progress?.domains?.length ? (
                             <div className="flex flex-wrap gap-2">
@@ -712,7 +818,7 @@ export default function AdminCRM() {
                           <div className="mt-4 pt-3 border-t border-[#e8eaed]">
                             <div className="text-xs text-gray-400 mb-2">Actions</div>
                             <div className="flex flex-wrap items-center gap-2">
-                              <button onClick={() => setScheduleFor(scheduleFor === m.email ? null : m.email)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📅 Schedule call</button>
+                              <button onClick={() => setScheduleFor(scheduleFor === m.id ? null : m.id)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📅 Schedule call</button>
                               <button onClick={() => viewResume(m)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📄 {resumeView[m.email] ? "Hide" : "View"} resume</button>
                               <span className="inline-flex items-center gap-1">
                                 <select value={trackDraft[m.email] || ""} onChange={e => setTrackDraft(s => ({ ...s, [m.email]: e.target.value }))} className="text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500">
@@ -728,8 +834,17 @@ export default function AdminCRM() {
                                 </select>
                                 <button onClick={() => assignRole(m)} className="text-xs px-2.5 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Assign</button>
                               </span>
-                              <button onClick={() => setBookFor(bookFor === m.email ? null : m.email)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📆 Book</button>
-                              {me?.isOwner && <button onClick={() => setInvoiceFor(invoiceFor === m.email ? null : m.email)} className="text-xs px-2.5 py-1.5 rounded-lg border border-orange-300 bg-orange-50 text-orange-700 hover:bg-orange-100">🧾 Send invoice</button>}
+                              <span className="inline-flex items-center gap-1">
+                                <select value={paceDraft[m.email] || ""} onChange={e => setPaceDraft(s => ({ ...s, [m.email]: e.target.value }))} className="text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500">
+                                  <option value="">Study pace…</option>
+                                  <option value="30">30-day</option>
+                                  <option value="60">60-day</option>
+                                  <option value="90">90-day</option>
+                                </select>
+                                <button onClick={() => setPace(m)} className="text-xs px-2.5 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Set plan</button>
+                              </span>
+                              <button onClick={() => setBookFor(bookFor === m.id ? null : m.id)} className="text-xs px-2.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">📆 Book</button>
+                              <button onClick={() => setInvoiceFor(invoiceFor === m.id ? null : m.id)} className="text-xs px-2.5 py-1.5 rounded-lg border border-orange-300 bg-orange-50 text-orange-700 hover:bg-orange-100">🧾 Send invoice</button>
                             </div>
                             <div className="flex flex-wrap items-center gap-2 mt-2">
                               <input value={dmDraft[m.email] || ""} onChange={e => setDmDraft(s => ({ ...s, [m.email]: e.target.value }))}
@@ -745,17 +860,22 @@ export default function AdminCRM() {
                               </select>
                               <button onClick={() => revokeAccess(m)} className="text-xs px-2.5 py-1.5 rounded-lg border border-red-300 bg-red-50 text-red-700 hover:bg-red-100">Remove access</button>
                             </div>
-                            {invoiceFor === m.email && me?.isOwner && (
-                              <div className="flex flex-wrap items-center gap-2 mt-2 bg-orange-50 border border-orange-200 rounded-lg p-2">
-                                <span className="text-xs text-orange-800">Invoice {m.name || m.email}:</span>
-                                <select value={invoiceService} onChange={e => setInvoiceService(e.target.value)} className="text-xs border border-orange-200 rounded-lg px-2 py-1.5 bg-white max-w-[260px]">
-                                  {catalog.length === 0 && <option value="">No Square items synced yet…</option>}
-                                  {catalog.map(it => <option key={it.id} value={it.id}>{it.name} — ${(it.priceCents / 100).toFixed(0)}</option>)}
-                                </select>
-                                <button onClick={() => sendInvoice(m)} className="text-xs px-3 py-1.5 rounded-lg bg-orange-600 text-white hover:bg-orange-700">Send invoice</button>
+                            {invoiceFor === m.id && (
+                              <div className="mt-2 bg-orange-50 border border-orange-200 rounded-lg p-2.5">
+                                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                  <span className="text-xs text-orange-800 font-medium">Invoice {m.name || m.email}</span>
+                                  {!m.email && <span className="text-[11px] text-red-600 font-medium">⚠ no email on file — add one first</span>}
+                                  <label className="ml-auto text-[11px] text-orange-800 flex items-center gap-1">$ off <input value={invoiceDiscount} onChange={e => setInvoiceDiscount(e.target.value)} placeholder="0" title="Discount in dollars (coaches capped at $300)" className="text-xs border border-orange-200 rounded-lg px-2 py-1 bg-white w-14" /></label>
+                                </div>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {COACH_SERVICES.map(s => (
+                                    <button key={s.key} disabled={!m.email} onClick={() => sendInvoice(m, s)} className="text-xs px-2.5 py-1.5 rounded-lg bg-white border border-orange-300 text-orange-800 hover:bg-orange-600 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed">{s.label} · ${(s.amount / 100).toFixed(0)}</button>
+                                  ))}
+                                </div>
+                                <p className="text-[11px] text-gray-500 mt-1.5">Click a program → confirm → sends (6% card fee added; coach discount ≤$300).</p>
                               </div>
                             )}
-                            {scheduleFor === m.email && (
+                            {scheduleFor === m.id && (
                               <div className="mt-2 bg-[#f8f9fa] border border-[#dadce0] rounded-lg p-3">
                                 <div className="flex flex-wrap items-center gap-2">
                                   <span className="text-xs text-gray-700">Meeting type:</span>
@@ -768,7 +888,7 @@ export default function AdminCRM() {
                                 <p className="text-[11px] text-gray-500 mt-1.5">This DMs {m.name || "them"} in Discord to book a {(scheduleType[m.email] || "Intro").toLowerCase()} call — they pick a coach + an open time (tomorrow 11–5 ET) in the bot. It doesn&apos;t reserve a slot here or charge anything.</p>
                               </div>
                             )}
-                            {bookFor === m.email && (
+                            {bookFor === m.id && (
                               <div className="mt-2 bg-[#f8f9fa] border border-[#dadce0] rounded-lg p-3">
                                 <div className="flex flex-wrap items-center gap-2">
                                   <span className="text-xs text-gray-700">Book a 1-on-1:</span>
@@ -905,7 +1025,7 @@ export default function AdminCRM() {
                 </div>
               )}
             </div>
-            <p className="text-gray-500 text-sm">Set your weekly availability so the team knows when you&apos;re free. You can only edit your own row.</p>
+            <p className="text-gray-500 text-sm">Set your weekly availability so the team knows when you&apos;re free.{me?.isOwner ? " As owner, you can edit any coach's row — hit Edit on their line. Coaches can only edit their own (not yours)." : " You can only edit your own row."}</p>
             <div className="bg-white border border-[#dadce0] rounded-xl overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="text-left text-xs text-gray-500 bg-[#f8f9fa]">
@@ -913,15 +1033,17 @@ export default function AdminCRM() {
                     <th className="py-2.5 px-4 font-medium">Coach</th>
                     {WEEKDAYS.map(d => <th key={d} className="px-3 font-medium">{d}</th>)}
                     <th className="px-3 font-medium">Note</th>
+                    {me?.isOwner && <th className="px-3 font-medium">Edit</th>}
                   </tr>
                 </thead>
                 <tbody>
-                  {schedules.length === 0 && <tr><td colSpan={9} className="py-4 px-4 text-gray-500">No availability set yet.</td></tr>}
+                  {schedules.length === 0 && <tr><td colSpan={10} className="py-4 px-4 text-gray-500">No availability set yet.</td></tr>}
                   {schedules.map(s => (
                     <tr key={s.discordId} className="border-b border-[#f1f3f4]">
                       <td className="py-2.5 px-4 font-medium">{s.name}{me && s.discordId === me.discordId && <span className="text-orange-600 text-xs ml-1">(you)</span>}</td>
                       {WEEKDAYS.map(d => <td key={d} className="px-3 text-gray-600 text-xs">{s.days?.[d] || "—"}</td>)}
                       <td className="px-3 text-gray-500 text-xs">{s.note || ""}</td>
+                      {me?.isOwner && <td className="px-3"><button onClick={() => { setSchedTarget(s.discordId === me.discordId ? null : { discordId: s.discordId, name: s.name }); setSchedDraft({ days: { ...(s.days || {}) }, note: s.note || "" }); }} className="text-xs text-orange-600 hover:underline">Edit</button></td>}
                     </tr>
                   ))}
                 </tbody>
@@ -929,7 +1051,10 @@ export default function AdminCRM() {
             </div>
 
             <div className="bg-white border border-[#dadce0] rounded-xl p-4">
-              <div className="font-semibold mb-3">Your availability {me ? `— ${me.name}` : ""}</div>
+              <div className="font-semibold mb-3 flex items-center gap-2 flex-wrap">
+                <span>{schedTarget ? `Editing ${schedTarget.name}'s availability` : `Your availability${me ? ` — ${me.name}` : ""}`}</span>
+                {schedTarget && <button onClick={() => { setSchedTarget(null); const mine = schedules.find(s => !!me && s.discordId === me.discordId); setSchedDraft(mine ? { days: { ...mine.days }, note: mine.note || "" } : { days: {}, note: "" }); }} className="text-xs text-gray-500 hover:text-orange-600 underline">← back to mine</button>}
+              </div>
               <div className="space-y-2 mb-3">
                 {WEEKDAYS.map(d => {
                   const cur = parseDay(schedDraft.days[d] || "");
@@ -1027,7 +1152,7 @@ export default function AdminCRM() {
           <div className="bg-white border border-[#dadce0] rounded-xl flex flex-col" style={{ height: "70vh" }}>
             <div className="px-4 py-3 border-b border-[#e8eaed] flex items-center justify-between">
               <div className="font-semibold flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-orange-500" />Bo Tech — CRM Assistant</div>
-              <div className="text-xs text-gray-500">{expanded ? `Looking at: ${expanded}` : "Open a member for member-specific help"}</div>
+              <div className="text-xs text-gray-500">{expanded ? `Looking at: ${members.find(m => m.id === expanded)?.name || members.find(m => m.id === expanded)?.email || "member"}` : "Open a member for member-specific help"}</div>
             </div>
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
               {boMsgs.length === 0 && (
@@ -1086,9 +1211,38 @@ export default function AdminCRM() {
         {/* ── Referrals ── */}
         {tab === "referrals" && (
           <div>
+            {/* Who is allowed to refer — active founding members + coaches. Share the $127 link with these people. */}
+            <div className="bg-white border border-[#dadce0] rounded-xl p-4 mb-5">
+              <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+                <div className="font-semibold text-sm">✅ Eligible referrers <span className="text-gray-400 font-normal">({eligibleReferrers.length}) — each gets a unique link</span></div>
+                <div className="flex gap-2">
+                  <button onClick={genReferralCodes} className="text-xs px-3 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-gray-50">Generate links</button>
+                  <button onClick={blastReferralLinks} className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">📨 DM everyone their link</button>
+                </div>
+              </div>
+              {referralBlastMsg && <div className="text-xs text-green-700 mb-2">{referralBlastMsg}</div>}
+              <p className="text-xs text-gray-500 mb-3">Paid founding members + coaches. Each person&apos;s <b>rotechllc.com/r/[code]</b> link auto-credits them by the buyer&apos;s email — no typing, bulletproof. Click a link to copy it and send it to them.</p>
+              {eligibleReferrers.length === 0 ? (
+                <div className="text-xs text-gray-400">No eligible referrers yet.</div>
+              ) : (
+                <div className="space-y-1 max-h-72 overflow-y-auto">
+                  {eligibleReferrers.map(m => (
+                    <div key={m.email} className="flex items-center justify-between gap-2 text-xs border-b border-[#f1f3f4] py-1.5">
+                      <span className="font-medium truncate">{m.name || m.email}</span>
+                      <div className="flex items-center gap-1.5 whitespace-nowrap">
+                        {m.referralCode ? (
+                          <button onClick={() => { navigator.clipboard.writeText(`https://rotechllc.com/r/${m.referralCode}`); setCopied(m.email); setTimeout(() => setCopied(""), 1500); }} className="text-[11px] px-2 py-1 rounded bg-gray-100 border border-gray-200 hover:border-orange-400 font-mono">{copied === m.email ? "✓ copied!" : `rotechllc.com/r/${m.referralCode}`}</button>
+                        ) : <span className="text-gray-400">— click Generate links</span>}
+                        <button onClick={() => blockReferrer(m)} title="Remove — they can't refer" className="text-[13px] px-1.5 py-0.5 rounded text-gray-400 hover:text-red-600 hover:bg-red-50">✕</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="text-gray-500 text-sm mr-auto">Who referred whom and what&apos;s owed. Payout = <b>${referralPayout}</b> per paid referral.</p>
+                <p className="text-gray-500 text-sm mr-auto">Auto-captured from referral links. <b>${referralPayout}</b>/cleared referral, <b>capped at $500/person</b> (or $1,000 store credit). Only active (non-refunded) referrals count — pay out after 5 business days. <b>Program runs until 200 members</b> {(stats?.total ?? members.length) >= 200 ? <span className="text-red-600 font-semibold">— ENDED (200 reached)</span> : <span className="text-gray-600">(currently {stats?.total ?? members.length}/200)</span>}.</p>
                 <input value={payoutDraft} onChange={e => setPayoutDraft(e.target.value)} placeholder={`${referralPayout}`} type="number" className="w-24 text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500" />
                 <button onClick={savePayout} className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Set payout</button>
               </div>
@@ -1096,21 +1250,23 @@ export default function AdminCRM() {
             </div>
             {referrers.length === 0 ? (
               <div className="bg-white border border-[#dadce0] rounded-xl p-6 text-sm text-gray-500">
-                No referrals recorded yet. To track them, signups need to capture a <code className="bg-gray-100 px-1 rounded">referredBy</code> code — I can wire that into the join flow so this fills automatically.
+                No referrals yet. This fills <b>automatically</b> — anyone who buys through the <b>$127 referral link</b> (square.link/u/jSF7J4zp) and types who referred them shows up here, and the referrer gets DM&apos;d that their $50 is coming.
               </div>
             ) : (
               <div className="bg-white border border-[#dadce0] rounded-xl overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="text-left text-xs text-gray-500 bg-[#f8f9fa]"><tr className="border-b border-[#e8eaed]">
-                    <th className="py-2.5 px-4 font-medium">Referrer</th><th className="px-3 font-medium">Referred</th><th className="px-3 font-medium">Paid</th><th className="px-3 font-medium">Owed</th>
+                    <th className="py-2.5 px-4 font-medium">Referrer</th><th className="px-3 font-medium">Tier / rate</th><th className="px-3 font-medium">Referred</th><th className="px-3 font-medium">Paid (cleared)</th><th className="px-3 font-medium">Cash owed</th><th className="px-3 font-medium">or Credit</th>
                   </tr></thead>
                   <tbody>
                     {referrers.map(r => (
                       <tr key={r.ref} className="border-b border-[#f1f3f4] hover:bg-[#f8f9fa]">
                         <td className="py-2.5 px-4 font-medium">{r.ref}</td>
+                        <td className="px-3"><span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${r.tier === 2 ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>T{r.tier}</span> <span className="text-gray-500">${r.rate}/ref</span></td>
                         <td className="px-3">{r.count}</td>
                         <td className="px-3">{r.paid}</td>
-                        <td className="px-3 font-semibold">${r.paid * referralPayout}</td>
+                        <td className="px-3 font-semibold">${r.owed}{r.capped && <span className="ml-1 text-[10px] px-1 rounded bg-orange-100 text-orange-700">$500 cap</span>}</td>
+                        <td className="px-3 text-gray-600">${r.creditOption}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1125,6 +1281,12 @@ export default function AdminCRM() {
             <p className="text-gray-500 text-sm mb-4">Send-to-client resources. Open to preview, or copy the link to send a client (Discord, email, text). These are the things we hand clients by hand until the bot delivers them automatically — more get added here as we build them.</p>
             <div className="grid sm:grid-cols-2 gap-3">
               {[
+                { title: "ROT July 2026 Offers", tag: "July Promo · Bo's 30th Birthday Drop", desc: "The full July offer sheet — membership, ServiceNow CSA, Security+ ($850), and the clearance birthday-drop pricing, plus the referral program. Client-facing — send it to a warm lead or pull it up on a call.", path: "/resources/rot-july-2026-offers.html" },
+                { title: "ServiceNow CSA — Study Plan + PDI Setup", tag: "ServiceNow · Client Study Plan", desc: "The full CSA roadmap: free PDI setup, the exam domains, a 30/60/90-day plan with study hours, and exam-day tips. Send to any CSA client.", path: "/resources/rot-csa-study-plan.html" },
+                { title: "Security+ — Study Plan", tag: "CompTIA · Client Study Plan", desc: "The Security+ (SY0-701) roadmap: the 5 domains with weights, a 30/60/90-day plan with study hours, acronym drills, and PBQ exam tips. Send to any Sec+ client.", path: "/resources/rot-secplus-study-plan.html" },
+                { title: "AWS AI Practitioner — Study Plan", tag: "AWS · Client Study Plan", desc: "The AIF-C01 roadmap (founding members get this track): the 5 exam domains, a 30/60/90-day plan with study hours, the AWS service map, and what's proven to pass fast. Send to any AWS AI client.", path: "/resources/rot-aws-ai-study-plan.html" },
+                { title: "FAQ — Onboarding, Billing, Add-ons, Referrals", tag: "General · Send to anyone", desc: "The member FAQ: getting in (auto-role), how the $27/$96 billing works, what's included vs paid add-ons (cert/clearance), studying/pace, and referrals. Send to any prospect or new member.", path: "/resources/rot-faq.html" },
+                { title: "How Rich Off Tech Works — Founding Member Guide", tag: "Onboarding · Send to founding members", desc: "The full breakdown: the 3 places (Discord/site/AI tutors), how the Discord runs (auto-role, channels, Bo Tech, calls, job drops), how the quiz/study engine works (domains, 75-80% target, labs, 30/60/90 plan), and a first-week checklist.", path: "/resources/rot-how-it-works.html" },
                 { title: "PB&J Challenge", tag: "Business Analyst · Requirements Lab", desc: "Interactive lab that teaches how a BA writes requirements. The client builds the steps, then runs it live with a coach (who plays the “machine”). No answer included — the lesson is them finding their own gaps.", path: "/labs/pbj-challenge.html" },
                 { title: "ServiceNow CSA Study Guide", tag: "ServiceNow CSA · Client Study Plan", desc: "The full CSA path, mapped to our 8 quiz domains + free PDI (developer instance) setup. 30/60/90-day pace the client picks with their coach on the call — never longer. Send it right after the intro/intake.", path: "/labs/servicenow-csa-study-guide.html" },
                 { title: "Transcribe a Call with Gemini", tag: "Coach Tool · Call notes + follow-ups", desc: "For any coach when Fireflies wasn't on the call. Ready-to-paste Gemini prompts that scope each call type (intake, coaching, interview prep, clearance) + consistent follow-up templates so every client gets the same Rich Off Tech voice.", path: "/labs/coach-call-transcription-gemini.html" },

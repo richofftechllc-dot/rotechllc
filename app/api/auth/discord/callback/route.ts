@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { coll } from "@/lib/firebase";
+import { sessionCookieOptions } from "@/lib/session-cookie";
 import crypto from "crypto";
 
 export const runtime = "nodejs";
@@ -27,9 +28,7 @@ function safeDest(req: NextRequest): string {
 function setSession(req: NextRequest, payload: string) {
   const sig = sign(payload);
   const res = NextResponse.redirect(new URL(safeDest(req), req.url));
-  res.cookies.set("rot_session", `${payload}.${sig}`, {
-    httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 30,
-  });
+  res.cookies.set("rot_session", `${payload}.${sig}`, sessionCookieOptions(req.headers.get("host"), 60 * 60 * 24 * 30));
   return res;
 }
 

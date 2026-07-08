@@ -4,6 +4,8 @@ import AboutMontage from "./components/AboutMontage";
 import BoAvatarFlip from "./components/BoAvatarFlip";
 import EstimateBuilderTrigger from "./components/EstimateBuilderTrigger";
 import WatchCarousel from "./components/WatchCarousel";
+import BirthdayBanner from "./components/BirthdayBanner";
+import FoundingSlot from "./components/FoundingSlot";
 
 async function getMemberCount() {
   try {
@@ -30,6 +32,7 @@ export default async function Home() {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
             <div className="text-orange-500 font-bold tracking-widest text-sm mb-4">BO TECH · YOUR AI-POWERED CAREER COMMAND CENTER</div>
+            <BirthdayBanner />
             <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-4">
               Break into Tech.<br />
               <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">No shortcuts.</span>
@@ -45,11 +48,11 @@ export default async function Home() {
               <a href="#agents" className="px-6 py-3 border border-white/20 rounded-lg hover:bg-white/5">
                 Talk to an AI agent
               </a>
-              <a href="#inside" className="px-6 py-3 border border-white/20 rounded-lg hover:bg-white/5">
-                What&apos;s inside →
+              <a href="#founding" className="px-6 py-3 border border-orange-500/40 text-orange-400 rounded-lg hover:bg-orange-500/10 font-bold">
+                See founding membership →
               </a>
             </div>
-            <p className="text-gray-500 text-sm mt-4">Free to join. Everything else gets handled inside — no checkout here.</p>
+            <p className="text-gray-500 text-sm mt-4">Free to join — or grab <a href="#founding" className="text-orange-400 underline underline-offset-2">founding membership</a> below. 🤎</p>
           </div>
           <BoAvatarFlip />
         </div>
@@ -60,6 +63,9 @@ export default async function Home() {
           <div><div className="text-3xl sm:text-5xl font-black text-orange-500">100%</div><div className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2">Virtual &amp; flexible</div></div>
         </div>
       </main>
+
+      {/* FOUNDING — last-slot pricing: $96 now, $227 next */}
+      <FoundingSlot />
 
       {/* WHO IT'S FOR — audience paths (cleared / commercial / recruiters / businesses) */}
       <section id="who" className="bg-black py-20 border-t border-white/5 scroll-mt-20">
