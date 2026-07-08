@@ -5,19 +5,19 @@ import { isValidSlot } from "@/lib/scheduleSlots";
 // Read a coach's day→range map from crmSchedule. Match by name (Randy/Tyler/Daquan) OR
 // by the known doc key (Discord ID, or the literal "owner" doc used for the code login),
 // so it resolves regardless of how the doc got keyed. {} if the coach has nothing set.
-const ID_BY_SLUG: Record<string, string> = {
-  tyler: "1465828992014876834",
-  daquan: "694452462676869122",
-  randy: (process.env.RANDY_DISCORD_ID || "owner").trim(),
+const IDS_BY_SLUG: Record<string, string[]> = {
+  randy: [(process.env.RANDY_DISCORD_ID || "").trim(), "1484048489695678475", "owner"].filter(Boolean),
+  tyler: ["1465828992014876834"],
+  daquan: ["694452462676869122"],
 };
 async function coachDays(slug: string): Promise<Record<string, string>> {
   try {
     const snap = await coll("crmSchedule").limit(100).get();
     for (const d of snap.docs) {
-      const data = d.data() as { name?: string; days?: Record<string, string> };
+      const data = d.data() as { name?: string; days?: Record<string, string>; coachKey?: string };
       const byName = String(data.name || "").toLowerCase().trim() === slug;
-      const byId = d.id === ID_BY_SLUG[slug] || (slug === "randy" && d.id === "owner");
-      if (byName || byId) return data.days || {};
+      const byId = (IDS_BY_SLUG[slug] || []).includes(d.id);
+      if (byName || byId || data.coachKey === slug) return data.days || {};
     }
   } catch { /* fall through to empty */ }
   return {};

@@ -10,14 +10,24 @@ export const dynamic = "force-dynamic";
 // real availability. Matched to the booking page's coach slugs by name.
 
 const SLUG_BY_NAME: Record<string, string> = { randy: "randy", tyler: "tyler", daquan: "daquan" };
+// Coaches also match by their crmSchedule doc key (Discord ID / "owner"), because the
+// display name captured at login can differ from the slug — e.g. Randy's account name is
+// "richofftech", so a name-only match dropped his schedule. IDs are the reliable key.
+const SLUG_BY_ID: Record<string, string> = {
+  [(process.env.RANDY_DISCORD_ID || "").trim()]: "randy",
+  "1484048489695678475": "randy",
+  owner: "randy",
+  "1465828992014876834": "tyler",
+  "694452462676869122": "daquan",
+};
 
 export async function GET() {
   try {
     const snap = await coll("crmSchedule").limit(100).get();
     const coaches = snap.docs
       .map((d) => {
-        const s = d.data() as { name?: string; days?: Record<string, string>; note?: string };
-        const slug = SLUG_BY_NAME[String(s.name || "").toLowerCase().trim()];
+        const s = d.data() as { name?: string; days?: Record<string, string>; note?: string; coachKey?: string };
+        const slug = SLUG_BY_NAME[String(s.name || "").toLowerCase().trim()] || SLUG_BY_ID[d.id] || (s.coachKey as string | undefined);
         if (!slug) return null;
         const days = s.days || {};
         // Keep only days the coach actually filled in.
