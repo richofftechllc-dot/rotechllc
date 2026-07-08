@@ -935,7 +935,12 @@ export default function AdminCRM() {
                   const cur = parseDay(schedDraft.days[d] || "");
                   const setPart = (part: "start" | "end", val: string) => setSchedDraft(s => {
                     const next = { ...parseDay(s.days[d] || ""), [part]: val };
-                    const composed = next.start && next.end ? `${next.start}–${next.end} ET` : "";
+                    // Retain a start-only pick (end still empty) so the start sticks and the
+                    // END dropdown un-disables. Before, picking a start saved "" — which snapped
+                    // it back to Off and left End disabled forever (couldn't set any time).
+                    const composed = next.start
+                      ? (next.end ? `${next.start}–${next.end} ET` : `${next.start}– ET`)
+                      : "";
                     return { ...s, days: { ...s.days, [d]: composed } };
                   });
                   return (
