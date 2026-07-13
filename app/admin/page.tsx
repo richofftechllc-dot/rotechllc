@@ -57,7 +57,7 @@ const CALL_PILL: Record<string, string> = {
 
 export default function AdminCRM() {
   const [authed, setAuthed] = useState<"loading" | "yes" | "no">("loading");
-  const [tab, setTab] = useState<"home" | "followups" | "members" | "calls" | "schedule" | "referrals" | "team" | "bo" | "sops" | "resources">("home");
+  const [tab, setTab] = useState<"home" | "followups" | "members" | "calls" | "schedule" | "referrals" | "team" | "bo" | "sops" | "resources" | "vouchers">("home");
   const [chat, setChat] = useState<{ id: string; authorId: string; authorName: string; text: string; createdAt: string }[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [boMsgs, setBoMsgs] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
@@ -70,6 +70,9 @@ export default function AdminCRM() {
   const [referralPayout, setReferralPayoutState] = useState(20);
   const [payoutDraft, setPayoutDraft] = useState("");
   const [payouts, setPayouts] = useState<{ referrer: string; amount: number; method: string; at: string }[]>([]);
+  const [vouchers, setVouchers] = useState<{ id: string; code: string; cert: string; expiry?: string; assignedTo?: string; forClient?: string; status: string; source?: string }[]>([]);
+  const [vForm, setVForm] = useState({ code: "", cert: "CompTIA Security+ (SY0-701)", expiry: "", assignedTo: "", source: "" });
+  const [vClientDraft, setVClientDraft] = useState<Record<string, string>>({});
   const [copied, setCopied] = useState("");
   const [referralBlastMsg, setReferralBlastMsg] = useState("");
   const [igText, setIgText] = useState("");
@@ -188,6 +191,21 @@ export default function AdminCRM() {
     const d = await r.json();
     if (d.ok) setPayouts(d.payouts);
   }, []);
+  const loadVouchers = useCallback(async () => {
+    const r = await fetch("/api/admin/vouchers");
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d.ok) setVouchers(d.vouchers);
+  }, []);
+  async function addVoucher() {
+    if (!vForm.code.trim()) return;
+    const r = await fetch("/api/admin/vouchers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...vForm, status: vForm.assignedTo ? "assigned" : "available" }) });
+    if ((await r.json()).ok) { setVForm({ ...vForm, code: "" }); loadVouchers(); }
+  }
+  async function updateVoucher(id: string, patch: { status?: string; forClient?: string; assignedTo?: string }) {
+    const r = await fetch("/api/admin/vouchers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, ...patch }) });
+    if ((await r.json()).ok) loadVouchers();
+  }
   async function saveSop(id: string, title: string) {
     const bodyText = sopDraft[id] ?? sops.find(s => s.id === id)?.body ?? "";
     await fetch("/api/admin/sops", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, title, body: bodyText }) });
@@ -403,7 +421,7 @@ export default function AdminCRM() {
     if (d.ok) loadFollowups();
   }
 
-  useEffect(() => { loadMembers(); loadFollowups(); loadSchedule(); loadCalls(); loadChat(); loadCatalog(); loadBookings(); loadSops(); loadConfig(); loadPayouts(); loadIgDrafts(); }, [loadMembers, loadFollowups, loadSchedule, loadCalls, loadChat, loadCatalog, loadBookings, loadSops, loadConfig, loadPayouts]);
+  useEffect(() => { loadMembers(); loadFollowups(); loadSchedule(); loadCalls(); loadChat(); loadCatalog(); loadBookings(); loadSops(); loadConfig(); loadPayouts(); loadVouchers(); loadIgDrafts(); }, [loadMembers, loadFollowups, loadSchedule, loadCalls, loadChat, loadCatalog, loadBookings, loadSops, loadConfig, loadPayouts, loadVouchers]);
   // Live-ish team chat: refresh every 8s while the Team tab is open.
   useEffect(() => {
     if (tab !== "team") return;
@@ -532,6 +550,7 @@ export default function AdminCRM() {
     { id: "bo", label: "Ask Bo" },
     { id: "sops", label: "SOPs" },
     { id: "resources", label: "Resources" },
+    { id: "vouchers", label: "Vouchers" },
     { id: "referrals", label: "Referrals" },
   ];
   const tierOptions = Array.from(new Set(members.map(m => m.tier).filter(Boolean))).sort();
@@ -1236,6 +1255,59 @@ export default function AdminCRM() {
               <textarea value={newSop.body} onChange={e => setNewSop(s => ({ ...s, body: e.target.value }))} rows={3} placeholder="The guide…" className="w-full text-sm border border-[#dadce0] rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-orange-500" />
               <button onClick={addSop} className="text-xs px-4 py-1.5 rounded-lg bg-orange-600 text-white hover:bg-orange-700">Add SOP</button>
             </div>
+          </div>
+        )}
+
+        {/* ── Vouchers ── */}
+        {tab === "vouchers" && (
+          <div>
+            <div className="bg-white border border-[#dadce0] rounded-xl p-4 mb-5">
+              <div className="font-semibold text-sm mb-1">🎟️ Add a voucher</div>
+              <p className="text-xs text-gray-500 mb-3">Log exam vouchers ROT buys (e.g. GC4L). Assign to a coach to hand out — then mark which client got it + when it&apos;s used. Nothing gets lost.</p>
+              <div className="flex flex-wrap gap-2 items-end">
+                <input value={vForm.code} onChange={e => setVForm({ ...vForm, code: e.target.value })} placeholder="Voucher code" className="text-xs border border-[#dadce0] rounded-lg px-2.5 py-2 font-mono w-40" />
+                <input value={vForm.cert} onChange={e => setVForm({ ...vForm, cert: e.target.value })} placeholder="Cert" className="text-xs border border-[#dadce0] rounded-lg px-2.5 py-2 w-56" />
+                <input value={vForm.expiry} onChange={e => setVForm({ ...vForm, expiry: e.target.value })} placeholder="Expiry (12/30/2026)" className="text-xs border border-[#dadce0] rounded-lg px-2.5 py-2 w-32" />
+                <input value={vForm.assignedTo} onChange={e => setVForm({ ...vForm, assignedTo: e.target.value })} placeholder="Assign to coach" className="text-xs border border-[#dadce0] rounded-lg px-2.5 py-2 w-36" />
+                <input value={vForm.source} onChange={e => setVForm({ ...vForm, source: e.target.value })} placeholder="Source (GC4L #…)" className="text-xs border border-[#dadce0] rounded-lg px-2.5 py-2 w-36" />
+                <button onClick={addVoucher} className="text-xs px-3 py-2 rounded-lg bg-[#202124] text-white hover:bg-black">Add</button>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 mb-3 text-xs text-gray-500">
+              <span><b className="text-[#202124]">{vouchers.length}</b> total</span>
+              <span><b className="text-green-700">{vouchers.filter(v => v.status !== "used").length}</b> live</span>
+              <span><b className="text-gray-500">{vouchers.filter(v => v.status === "used").length}</b> used</span>
+            </div>
+            {vouchers.length === 0 ? (
+              <div className="bg-white border border-[#dadce0] rounded-xl p-6 text-sm text-gray-500">No vouchers logged yet. Add one above.</div>
+            ) : (
+              <div className="bg-white border border-[#dadce0] rounded-xl overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="text-left text-xs text-gray-500 bg-[#f8f9fa]"><tr className="border-b border-[#e8eaed]">
+                    <th className="py-2.5 px-4 font-medium">Code</th><th className="px-3 font-medium">Cert</th><th className="px-3 font-medium">Expiry</th><th className="px-3 font-medium">Coach</th><th className="px-3 font-medium">For client</th><th className="px-3 font-medium">Status</th>
+                  </tr></thead>
+                  <tbody>
+                    {vouchers.map(v => (
+                      <tr key={v.id} className={`border-b border-[#f1f3f4] hover:bg-[#f8f9fa] ${v.status === "used" ? "opacity-50" : ""}`}>
+                        <td className="py-2.5 px-4 font-mono text-xs">{v.code}</td>
+                        <td className="px-3 text-gray-600">{v.cert}</td>
+                        <td className="px-3 text-gray-500">{v.expiry || "—"}</td>
+                        <td className="px-3">{v.assignedTo || "—"}</td>
+                        <td className="px-3">
+                          <input value={vClientDraft[v.id] ?? v.forClient ?? ""} onChange={e => setVClientDraft({ ...vClientDraft, [v.id]: e.target.value })} onBlur={e => { const val = e.target.value.trim(); if (val !== (v.forClient || "")) updateVoucher(v.id, { forClient: val, status: val && v.status === "assigned" ? "given" : v.status }); }} placeholder="client name" className="text-xs border border-[#e8eaed] rounded px-2 py-1 w-28" />
+                        </td>
+                        <td className="px-3">
+                          <div className="flex items-center gap-1.5 whitespace-nowrap">
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-semibold ${v.status === "used" ? "bg-gray-100 text-gray-500" : v.status === "given" ? "bg-blue-100 text-blue-700" : v.status === "assigned" ? "bg-amber-100 text-amber-700" : "bg-green-100 text-green-700"}`}>{v.status}</span>
+                            {v.status !== "used" && <button onClick={() => updateVoucher(v.id, { status: "used" })} className="text-[11px] px-2 py-0.5 rounded border border-gray-300 text-gray-600 hover:bg-gray-50">Mark used</button>}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
 
