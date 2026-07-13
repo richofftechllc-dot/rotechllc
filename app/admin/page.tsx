@@ -69,6 +69,7 @@ export default function AdminCRM() {
   const [newSop, setNewSop] = useState({ title: "", body: "" });
   const [referralPayout, setReferralPayoutState] = useState(20);
   const [payoutDraft, setPayoutDraft] = useState("");
+  const [payouts, setPayouts] = useState<{ referrer: string; amount: number; method: string; at: string }[]>([]);
   const [copied, setCopied] = useState("");
   const [referralBlastMsg, setReferralBlastMsg] = useState("");
   const [igText, setIgText] = useState("");
@@ -181,6 +182,12 @@ export default function AdminCRM() {
     const d = await r.json();
     if (d.ok) setReferralPayoutState(d.referralPayout);
   }, []);
+  const loadPayouts = useCallback(async () => {
+    const r = await fetch("/api/admin/referral-payout");
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d.ok) setPayouts(d.payouts);
+  }, []);
   async function saveSop(id: string, title: string) {
     const bodyText = sopDraft[id] ?? sops.find(s => s.id === id)?.body ?? "";
     await fetch("/api/admin/sops", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, title, body: bodyText }) });
@@ -229,6 +236,15 @@ export default function AdminCRM() {
     const r = await fetch("/api/admin/config", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ referralPayout: v }) });
     const d = await r.json();
     if (d.ok) { setReferralPayoutState(d.referralPayout); setPayoutDraft(""); }
+  }
+  // Record a payout against a referrer (cash or store credit). Enforces the cap by
+  // logging what was actually paid — the rollup then shows owed minus paid.
+  async function markPaid(referrer: string, amount: number, method: "cash" | "credit") {
+    if (!amount || amount <= 0) return;
+    if (!confirm(`Record ${method === "credit" ? "$" + amount + " store credit" : "$" + amount + " cash"} paid to ${referrer}?`)) return;
+    const r = await fetch("/api/admin/referral-payout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ referrer, amount, method }) });
+    const d = await r.json();
+    if (d.ok) loadPayouts();
   }
   async function sendChat() {
     const text = chatInput.trim();
@@ -387,7 +403,7 @@ export default function AdminCRM() {
     if (d.ok) loadFollowups();
   }
 
-  useEffect(() => { loadMembers(); loadFollowups(); loadSchedule(); loadCalls(); loadChat(); loadCatalog(); loadBookings(); loadSops(); loadConfig(); loadIgDrafts(); }, [loadMembers, loadFollowups, loadSchedule, loadCalls, loadChat, loadCatalog, loadBookings, loadSops, loadConfig]);
+  useEffect(() => { loadMembers(); loadFollowups(); loadSchedule(); loadCalls(); loadChat(); loadCatalog(); loadBookings(); loadSops(); loadConfig(); loadPayouts(); loadIgDrafts(); }, [loadMembers, loadFollowups, loadSchedule, loadCalls, loadChat, loadCatalog, loadBookings, loadSops, loadConfig, loadPayouts]);
   // Live-ish team chat: refresh every 8s while the Team tab is open.
   useEffect(() => {
     if (tab !== "team") return;
@@ -469,6 +485,15 @@ export default function AdminCRM() {
   // Tier 1 (first 100 paid founders) = $50/referral · Tier 2 (joined after) = $25/referral.
   const byRefCode: Record<string, Member> = {};
   members.forEach(m => { if (m.referralCode) byRefCode[m.referralCode.toLowerCase()] = m; });
+  // Payout LEDGER: sum what's actually been paid per referrer so the rollup shows
+  // owed MINUS paid = remaining (and the $500 cap is enforced, not just displayed).
+  const paidCashByRef: Record<string, number> = {};
+  const tookCreditByRef: Record<string, boolean> = {};
+  payouts.forEach(p => {
+    const k = String(p.referrer || "").toLowerCase();
+    if (p.method === "credit") tookCreditByRef[k] = true;
+    else paidCashByRef[k] = (paidCashByRef[k] || 0) + (Number(p.amount) || 0);
+  });
   const referrers = Object.entries(referrerMap).map(([ref, list]) => {
     const paid = list.filter(x => x.paymentStatus === "active" || x.paymentStatus === "comp").length;
     const refMember = byRefCode[String(ref).toLowerCase()];
@@ -476,9 +501,15 @@ export default function AdminCRM() {
     const rate = tier === 2 ? 25 : 50;
     const owedRaw = paid * rate;
     const owed = Math.min(owedRaw, CAP_PER_PERSON);
-    return { ref, tier, rate, count: list.length, paid, owed, capped: owedRaw > CAP_PER_PERSON, creditOption: owed >= CAP_PER_PERSON ? 1000 : owed * 2 };
-  }).sort((a, b) => b.owed - a.owed || b.count - a.count);
-  const totalOwed = referrers.reduce((s, r) => s + r.owed, 0);
+    const k = String(ref).toLowerCase();
+    const paidOut = paidCashByRef[k] || 0;
+    const tookCredit = !!tookCreditByRef[k];
+    // Credit closes out the whole balance; otherwise remaining = owed − cash already paid.
+    const remaining = tookCredit ? 0 : Math.max(0, owed - paidOut);
+    const settled = remaining === 0 && (paidOut > 0 || tookCredit);
+    return { ref, tier, rate, count: list.length, paid, owed, paidOut, tookCredit, remaining, settled, capped: owedRaw > CAP_PER_PERSON, creditOption: owed >= CAP_PER_PERSON ? 1000 : owed * 2 };
+  }).sort((a, b) => b.remaining - a.remaining || b.owed - a.owed || b.count - a.count);
+  const totalOwed = referrers.reduce((s, r) => s + r.remaining, 0);
   const eligibleReferrers = members.filter(m => m.referralEligible).sort((a, b) => (a.name || a.email).localeCompare(b.name || b.email));
 
   // ── Coach Home (command center) — derived from already-loaded state, no new fetch ──
@@ -1246,7 +1277,7 @@ export default function AdminCRM() {
                 <input value={payoutDraft} onChange={e => setPayoutDraft(e.target.value)} placeholder={`${referralPayout}`} type="number" className="w-24 text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500" />
                 <button onClick={savePayout} className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Set payout</button>
               </div>
-              <span className="text-sm font-semibold">Total owed: ${totalOwed}</span>
+              <span className="text-sm font-semibold">Still owed: ${totalOwed}</span>
             </div>
             {referrers.length === 0 ? (
               <div className="bg-white border border-[#dadce0] rounded-xl p-6 text-sm text-gray-500">
@@ -1256,17 +1287,26 @@ export default function AdminCRM() {
               <div className="bg-white border border-[#dadce0] rounded-xl overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="text-left text-xs text-gray-500 bg-[#f8f9fa]"><tr className="border-b border-[#e8eaed]">
-                    <th className="py-2.5 px-4 font-medium">Referrer</th><th className="px-3 font-medium">Tier / rate</th><th className="px-3 font-medium">Referred</th><th className="px-3 font-medium">Paid (cleared)</th><th className="px-3 font-medium">Cash owed</th><th className="px-3 font-medium">or Credit</th>
+                    <th className="py-2.5 px-4 font-medium">Referrer</th><th className="px-3 font-medium">Tier / rate</th><th className="px-3 font-medium">Referred</th><th className="px-3 font-medium">Paid (cleared)</th><th className="px-3 font-medium">Cash owed</th><th className="px-3 font-medium">Paid out</th><th className="px-3 font-medium">Remaining</th><th className="px-3 font-medium">Record</th>
                   </tr></thead>
                   <tbody>
                     {referrers.map(r => (
-                      <tr key={r.ref} className="border-b border-[#f1f3f4] hover:bg-[#f8f9fa]">
+                      <tr key={r.ref} className={`border-b border-[#f1f3f4] hover:bg-[#f8f9fa] ${r.settled ? "opacity-60" : ""}`}>
                         <td className="py-2.5 px-4 font-medium">{r.ref}</td>
                         <td className="px-3"><span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${r.tier === 2 ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>T{r.tier}</span> <span className="text-gray-500">${r.rate}/ref</span></td>
                         <td className="px-3">{r.count}</td>
                         <td className="px-3">{r.paid}</td>
                         <td className="px-3 font-semibold">${r.owed}{r.capped && <span className="ml-1 text-[10px] px-1 rounded bg-orange-100 text-orange-700">$500 cap</span>}</td>
-                        <td className="px-3 text-gray-600">${r.creditOption}</td>
+                        <td className="px-3 text-gray-600">{r.tookCredit ? <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 font-semibold">$1,000 credit</span> : r.paidOut > 0 ? `$${r.paidOut}` : "—"}</td>
+                        <td className="px-3 font-semibold">{r.settled ? <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-100 text-green-700">✓ settled</span> : `$${r.remaining}`}</td>
+                        <td className="px-3">
+                          {!r.settled && r.remaining > 0 && (
+                            <div className="flex gap-1 whitespace-nowrap">
+                              <button onClick={() => markPaid(r.ref, r.remaining, "cash")} className="text-[11px] px-2 py-1 rounded bg-[#202124] text-white hover:bg-black">Paid ${r.remaining} cash</button>
+                              <button onClick={() => markPaid(r.ref, r.creditOption, "credit")} title={`Log $${r.creditOption} store credit instead of cash`} className="text-[11px] px-2 py-1 rounded border border-purple-300 text-purple-700 hover:bg-purple-50">${r.creditOption} credit</button>
+                            </div>
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
