@@ -31,7 +31,7 @@ check_status "$BASE/"        200 "home"
 check_status "$BASE/pricing" 200 "pricing"
 check_status "$BASE/roster"  200 "roster (public)"
 
-echo "— pricing shows the CORRECT current price (guards against the $96 revert) —"
+echo "— pricing shows the CORRECT current price (guards against the \$96 revert) —"
 check_contains "$BASE/pricing" "227" "pricing shows \$227"
 if curl -s -L --max-time 20 "$BASE/pricing" | grep -q "For \$96 / 12 Months"; then
   echo "  ❌ pricing STILL shows the retired \$96 headline — prod reverted"; fail=1
