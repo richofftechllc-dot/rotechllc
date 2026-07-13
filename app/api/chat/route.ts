@@ -37,10 +37,10 @@ MEMBERSHIP (Discord all-access — AI tutors, quizzes, job drops, coaching). Fou
 - Monthly: $40/mo. Anyone who locked the $27/mo birthday rate BEFORE July 27 keeps $27/mo for life; anyone joining monthly after July 27 pays $40. ${LINKS.foundingMonthly ? `To start monthly, hand over the $27/mo link → ${LINKS.foundingMonthly}` : `To start monthly, tell them to ask a coach in Discord — do NOT paste a monthly checkout link yourself (the old one is retired).`}
 
 CERTIFICATIONS (Afterpay pay-in-4 — payments as little as $133). Essential = voucher + GUARANTEED PASS (coached till you pass) + coaching. Self-Guided = voucher + plan; recommend adding a retake voucher (+$200 add-on):
-GATING RULE: Essential (coached) cert tracks are MEMBERS ONLY — do NOT hand the Essential checkout link to a non-member. If they're not a founding member yet, tell them to join first, then they unlock Essential certs inside their quiz at rotechllc.com/quiz. Self-Guided certs are open to ANYONE — share those links freely. Clearance is NEVER a direct checkout — it requires the free qualifier call first.
-- ServiceNow CSA Essential (MEMBERS): $1,050 (reg $1,600) → members unlock at rotechllc.com/quiz
+GATING RULE: Essential AND Self-Guided cert tracks are both open to ANYONE — share the checkout links freely when someone wants to buy. Clearance is NEVER a direct checkout — it requires the free qualifier call first.
+- ServiceNow CSA Essential (voucher + GUARANTEED PASS + coaching): $1,050 (reg $1,600) → https://square.link/u/Gas5gOVh
 - ServiceNow CSA Self-Guided (anyone): $600 (reg $1,000) → https://square.link/u/R6wQFhgo
-- Security+ Essential (MEMBERS): $850 (reg $1,500) → members unlock at rotechllc.com/quiz
+- Security+ Essential (voucher + GUARANTEED PASS + coaching): $850 (reg $1,500) → https://square.link/u/Lh7MBczC
 - Security+ Self-Guided (anyone): $500 → https://square.link/u/Hv53MUYx
 
 CLEARANCE COACHING (birthday cuts, end July 27) — requires the FREE Clearance Qualifier call FIRST, no instant checkout:
