@@ -45,6 +45,11 @@ export async function POST(req: Request) {
       if (b.status && STATUSES.includes(b.status)) patch.status = b.status;
       if (b.assignedTo !== undefined) patch.assignedTo = String(b.assignedTo).slice(0, 60);
       if (b.forClient !== undefined) patch.forClient = String(b.forClient).slice(0, 80);
+      // Handoff tracking: stamp when we DM a coach the codes; the bot later sets
+      // confirmedByCoach when they tap the Confirm button.
+      const bx = b as Record<string, unknown>;
+      if (bx.handoffId !== undefined) patch.handoffId = String(bx.handoffId).slice(0, 60);
+      if (bx.sentAt !== undefined) patch.sentAt = String(bx.sentAt).slice(0, 40);
       await coll("vouchers").doc(b.id).set(patch, { merge: true });
       return NextResponse.json({ ok: true, id: b.id });
     }
