@@ -9,6 +9,6 @@
 // the URL is pasted here (one edit) + redeployed, the monthly button and Bo's hand-off
 // light up automatically. Also mirror the same URL into the bot's prices.js LINKS.
 export const LINKS = {
-  foundingMonthly: "", // $27/mo — paste the reusable Square subscription link when created
+  foundingMonthly: "https://square.link/u/XlN3ZFcU", // $27/mo durable reusable subscription checkout
   foundingYearly: "https://square.link/u/c8X7TC0z", // $227/yr durable quick_pay
 } as const;
