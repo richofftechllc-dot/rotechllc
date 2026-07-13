@@ -70,7 +70,7 @@ export default function AdminCRM() {
   const [referralPayout, setReferralPayoutState] = useState(20);
   const [payoutDraft, setPayoutDraft] = useState("");
   const [payouts, setPayouts] = useState<{ referrer: string; amount: number; method: string; at: string }[]>([]);
-  const [vouchers, setVouchers] = useState<{ id: string; code: string; cert: string; expiry?: string; assignedTo?: string; forClient?: string; status: string; source?: string }[]>([]);
+  const [vouchers, setVouchers] = useState<{ id: string; code: string; cert: string; expiry?: string; assignedTo?: string; forClient?: string; status: string; source?: string; sentAt?: string; confirmedByCoach?: boolean; confirmedAt?: string; confirmedBy?: string }[]>([]);
   const [vForm, setVForm] = useState({ code: "", cert: "CompTIA Security+ (SY0-701)", expiry: "", assignedTo: "", source: "" });
   const [vClientDraft, setVClientDraft] = useState<Record<string, string>>({});
   const [copied, setCopied] = useState("");
@@ -1284,7 +1284,7 @@ export default function AdminCRM() {
               <div className="bg-white border border-[#dadce0] rounded-xl overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="text-left text-xs text-gray-500 bg-[#f8f9fa]"><tr className="border-b border-[#e8eaed]">
-                    <th className="py-2.5 px-4 font-medium">Code</th><th className="px-3 font-medium">Cert</th><th className="px-3 font-medium">Expiry</th><th className="px-3 font-medium">Coach</th><th className="px-3 font-medium">For client</th><th className="px-3 font-medium">Status</th>
+                    <th className="py-2.5 px-4 font-medium">Code</th><th className="px-3 font-medium">Cert</th><th className="px-3 font-medium">Expiry</th><th className="px-3 font-medium">Coach</th><th className="px-3 font-medium">Receipt</th><th className="px-3 font-medium">For client</th><th className="px-3 font-medium">Status</th>
                   </tr></thead>
                   <tbody>
                     {vouchers.map(v => (
@@ -1293,6 +1293,13 @@ export default function AdminCRM() {
                         <td className="px-3 text-gray-600">{v.cert}</td>
                         <td className="px-3 text-gray-500">{v.expiry || "—"}</td>
                         <td className="px-3">{v.assignedTo || "—"}</td>
+                        <td className="px-3 whitespace-nowrap">
+                          {v.confirmedByCoach
+                            ? <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-semibold" title={v.confirmedAt ? `Confirmed ${new Date(v.confirmedAt).toLocaleString()}` : ""}>✓ confirmed{v.confirmedBy ? ` · ${v.confirmedBy}` : ""}</span>
+                            : v.sentAt
+                            ? <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-semibold" title={`Sent ${new Date(v.sentAt).toLocaleString()}`}>sent · awaiting</span>
+                            : <span className="text-[10px] text-gray-400">not sent</span>}
+                        </td>
                         <td className="px-3">
                           <input value={vClientDraft[v.id] ?? v.forClient ?? ""} onChange={e => setVClientDraft({ ...vClientDraft, [v.id]: e.target.value })} onBlur={e => { const val = e.target.value.trim(); if (val !== (v.forClient || "")) updateVoucher(v.id, { forClient: val, status: val && v.status === "assigned" ? "given" : v.status }); }} placeholder="client name" className="text-xs border border-[#e8eaed] rounded px-2 py-1 w-28" />
                         </td>
