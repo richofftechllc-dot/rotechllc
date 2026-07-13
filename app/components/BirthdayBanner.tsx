@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { LINKS } from "@/lib/links";
 
 // Birthday-drop banner on the homepage: live countdown to July 27 + live PAID founding
 // spots (from /api/founding-count) + the join buttons.
@@ -55,8 +56,12 @@ export default function BirthdayBanner() {
         {soldOut && (
           <a href="https://square.link/u/c8X7TC0z" className={btn + " bg-white text-black hover:opacity-90"}>Founding — $227 / year</a>
         )}
-        {/* NOTE: the $27/mo birthday subscription link was single-use (bounced to /welcome
-            after the first subscriber) — pulled until a durable recurring link is rebuilt. */}
+        {/* $27/mo: shows ONLY once a durable REUSABLE subscription link is set in
+            lib/links.ts (foundingMonthly). Blank = no button, so a dead link can't appear.
+            Gated to !soldOut like the $96 button. */}
+        {!soldOut && LINKS.foundingMonthly && (
+          <a href={LINKS.foundingMonthly} className={btn + " bg-white text-black hover:opacity-90"}>Founding — $27 / mo</a>
+        )}
         <a href="/resources/rot-july-2026-offers.html" className={btn + " border border-white/30 text-white hover:bg-white/10"}>See the full deal →</a>
       </div>
     </div>

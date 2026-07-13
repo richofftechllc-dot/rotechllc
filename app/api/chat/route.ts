@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { coll } from "@/lib/firebase";
 import { getAuthedCode } from "@/lib/session";
 import { LESSONS } from "@/lib/quizData";
+import { LINKS } from "@/lib/links";
 
 // Strip a lesson's HTML to plain text so Bo can be grounded in it via the system prompt.
 function lessonToText(html: string): string {
@@ -33,7 +34,7 @@ ROT facts — JULY 2026 "Bo's 30th Birthday Drop" (hard deadline JULY 27, 2026; 
 
 MEMBERSHIP (Discord all-access — AI tutors, quizzes, job drops, coaching). Founding membership INCLUDES the AWS AI Practitioner quiz track FREE (lessons + practice + labs). Security+ and ServiceNow CSA are SEPARATE paid cert tracks (see below) — they are NOT free with base founding.
 - Founding ($96, first 100) just SOLD OUT. Current founding entry is $227/year → https://square.link/u/c8X7TC0z (good through July 27; after July 27 it becomes $375/year).
-- Monthly: $40/mo. Anyone who locked the $27/mo birthday rate BEFORE July 27 keeps $27/mo for life; anyone joining monthly after July 27 pays $40. To start monthly, tell them to ask a coach in Discord — do NOT paste a monthly checkout link yourself.
+- Monthly: $40/mo. Anyone who locked the $27/mo birthday rate BEFORE July 27 keeps $27/mo for life; anyone joining monthly after July 27 pays $40. ${LINKS.foundingMonthly ? `To start monthly, hand over the $27/mo link → ${LINKS.foundingMonthly}` : `To start monthly, tell them to ask a coach in Discord — do NOT paste a monthly checkout link yourself (the old one is retired).`}
 
 CERTIFICATIONS (Afterpay pay-in-4 — payments as little as $133). Essential = voucher + GUARANTEED PASS (coached till you pass) + coaching. Self-Guided = voucher + plan; recommend adding a retake voucher (+$200 add-on):
 GATING RULE: Essential (coached) cert tracks are MEMBERS ONLY — do NOT hand the Essential checkout link to a non-member. If they're not a founding member yet, tell them to join first, then they unlock Essential certs inside their quiz at rotechllc.com/quiz. Self-Guided certs are open to ANYONE — share those links freely. Clearance is NEVER a direct checkout — it requires the free qualifier call first.
