@@ -19,6 +19,25 @@ function adminIdSet(): Set<string> {
   return new Set(ids);
 }
 
+// Coach login codes → their Discord ID. Tyler and Daquan sign into the CRM with their
+// FIRSTNAME2026 code and get FULL coach access (not owner) the SAME deterministic way
+// Randy does with the owner code — with NO dependency on the live Discord role lookup or
+// the ADMIN_DISCORD_IDS env, both of which were silently failing in prod and bouncing
+// coaches back to the login screen ("opens, then goes back to login"). The Discord ID is
+// only a fallback for schedule matching / invoice attribution — the real one is read from
+// the coach's customer doc when present. Extend with COACH_LOGIN_CODES="CODE:discordId,...".
+function coachCodeMap(): Record<string, string> {
+  const map: Record<string, string> = {
+    TYLER2026: "1465828992014876834",
+    DAQUAN2026: "694452462676869122",
+  };
+  for (const pair of (process.env.COACH_LOGIN_CODES || "").split(",")) {
+    const [code, id] = pair.split(":").map((s) => (s || "").trim());
+    if (code) map[code.toUpperCase()] = id || map[code.toUpperCase()] || "coach";
+  }
+  return map;
+}
+
 // Preferred gate: the ROT Coach role. Only Randy, Tyler, Daquan hold it today, and any
 // future coach is auto-included — no ID list to maintain. Needs the bot token in the
 // site env (DISCORD_BOT_TOKEN) so the server can read the member's roles.
@@ -87,6 +106,26 @@ export async function getAuthedAdmin(req: Request): Promise<{ discordId: string;
   const OWNER_CODE = (process.env.OWNER_LOGIN_CODE || "RANDY2026").toUpperCase();
   if (sess.kind === "code" && sess.code.toUpperCase() === OWNER_CODE) {
     return { discordId: (process.env.RANDY_DISCORD_ID || "owner").trim(), name: "Randy", isOwner: true };
+  }
+  // Coach master codes — Tyler/Daquan get full coach access via the same trusted,
+  // env-independent path as the owner code (minus owner-only privileges). Prefer the
+  // real Discord ID + name from their customer doc so invoice attribution and schedule
+  // matching stay correct; fall back to the built-in ID if the doc is missing/incomplete.
+  if (sess.kind === "code") {
+    const fallbackId = coachCodeMap()[sess.code.toUpperCase()];
+    if (fallbackId) {
+      let discordId = fallbackId;
+      let name = "Coach";
+      try {
+        const snap = await coll("customers").where("quizCode", "==", sess.code).limit(1).get();
+        if (!snap.empty) {
+          const c = snap.docs[0].data() as { discordId?: string; name?: string };
+          if (c.discordId) discordId = c.discordId;
+          if (c.name) name = c.name;
+        }
+      } catch { /* use the built-in fallback identity */ }
+      return { discordId: discordId || "coach", name, isOwner: false };
+    }
   }
   const allow = adminIdSet();
 
