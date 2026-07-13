@@ -140,7 +140,9 @@ export default function MemberHome() {
           <Action href="/quiz" emoji="📝" label="Take a quiz" sub="Drill a domain" />
           <Action href="/resume" emoji="📄" label="My resume" sub="Build / tailor" />
           <Action href="/roster" emoji="🌐" label="Roster" sub="The community" />
-          <Action href="/hub" emoji="📚" label="Resources" sub="Tools & guides" />
+          {/* CRM is coach/owner-only (server-gated at /admin too). Replaces the old
+              "Resources" tile that pointed at Randy's private /hub — members never see it. */}
+          {d.isCoach && <Action href="/admin" emoji="🛠" label="CRM" sub="Command center" />}
           <Action href="/calls" emoji="🎥" label="My calls" sub="Sessions & recaps" />
         </div>
 
