@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   const admin = await getAuthedAdmin(req);
   if (!admin) return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 });
 
-  let body: { type?: string; payload?: Record<string, unknown> };
+  let body: { type?: string; payload?: Record<string, unknown>; sendAt?: string };
   try { body = await req.json(); } catch { return NextResponse.json({ ok: false, error: "bad_json" }, { status: 400 }); }
   const type = String(body.type || "");
   if (!type) return NextResponse.json({ ok: false, error: "missing type" }, { status: 400 });
@@ -34,6 +34,9 @@ export async function POST(req: Request) {
       type,
       payload: body.payload || {},
       status: "pending",
+      // Optional scheduled send — the bot leaves the command pending until this ISO time
+      // (e.g. a 7am community-meeting announcement) instead of firing on the next tick.
+      ...(body.sendAt ? { sendAt: String(body.sendAt) } : {}),
       requestedBy: admin.discordId,
       requestedByName: admin.name,
       createdAt: new Date().toISOString(),
