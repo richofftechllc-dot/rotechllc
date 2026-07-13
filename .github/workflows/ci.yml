@@ -1,0 +1,28 @@
+name: CI
+
+# Build-gate: every PR into main must compile before it can merge.
+# This is the wall that stops a broken build from ever reaching production
+# (prod = main, auto-deployed by Vercel). If this job fails, do not merge.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install deps
+        run: npm ci
+      - name: Build (must pass to merge)
+        run: npm run build
+        env:
+          # Build must succeed without prod secrets — the app already stubs
+          # Firebase when creds are absent (see lib/firebase.ts).
+          NEXT_TELEMETRY_DISABLED: "1"
