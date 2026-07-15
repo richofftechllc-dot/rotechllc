@@ -62,6 +62,7 @@ export default async function Pricing() {
             <div className="text-3xl font-black text-white">$27<span className="text-base font-bold text-gray-400"> / month</span></div>
             <div className="text-gray-500 text-xs mt-1 mb-3">First 2 months for $27, then $27/mo while active</div>
             <a href="/api/checkout/monthly" className="block w-full py-3 border border-orange-500/50 text-orange-400 font-bold rounded-lg hover:bg-orange-500/10">Lock $27 / month</a>
+            <div className="text-gray-500 text-[11px] mt-2">Checkout shows an “ends” date — that’s just the 2-for-$27 promo window; it renews at $27/mo after, cancel anytime.</div>
             <div className="text-gray-400 text-sm mt-4">🔒 Founding full — {Math.max(count, 100)} in the community</div>
             <div className="text-gray-500 text-xs mt-2 italic">Through July 27: <b className="text-gray-300">$227/yr or $27/mo</b> · after: $375/yr or $40/mo.</div>
           </div>

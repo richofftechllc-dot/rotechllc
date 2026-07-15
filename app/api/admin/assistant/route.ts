@@ -128,6 +128,19 @@ export async function POST(req: Request) {
         required: ["memberEmail", "service"],
       },
     },
+    {
+      name: "cancel_invoice",
+      description: "Cancel/void a member's most recent UNPAID Square invoice (or a specific invoice number). Never cancels an already-PAID invoice. Use when a coach says 'cancel that invoice', 'void Justice's invoice', 'that was a test, cancel it', etc. Resolve the member with lookup_member first for their email.",
+      input_schema: {
+        type: "object",
+        properties: {
+          memberEmail: { type: "string", description: "the member's email (from lookup_member or the roster)" },
+          memberName: { type: "string", description: "the member's name" },
+          invoiceNumber: { type: "string", description: "optional specific Square invoice number, e.g. 000232. Omit to cancel their most recent unpaid invoice." },
+        },
+        required: ["memberEmail"],
+      },
+    },
   ];
 
   type Block = { type: string; text?: string; id?: string; name?: string; input?: Record<string, unknown> };
@@ -188,6 +201,30 @@ export async function POST(req: Request) {
           toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: invoiceNote });
         } catch {
           toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: "Failed to queue the invoice — tell the coach to use the 🧾 Send invoice button on the member card." });
+        }
+        continue;
+      }
+      if (tu.name === "cancel_invoice") {
+        const inp = tu.input || {};
+        const email = String(inp.memberEmail || "").trim().toLowerCase();
+        if (!email.includes("@")) {
+          toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: "Failed: need a valid member email to cancel an invoice." });
+          continue;
+        }
+        const invoiceNumber = inp.invoiceNumber ? String(inp.invoiceNumber).trim() : "";
+        try {
+          await coll("botCommands").add({
+            type: "cancelInvoice",
+            payload: { clientName: String(inp.memberName || email), clientEmail: email, ...(invoiceNumber ? { invoiceNumber } : {}) },
+            status: "pending",
+            requestedBy: admin.discordId,
+            requestedByName: admin.name,
+            createdAt: new Date().toISOString(),
+          });
+          invoiceNote = `🚫 Cancel queued: ${invoiceNumber ? `invoice #${invoiceNumber}` : "the most recent unpaid invoice"} for ${inp.memberName || email}. It'll void in Square in a few seconds (paid invoices are never touched).`;
+          toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: invoiceNote });
+        } catch {
+          toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: "Failed to queue the cancel — the coach can cancel it directly in Square." });
         }
         continue;
       }
