@@ -92,7 +92,7 @@ export async function POST(req: Request) {
     "Rich Off Tech is a tech-career company: cleared IT, cybersecurity (Security+), ServiceNow CSA, AWS AI Practitioner, resume help, and 1-on-1 coaching.",
     "You help coaches manage members and DRAFT outreach in a real, grounded, hype-but-not-corny voice.",
     "CRITICAL — you have a `lookup_member` tool that reads the live member database. When a coach names a member (even just a first name like 'Racee' or 'Justice'), CALL lookup_member FIRST to pull their email, Discord, quiz code, tier, tracks, and status. You almost ALWAYS already have them on file — do NOT tell a coach you don't have someone's email/Discord until lookup_member has come back empty, and do NOT ask the coach for an email you can look up yourself.",
-    "You CAN also SEND a Square invoice via the send_invoice tool when the coach clearly asks (e.g. 'invoice Racee for CSA Essential, $200 off'). Resolve the member with lookup_member, use that email, then send. Coaches can discount up to $300; more is refused (owner only). If the SERVICE or discount is genuinely ambiguous, ask — but never ask for contact info you can look up.",
+    "You CAN also SEND a Square invoice via the send_invoice tool when the coach clearly asks (e.g. 'invoice Racee for CSA Essential, $200 off'). Resolve the member with lookup_member, use that email, then send. Coaches can discount up to $300 instantly. A discount OVER $300 is still allowed — do NOT refuse it — it automatically routes to Randy for approval (he gets a Discord ping and the invoice sends once he approves). So just call send_invoice with the amount the coach asked for and tell them it's gone to Randy for approval. If the SERVICE or discount is genuinely ambiguous, ask — but never ask for contact info you can look up.",
     `INVOICE SERVICES (key = label ($full price before discount)): ${serviceList}. Pass the matching key; the coach's discount comes off this.`,
     "The roster below is a quick summary (name | email | code | discord | tier | payment | days left | tracks | progress). It may be truncated — treat lookup_member as the source of truth for any specific member.",
     "Be concise and practical. Don't invent member details — look them up.",
@@ -116,7 +116,7 @@ export async function POST(req: Request) {
     },
     {
       name: "send_invoice",
-      description: "Send a Square invoice to a member. The member is emailed a real invoice. Coach discounts are capped at $300.",
+      description: "Send a Square invoice to a member. The member is emailed a real invoice. Coach discounts up to $300 send immediately; a discount over $300 is allowed too but routes to Randy for approval automatically (don't refuse it).",
       input_schema: {
         type: "object",
         properties: {
@@ -183,10 +183,9 @@ export async function POST(req: Request) {
           continue;
         }
         const discountCents = Math.max(0, Math.round((Number(inp.discountDollars) || 0) * 100));
-        if (discountCents > 30000 && !isOwner) {
-          toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: "Refused: discount over $300 — only Randy (owner) can send that." });
-          continue;
-        }
+        // Over $300 from a coach is NOT refused — the bot routes it to Randy for approval
+        // (he gets a Discord ping; `!approveinvoice` sends it). Randy himself bypasses.
+        const needsApproval = discountCents > 30000 && !isOwner;
         try {
           await coll("botCommands").add({
             type: "invoice",
@@ -197,7 +196,9 @@ export async function POST(req: Request) {
             createdAt: new Date().toISOString(),
           });
           const off = discountCents > 0 ? ` (−$${(discountCents / 100).toFixed(0)} off)` : "";
-          invoiceNote = `✅ Invoice queued: ${svc.label}${off} → ${inp.memberName || email}. Square is emailing it now; it'll show in follow-ups for payment tracking.`;
+          invoiceNote = needsApproval
+            ? `🔔 ${svc.label}${off} → ${inp.memberName || email}: that discount is over the $300 coach cap, so it's been sent to Randy for approval. He gets a Discord ping now — the invoice goes out the moment he approves it.`
+            : `✅ Invoice queued: ${svc.label}${off} → ${inp.memberName || email}. Square is emailing it now; it'll show in follow-ups for payment tracking.`;
           toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: invoiceNote });
         } catch {
           toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: "Failed to queue the invoice — tell the coach to use the 🧾 Send invoice button on the member card." });
