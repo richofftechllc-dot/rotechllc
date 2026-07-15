@@ -28,6 +28,11 @@ const COACH_SERVICES = [
   { key: "csa-accelerated", label: "CSA Accelerated", amount: 280000 },
   { key: "aws", label: "AWS Cloud Practitioner", amount: 100000 },
 ];
+// Canonical access tracks — the clean set to toggle a member into. $27/mo founding =
+// "General Access" only; cert tracks are add-ons. Existing docs may hold legacy labels
+// (e.g. "Security+ + ServiceNow CSA + AWS AI Practitioner") — the editor surfaces those
+// as removable chips so they can be cleaned up.
+const TRACK_CHOICES = ["General Access", "Security+", "ServiceNow CSA", "AWS AI Practitioner", "Clearance Coaching"];
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const TIME_OPTS = ["", "7am", "8am", "9am", "10am", "11am", "12pm", "1pm", "2pm", "3pm", "4pm", "5pm", "6pm", "7pm", "8pm", "9pm", "10pm"];
 // Parse "9am–5pm ET" → {start, end}; compose back on change. Keeps the stored string format.
@@ -103,6 +108,8 @@ export default function AdminCRM() {
   const [refDraft, setRefDraft] = useState<Record<string, string>>({});
   const [dmDraft, setDmDraft] = useState<Record<string, string>>({});
   const [trackDraft, setTrackDraft] = useState<Record<string, string>>({});
+  const [trackEdit, setTrackEdit] = useState<Record<string, string[]>>({}); // per-member exact track list being edited
+  const [sortBy, setSortBy] = useState<"newest" | "expiring" | "name">("newest");
   const [actionMsg, setActionMsg] = useState<Record<string, string>>({});
   const [resumeView, setResumeView] = useState<Record<string, { name?: string; data: unknown; updatedAt?: string } | null>>({});
   const [invoiceFor, setInvoiceFor] = useState<string | null>(null);
@@ -324,6 +331,27 @@ export default function AdminCRM() {
     const d = await r.json();
     setActionMsg(s => ({ ...s, [m.email]: r.ok && d.ok ? `✓ ${pace}-day plan set — they see the dated roadmap on /plan.` : `Error: ${d.error || r.status}` }));
   }
+  // ── Access tracks: exact-list editor (the source of truth the quiz + roster read) ──
+  function editTracks(m: Member) { setTrackEdit(s => ({ ...s, [m.email]: s[m.email] ?? [...(m.tracks || [])] })); }
+  function toggleTrack(email: string, t: string) {
+    setTrackEdit(s => {
+      const cur = s[email] ?? [];
+      return { ...s, [email]: cur.includes(t) ? cur.filter(x => x !== t) : [...cur, t] };
+    });
+  }
+  async function saveTracks(m: Member) {
+    const tracks = trackEdit[m.email] ?? m.tracks ?? [];
+    setActionMsg(s => ({ ...s, [m.email]: "…" }));
+    const r = await fetch("/api/admin/set-tracks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: m.email, tracks }) });
+    const d = await r.json();
+    if (r.ok && d.ok) {
+      setActionMsg(s => ({ ...s, [m.email]: `✓ Tracks saved: ${tracks.join(", ") || "none"}` }));
+      setTrackEdit(s => { const n = { ...s }; delete n[m.email]; return n; });
+      loadMembers();
+    } else {
+      setActionMsg(s => ({ ...s, [m.email]: `Error: ${d.error || r.status}` }));
+    }
+  }
   function scheduleCall(m: Member) {
     const type = scheduleType[m.email] || "Intro";
     const blurb: Record<string, string> = {
@@ -488,7 +516,12 @@ export default function AdminCRM() {
   const filteredMembers = members.filter(m =>
     (!q || [m.name, m.email, m.discordTag, m.tier, m.tracks.join(",")].join(" ").toLowerCase().includes(q.toLowerCase())) &&
     (!fTier || m.tier === fTier) &&
-    (!fStatus || m.paymentStatus === fStatus));
+    (!fStatus || m.paymentStatus === fStatus))
+    .sort((a, b) => {
+      if (sortBy === "newest") return Date.parse(b.purchaseDate || "") - Date.parse(a.purchaseDate || "") || 0;
+      if (sortBy === "expiring") return (a.daysLeft ?? 99999) - (b.daysLeft ?? 99999);
+      return (a.name || a.email || "").localeCompare(b.name || b.email || "");
+    });
   const lateCount = members.filter(m => m.paymentStatus === "late" || m.paymentStatus === "expired").length;
 
   // Referral rollup: group by who referred them, count paid, compute payout owed.
@@ -771,6 +804,11 @@ export default function AdminCRM() {
                 <option value="">All status</option>
                 {statusOptions.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
+              <select value={sortBy} onChange={e => setSortBy(e.target.value as "newest" | "expiring" | "name")} className="bg-white border border-[#dadce0] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-orange-500" title="Sort roster">
+                <option value="newest">Newest first</option>
+                <option value="expiring">Expiring soon</option>
+                <option value="name">Name (A–Z)</option>
+              </select>
               {(q || fTier || fStatus) && <button onClick={() => { setQ(""); setFTier(""); setFStatus(""); }} className="text-sm px-3 rounded-lg border border-[#dadce0] text-gray-600 hover:bg-gray-50">Clear</button>}
               <span className="text-xs text-gray-400 self-center ml-auto">{filteredMembers.length} shown</span>
             </div>
@@ -827,7 +865,38 @@ export default function AdminCRM() {
                               </div>
                               {resetMsg[m.email] && <div className="text-[10px] text-green-700 mt-0.5 font-mono">{resetMsg[m.email]}</div>}
                             </div>
-                            <div><span className="text-gray-400">Tracks</span><div className="font-medium">{m.tracks.join(", ") || "—"}</div></div>
+                            <div className="sm:col-span-2 lg:col-span-3">
+                              <div className="flex items-center gap-2">
+                                <span className="text-gray-400">Access tracks</span>
+                                {trackEdit[m.email] === undefined
+                                  ? <button onClick={() => editTracks(m)} className="text-[10px] px-2 py-0.5 rounded border border-[#dadce0] text-gray-600 hover:bg-gray-50">Edit</button>
+                                  : <button onClick={() => setTrackEdit(s => { const n = { ...s }; delete n[m.email]; return n; })} className="text-[10px] px-2 py-0.5 rounded border border-[#dadce0] text-gray-500 hover:bg-gray-50">Cancel</button>}
+                              </div>
+                              {trackEdit[m.email] === undefined ? (
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  {m.tracks.length ? m.tracks.map(t => <span key={t} className="text-[11px] px-2 py-0.5 rounded bg-gray-100 border border-gray-200 text-gray-700">{t}</span>) : <span className="text-gray-400">General Access only (no cert tracks)</span>}
+                                </div>
+                              ) : (
+                                <div className="mt-1.5">
+                                  <div className="flex flex-wrap gap-1.5 mb-2">
+                                    {TRACK_CHOICES.map(t => {
+                                      const on = (trackEdit[m.email] || []).includes(t);
+                                      return <button key={t} onClick={() => toggleTrack(m.email, t)} className={`text-[11px] px-2 py-1 rounded-full border transition ${on ? "bg-emerald-600 text-white border-emerald-600" : "bg-white text-gray-600 border-[#dadce0] hover:bg-gray-50"}`}>{on ? "✓ " : "+ "}{t}</button>;
+                                    })}
+                                  </div>
+                                  {(trackEdit[m.email] || []).some(t => !TRACK_CHOICES.includes(t)) && (
+                                    <div className="flex flex-wrap gap-1 mb-2 items-center">
+                                      {(trackEdit[m.email] || []).filter(t => !TRACK_CHOICES.includes(t)).map(t => (
+                                        <span key={t} className="text-[11px] px-2 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-700">{t}<button onClick={() => toggleTrack(m.email, t)} className="ml-1 text-amber-500 hover:text-amber-800">×</button></span>
+                                      ))}
+                                      <span className="text-[10px] text-gray-400">legacy — × to remove</span>
+                                    </div>
+                                  )}
+                                  <button onClick={() => saveTracks(m)} className="text-xs px-3 py-1 rounded-lg bg-[#202124] text-white hover:bg-black">Save tracks</button>
+                                  {actionMsg[m.email] && <span className="text-[11px] text-gray-600 ml-2">{actionMsg[m.email]}</span>}
+                                </div>
+                              )}
+                            </div>
                             <div><span className="text-gray-400">Roles</span><div className="font-medium">{m.roles?.length ? m.roles.join(", ") : "—"}</div></div>
                             <div><span className="text-gray-400">Certs</span><div className="font-medium">{m.certs?.length ? m.certs.join(", ") : "—"}</div></div>
                             <div><span className="text-gray-400">Phone</span><div className="font-medium">{m.phone || "—"}</div></div>
