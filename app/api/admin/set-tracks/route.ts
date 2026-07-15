@@ -12,21 +12,36 @@ export const dynamic = "force-dynamic";
 export async function POST(req: Request) {
   const admin = await getAuthedAdmin(req);
   if (!admin) return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 });
-  let b: { email?: string; tracks?: string[] };
+  let b: { email?: string; quizCode?: string; discordId?: string; tracks?: string[] };
   try { b = await req.json(); } catch { return NextResponse.json({ ok: false, error: "bad_json" }, { status: 400 }); }
   const email = String(b.email || "").toLowerCase().trim();
-  if (!email.includes("@")) return NextResponse.json({ ok: false, error: "need valid email" }, { status: 400 });
+  const quizCode = String(b.quizCode || "").toUpperCase().trim();
+  const discordId = String(b.discordId || "").trim();
   if (!Array.isArray(b.tracks)) return NextResponse.json({ ok: false, error: "need tracks[]" }, { status: 400 });
+  if (!email.includes("@") && !quizCode && !discordId) {
+    return NextResponse.json({ ok: false, error: "need email, quizCode, or discordId" }, { status: 400 });
+  }
   // Normalize: trim, drop blanks, de-dupe, cap length.
   const tracks = Array.from(new Set(b.tracks.map((t) => String(t).trim()).filter(Boolean))).slice(0, 12);
   try {
-    const snap = await coll("customers").where("email", "==", email).get();
-    if (snap.empty) return NextResponse.json({ ok: false, error: "member not found" }, { status: 404 });
+    // Match by ANY identifier — clobbered docs can lose their email but keep a quizCode /
+    // discordId, so email-only matching silently misses them. Union across all matches.
+    const refs = new Map<string, FirebaseFirestore.DocumentReference>();
+    if (email.includes("@")) (await coll("customers").where("email", "==", email).get()).forEach((d) => refs.set(d.id, d.ref));
+    if (quizCode) (await coll("customers").where("quizCode", "==", quizCode).get()).forEach((d) => refs.set(d.id, d.ref));
+    if (discordId) (await coll("customers").where("discordId", "==", discordId).get()).forEach((d) => refs.set(d.id, d.ref));
+    if (!refs.size) return NextResponse.json({ ok: false, error: "member not found" }, { status: 404 });
     const now = new Date().toISOString();
-    for (const doc of snap.docs) {
-      await doc.ref.set({ tracks, tracksEditedAt: now, tracksEditedBy: admin.name }, { merge: true });
+    // Write BOTH shapes: `tracks` (array, for the roster display) AND `track` (singular
+    // string) — the quiz/access layer (lib/access.ts) reads the SINGULAR `track` via
+    // substring match, and the roster falls back to it when the array is empty. Writing
+    // only the array left the stale singular field silently granting access. Join with
+    // " + " so the substring matcher still sees each cert name.
+    const trackStr = tracks.join(" + ") || "General Access";
+    for (const ref of refs.values()) {
+      await ref.set({ tracks, track: trackStr, tracksEditedAt: now, tracksEditedBy: admin.name }, { merge: true });
     }
-    return NextResponse.json({ ok: true, tracks, docs: snap.size });
+    return NextResponse.json({ ok: true, tracks, docs: refs.size });
   } catch (e) {
     return NextResponse.json({ ok: false, error: e instanceof Error ? e.message : "error" }, { status: 500 });
   }

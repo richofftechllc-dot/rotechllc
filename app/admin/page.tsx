@@ -342,7 +342,7 @@ export default function AdminCRM() {
   async function saveTracks(m: Member) {
     const tracks = trackEdit[m.email] ?? m.tracks ?? [];
     setActionMsg(s => ({ ...s, [m.email]: "…" }));
-    const r = await fetch("/api/admin/set-tracks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: m.email, tracks }) });
+    const r = await fetch("/api/admin/set-tracks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: m.email, quizCode: m.quizCode, discordId: m.discordId, tracks }) });
     const d = await r.json();
     if (r.ok && d.ok) {
       setActionMsg(s => ({ ...s, [m.email]: `✓ Tracks saved: ${tracks.join(", ") || "none"}` }));
