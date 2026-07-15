@@ -3,7 +3,7 @@
 // here, so it is safe to import from client components (e.g. app/quiz/page.tsx).
 //   sp = Security+ · csa = ServiceNow CSA · ai = AWS AI
 
-export type AccessOpts = { plan?: string | null; productType?: string | null };
+export type AccessOpts = { plan?: string | null; productType?: string | null; billingCycle?: string | null };
 
 // Map a customer's track string (+ tier context) → the set of track prefixes they can
 // access. This is the EXACT logic the quiz + video gate use — do not fork it.
@@ -15,12 +15,14 @@ export function allowedPrefixes(trackStr: string | null, opts: AccessOpts = {}):
   const out = new Set<string>();
   const plan = (opts.plan || "").toLowerCase();
   const productType = (opts.productType || "").toLowerCase();
+  const billingCycle = (opts.billingCycle || "").toLowerCase();
 
   // AWS AI Practitioner is a FOUNDING perk — free for founding members, but NOT for
   // $27/mo (monthly) members or free / Discord-only members. Grant it only to a paid
   // founding member who is NOT on the monthly plan — or to anyone whose track string
-  // explicitly names AWS AI (a coach-granted add-on). Everyone else: no AI.
-  const isMonthly = plan === "monthly";
+  // explicitly names AWS AI (a coach-granted add-on). Everyone else: no AI. NOTE: some
+  // $27/mo records carry plan:"founding" but billingCycle:"monthly" — treat either as monthly.
+  const isMonthly = plan === "monthly" || billingCycle === "monthly";
   const isFounding = productType.includes("founding");
   if (!isMonthly && (isFounding || t.includes("aws") || t.includes("ai practitioner"))) out.add("ai");
 

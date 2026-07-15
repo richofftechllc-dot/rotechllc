@@ -47,6 +47,7 @@ export async function GET(req: NextRequest) {
   let track: string | null = null;
   let plan: string | null = null;
   let productType: string | null = null;
+  let billingCycle: string | null = null;
   try {
     const snap = sess.kind === "code"
       ? await coll("customers").where("quizCode", "==", sess.code).limit(1).get()
@@ -56,10 +57,11 @@ export async function GET(req: NextRequest) {
       track = (d.track as string) || null;
       plan = (d.plan as string) || null;
       productType = (d.productType as string) || null;
+      billingCycle = (d.billingCycle as string) || null;
     }
   } catch { /* fall through — no track */ }
 
-  const allowed = isCoach ? new Set(["sp", "csa", "ai"]) : allowedPrefixes(track, { plan, productType });
+  const allowed = isCoach ? new Set(["sp", "csa", "ai"]) : allowedPrefixes(track, { plan, productType, billingCycle });
 
   // Full content for allowed tracks; metadata-only cards for locked ones.
   const tracks = TRACKS.filter((t) => allowed.has(t.id));
