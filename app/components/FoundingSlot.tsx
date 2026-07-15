@@ -91,6 +91,9 @@ export default function FoundingSlot() {
           {/* $27/mo — monthly option, available alongside the yearly through July 27. */}
           <div className="mt-4 text-gray-400 text-sm">or lock <b className="text-white">$27/month</b> — first 2 months for $27, then $27/mo while active</div>
           <a href={CHECKOUT_27} className="inline-block w-full max-w-xs px-8 py-3 mt-2 border border-orange-500/50 text-orange-300 font-bold text-sm rounded-xl hover:bg-orange-500/10 uppercase tracking-wide">Lock $27 / month →</a>
+          {/* Square's checkout shows an "ends Aug 15" note for the 2-for-$27 promo window —
+              the membership actually renews at $27/mo after. Set expectations up front. */}
+          <div className="mt-2 text-gray-500 text-xs max-w-xs mx-auto">Heads up: checkout shows an “ends” date — that’s just the 2-for-$27 promo window. Your membership renews at <b className="text-gray-300">$27/mo</b> after, cancel anytime.</div>
 
           <div className="text-orange-300/90 text-sm font-semibold mt-4">{seatLine}</div>
           {/* July 27 deadline — both the $227/yr and the $27/mo deal expire then; prices rise after. */}
