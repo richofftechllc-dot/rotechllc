@@ -42,16 +42,24 @@ export async function GET(req: NextRequest) {
   let isCoach = false;
   try { isCoach = !!(await getAuthedAdmin(req)); } catch { isCoach = false; }
 
-  // Resolve the member's track server-side (never trust the client).
+  // Resolve the member's track + tier server-side (never trust the client). Tier gates
+  // the AWS AI founding perk: $27/mo (monthly) and free members don't get it.
   let track: string | null = null;
+  let plan: string | null = null;
+  let productType: string | null = null;
   try {
     const snap = sess.kind === "code"
       ? await coll("customers").where("quizCode", "==", sess.code).limit(1).get()
       : await coll("customers").where("discordId", "==", sess.userId).limit(1).get();
-    if (!snap.empty) track = (snap.docs[0].data().track as string) || null;
+    if (!snap.empty) {
+      const d = snap.docs[0].data();
+      track = (d.track as string) || null;
+      plan = (d.plan as string) || null;
+      productType = (d.productType as string) || null;
+    }
   } catch { /* fall through — no track */ }
 
-  const allowed = isCoach ? new Set(["sp", "csa", "ai"]) : allowedPrefixes(track);
+  const allowed = isCoach ? new Set(["sp", "csa", "ai"]) : allowedPrefixes(track, { plan, productType });
 
   // Full content for allowed tracks; metadata-only cards for locked ones.
   const tracks = TRACKS.filter((t) => allowed.has(t.id));

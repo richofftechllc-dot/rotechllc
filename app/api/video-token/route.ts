@@ -28,7 +28,10 @@ export async function POST(req: NextRequest) {
     if (custSnap.empty) {
       return NextResponse.json({ ok: false, error: "Account not found" }, { status: 401 });
     }
-    const track: string | null = custSnap.docs[0].data().track || null;
+    const cust = custSnap.docs[0].data();
+    const track: string | null = cust.track || null;
+    const plan: string | null = cust.plan || null;
+    const productType: string | null = cust.productType || null;
 
     // 2) Look up the lesson.
     const lessonSnap = await coll("lessons").where("lessonId", "==", lessonId).limit(1).get();
@@ -43,7 +46,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 3) Access check — same prefix gate as the quiz; null/empty track is denied.
-    if (!accessAllows(track, requiredAccess)) {
+    if (!accessAllows(track, requiredAccess, { plan, productType })) {
       return NextResponse.json({ ok: false, locked: true, error: "This lesson isn't in your plan." }, { status: 403 });
     }
 
