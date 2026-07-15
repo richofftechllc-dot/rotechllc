@@ -409,7 +409,7 @@ export default function AdminCRM() {
       const roster = members.slice(0, 200).map(m => {
         const pr = m.progress;
         const prog = pr ? `${pr.done} quizzes done${pr.avg != null ? `, avg ${pr.avg}%` : ""}${pr.weak?.length ? `, weak: ${pr.weak.join("/")}` : ""}` : "no quiz activity";
-        return `${m.name || m.email} | ${m.tier || "—"} | ${m.paymentStatus} | ${m.daysLeft ?? "—"}d left | tracks: ${m.tracks.join("/") || "none"} | ${prog}`;
+        return `${m.name || "(no name)"}${m.email ? ` <${m.email}>` : " (no email on file)"} | code:${m.quizCode || "—"}${m.discordTag ? ` | discord:${m.discordTag}` : ""} | ${m.tier || "—"} | ${m.paymentStatus} | ${m.daysLeft ?? "—"}d left | tracks: ${m.tracks.join("/") || "none"} | ${prog}`;
       }).join("\n");
       const focus = expanded ? members.find(m => m.id === expanded) : null;
       const r = await fetch("/api/admin/assistant", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: next, roster, focus }) });
