@@ -168,7 +168,7 @@ export async function POST(req: Request) {
     const rec = rateLimit.get(ip);
     if (rec && now < rec.reset) {
       if (rec.count >= LIMIT) {
-        return NextResponse.json({ reply: "Slow down. Hit the Founding Member button if you're serious — $96 unlocks the real coaching." });
+        return NextResponse.json({ reply: "Slow down. Hit the Founding Member button if you're serious — $227 unlocks the real coaching." });
       }
       rec.count++;
     } else {
