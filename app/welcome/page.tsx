@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-const FOUNDING_LINK = "https://square.link/u/7r9pO4c0"; // durable quick_pay $96 (reusable)
+const FOUNDING_LINK = "https://square.link/u/c8X7TC0z"; // durable $227/yr founding checkout ($96 first-100 sold out)
 const DISCORD_LINK = "https://discord.gg/dtcYf8PTNa";
 
 // Square appends order/transaction identifiers to the redirect URL after a
@@ -65,7 +65,7 @@ export default async function Welcome({
           </p>
           <div className="mb-12 max-w-xl mx-auto bg-zinc-900 border border-orange-500/30 rounded-xl p-5">
             <p className="text-gray-300 text-sm mb-4">
-              Haven&apos;t locked in yet? Founding Member is a one-time <b className="text-white">$96</b> for 12 months.
+              Haven&apos;t locked in yet? Founding Member is a one-time <b className="text-white">$227</b> for 12 months.
             </p>
             <a
               href={FOUNDING_LINK}
@@ -73,7 +73,7 @@ export default async function Welcome({
               rel="noopener noreferrer"
               className="inline-block px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 font-bold rounded-lg"
             >
-              Lock In VIP Access — $96
+              Lock In VIP Access — $227
             </a>
           </div>
         </>
