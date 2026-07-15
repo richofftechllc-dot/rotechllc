@@ -9,9 +9,11 @@ import { useEffect, useState } from "react";
 const CHECKOUT_96 = "https://square.link/u/7r9pO4c0";
 // $227/yr durable quick_pay link — the price once founding ($96) is sold out.
 const CHECKOUT_227 = "https://square.link/u/c8X7TC0z";
-// $27/mo founding subscription (durable, reusable) — a monthly option available through
-// July 27 (then $40/mo). Not tied to the first-100 seat, so it stays live after sellout.
-const CHECKOUT_27 = "https://square.link/u/XlN3ZFcU";
+// $27/mo founding subscription — a monthly option available through July 27 (then $40/mo).
+// Points at our own route that mints a FRESH Square subscription link per click; a raw
+// square.link subscription link binds to its first buyer and freezes on that buyer's
+// confirmation forever. See app/api/checkout/monthly/route.ts.
+const CHECKOUT_27 = "/api/checkout/monthly";
 
 type Count = { spotsLeft?: number; soldOut?: boolean };
 

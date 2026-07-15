@@ -9,6 +9,10 @@
 // the URL is pasted here (one edit) + redeployed, the monthly button and Bo's hand-off
 // light up automatically. Also mirror the same URL into the bot's prices.js LINKS.
 export const LINKS = {
-  foundingMonthly: "https://square.link/u/XlN3ZFcU", // $27/mo durable reusable subscription checkout
+  // $27/mo: our own route that mints a FRESH Square subscription link per click. A raw
+  // square.link subscription link binds to its first buyer and then freezes on that
+  // buyer's confirmation screen forever (single-use) — the per-click route is the only
+  // way to keep it durable. See app/api/checkout/monthly/route.ts.
+  foundingMonthly: "/api/checkout/monthly",
   foundingYearly: "https://square.link/u/c8X7TC0z", // $227/yr durable quick_pay
 } as const;
