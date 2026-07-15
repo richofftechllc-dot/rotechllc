@@ -38,6 +38,15 @@ const freePerks = [
   },
 ];
 
+// Cert pricing — birthday promo through July 27 (prices include the ~6% processing fee;
+// each splits into 4 with Afterpay). Totals mirror the offers sheet.
+const certs = [
+  { tag: "ServiceNow CSA", name: "CSA Essential", was: "$1,600", now: "$1,113", save: "save $550", desc: "Voucher + guaranteed pass (we coach you till you pass) + full coaching & study plan.", afterpay: "4 × $278", url: "https://square.link/u/Gas5gOVh" },
+  { tag: "ServiceNow CSA", name: "CSA Self-Guided", was: "$1,000", now: "$636", save: "save $400", desc: "Voucher + study plan & exam guidance. Test on your own timeline. (+$200 retake recommended.)", afterpay: "4 × $159", url: "https://square.link/u/R6wQFhgo" },
+  { tag: "CompTIA", name: "Security+ Essential", was: "$1,500", now: "$901", save: "save $650", desc: "Voucher + guaranteed pass + coaching. The cert that unlocks cleared / federal roles.", afterpay: "4 × $225", url: "https://square.link/u/Lh7MBczC" },
+  { tag: "CompTIA", name: "Security+ Self-Guided", was: "$1,500", now: "$530", save: "save $1,000", desc: "Voucher + study plan. Test on your own timeline. (+$200 retake recommended.)", afterpay: "4 × $133", url: "https://square.link/u/Hv53MUYx" },
+];
+
 export default async function Pricing() {
   const count = await getMemberCount();
   return (
@@ -58,9 +67,38 @@ export default async function Pricing() {
             <div className="text-orange-400 text-xs font-bold tracking-widest uppercase mt-1">Per year · 12 months full access</div>
             <div className="text-gray-500 text-xs mt-1 mb-6">Founding ($96) sold out · one payment</div>
             <a href="https://square.link/u/c8X7TC0z" target="_blank" rel="noopener noreferrer" className="block w-full py-4 bg-gradient-to-r from-orange-500 to-red-500 font-bold rounded-lg">Join — $227 / year</a>
+            <div className="my-4 flex items-center gap-3 text-gray-600 text-xs"><span className="flex-1 h-px bg-white/10" />or lock monthly<span className="flex-1 h-px bg-white/10" /></div>
+            <div className="text-3xl font-black text-white">$27<span className="text-base font-bold text-gray-400"> / month</span></div>
+            <div className="text-gray-500 text-xs mt-1 mb-3">First 2 months for $27, then $27/mo while active</div>
+            <a href="https://square.link/u/XlN3ZFcU" target="_blank" rel="noopener noreferrer" className="block w-full py-3 border border-orange-500/50 text-orange-400 font-bold rounded-lg hover:bg-orange-500/10">Lock $27 / month</a>
             <div className="text-gray-400 text-sm mt-4">🔒 Founding full — {Math.max(count, 100)} in the community</div>
-            <div className="text-gray-500 text-xs mt-2 italic">Locked at $227 through July 27 · $375/year after.</div>
+            <div className="text-gray-500 text-xs mt-2 italic">Through July 27: <b className="text-gray-300">$227/yr or $27/mo</b> · after: $375/yr or $40/mo.</div>
           </div>
+        </div>
+      </div>
+
+      {/* CERTIFICATIONS — birthday promo through July 27 */}
+      <div className="mt-16">
+        <div className="text-center mb-8">
+          <div className="text-orange-500 font-bold tracking-widest text-sm mb-3">🎓 CERTIFICATIONS</div>
+          <h2 className="text-3xl md:text-4xl font-black">Get certified — voucher included</h2>
+          <p className="text-gray-400 mt-3 max-w-2xl mx-auto">Bootcamps charge $2,800–$4,500 for these. Not here. Every price is the <b className="text-white">total</b> (incl. the ~6% fee) and splits into 4 with Afterpay. <b className="text-orange-400">Birthday pricing through July 27</b> — after that they go back to full price.</p>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-5">
+          {certs.map(c => (
+            <div key={c.name} className="bg-zinc-900 border border-white/10 rounded-xl p-6">
+              <div className="text-[11px] font-bold tracking-widest uppercase text-orange-400 mb-1">{c.tag}</div>
+              <h3 className="text-xl font-black mb-2">{c.name}</h3>
+              <div className="flex items-baseline gap-2 mb-2 flex-wrap">
+                <span className="text-gray-500 line-through text-lg">{c.was}</span>
+                <span className="text-3xl font-black text-white">{c.now}</span>
+                <span className="text-xs font-bold text-green-400 bg-green-500/10 border border-green-500/20 rounded px-1.5 py-0.5">{c.save}</span>
+              </div>
+              <p className="text-gray-400 text-sm mb-3">{c.desc}</p>
+              <div className="text-sm font-bold text-orange-300 mb-3">💳 or {c.afterpay} with Afterpay</div>
+              <a href={c.url} target="_blank" rel="noopener noreferrer" className="block w-full py-3 bg-gradient-to-r from-orange-500 to-red-500 text-center font-bold rounded-lg">Enroll — {c.now} →</a>
+            </div>
+          ))}
         </div>
       </div>
 
