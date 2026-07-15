@@ -9,6 +9,9 @@ import { useEffect, useState } from "react";
 const CHECKOUT_96 = "https://square.link/u/7r9pO4c0";
 // $227/yr durable quick_pay link — the price once founding ($96) is sold out.
 const CHECKOUT_227 = "https://square.link/u/c8X7TC0z";
+// $27/mo founding subscription (durable, reusable) — a monthly option available through
+// July 27 (then $40/mo). Not tied to the first-100 seat, so it stays live after sellout.
+const CHECKOUT_27 = "https://square.link/u/XlN3ZFcU";
 
 type Count = { spotsLeft?: number; soldOut?: boolean };
 
@@ -82,6 +85,10 @@ export default function FoundingSlot() {
           >
             {soldOut ? "Join founding — $227/year →" : "Claim the last slot — $96 →"}
           </a>
+
+          {/* $27/mo — monthly option, available alongside the yearly through July 27. */}
+          <div className="mt-4 text-gray-400 text-sm">or lock <b className="text-white">$27/month</b> — first 2 months for $27, then $27/mo while active</div>
+          <a href={CHECKOUT_27} className="inline-block w-full max-w-xs px-8 py-3 mt-2 border border-orange-500/50 text-orange-300 font-bold text-sm rounded-xl hover:bg-orange-500/10 uppercase tracking-wide">Lock $27 / month →</a>
 
           <div className="text-orange-300/90 text-sm font-semibold mt-4">{seatLine}</div>
           {/* July 27 deadline — both the $227/yr and the $27/mo deal expire then; prices rise after. */}

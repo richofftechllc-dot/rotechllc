@@ -56,10 +56,11 @@ export default function BirthdayBanner() {
         {soldOut && (
           <a href="https://square.link/u/c8X7TC0z" className={btn + " bg-white text-black hover:opacity-90"}>Founding — $227 / year</a>
         )}
-        {/* $27/mo: shows ONLY once a durable REUSABLE subscription link is set in
-            lib/links.ts (foundingMonthly). Blank = no button, so a dead link can't appear.
-            Gated to !soldOut like the $96 button. */}
-        {!soldOut && LINKS.foundingMonthly && (
+        {/* $27/mo: a monthly subscription — NOT gated to the first-100 like the $96 seat,
+            so it stays available after founding fills (through July 27, then $40/mo).
+            Shows once a durable REUSABLE link is set in lib/links.ts (foundingMonthly);
+            blank = no button so a dead link can't appear. */}
+        {LINKS.foundingMonthly && (
           <a href={LINKS.foundingMonthly} className={btn + " bg-white text-black hover:opacity-90"}>Founding — $27 / mo</a>
         )}
         <a href="/resources/rot-july-2026-offers.html" className={btn + " border border-white/30 text-white hover:bg-white/10"}>See the full deal →</a>
