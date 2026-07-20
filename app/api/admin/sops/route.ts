@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 // SOPs the team can read + edit, one per service. Firestore `sops`, doc id = slug.
 const SEED = [
-  { id: "onboarding", title: "Member Onboarding", body: "1) Join Discord → role within 24h. 2) DM the bot !start. 3) Quick intro in #introductions. 4) Add to roster: rotechllc.com/roster.\n\nFounding ($227) includes the study/quiz engine. 1-on-1 cert coaching tracks are a paid add-on." },
+  { id: "onboarding", title: "Member Onboarding", body: "1) Join Discord with the checkout Discord name → Bo auto-assigns the role on sight (no commands). 2) Bo DMs their login code + a Start button for the 30-second intro (posts to #introductions). 3) Not auto-linked? Randy runs !linkemail <email> <discordId>. 4) Add to roster: rotechllc.com/roster.\n\nFounding ($227) includes the study/quiz engine. 1-on-1 cert coaching tracks are a paid add-on." },
   { id: "security-plus", title: "Security+ Track", body: "Study engine + practice quizzes. Coaching track (paid add-on) = 1-on-1 to exam day. Book test support, proctor via #rotech-trainer." },
   { id: "servicenow-csa", title: "ServiceNow CSA Track", body: "9 CSA modules (Flo). Quiz engine for practice. Coaching track (paid add-on) for hands-on + exam prep." },
   { id: "clearance", title: "Clearance Guidance", body: "Clearance Qualifier voice agent first, then a strategy call. Secret/TS/TS-SCI packages are paid." },

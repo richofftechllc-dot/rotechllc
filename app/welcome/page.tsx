@@ -26,8 +26,8 @@ const steps = [
   },
   {
     n: "STEP 3",
-    titleNode: <>Type <code className="text-orange-500 font-mono">!start</code> in Discord</>,
-    body: "That kicks off your intake and unlocks everything: your quiz link, cert track, and a free 30-min 1-on-1 with Bo.",
+    titleNode: <>Join Discord — your role is automatic</>,
+    body: "Join with the same Discord name you used at checkout and Bo assigns your role on sight — no commands to type. He'll DM you your login code and a Start button for your 30-second intro.",
   },
 ];
 
