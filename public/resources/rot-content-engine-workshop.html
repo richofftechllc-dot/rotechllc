@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROT Content Engine Workshop — Clip It, Caption It, Post It · Rich Off Tech</title>
+<style>
+  :root{--ink:#151515;--muted:#5f5c58;--brown:#6b4226;--line:#e6e3df;--soft:#faf7f4}
+  *{box-sizing:border-box}body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);line-height:1.6}
+  .wrap{max-width:800px;margin:0 auto;padding:0 20px 60px}
+  header{border-bottom:3px solid var(--ink);padding:24px 0 12px;margin-bottom:8px}
+  .logo{font-weight:800;letter-spacing:.04em;font-size:18px}.logo b{color:var(--brown)}
+  h1{font-size:clamp(26px,5vw,40px);margin:20px 0 6px;letter-spacing:-.02em}
+  .lede{color:var(--muted);font-size:16px;margin:0 0 8px}
+  h2{font-size:20px;margin:32px 0 8px}
+  h3{font-size:16px;margin:18px 0 6px}
+  table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:14.5px;margin:12px 0}
+  th,td{text-align:left;padding:10px 14px;border-top:1px solid var(--line)}
+  thead th{background:var(--soft);border-top:none;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  ul,ol{margin:6px 0;padding-left:20px}li{margin-bottom:5px}
+  a{color:var(--brown)}b{color:var(--ink)}
+  .tag{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--brown);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+  .card{border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0;background:var(--soft)}
+  .prompt{border:1px solid var(--line);border-left:4px solid var(--brown);border-radius:8px;padding:10px 14px;margin:10px 0;background:#fff;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13.5px}
+  footer{margin-top:36px;border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><span class="logo">RICH OFF <b>TECH</b></span></header>
+  <span class="tag">Community Session · Follow-Along Workshop</span>
+  <h1>The ROT Content Engine — Clip It, Caption It, Post It 🤎</h1>
+  <p class="lede">One hour, hands-on. You bring one long video; you leave with real clips, captions on, ready to post — made by talking to AI in plain English. No editing software. No tech background. This is the same engine ROT uses for its own content.</p>
+
+  <h2>💡 Why this session matters</h2>
+  <p>Whether you're building a personal brand for recruiters, marketing your coaching or business, or repurposing sermons/streams/trainings — the game now is <b>talk to your AI, let it run the tools</b>. AI isn't taking creators out; it's taking <i>lazy</i> creators out. The ones who win teach the AI to do what they already do, then get their time back. Tonight you set that up for yourself, live.</p>
+
+  <h2>✅ Do this BEFORE the session (~20 minutes)</h2>
+  <p>Come ready or you'll be watching instead of doing. Five steps:</p>
+  <table>
+    <thead><tr><th>#</th><th>Pre-work step</th><th>Details</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><b>Get the Claude desktop app</b></td><td>Download at <a href="https://claude.ai/download">claude.ai/download</a> and sign in (free account is fine). We use the DESKTOP app, not just the website.</td></tr>
+      <tr><td>2</td><td><b>Create your Opus Clip account</b></td><td>Sign up at <a href="https://www.opus.pro">opus.pro</a>. Your free trial comes with <b>90 minutes of free credits</b> — we'll burn some together. (Credit link gets dropped in Discord before the session — sign IN to Opus Clip first, then click it.)</td></tr>
+      <tr><td>3</td><td><b>Connect the Opus Clip MCP to Claude</b></td><td>In Claude desktop: Settings → Connectors → top-right <b>"Add custom connector"</b> → paste the Opus Clip MCP URL from <a href="https://www.opus.pro/mcp">opus.pro/mcp</a>. Then in a chat, tap the <b>+</b> by the input box and make sure the Opus Clip connector is toggled ON.</td></tr>
+      <tr><td>4</td><td><b>Have ONE long video ready</b></td><td>A YouTube link to YOUR content (talk, stream, training, sermon — 5 min to 3 hours), or a video file on your computer. Nothing yet? Record 2–3 minutes on your phone: "how I got into tech / what I'm building." That's your material.</td></tr>
+      <tr><td>5</td><td><b>Join from a computer</b></td><td>You'll be typing into Claude while watching the session. Phone-only = spectator mode. Desktop = player mode.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>🗓️ The hour, block by block</h2>
+  <table>
+    <thead><tr><th>Time</th><th>Block</th><th>What we do</th></tr></thead>
+    <tbody>
+      <tr><td>0:00–0:05</td><td><b>Why we're here</b></td><td>The shift: stop clicking around websites, start directing your AI. What the ROT content engine looks like end to end.</td></tr>
+      <tr><td>0:05–0:15</td><td><b>Meet your new intern</b></td><td>Everyone runs the discovery prompt (below) and sees everything Opus Clip can do from inside Claude. Connector check — nobody left behind.</td></tr>
+      <tr><td>0:15–0:30</td><td><b>First clip job — LIVE</b></td><td>Drop your video link with the clip prompt. While jobs run: how credits work, checking your usage, why you never babysit the screen.</td></tr>
+      <tr><td>0:30–0:40</td><td><b>Status + delivery</b></td><td>Ask for status in plain English, get your download links, review your clips. The alt-tab workflow: kick jobs off, do other work, check in when you feel like it.</td></tr>
+      <tr><td>0:40–0:50</td><td><b>Level-up moves</b></td><td>Bulk-caption a whole folder in one prompt · brand templates · dubbing your content into another language · the trend-jacking recipe · the Monday-morning full-auto setup.</td></tr>
+      <tr><td>0:50–1:00</td><td><b>Q&amp;A + your homework</b></td><td>Live troubleshooting, then marching orders (below).</td></tr>
+    </tbody>
+  </table>
+
+  <h2>💬 The prompts we'll run (copy/paste ready)</h2>
+  <h3>1 — Discovery: see what it can do</h3>
+  <div class="prompt">Tell me everything the connected Opus Clip MCP can do.</div>
+  <div class="prompt">Rewrite that in a non-technical way.</div>
+  <h3>2 — Your first clip job</h3>
+  <div class="prompt">Have Opus Clip clip this video and add captions: [paste your YouTube link]</div>
+  <p style="font-size:14px;color:var(--muted)">Got a brand template set up in Opus Clip? Add "and use my [template name] brand template." If Claude says it can't find it, create it in Opus Clip, then just say "check again."</p>
+  <h3>3 — Check in like a boss</h3>
+  <div class="prompt">What's the status of my clip job?</div>
+  <div class="prompt">Give me the download links for all the clips.</div>
+  <h3>4 — Bulk mode (the real time-saver)</h3>
+  <div class="prompt">Using the Opus Clip MCP, take every video in this folder and add captions. Keep every video at its original full length.</div>
+  <h3>5 — Cost check (know your numbers)</h3>
+  <div class="prompt">Check my Opus Clip credit usage and tell me how many credits I have left.</div>
+
+  <h2>⚠️ Gotchas we learned so you don't have to</h2>
+  <ul>
+    <li><b>Claude beats ChatGPT for this.</b> Claude finds the connector instantly, no restart, less hand-holding. ChatGPT needs a restart after installing the MCP and more explicit instructions. If you're new to AI clients — start with Claude.</li>
+    <li><b>Dubbing runs solo.</b> The auto-dub feature (10 credits/min) wants its own job — don't stack it with clipping instructions in one prompt.</li>
+    <li><b>Brand template must exist first.</b> The AI can't use a template you haven't created in your Opus Clip account. Make it there once, then it's one word in every future prompt.</li>
+    <li><b>Long-form works too.</b> It's not just shorts — Opus Clip can cut up to 15-minute horizontal videos from a long stream.</li>
+    <li><b>Talk, don't type.</b> The mic button in Claude works great — describe what you want out loud and it runs the same job.</li>
+  </ul>
+
+  <h2>🚀 The level-up: your content on autopilot</h2>
+  <div class="card">
+    <b>The trend-jacking recipe:</b> have your AI pull this week's trending topics in your niche → search YOUR past clips for the one that matches a trend → caption it, schedule it, and DM you a receipt. That's riding waves instead of inventing them.
+  </div>
+  <div class="card">
+    <b>The Monday-morning machine:</b> one folder (or Dropbox) where you drop every long video you record → a scheduled task in Claude that checks it weekly, sends new videos to Opus Clip, captions them, and queues the clips. You wake up to content, done. Record once, post all week.
+  </div>
+
+  <h2>📋 Homework (due before next community call)</h2>
+  <ol>
+    <li>Burn your 90 free credits this week — experiment, you can't break anything.</li>
+    <li>Post your best clip in the Discord and tell us the prompt that made it.</li>
+    <li>Bring ONE automation idea from your own life/work — we'll pick the best ones and build them together on a future call.</li>
+  </ol>
+
+  <footer>Rich Off Tech LLC · rotechllc.com · Questions? Ask Bo in the Discord — he knows this whole workflow. 👇🏾 Bring your video, leave with content.</footer>
+</div>
+</body>
+</html>
