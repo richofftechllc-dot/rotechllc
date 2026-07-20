@@ -68,5 +68,17 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ ok: false, error: "That time was just taken — pick another." }, { status: 409 });
   }
+  // Ping the booked coach in Discord via the bot's command queue (best-effort — the
+  // booking stands even if the ping write fails). Owner ID fallback matches crmSchedule.
+  try {
+    const coachDiscordId = coach === "randy"
+      ? (process.env.RANDY_DISCORD_ID || "1484048489695678475")
+      : coach === "daquan" ? "694452462676869122" : "1465828992014876834";
+    await coll("botCommands").add({
+      type: "dm",
+      payload: { discordId: coachDiscordId, message: `📅 NEW BOOKING — ${name} (${email}) booked you: ${String(b.label || slot)} · Topic: ${topic}` },
+      status: "pending", requestedByName: "web-booking", createdAt: now,
+    });
+  } catch {}
   return NextResponse.json({ ok: true });
 }

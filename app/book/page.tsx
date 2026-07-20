@@ -15,7 +15,7 @@ const COACHES = [
   { key: "tyler", name: "Tyler" },
   { key: "daquan", name: "Daquan" },
 ];
-const TOPICS = ["Certifications / studying", "Career / resume", "Clearance", "General / not sure yet"];
+const TOPICS = ["Onboarding / new member", "Certifications / studying", "Career / resume", "Clearance", "General / not sure yet"];
 
 type Slot = { value: string; label: string };
 type CoachAvail = { slug: string; name: string; days: Record<string, string>; note: string };

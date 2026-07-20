@@ -1,5 +1,4 @@
 const cmds = [
-  { cmd: "!start", desc: "Get set up + confirm your access after joining" },
   { cmd: "!quiz", desc: "Your personal quiz link (Security+, CSA, AWS AI)" },
   { cmd: "!progress", desc: "See your quiz progress" },
   { cmd: "!learn", desc: "Guided lessons with Flo (course engine)" },
