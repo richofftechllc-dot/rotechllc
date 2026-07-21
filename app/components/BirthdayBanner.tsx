@@ -4,9 +4,11 @@ import { LINKS } from "@/lib/links";
 
 // Birthday-drop banner on the homepage: live countdown to July 27 + live PAID founding
 // spots (from /api/founding-count) + the join buttons.
-// RULE: $96/12mo and $27/mo (2-for-$27) are ONLY available while under 100 members.
-// The instant the paid count hits 100 (soldOut), those buttons disappear and it flips
-// to the yearly ($227) offer — so the front page can never show a closed deal.
+//
+// The old $96/12mo seat is RETIRED (2026-07-21) — its Square links and catalog item were
+// permanently deleted, so a $96 button here would send buyers to a dead checkout. Founding
+// is now $227/yr or $27/mo, both shown regardless of the paid count; the count only drives
+// the "spots left" urgency text, never which price is offered.
 export default function BirthdayBanner() {
   const target = new Date("2026-07-27T23:59:59-04:00").getTime();
   const [left, setLeft] = useState<number>(target - Date.now());
@@ -45,21 +47,14 @@ export default function BirthdayBanner() {
         {spots !== null && !soldOut && (
           <span className="text-gray-400 text-base font-semibold"> · {spots} founding spots left</span>
         )}
-        {soldOut && left > 0 && <span className="text-gray-400 text-base font-semibold"> · founding full — $227/yr now (new pricing after July 27)</span>}
+        {soldOut && left > 0 && <span className="text-gray-400 text-base font-semibold"> · founding full (new pricing after July 27)</span>}
       </div>
       <div className="flex flex-wrap gap-2 mt-3">
-        {/* $96 founding closes at 100 members. DURABLE quick_pay link (reusable). */}
-        {!soldOut && (
-          <a href="https://square.link/u/7r9pO4c0" className={btn + " bg-white text-black hover:opacity-90"}>Founding — $96 / 12 months</a>
-        )}
-        {/* $96 sold out → the durable $227/yr link takes over. */}
-        {soldOut && (
-          <a href="https://square.link/u/c8X7TC0z" className={btn + " bg-white text-black hover:opacity-90"}>Founding — $227 / year</a>
-        )}
-        {/* $27/mo: a monthly subscription — NOT gated to the first-100 like the $96 seat,
-            so it stays available after founding fills (through July 27, then $40/mo).
-            Shows once a durable REUSABLE link is set in lib/links.ts (foundingMonthly);
-            blank = no button so a dead link can't appear. */}
+        {/* $227/yr — durable quick_pay link (reusable), always the annual founding rate. */}
+        <a href={LINKS.foundingYearly} className={btn + " bg-white text-black hover:opacity-90"}>Founding — $227 / year</a>
+        {/* $27/mo monthly subscription (through July 27, then $40/mo). Shows once a durable
+            REUSABLE link is set in lib/links.ts (foundingMonthly); blank = no button so a
+            dead link can't appear. */}
         {LINKS.foundingMonthly && (
           <a href={LINKS.foundingMonthly} className={btn + " bg-white text-black hover:opacity-90"}>Founding — $27 / mo</a>
         )}
