@@ -400,8 +400,22 @@ export default function AdminCRM() {
   }
 
   // Bo Tech assistant — sends the roster snapshot + whoever's expanded for grounded answers.
-  async function askBo() {
-    const text = boInput.trim();
+  async function askBo() { return sendBo(boInput); }
+
+  // Pre-populated cert invoice buttons. If a member is open, send the invoice request for
+  // them immediately; otherwise pre-fill the box so the coach just types who it's for.
+  function certQuick(serviceLabel: string) {
+    if (boBusy) return;
+    const focus = expanded ? members.find(m => m.id === expanded) : null;
+    if (focus && (focus.email || focus.name)) {
+      sendBo(`Invoice ${focus.name || focus.email}${focus.email ? ` <${focus.email}>` : ""} for ${serviceLabel}. No discount — just send it.`);
+    } else {
+      setBoInput(`Invoice [member name or email] for ${serviceLabel}. No discount — just send it.`);
+    }
+  }
+
+  async function sendBo(textRaw: string) {
+    const text = textRaw.trim();
     if (!text || boBusy) return;
     const next = [...boMsgs, { role: "user" as const, content: text }];
     setBoMsgs(next); setBoInput(""); setBoBusy(true);
@@ -1272,6 +1286,21 @@ export default function AdminCRM() {
             <div className="px-4 py-3 border-b border-[#e8eaed] flex items-center justify-between">
               <div className="font-semibold flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-orange-500" />Bo Tech — CRM Assistant</div>
               <div className="text-xs text-gray-500">{expanded ? `Looking at: ${members.find(m => m.id === expanded)?.name || members.find(m => m.id === expanded)?.email || "member"}` : "Open a member for member-specific help"}</div>
+            </div>
+            {/* Pre-populated cert invoice buttons — one click sends (member open) or pre-fills. */}
+            <div className="px-4 py-2 border-b border-[#e8eaed] bg-[#faf7f4] flex flex-wrap items-center gap-2">
+              <span className="text-[11px] uppercase tracking-wide text-gray-500">🧾 Quick invoice{expanded ? " (sends for open member)" : " (opens a member = 1-click send)"}:</span>
+              {[
+                { label: "Security+ Essential · $850", svc: "Security+ Essential" },
+                { label: "Security+ Self-Guided · $500", svc: "Security+ Self-Guided" },
+                { label: "ServiceNow CSA Essential", svc: "ServiceNow CSA Essential" },
+                { label: "AWS Cloud Practitioner", svc: "AWS Cloud Practitioner" },
+              ].map(b => (
+                <button key={b.svc} onClick={() => certQuick(b.svc)} disabled={boBusy}
+                  className="text-xs px-3 py-1.5 rounded-full border border-orange-300 bg-white text-orange-800 font-medium hover:bg-orange-50 disabled:opacity-50">
+                  {b.label}
+                </button>
+              ))}
             </div>
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
               {boMsgs.length === 0 && (

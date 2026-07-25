@@ -12,10 +12,17 @@ import { coll } from "@/lib/firebase";
 
 const SESSION_SECRET = process.env.SESSION_SECRET || "";
 
+// Coaches pinned by Discord ID so they always have CRM access even if the Vercel env
+// (ADMIN_DISCORD_IDS) or their Discord role check is misconfigured. Tyler + Daquan.
+// Randy comes in via RANDY_DISCORD_ID. Anyone with the ROT Coach role is also allowed
+// (see hasCoachRole) — this is the "pin the known coaches too" belt-and-suspenders.
+const PINNED_COACH_IDS = ["1465828992014876834", "694452462676869122"]; // Tyler, Daquan
+
 function adminIdSet(): Set<string> {
   const ids = (process.env.ADMIN_DISCORD_IDS || "")
     .split(",").map(s => s.trim()).filter(Boolean);
   if (process.env.RANDY_DISCORD_ID) ids.push(process.env.RANDY_DISCORD_ID.trim());
+  ids.push(...PINNED_COACH_IDS);
   return new Set(ids);
 }
 
