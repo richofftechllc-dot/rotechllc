@@ -11,8 +11,8 @@ type Msg = { role: "user" | "assistant"; content: string };
 // $300 coach discount cap + attribution. These are the FULL base prices — coaches apply
 // a discount on top; the July promo numbers are the public self-serve links, not these.
 const COACH_SERVICES = [
-  { key: "sec-essential", label: "CompTIA Security+ — Essential", amount: 150000 },
-  { key: "sec-accelerated", label: "CompTIA Security+ — Accelerated", amount: 240000 },
+  { key: "sec-essential", label: "CompTIA Security+ — Essential (voucher + coaching)", amount: 85000 },
+  { key: "sec-selfguided", label: "CompTIA Security+ — Self-Guided (voucher + plan)", amount: 50000 },
   { key: "csa-essential", label: "ServiceNow CSA — Essential", amount: 160000 },
   { key: "csa-accelerated", label: "ServiceNow CSA — Accelerated", amount: 280000 },
   { key: "aws", label: "AWS Cloud Practitioner", amount: 100000 },
