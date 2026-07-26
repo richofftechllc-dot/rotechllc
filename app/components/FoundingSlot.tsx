@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 // item were permanently deleted, so any $96 URL is now dead. Do not reintroduce a $96
 // price here — there is nothing left in Square to charge against it.
 const CHECKOUT_227 = "https://square.link/u/c8X7TC0z";
-// $27/mo founding subscription — a monthly option available through July 27 (then $40/mo).
+// $27/mo founding subscription — a monthly option available through the deal deadline (then $40/mo).
 // Points at our own route that mints a FRESH Square subscription link per click; a raw
 // square.link subscription link binds to its first buyer and freezes on that buyer's
 // confirmation forever. See app/api/checkout/monthly/route.ts.
@@ -79,7 +79,7 @@ export default function FoundingSlot() {
             Join founding — $227/year →
           </a>
 
-          {/* $27/mo — monthly option, available alongside the yearly through July 27. */}
+          {/* $27/mo — monthly option, available alongside the yearly through the deal deadline. */}
           <div className="mt-4 text-gray-400 text-sm">or lock <b className="text-white">$27/month</b> — first 2 months for $27, then $27/mo while active</div>
           <a href={CHECKOUT_27} className="inline-block w-full max-w-xs px-8 py-3 mt-2 border border-orange-500/50 text-orange-300 font-bold text-sm rounded-xl hover:bg-orange-500/10 uppercase tracking-wide">Lock $27 / month →</a>
           {/* Square's checkout shows an "ends Aug 15" note for the 2-for-$27 promo window —
@@ -87,9 +87,9 @@ export default function FoundingSlot() {
           <div className="mt-2 text-gray-500 text-xs max-w-xs mx-auto">Heads up: checkout shows an “ends” date — that’s just the 2-for-$27 promo window. Your membership renews at <b className="text-gray-300">$27/mo</b> after, cancel anytime.</div>
 
           <div className="text-orange-300/90 text-sm font-semibold mt-4">{seatLine}</div>
-          {/* July 27 deadline — both the $227/yr and the $27/mo deal expire then; prices rise after. */}
+          {/* Deal deadline — both the $227/yr and the $27/mo deal expire then; prices rise after. */}
           <div className="mt-3 inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold px-3 py-1.5 rounded-full">
-            ⏳ $227/year &amp; the $27/mo deal are good only through July 27 — new pricing after.
+            ⏳ $227/year &amp; the $27/mo deal are good only through July 28 — new pricing after.
           </div>
           <div className="text-gray-500 text-xs mt-2">Secure checkout via Square · instant access</div>
         </div>

@@ -1,4 +1,7 @@
+"use client";
+import { useEffect, useState } from "react";
 import { LINKS } from "@/lib/links";
+import { DEAL_WINDOW_LABEL } from "@/lib/deal";
 
 // BIRTHDAY DROP — Bo's 30th, live July 26–27, 2026.
 // $727 promo rate ($777.89 with Square's service fee) for a full cert package, plus a
@@ -54,6 +57,16 @@ function included(system: string): string[] {
 }
 
 export default function BirthdayDrop() {
+  // Window label follows the CRM-extendable deadline (GET /api/deal). Falls back to the
+  // compiled-in label so the footer line is never blank.
+  const [windowLabel, setWindowLabel] = useState(DEAL_WINDOW_LABEL);
+  useEffect(() => {
+    fetch("/api/deal")
+      .then((r) => r.json())
+      .then((j) => { if (j?.endLabel) setWindowLabel(`July 26\u2013${String(j.endLabel).replace(/^\w+ /, "")}, 2026`); })
+      .catch(() => {});
+  }, []);
+
   return (
     <section id="bday" className="bg-black py-20 border-t border-white/5 scroll-mt-20">
       <div className="max-w-5xl mx-auto px-6">
@@ -123,7 +136,7 @@ export default function BirthdayDrop() {
         </div>
 
         <p className="text-gray-500 text-sm text-center mt-8">
-          Live July 26–27, 2026. Afterpay available at checkout.
+          Live {windowLabel}. Afterpay available at checkout.
         </p>
       </div>
     </section>
