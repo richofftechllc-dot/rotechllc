@@ -7,6 +7,7 @@ import WatchCarousel from "./components/WatchCarousel";
 import BirthdayBanner from "./components/BirthdayBanner";
 import FoundingSlot from "./components/FoundingSlot";
 import BirthdayDrop from "./components/BirthdayDrop";
+import ResultsWall from "./components/ResultsWall";
 
 async function getMemberCount() {
   try {
@@ -69,6 +70,10 @@ export default async function Home() {
           <div><div className="text-3xl sm:text-5xl font-black text-orange-500">100%</div><div className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2">Virtual &amp; flexible</div></div>
         </div>
       </main>
+
+      {/* RESULTS WALL — real redacted cert passes + quoted job outcomes. Sits right
+          under the drop so the proof lands before the founding pitch. */}
+      <ResultsWall />
 
       {/* FOUNDING — $227/yr founding rate ($375 after the deal deadline). The $96 seat is retired. */}
       <FoundingSlot />
