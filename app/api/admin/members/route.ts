@@ -140,6 +140,11 @@ export async function GET(req: Request) {
         assignedTo: (c.assignedTo as string) || (rac.assignedTo as string) || "",
         notes: (c.crmNotes as string) || (rac.crmNotes as string) || "",
         sentLog: (Array.isArray(c.sentLog) ? c.sentLog : []) as { type?: string; title?: string; detail?: string; at?: string }[],
+        // Birthday Drop coach flags. The bot seeds voucherPurchased on a cert purchase and
+        // sets resumeNeeded when a resume arrives via the Discord intake; coaches toggle
+        // both from the member detail view (/api/admin/member-flags).
+        voucherPurchased: !!c.voucherPurchased,
+        resumeNeeded: !!c.resumeNeeded,
         progress,
       };
     });
@@ -168,6 +173,10 @@ export async function GET(req: Request) {
         tracks: Array.from(new Set(group.flatMap((g) => g.tracks || []))),
         referralCode: group.map((g) => g.referralCode).find(Boolean) || primary.referralCode,
         foundingTier: Math.min(...group.map((g) => g.foundingTier || 1)),
+        // Union the coach flags — a flag set on a duplicate doc must not vanish when the
+        // rows collapse, or a coach would lose sight of an outstanding voucher/resume.
+        voucherPurchased: group.some((g) => g.voucherPurchased),
+        resumeNeeded: group.some((g) => g.resumeNeeded),
       });
     }
 
@@ -209,7 +218,8 @@ export async function GET(req: Request) {
               tracks: [], roles: [], certs: [], phone: "", quizCode: "", accessEndDate: "",
               daysLeft: null, plan: "", referredBy: "", referralEligible: false, referralCode: "",
               foundingTier: 0, purchaseDate: "", rolesAssigned: false, assignedTo: "", notes: "",
-              sentLog: [], progress: { domains: [], done: 0, avg: null, weak: [] },
+              sentLog: [], voucherPurchased: false, resumeNeeded: false,
+              progress: { domains: [], done: 0, avg: null, weak: [] },
             });
           }
         }

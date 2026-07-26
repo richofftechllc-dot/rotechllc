@@ -7,6 +7,9 @@ type Member = {
   tier: string; status: string; paymentStatus: string; invoiced: boolean;
   tracks: string[]; roles: string[]; certs?: string[]; phone?: string; quizCode: string; accessEndDate: string; daysLeft?: number | null; plan?: string; referredBy?: string; rolesAssigned: boolean;
   sentLog?: { type?: string; title?: string; detail?: string; at?: string }[];
+  // Birthday Drop follow-through flags (customers doc) — coach-toggled below.
+  voucherPurchased?: boolean;
+  resumeNeeded?: boolean;
   referralEligible?: boolean;
   referralCode?: string;
   foundingTier?: number;
@@ -284,6 +287,27 @@ export default function AdminCRM() {
     const d = await r.json();
     setResetMsg(s => ({ ...s, [m.email]: d.ok ? `New code: ${d.quizCode}` : `Error: ${d.error}` }));
     if (d.ok) loadMembers();
+  }
+
+  // Birthday Drop coach flags — voucher bought yet, resume still owed. Optimistically
+  // flips the local row so the badge reacts instantly, then reloads from Firestore.
+  async function setFlag(m: Member, flag: "voucherPurchased" | "resumeNeeded", value: boolean) {
+    setMembers(list => list.map(x => (x.id === m.id ? { ...x, [flag]: value } : x)));
+    setActionMsg(s => ({ ...s, [m.email]: "…" }));
+    const r = await fetch("/api/admin/member-flags", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: m.email, [flag]: value }),
+    });
+    const d = await r.json();
+    setActionMsg(s => ({
+      ...s,
+      [m.email]: r.ok && d.ok
+        ? (flag === "voucherPurchased"
+            ? (value ? "✓ Voucher marked PURCHASED" : "✓ Voucher marked NOT PURCHASED")
+            : (value ? "✓ Flagged NEEDS RESUME" : "✓ Resume cleared"))
+        : `Error: ${d.error || r.status}`,
+    }));
+    if (r.ok && d.ok) loadMembers(); else setMembers(list => list.map(x => (x.id === m.id ? { ...x, [flag]: !value } : x)));
   }
 
   // CRM → bot actions (the bot executes these from the botCommands queue).
@@ -910,6 +934,39 @@ export default function AdminCRM() {
                                   {actionMsg[m.email] && <span className="text-[11px] text-gray-600 ml-2">{actionMsg[m.email]}</span>}
                                 </div>
                               )}
+                            </div>
+                            {/* Exam voucher — coach flips this once it's actually bought from GC4L.
+                                Birthday Drop packages include a voucher, and it has to be activated
+                                within 14 days of purchase, so this row is the follow-through check. */}
+                            <div>
+                              <span className="text-gray-400">Exam voucher</span>
+                              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                                <span className={`text-[11px] px-2 py-0.5 rounded font-semibold ${m.voucherPurchased ? "bg-emerald-50 border border-emerald-200 text-emerald-700" : "bg-amber-50 border border-amber-200 text-amber-700"}`}>
+                                  {m.voucherPurchased ? "PURCHASED" : "NOT PURCHASED"}
+                                </span>
+                                <button onClick={() => setFlag(m, "voucherPurchased", !m.voucherPurchased)}
+                                  className="text-[10px] px-2 py-0.5 rounded border border-[#dadce0] text-gray-600 hover:bg-gray-50">
+                                  {m.voucherPurchased ? "Mark not purchased" : "Mark purchased"}
+                                </button>
+                                <a href="https://getcertified4less.com" target="_blank" rel="noopener noreferrer"
+                                  className="text-[10px] px-2 py-0.5 rounded border border-[#dadce0] text-gray-700 hover:bg-gray-50">
+                                  Buy Voucher (GC4L) ↗
+                                </a>
+                              </div>
+                            </div>
+                            {/* Resume — the bot sets this when a resume lands in the Discord intake.
+                                Coach toggles it off after sending the rebuilt ROT-format copy back. */}
+                            <div>
+                              <span className="text-gray-400">Resume</span>
+                              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                                <span className={`text-[11px] px-2 py-0.5 rounded font-semibold ${m.resumeNeeded ? "bg-red-50 border border-red-200 text-red-700" : "bg-gray-100 border border-gray-200 text-gray-600"}`}>
+                                  {m.resumeNeeded ? "NEEDS RESUME" : "Nothing outstanding"}
+                                </span>
+                                <button onClick={() => setFlag(m, "resumeNeeded", !m.resumeNeeded)}
+                                  className="text-[10px] px-2 py-0.5 rounded border border-[#dadce0] text-gray-600 hover:bg-gray-50">
+                                  {m.resumeNeeded ? "Mark sent" : "Flag needs resume"}
+                                </button>
+                              </div>
                             </div>
                             <div><span className="text-gray-400">Roles</span><div className="font-medium">{m.roles?.length ? m.roles.join(", ") : "—"}</div></div>
                             <div><span className="text-gray-400">Certs</span><div className="font-medium">{m.certs?.length ? m.certs.join(", ") : "—"}</div></div>
