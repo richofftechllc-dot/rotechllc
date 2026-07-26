@@ -13,15 +13,21 @@ type Pkg = {
   name: string;
   blurb: string;
   system: string; // the track's quiz/lesson scope
+  regular: string; // the normal Essential-tier price, shown struck through
   href: string;
   cta: string;
 };
 
+// `regular` mirrors the "Regular" column on the July 2026 offer sheet
+// (public/resources/rot-july-2026-offers.html) so the anchor price is the same
+// number everywhere: Security+ Essential $1,500, CSA Essential $1,600. These
+// birthday packages are the Essential tier (voucher + coaching + study plan).
 const PACKAGES: Pkg[] = [
   {
     name: "CompTIA Security+",
     blurb: "The cert that opens cleared and commercial security roles.",
     system: "ROT quiz + lesson system (5 Sec+ domains)",
+    regular: "$1,500",
     href: LINKS.bdaySecPlus,
     cta: "Get Security+ — $727 →",
   },
@@ -29,6 +35,7 @@ const PACKAGES: Pkg[] = [
     name: "ServiceNow CSA",
     blurb: "The fastest lane into platform and admin work.",
     system: "ROT quiz + lesson system (8 CSA modules)",
+    regular: "$1,600",
     href: LINKS.bdayCsa,
     cta: "Get CSA — $727 →",
   },
@@ -68,11 +75,12 @@ export default function BirthdayDrop() {
               <h3 className="text-2xl font-black mb-2">{p.name}</h3>
               <p className="text-gray-400 text-sm mb-6">{p.blurb}</p>
 
-              <div className="flex items-end gap-2 mb-1">
+              <div className="flex items-end gap-3 mb-1">
                 <span className="text-5xl md:text-6xl font-black leading-none">$727</span>
-                <span className="text-gray-400 text-lg mb-1">promo rate</span>
+                <span className="text-gray-500 text-2xl line-through mb-1">{p.regular}</span>
               </div>
               <div className="text-gray-400 text-sm mb-6">
+                Promo rate — normally <span className="line-through">{p.regular}</span>.{" "}
                 <span className="font-bold text-white">$777.89</span> total with service fee.
               </div>
 
@@ -101,8 +109,9 @@ export default function BirthdayDrop() {
           <div>
             <h3 className="text-lg font-bold mb-1">ROT Discord Access</h3>
             <p className="text-gray-400 text-sm">
-              <span className="font-bold text-white">$100</span> for 12 months — the community, the
-              AI tutors, weekly calls, and job drops.
+              <span className="font-bold text-white">$100</span> for 12 months{" "}
+              <span className="line-through">$227</span> — the community, the AI tutors, weekly
+              calls, and job drops.
             </p>
           </div>
           <a
