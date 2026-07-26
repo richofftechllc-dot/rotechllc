@@ -28,6 +28,11 @@ export default async function Home() {
   const memberCount = await getMemberCount();
   return (
     <>
+      {/* BIRTHDAY DROP — headlines the site while the drop is live (July 26–27, 2026).
+          Sits ABOVE the hero on purpose: it's the offer we're driving traffic to this
+          week. Move it back below the hero (or remove it) once the drop closes. */}
+      <BirthdayDrop />
+
       {/* HERO */}
       <main className="max-w-6xl mx-auto px-6 py-16 md:py-24">
         <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -64,9 +69,6 @@ export default async function Home() {
           <div><div className="text-3xl sm:text-5xl font-black text-orange-500">100%</div><div className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2">Virtual &amp; flexible</div></div>
         </div>
       </main>
-
-      {/* BIRTHDAY DROP — this week's headline offer (July 26–27, 2026), above founding. */}
-      <BirthdayDrop />
 
       {/* FOUNDING — $227/yr founding rate ($375 after July 27). The $96 seat is retired. */}
       <FoundingSlot />
