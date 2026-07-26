@@ -6,6 +6,7 @@ import EstimateBuilderTrigger from "./components/EstimateBuilderTrigger";
 import WatchCarousel from "./components/WatchCarousel";
 import BirthdayBanner from "./components/BirthdayBanner";
 import FoundingSlot from "./components/FoundingSlot";
+import BirthdayDrop from "./components/BirthdayDrop";
 
 async function getMemberCount() {
   try {
@@ -63,6 +64,9 @@ export default async function Home() {
           <div><div className="text-3xl sm:text-5xl font-black text-orange-500">100%</div><div className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2">Virtual &amp; flexible</div></div>
         </div>
       </main>
+
+      {/* BIRTHDAY DROP — this week's headline offer (July 26–27, 2026), above founding. */}
+      <BirthdayDrop />
 
       {/* FOUNDING — $227/yr founding rate ($375 after July 27). The $96 seat is retired. */}
       <FoundingSlot />
