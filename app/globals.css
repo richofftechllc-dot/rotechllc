@@ -31,3 +31,39 @@ h1, h2, h3 {
   overflow-wrap: break-word;
   word-break: break-word;
 }
+
+/* ── RESULTS WALL marquee (app/components/ResultsWall.tsx) ──────────────────
+   Two rows of win screenshots drifting in opposite directions over a static
+   background. Pure CSS so there's no JS on the critical path.
+   Each track renders its cards TWICE and translates exactly -50%, so the wrap
+   point lands on an identical frame and the loop looks seamless. */
+.rot-marquee {
+  overflow: hidden;
+  /* Fade both edges so cards enter and leave instead of popping at the border. */
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+.rot-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+.rot-left  { animation: rot-scroll-left  70s linear infinite; }
+.rot-right { animation: rot-scroll-right 70s linear infinite; }
+/* Pause on hover so someone can actually read a score. */
+.rot-marquee:hover .rot-track { animation-play-state: paused; }
+
+@keyframes rot-scroll-left {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+@keyframes rot-scroll-right {
+  from { transform: translate3d(-50%, 0, 0); }
+  to   { transform: translate3d(0, 0, 0); }
+}
+
+/* Motion is decorative — hold the rows still for anyone who asked for less of it. */
+@media (prefers-reduced-motion: reduce) {
+  .rot-left, .rot-right { animation: none; }
+  .rot-marquee { overflow-x: auto; }
+}
