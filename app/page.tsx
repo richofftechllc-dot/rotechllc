@@ -70,7 +70,7 @@ export default async function Home() {
         </div>
       </main>
 
-      {/* FOUNDING — $227/yr founding rate ($375 after July 27). The $96 seat is retired. */}
+      {/* FOUNDING — $227/yr founding rate ($375 after the deal deadline). The $96 seat is retired. */}
       <FoundingSlot />
 
       {/* WHO IT'S FOR — audience paths (cleared / commercial / recruiters / businesses) */}

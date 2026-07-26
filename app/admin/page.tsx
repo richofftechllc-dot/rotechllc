@@ -76,6 +76,12 @@ export default function AdminCRM() {
   const [sopDraft, setSopDraft] = useState<Record<string, string>>({});
   const [newSop, setNewSop] = useState({ title: "", body: "" });
   const [referralPayout, setReferralPayoutState] = useState(20);
+  // Live promo deadline (crmConfig/settings.dealDeadline). The public site reads the same
+  // value through /api/deal, so extending here moves the homepage countdown and every
+  // "ends <date>" line with no deploy.
+  const [dealDeadline, setDealDeadline] = useState<string>("");
+  const [dealEndLabel, setDealEndLabel] = useState<string>("");
+  const [dealMsg, setDealMsg] = useState("");
   const [payoutDraft, setPayoutDraft] = useState("");
   const [payouts, setPayouts] = useState<{ referrer: string; amount: number; method: string; at: string }[]>([]);
   const [vouchers, setVouchers] = useState<{ id: string; code: string; cert: string; expiry?: string; assignedTo?: string; forClient?: string; status: string; source?: string; sentAt?: string; confirmedByCoach?: boolean; confirmedAt?: string; confirmedBy?: string }[]>([]);
@@ -193,7 +199,11 @@ export default function AdminCRM() {
     const r = await fetch("/api/admin/config");
     if (!r.ok) return;
     const d = await r.json();
-    if (d.ok) setReferralPayoutState(d.referralPayout);
+    if (d.ok) {
+      setReferralPayoutState(d.referralPayout);
+      if (d.dealDeadline) setDealDeadline(d.dealDeadline);
+      if (d.dealEndLabel) setDealEndLabel(d.dealEndLabel);
+    }
   }, []);
   const loadPayouts = useCallback(async () => {
     const r = await fetch("/api/admin/referral-payout");
@@ -258,6 +268,33 @@ export default function AdminCRM() {
     await fetch("/api/admin/referral-block", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: m.email, name: m.name, blocked: true }) });
     loadMembers();
   }
+  // Extend (or pull in) the live promo deadline. Days are added to the CURRENT deadline
+  // when it's still in the future, otherwise to now — so clicking "+1 day" the morning
+  // after it lapsed restarts from today instead of landing in the past.
+  async function extendDeal(days: number) {
+    const base = dealDeadline && new Date(dealDeadline).getTime() > Date.now() ? new Date(dealDeadline) : new Date();
+    const next = new Date(base);
+    next.setDate(next.getDate() + days);
+    next.setHours(23, 59, 59, 0);
+    await setDealDate(next.toISOString());
+  }
+
+  async function setDealDate(iso: string) {
+    setDealMsg("…");
+    const r = await fetch("/api/admin/config", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dealDeadline: iso }),
+    });
+    const d = await r.json();
+    if (r.ok && d.ok) {
+      setDealDeadline(d.dealDeadline);
+      setDealEndLabel(d.dealEndLabel);
+      setDealMsg(`✓ Deal now runs through ${d.dealEndLabel} — the site updated`);
+    } else {
+      setDealMsg(`Error: ${d.error || r.status}`);
+    }
+  }
+
   async function savePayout() {
     const v = Number(payoutDraft);
     if (isNaN(v)) return;
@@ -669,6 +706,33 @@ export default function AdminCRM() {
               <div className="text-xs text-gray-500 mt-1">{c.label}</div>
             </div>
           ))}
+        </div>
+
+        {/* LIVE DEAL — the promo window every price on the public site quotes. Extending here
+            writes crmConfig/settings.dealDeadline; the homepage countdown and every
+            "ends <date>" line read it back through /api/deal, so no deploy is needed. */}
+        <div className="bg-white border border-[#dadce0] rounded-xl p-4 mb-6 flex flex-wrap items-center gap-3">
+          <div className="mr-auto">
+            <div className="text-[11px] uppercase tracking-wide text-gray-500">Live deal window</div>
+            <div className="text-lg font-semibold text-[#202124]">
+              Birthday Drop {dealEndLabel ? <>runs through <span className="text-orange-700">{dealEndLabel}</span></> : "— loading…"}
+              {dealDeadline && new Date(dealDeadline).getTime() < Date.now() && (
+                <span className="ml-2 text-xs font-semibold text-red-600 uppercase">closed</span>
+              )}
+            </div>
+            <div className="text-xs text-gray-500 mt-0.5">Sec+ $727 · CSA $727 · Discord 12mo $100. Changing this updates the homepage countdown and Bo instantly.</div>
+          </div>
+          <button onClick={() => extendDeal(1)} className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black font-medium">Extend 1 day</button>
+          <button onClick={() => extendDeal(3)} className="text-xs px-3 py-1.5 rounded-lg border border-[#dadce0] text-gray-700 hover:bg-gray-50 font-medium">Extend 3 days</button>
+          <button onClick={() => extendDeal(7)} className="text-xs px-3 py-1.5 rounded-lg border border-[#dadce0] text-gray-700 hover:bg-gray-50 font-medium">Extend 1 week</button>
+          <input
+            type="date"
+            value={dealDeadline ? new Date(dealDeadline).toISOString().slice(0, 10) : ""}
+            onChange={e => { if (e.target.value) setDealDate(new Date(`${e.target.value}T23:59:59`).toISOString()); }}
+            className="text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500"
+            title="Or pick an exact end date"
+          />
+          {dealMsg && <div className="text-xs text-gray-600 basis-full">{dealMsg}</div>}
         </div>
 
         {/* Tabs */}
@@ -1348,6 +1412,12 @@ export default function AdminCRM() {
             <div className="px-4 py-2 border-b border-[#e8eaed] bg-[#faf7f4] flex flex-wrap items-center gap-2">
               <span className="text-[11px] uppercase tracking-wide text-gray-500">🧾 Quick invoice{expanded ? " (sends for open member)" : " (opens a member = 1-click send)"}:</span>
               {[
+                // BIRTHDAY DROP first — while the drop is live it's the price we lead with,
+                // and it undercuts the Essential tiers below. Labels carry the promo price so
+                // a coach can't quote the old number by accident.
+                { label: "🎂 Sec+ Birthday Drop · $727", svc: "Security+ Birthday Drop ($727 promo, $777.89 with fee)" },
+                { label: "🎂 CSA Birthday Drop · $727", svc: "ServiceNow CSA Birthday Drop ($727 promo, $777.89 with fee)" },
+                { label: "🎂 Discord 12mo · $100", svc: "ROT Discord Access, 12 months ($100 promo)" },
                 { label: "Security+ Essential · $850", svc: "Security+ Essential" },
                 { label: "Security+ Self-Guided · $500", svc: "Security+ Self-Guided" },
                 { label: "ServiceNow CSA Essential", svc: "ServiceNow CSA Essential" },

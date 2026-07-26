@@ -44,7 +44,7 @@ export default async function Pricing() {
     <main className="max-w-6xl mx-auto px-6 py-16">
       <h1 className="text-5xl md:text-7xl font-black text-center mb-4">Everything You Get<br /><span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">Now $227 / Year.</span></h1>
       <p className="text-gray-400 text-center mb-16 max-w-2xl mx-auto">
-        The <b className="text-white">first-100 founding seats ($96) are gone.</b> Membership is now <b className="text-white">$227/year</b> — full access for 12 months, one payment, no recurring surprises. Locked at $227 <b className="text-white">through July 27</b>; $375/year after.
+        The <b className="text-white">first-100 founding seats ($96) are gone.</b> Membership is now <b className="text-white">$227/year</b> — full access for 12 months, one payment, no recurring surprises. Locked at $227 <b className="text-white">through July 28</b>; $375/year after.
       </p>
 
       <div className="border-2 border-orange-500/30 rounded-2xl p-8 md:p-12 relative">
@@ -64,7 +64,7 @@ export default async function Pricing() {
             <a href="/api/checkout/monthly" className="block w-full py-3 border border-orange-500/50 text-orange-400 font-bold rounded-lg hover:bg-orange-500/10">Lock $27 / month</a>
             <div className="text-gray-500 text-[11px] mt-2">Checkout shows an “ends” date — that’s just the 2-for-$27 promo window; it renews at $27/mo after, cancel anytime.</div>
             <div className="text-gray-400 text-sm mt-4">🔒 Founding full — {Math.max(count, 100)} in the community</div>
-            <div className="text-gray-500 text-xs mt-2 italic">Through July 27: <b className="text-gray-300">$227/yr or $27/mo</b> · after: $375/yr or $40/mo.</div>
+            <div className="text-gray-500 text-xs mt-2 italic">Through July 28: <b className="text-gray-300">$227/yr or $27/mo</b> · after: $375/yr or $40/mo.</div>
           </div>
         </div>
       </div>
