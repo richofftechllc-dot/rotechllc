@@ -1,4 +1,5 @@
 import EstimateBuilderTrigger from "../components/EstimateBuilderTrigger";
+import { CHECKOUT, COACH_FALLBACK } from "@/lib/pricing";
 
 async function getMemberCount() {
   try {
@@ -42,9 +43,9 @@ export default async function Pricing() {
   const count = await getMemberCount();
   return (
     <main className="max-w-6xl mx-auto px-6 py-16">
-      <h1 className="text-5xl md:text-7xl font-black text-center mb-4">Everything You Get<br /><span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">Now $227 / Year.</span></h1>
+      <h1 className="text-5xl md:text-7xl font-black text-center mb-4">Everything You Get<br /><span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">Now $375 / Year.</span></h1>
       <p className="text-gray-400 text-center mb-16 max-w-2xl mx-auto">
-        The <b className="text-white">first-100 founding seats ($96) are gone.</b> Membership is now <b className="text-white">$227/year</b> — full access for 12 months, one payment, no recurring surprises. Locked at $227 <b className="text-white">through July 27</b>; $375/year after.
+        Founding is <b className="text-white">closed</b> — all 99 seats gone. Membership is <b className="text-white">$375/year</b> — full access for 12 months, one payment, no recurring surprises. Everyone who joined at a founding rate <b className="text-white">keeps it</b>.
       </p>
 
       <div className="border-2 border-orange-500/30 rounded-2xl p-8 md:p-12 relative">
@@ -54,17 +55,17 @@ export default async function Pricing() {
             {benefits.map(b => <li key={b} className="flex gap-3 text-gray-300"><span className="text-green-500">✓</span>{b}</li>)}
           </ul>
           <div className="bg-zinc-900 border border-white/10 rounded-xl p-8 text-center">
-            <div className="text-7xl font-black text-orange-500">$227</div>
+            <div className="text-7xl font-black text-orange-500">$375</div>
             <div className="text-orange-400 text-xs font-bold tracking-widest uppercase mt-1">Per year · 12 months full access</div>
-            <div className="text-gray-500 text-xs mt-1 mb-6">Founding ($96) sold out · one payment</div>
-            <a href="https://square.link/u/c8X7TC0z" target="_blank" rel="noopener noreferrer" className="block w-full py-4 bg-gradient-to-r from-orange-500 to-red-500 font-bold rounded-lg">Join — $227 / year</a>
+            <div className="text-gray-500 text-xs mt-1 mb-6">Founding closed · one payment · 12 months</div>
+            <a href={CHECKOUT.yearly || COACH_FALLBACK} target="_blank" rel="noopener noreferrer" className="block w-full py-4 bg-gradient-to-r from-orange-500 to-red-500 font-bold rounded-lg">{CHECKOUT.yearly ? "Join — $375 / year" : "Talk to a coach to join"}</a>
             <div className="my-4 flex items-center gap-3 text-gray-600 text-xs"><span className="flex-1 h-px bg-white/10" />or lock monthly<span className="flex-1 h-px bg-white/10" /></div>
-            <div className="text-3xl font-black text-white">$27<span className="text-base font-bold text-gray-400"> / month</span></div>
-            <div className="text-gray-500 text-xs mt-1 mb-3">First 2 months for $27, then $27/mo while active</div>
-            <a href="/api/checkout/monthly" className="block w-full py-3 border border-orange-500/50 text-orange-400 font-bold rounded-lg hover:bg-orange-500/10">Lock $27 / month</a>
-            <div className="text-gray-500 text-[11px] mt-2">Checkout shows an “ends” date — that’s just the 2-for-$27 promo window; it renews at $27/mo after, cancel anytime.</div>
+            <div className="text-3xl font-black text-white">$40<span className="text-base font-bold text-gray-400"> / month</span></div>
+            <div className="text-gray-500 text-xs mt-1 mb-3">$40/mo while active · cancel anytime</div>
+            {CHECKOUT.monthly && (<a href={CHECKOUT.monthly} className="block w-full py-3 border border-orange-500/50 text-orange-400 font-bold rounded-lg hover:bg-orange-500/10">Start — $40 / month</a>)}
+            
             <div className="text-gray-400 text-sm mt-4">🔒 Founding full — {Math.max(count, 100)} in the community</div>
-            <div className="text-gray-500 text-xs mt-2 italic">Through July 27: <b className="text-gray-300">$227/yr or $27/mo</b> · after: $375/yr or $40/mo.</div>
+            <div className="text-gray-500 text-xs mt-2 italic">Locked in at a founding rate? You keep it — <b className="text-gray-300">$227/yr or $27/mo stays yours</b> for as long as you stay active.</div>
           </div>
         </div>
       </div>

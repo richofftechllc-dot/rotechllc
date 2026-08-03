@@ -1,20 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 
-// $227/yr founding checkout — the CURRENT annual rate.
-// DURABLE quick_pay link (reusable — every buyer gets a fresh order, never dies).
-// Do NOT swap this for an `order`-based square.link; those are single-use and bounce
-// to /welcome after the first payment.
-//
-// The old $96/yr seat is RETIRED (2026-07-21): its Square payment links and catalog
-// item were permanently deleted, so any $96 URL is now dead. Do not reintroduce a $96
-// price here — there is nothing left in Square to charge against it.
-const CHECKOUT_227 = "https://square.link/u/c8X7TC0z";
-// $27/mo founding subscription — a monthly option available through July 27 (then $40/mo).
-// Points at our own route that mints a FRESH Square subscription link per click; a raw
-// square.link subscription link binds to its first buyer and freezes on that buyer's
-// confirmation forever. See app/api/checkout/monthly/route.ts.
-const CHECKOUT_27 = "/api/checkout/monthly";
+// Checkout URLs come from lib/pricing.ts alongside the prices they charge.
+// While one is blank we show the price and route buyers to a coach rather than
+// render a button wired to the retired $227/$27 links — those still charge the
+// OLD amounts, and a "$375" button that takes $227 is a chargeback waiting.
+import { PRICING, CHECKOUT, COACH_FALLBACK } from "@/lib/pricing";
 
 type Count = { spotsLeft?: number; soldOut?: boolean };
 
@@ -63,33 +54,33 @@ export default function FoundingSlot() {
           )}
 
           <div className="flex items-end justify-center gap-2 mb-1">
-            <span className="text-6xl md:text-7xl font-black leading-none">$227</span>
+            <span className="text-6xl md:text-7xl font-black leading-none">$375</span>
             <span className="text-gray-400 text-xl mb-2">/year</span>
           </div>
 
-          {/* $375/yr is the post-founding rate — the anchor that makes $227 the deal. */}
+          {/* Founding closed Jul 27 2026. Members who bought in keep their rate. */}
           <div className="text-gray-400 text-sm mb-6">
-            Founding rate — <span className="font-bold text-white">$375/year</span> once founding closes.
+            Founding is closed. Everyone who got in <span className="font-bold text-white">keeps their rate</span>.
           </div>
 
           <a
-            href={CHECKOUT_227}
+            href={CHECKOUT.yearly || COACH_FALLBACK}
             className="inline-block w-full max-w-xs px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-black text-lg rounded-xl hover:opacity-90 uppercase tracking-wide"
           >
-            Join founding — $227/year →
+            {CHECKOUT.yearly ? `Join — $${PRICING.yearly}/year →` : "Talk to a coach to join →"}
           </a>
 
           {/* $27/mo — monthly option, available alongside the yearly through July 27. */}
-          <div className="mt-4 text-gray-400 text-sm">or lock <b className="text-white">$27/month</b> — first 2 months for $27, then $27/mo while active</div>
-          <a href={CHECKOUT_27} className="inline-block w-full max-w-xs px-8 py-3 mt-2 border border-orange-500/50 text-orange-300 font-bold text-sm rounded-xl hover:bg-orange-500/10 uppercase tracking-wide">Lock $27 / month →</a>
-          {/* Square's checkout shows an "ends Aug 15" note for the 2-for-$27 promo window —
-              the membership actually renews at $27/mo after. Set expectations up front. */}
-          <div className="mt-2 text-gray-500 text-xs max-w-xs mx-auto">Heads up: checkout shows an “ends” date — that’s just the 2-for-$27 promo window. Your membership renews at <b className="text-gray-300">$27/mo</b> after, cancel anytime.</div>
+          <div className="mt-4 text-gray-400 text-sm">or go month to month at <b className="text-white">$40/month</b> — cancel anytime</div>
+          {CHECKOUT.monthly && (
+            <a href={CHECKOUT.monthly} className="inline-block w-full max-w-xs px-8 py-3 mt-2 border border-orange-500/50 text-orange-300 font-bold text-sm rounded-xl hover:bg-orange-500/10 uppercase tracking-wide">Start — ${PRICING.monthly} / month →</a>
+          )}
+
 
           <div className="text-orange-300/90 text-sm font-semibold mt-4">{seatLine}</div>
-          {/* July 27 deadline — both the $227/yr and the $27/mo deal expire then; prices rise after. */}
-          <div className="mt-3 inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold px-3 py-1.5 rounded-full">
-            ⏳ $227/year &amp; the $27/mo deal are good only through July 27 — new pricing after.
+          {/* Founding closed Jul 27 2026 — existing members keep their rate for life. */}
+          <div className="mt-3 inline-flex items-center gap-2 bg-white/5 border border-white/15 text-gray-300 text-xs font-bold px-3 py-1.5 rounded-full">
+            Founding closed — members who locked $227/yr or $27/mo keep it.
           </div>
           <div className="text-gray-500 text-xs mt-2">Secure checkout via Square · instant access</div>
         </div>

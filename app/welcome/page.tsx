@@ -1,6 +1,9 @@
 import Image from "next/image";
 
-const FOUNDING_LINK = "https://square.link/u/c8X7TC0z"; // durable $227/yr founding checkout ($96 first-100 sold out)
+// Membership checkout. Comes from lib/pricing.ts so the price and the URL that
+// charges it can never drift apart. Blank until the $375 Square link exists —
+// the old $227 link is NOT reused, it charges the wrong amount.
+import { CHECKOUT, COACH_FALLBACK } from "@/lib/pricing";
 const DISCORD_LINK = "https://discord.gg/dtcYf8PTNa";
 
 // Square appends order/transaction identifiers to the redirect URL after a
@@ -65,15 +68,15 @@ export default async function Welcome({
           </p>
           <div className="mb-12 max-w-xl mx-auto bg-zinc-900 border border-orange-500/30 rounded-xl p-5">
             <p className="text-gray-300 text-sm mb-4">
-              Haven&apos;t locked in yet? Founding Member is a one-time <b className="text-white">$227</b> for 12 months.
+              Haven&apos;t locked in yet? Membership is a one-time <b className="text-white">$375</b> for 12 months.
             </p>
             <a
-              href={FOUNDING_LINK}
+              href={CHECKOUT.yearly || COACH_FALLBACK}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 font-bold rounded-lg"
             >
-              Lock In VIP Access — $227
+              {CHECKOUT.yearly ? "Lock In VIP Access — $375" : "Talk to a coach to join"}
             </a>
           </div>
         </>

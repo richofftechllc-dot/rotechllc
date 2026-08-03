@@ -30,11 +30,11 @@ const FLO_VOICE = `You are Flo, the ServiceNow + process instructor for Rich Off
 
 const SHARED_FACTS = `
 
-ROT facts — JULY 2026 "Bo's 30th Birthday Drop" (hard deadline JULY 27, 2026; founding closes at 100 members). Two clocks always: July 27 + only a few founding spots left.
+ROT facts — AUGUST 2026. The July "Bo's 30th Birthday Drop" is OVER and founding is CLOSED (sold out). Do NOT sell a deadline that has passed and do NOT mention founding spots — there are none. Regular pricing is live and it is not a discount, so sell the value, not urgency.
 
 MEMBERSHIP (Discord all-access — AI tutors, quizzes, job drops, coaching). Founding membership INCLUDES the AWS AI Practitioner quiz track FREE (lessons + practice + labs). Security+ and ServiceNow CSA are SEPARATE paid cert tracks (see below) — they are NOT free with base founding.
-- Founding ($96, first 100) just SOLD OUT. Current founding entry is $227/year → https://square.link/u/c8X7TC0z (good through July 27; after July 27 it becomes $375/year).
-- Monthly: $40/mo. Anyone who locked the $27/mo birthday rate BEFORE July 27 keeps $27/mo for life; anyone joining monthly after July 27 pays $40. ${LINKS.foundingMonthly ? `To start monthly, hand over the $27/mo link → ${LINKS.foundingMonthly}` : `To start monthly, tell them to ask a coach in Discord — do NOT paste a monthly checkout link yourself (the old one is retired).`}
+- Founding is CLOSED (sold out, closed Jul 27 2026). Membership is now $375/year. Anyone who bought at $227/yr or $96 keeps that rate as long as they stay active — say so plainly, it matters to people.
+- Monthly: $40/mo, live now. Anyone who locked the $27/mo birthday rate BEFORE July 27 keeps $27/mo for life; everyone joining now pays $40. ${LINKS.foundingMonthly ? `To start monthly, hand over the $27/mo link → ${LINKS.foundingMonthly}` : `To start monthly, tell them to ask a coach in Discord — do NOT paste a monthly checkout link yourself (the old one is retired).`}
 
 CERTIFICATIONS (Afterpay pay-in-4 — payments as little as $133). Essential = voucher + GUARANTEED PASS (coached till you pass) + coaching. Self-Guided = voucher + plan; recommend adding a retake voucher (+$200 add-on):
 GATING RULE: Essential AND Self-Guided cert tracks are both open to ANYONE — share the checkout links freely when someone wants to buy. Clearance is NEVER a direct checkout — it requires the free qualifier call first.
@@ -50,7 +50,7 @@ CLEARANCE COACHING (birthday cuts, end July 27) — requires the FREE Clearance 
 BOOK A 1-ON-1 CALL: https://www.rotechllc.com/book
 REFERRALS: yearly members earn $50 per referral who ALSO goes yearly (up to $500 cash or $1,000 credit); payouts take up to 5 business days.
 
-YOUR JOB when someone shows interest: name the two clocks, hand them the ONE link that fits (join, yearly, a cert, or the qualifier for clearance), and push them to lock it in before July 27.`;
+YOUR JOB when someone shows interest: hand them the ONE link that fits (join, a cert, or the qualifier for clearance). No fake urgency — founding is gone and July is over. If someone already bought at a founding rate, tell them plainly they keep it.`;
 
 const SHARED_RULES = `
 
@@ -168,7 +168,7 @@ export async function POST(req: Request) {
     const rec = rateLimit.get(ip);
     if (rec && now < rec.reset) {
       if (rec.count >= LIMIT) {
-        return NextResponse.json({ reply: "Slow down. Hit the Founding Member button if you're serious — $227 unlocks the real coaching." });
+        return NextResponse.json({ reply: "Slow down. Hit the membership button if you're serious — $375/year unlocks the real coaching." });
       }
       rec.count++;
     } else {
