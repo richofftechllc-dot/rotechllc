@@ -47,8 +47,21 @@ export default function Nav() {
   return (
     <nav className="sticky top-0 z-40 bg-rot-bg/80 backdrop-blur-xl border-b border-rot-line">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-          <Image src="/bo-avatar.png" alt="ROT" width={36} height={36} className="rounded-full" />
+        {/* The real RT mark, not Bo's face. Bo is a person on the team; the
+            monogram is the company, and the header is the one slot that appears
+            on every page. rot-mark-ink.png is the monogram alone — the master
+            lockup's "RICH OFF TECH" line is 3px tall at this size and turns to
+            mush, so the wordmark is set in type beside it instead.
+            priority: it is above the fold on every route. */}
+        <Link href="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
+          <Image
+            src="/rot-mark-ink.png"
+            alt=""
+            width={34}
+            height={32}
+            priority
+            className="w-[34px] h-auto"
+          />
           <span className="font-semibold tracking-tight text-rot-fg">Rich Off Tech</span>
         </Link>
 

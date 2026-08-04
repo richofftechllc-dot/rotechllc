@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 // TODO Bo: confirm the IG handle + LinkedIn slug below; placeholders if uncertain.
 const SOCIALS = {
@@ -13,8 +14,22 @@ export default function Footer() {
     <footer className="border-t border-rot-line bg-rot-sunken py-12 mt-0">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid md:grid-cols-3 gap-10">
+          {/* The full lockup, large and quiet — the mark signs off the page
+              rather than shouting at the end of it. This replaces the orange
+              text wordmark: the accent is supposed to mean "this costs money",
+              and spending it on a footer heading was the loudest orange on the
+              page sitting furthest from anything you can buy.
+
+              The lockup already sets "RICH OFF TECH", so the line of type that
+              used to sit here would be saying it twice. */}
           <div>
-            <div className="font-black text-xl mb-2"><span className="text-rot-accent">Rich Off Tech</span></div>
+            <Image
+              src="/rot-lockup-ink.png"
+              alt="Rich Off Tech"
+              width={700}
+              height={754}
+              className="w-[132px] h-auto mb-5 opacity-80"
+            />
             <p className="text-rot-faint text-sm leading-relaxed">
               Cleared tech. No shortcuts.<br />
               Community-led pipeline for cleared &amp; aspiring tech professionals.

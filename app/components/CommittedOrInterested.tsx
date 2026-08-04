@@ -50,7 +50,10 @@ export default function CommittedOrInterested() {
 
         <div className="grid md:grid-cols-2 gap-px bg-rot-line border border-rot-line items-stretch">
           {/* ── INTERESTED ─────────────────────────────────────────────── */}
-          <div className="bg-rot-surface p-8 md:p-10 flex flex-col">
+          {/* Ivory + a champagne hairline. Flat white next to the onyx column
+              read as "unstyled", not as "calm" — the warmth and the metal edge
+              make the free side a deliberate choice rather than the leftover. */}
+          <div className="rot-ivory rot-champagne-edge p-8 md:p-10 flex flex-col">
             <div className="rot-kicker mb-5">Interested</div>
             <h3 className="text-3xl md:text-4xl font-semibold mb-4">Look around. For real.</h3>
             <p className="text-rot-muted mb-8 leading-relaxed">
@@ -101,13 +104,21 @@ export default function CommittedOrInterested() {
           </div>
 
           {/* ── COMMITTED ──────────────────────────────────────────────── */}
-          <div className="bg-rot-sunken p-8 md:p-10 flex flex-col relative">
-            <div className="absolute top-8 right-8 rot-kicker text-rot-accent">
+          {/* ONYX. The paid side is the only dark surface on the site, and that
+              is the whole point: on a page made of white marble, the one slab of
+              polished black stone is unmistakably the expensive option. It does
+              the persuading that a grey card was not doing.
+
+              The black cert card in Offers is the same material on purpose —
+              onyx marks the things that cost money. Keep it to those; ordinary
+              sections going dark puts us back at the site Randy rejected. */}
+          <div className="rot-onyx p-8 md:p-10 flex flex-col">
+            <div className="absolute top-8 right-8 rot-kicker !text-rot-accent-2">
               Who Bo works with
             </div>
-            <div className="rot-kicker mb-5 text-rot-accent">Committed</div>
-            <h3 className="text-3xl md:text-4xl font-semibold mb-4">You&apos;re changing your life.</h3>
-            <p className="text-rot-muted mb-8 leading-relaxed">
+            <div className="rot-kicker mb-5 !text-rot-accent-2">Committed</div>
+            <h3 className="text-3xl md:text-4xl font-semibold mb-4 rot-onyx-fg">You&apos;re changing your life.</h3>
+            <p className="rot-onyx-muted mb-8 leading-relaxed">
               You&apos;ve decided. You want the cert, the clearance path, the job — and
               you want somebody in it with you until you get there. Membership is the
               door: get in, meet your coach, and they map the cert track around your
@@ -118,20 +129,26 @@ export default function CommittedOrInterested() {
                 a cert track is a separate decision a coach walks you through once
                 you're in, so putting $1,500 next to $375 here just made the step
                 look bigger than it is. Cert prices live on /certifications. */}
-            <ul className="space-y-3 text-sm text-rot-muted mb-8">
-              <li className="flex gap-2"><span className="text-rot-accent shrink-0">—</span><span>A coach who knows your name and what you&apos;re working toward</span></li>
-              <li className="flex gap-2"><span className="text-rot-accent shrink-0">—</span><span>Bo Tech and the quiz engine — your AI tutor, in your Discord, at 3 AM</span></li>
-              <li className="flex gap-2"><span className="text-rot-accent shrink-0">—</span><span>Resume rebuilt in ROT format, and the recruiter roster</span></li>
-              <li className="flex gap-2"><span className="text-rot-accent shrink-0">—</span><span>Weekly calls and job drops Mon/Wed/Fri</span></li>
+            {/* Dashes use accent-2 (#ff7a00), not accent (#e8451f). The darker
+                brand red clears 4.5:1 on white but not on onyx; the brighter
+                orange does, and at this size it is the difference between a
+                legible list marker and a smudge. */}
+            <ul className="space-y-3 text-sm rot-onyx-muted mb-8">
+              <li className="flex gap-2"><span className="text-rot-accent-2 shrink-0">—</span><span>A coach who knows your name and what you&apos;re working toward</span></li>
+              <li className="flex gap-2"><span className="text-rot-accent-2 shrink-0">—</span><span>Bo Tech and the quiz engine — your AI tutor, in your Discord, at 3 AM</span></li>
+              <li className="flex gap-2"><span className="text-rot-accent-2 shrink-0">—</span><span>Resume rebuilt in ROT format, and the recruiter roster</span></li>
+              <li className="flex gap-2"><span className="text-rot-accent-2 shrink-0">—</span><span>Weekly calls and job drops Mon/Wed/Fri</span></li>
             </ul>
 
-            <div className="border-y border-rot-line py-6 mb-8">
+            {/* Hairlines here must be the onyx pair — --rot-line is a dark ink
+                wash that vanishes completely on black. */}
+            <div className="border-y border-rot-onyx-line py-6 mb-8">
               <div className="flex items-end justify-center gap-2">
-                <span className="text-5xl font-semibold leading-none tracking-tight">{money(PRICING.yearly)}</span>
-                <span className="text-rot-muted mb-1">/year</span>
+                <span className="text-5xl font-semibold leading-none tracking-tight rot-onyx-fg">{money(PRICING.yearly)}</span>
+                <span className="rot-onyx-muted mb-1">/year</span>
               </div>
-              <div className="text-rot-muted text-sm text-center mt-2">or {money(PRICING.monthly)}/month — cancel anytime</div>
-              <div className="text-rot-accent text-xs font-semibold text-center mt-2">Save {money(YEARLY_SAVING)} a year by paying yearly</div>
+              <div className="rot-onyx-muted text-sm text-center mt-2">or {money(PRICING.monthly)}/month — cancel anytime</div>
+              <div className="text-rot-accent-2 text-xs font-semibold text-center mt-2">Save {money(YEARLY_SAVING)} a year by paying yearly</div>
             </div>
 
             <div className="mt-auto flex flex-col gap-3">
@@ -141,7 +158,7 @@ export default function CommittedOrInterested() {
               >
                 I&apos;m committed — start here →
               </a>
-              <a href="/help#agents" className="rot-btn-ghost w-full px-6 py-3 text-sm">
+              <a href="/help#agents" className="rot-btn-ghost-onyx w-full px-6 py-3 text-sm">
                 Not sure which track? Talk to an agent — free
               </a>
             </div>
