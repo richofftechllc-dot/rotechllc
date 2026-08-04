@@ -90,6 +90,22 @@ export const CERTS = {
   discordAccess: { price: 375, url: "https://square.link/u/ThiCFqpM", name: "ROT Discord Access" },
 } as const;
 
+// ─── THE REST OF THE CATALOG ─────────────────────────────────────────────────
+// Security+ and ServiceNow CSA are the flagships and the only two with self-serve
+// checkout — they are what people actually buy. Everything below is coached too,
+// but priced per person by a coach, so these entries deliberately carry NO price
+// and NO checkout link. Do not invent either: a cert with a made-up price on the
+// site is a chargeback, and a made-up Square link takes money the bot cannot route.
+//
+// "Anything you can sit online" is the real offer. This list is the recognisable
+// names, not the limit.
+export const CERT_CATALOG: Array<{ group: string; certs: string[] }> = [
+  { group: "CompTIA", certs: ["Network+", "A+", "CySA+", "PenTest+", "CASP+ / SecX", "Linux+", "Cloud+", "Project+"] },
+  { group: "Cloud", certs: ["AWS Cloud Practitioner", "AWS Solutions Architect", "AZ-900", "AZ-104", "Google Cloud Digital Leader"] },
+  { group: "ServiceNow", certs: ["CSA", "CAD (App Developer)", "CIS — ITSM", "CIS — CSM"] },
+  { group: "Project & governance", certs: ["PMP", "CAPM", "CISA", "CISM", "CISSP", "ITIL 4"] },
+];
+
 // ─── COACH INVOICE MENU ──────────────────────────────────────────────────────
 // FULL base prices a coach invoices from — they may apply a discount on top (the
 // bot enforces the $300 cap). Amounts are CENTS to match Square and the bot.
