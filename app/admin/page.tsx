@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback, Fragment } from "react";
 import Image from "next/image";
 import { CERTS, COACH_SERVICES, money } from "@/lib/pricing";
+import type { Lead } from "../api/admin/leads/route";
 
 type Member = {
   id: string; email: string; name: string; discordTag: string; discordId: string;
@@ -62,7 +63,7 @@ const CALL_PILL: Record<string, string> = {
 
 export default function AdminCRM() {
   const [authed, setAuthed] = useState<"loading" | "yes" | "no">("loading");
-  const [tab, setTab] = useState<"home" | "followups" | "members" | "calls" | "schedule" | "referrals" | "team" | "bo" | "sops" | "resources" | "vouchers">("home");
+  const [tab, setTab] = useState<"home" | "followups" | "members" | "calls" | "schedule" | "referrals" | "team" | "bo" | "sops" | "resources" | "vouchers" | "leads">("home");
   const [chat, setChat] = useState<{ id: string; authorId: string; authorName: string; text: string; createdAt: string }[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [boMsgs, setBoMsgs] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
@@ -130,6 +131,11 @@ export default function AdminCRM() {
   const [adminCodeErr, setAdminCodeErr] = useState("");
   const [bookFor, setBookFor] = useState<string | null>(null);
   const [bookCoach, setBookCoach] = useState<Record<string, string>>({});
+  // Site lead forms (interested / cohort / AI waitlist). Read-only: leads are NOT
+  // customers and must never be counted as such.
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [leadKind, setLeadKind] = useState<string>("all");
+  const [leadHideConverted, setLeadHideConverted] = useState(true);
   const [bookSlot, setBookSlot] = useState<Record<string, string>>({});
   const [bookTopic, setBookTopic] = useState<Record<string, string>>({});
 
@@ -207,6 +213,12 @@ export default function AdminCRM() {
     if (!r.ok) return;
     const d = await r.json();
     if (d.ok) setPayouts(d.payouts);
+  }, []);
+  const loadLeads = useCallback(async () => {
+    const r = await fetch("/api/admin/leads");
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d.ok) setLeads(d.leads);
   }, []);
   const loadVouchers = useCallback(async () => {
     const r = await fetch("/api/admin/vouchers");
@@ -521,7 +533,7 @@ export default function AdminCRM() {
     if (d.ok) loadFollowups();
   }
 
-  useEffect(() => { loadMembers(); loadFollowups(); loadSchedule(); loadCalls(); loadChat(); loadCatalog(); loadBookings(); loadSops(); loadConfig(); loadPayouts(); loadVouchers(); loadIgDrafts(); }, [loadMembers, loadFollowups, loadSchedule, loadCalls, loadChat, loadCatalog, loadBookings, loadSops, loadConfig, loadPayouts, loadVouchers]);
+  useEffect(() => { loadMembers(); loadFollowups(); loadSchedule(); loadCalls(); loadChat(); loadCatalog(); loadBookings(); loadSops(); loadConfig(); loadPayouts(); loadVouchers(); loadLeads(); loadIgDrafts(); }, [loadMembers, loadFollowups, loadSchedule, loadCalls, loadChat, loadCatalog, loadBookings, loadSops, loadConfig, loadPayouts, loadVouchers, loadLeads]);
   // Live-ish team chat: refresh every 8s while the Team tab is open.
   useEffect(() => {
     if (tab !== "team") return;
@@ -656,6 +668,7 @@ export default function AdminCRM() {
     { id: "sops", label: "SOPs" },
     { id: "resources", label: "Resources" },
     { id: "vouchers", label: "Vouchers" },
+    { id: "leads", label: "Leads" },
     { id: "referrals", label: "Referrals" },
   ];
   const tierOptions = Array.from(new Set(members.map(m => m.tier).filter(Boolean))).sort();
@@ -1484,6 +1497,76 @@ export default function AdminCRM() {
         )}
 
         {/* ── Vouchers ── */}
+        {tab === "leads" && (
+          <div>
+            <div className="bg-white border border-[#dadce0] rounded-xl p-4 mb-5">
+              <div className="font-semibold text-sm mb-1">📥 Site leads</div>
+              <p className="text-xs text-gray-500 mb-3">
+                Everyone who filled in a form on rotechllc.com — the Interested side of the home page,
+                the cohort waitlist, and the AI waitlist. These were being written to Firestore for
+                months with no view and no working notification, so some of them have never been
+                contacted. A lead is <b>not</b> a member and is never counted as one.
+              </p>
+              <div className="flex flex-wrap gap-2 items-center">
+                <select value={leadKind} onChange={e => setLeadKind(e.target.value)} className="text-xs border border-[#dadce0] rounded-lg px-2.5 py-2">
+                  <option value="all">All sources</option>
+                  {Array.from(new Set(leads.map(l => l.kind))).sort().map(k => <option key={k} value={k}>{k}</option>)}
+                </select>
+                <label className="text-xs text-gray-600 flex items-center gap-1.5">
+                  <input type="checkbox" checked={leadHideConverted} onChange={e => setLeadHideConverted(e.target.checked)} />
+                  Hide the ones who already bought
+                </label>
+                <button onClick={loadLeads} className="text-xs px-3 py-2 rounded-lg border border-[#dadce0] hover:bg-gray-50">Refresh</button>
+                <span className="text-xs text-gray-500 ml-auto">
+                  {leads.filter(l => !l.converted).length} not yet converted · {leads.length} total
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-white border border-[#dadce0] rounded-xl overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-[#f8f9fa] text-[11px] uppercase tracking-wide text-gray-500">
+                  <tr>
+                    <th className="text-left px-4 py-2.5">Name</th>
+                    <th className="text-left px-4 py-2.5">Contact</th>
+                    <th className="text-left px-4 py-2.5">Source</th>
+                    <th className="text-left px-4 py-2.5">When</th>
+                    <th className="text-left px-4 py-2.5">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {leads
+                    .filter(l => leadKind === "all" || l.kind === leadKind)
+                    .filter(l => !leadHideConverted || !l.converted)
+                    .map(l => (
+                      <tr key={l.id} className="border-t border-[#e8eaed] hover:bg-[#f8f9fa]">
+                        <td className="px-4 py-2.5 font-medium">{l.name || <span className="text-gray-400">—</span>}</td>
+                        <td className="px-4 py-2.5">
+                          {l.email && <a href={`mailto:${l.email}`} className="text-blue-700 hover:underline">{l.email}</a>}
+                          {l.email && l.phone && <span className="text-gray-300 mx-1.5">·</span>}
+                          {l.phone && <a href={`tel:${l.phone}`} className="text-blue-700 hover:underline">{l.phone}</a>}
+                          {!l.email && !l.phone && <span className="text-gray-400">—</span>}
+                        </td>
+                        <td className="px-4 py-2.5 text-gray-600">{l.kind}{l.cohort ? ` · ${l.cohort}` : ""}</td>
+                        <td className="px-4 py-2.5 text-gray-500 whitespace-nowrap">
+                          {l.createdAt ? new Date(l.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—"}
+                        </td>
+                        <td className="px-4 py-2.5">
+                          {l.converted
+                            ? <span className="text-[11px] font-semibold uppercase tracking-wide text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5">Bought</span>
+                            : <span className="text-[11px] font-semibold uppercase tracking-wide text-orange-700 bg-orange-50 border border-orange-200 rounded-full px-2 py-0.5">Follow up</span>}
+                        </td>
+                      </tr>
+                    ))}
+                  {leads.filter(l => leadKind === "all" || l.kind === leadKind).filter(l => !leadHideConverted || !l.converted).length === 0 && (
+                    <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-500 text-xs">No leads here.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {tab === "vouchers" && (
           <div>
             <div className="bg-white border border-[#dadce0] rounded-xl p-4 mb-5">
