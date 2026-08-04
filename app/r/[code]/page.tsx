@@ -46,7 +46,7 @@ export default function ReferralLanding() {
           <>
             {referrer && <div className="inline-block text-xs px-3 py-1 rounded-full bg-orange-500/15 text-orange-400 border border-orange-500/30 mb-3">Referred by {referrer}</div>}
             <h1 className="text-2xl font-black mb-2">Membership — $200/year</h1>
-            <p className="text-gray-400 text-sm mb-4">Referred rate. Everyone else pays $375 — or $27/mo instead of $40.</p>
+            <p className="text-gray-400 text-sm mb-4">Referred rate — $175 off. Everyone else pays $375.</p>
             <p className="text-gray-400 mb-5">Full access for 12 months: community, AI tutors, the quiz/study engine (Security+, ServiceNow CSA, AWS AI), weekly calls, and job drops.</p>
             <label className="block text-xs uppercase tracking-wider text-gray-400 mb-2">Your email</label>
             <input

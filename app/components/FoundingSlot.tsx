@@ -70,7 +70,7 @@ export default function FoundingSlot() {
             {CHECKOUT.yearly ? `Join — $${PRICING.yearly}/year →` : "Talk to a coach to join →"}
           </a>
 
-          {/* $27/mo — monthly option, available alongside the yearly through July 27. */}
+          {/* $40/mo monthly. $27/mo is grandfathered only — never shown or sold. */}
           <div className="mt-4 text-gray-400 text-sm">or go month to month at <b className="text-white">$40/month</b> — cancel anytime</div>
           {CHECKOUT.monthly && (
             <a href={CHECKOUT.monthly} className="inline-block w-full max-w-xs px-8 py-3 mt-2 border border-orange-500/50 text-orange-300 font-bold text-sm rounded-xl hover:bg-orange-500/10 uppercase tracking-wide">Start — ${PRICING.monthly} / month →</a>

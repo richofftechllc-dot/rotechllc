@@ -52,42 +52,25 @@ export const money = (n: number) => `$${n.toLocaleString("en-US")}`;
 // The bot already routes 37500 and 4000 cents in AMOUNT_ROUTES, so roles, quiz
 // codes and welcome emails fire automatically the moment those amounts land.
 export const CHECKOUT = {
-  // ── ROOT CAUSE FOUND AND FIXED (Aug 3 2026) ────────────────────────────
-  // The first four links all charged 6% Virginia sales tax on top, because
-  // Square's "Virginia (22307)" tax had "Apply tax to custom amounts" ON.
-  // Payment links built as "Take a payment / Exact amount" ARE custom amounts.
-  // Catalog items (the certs, sold as "Sell an item") were never affected.
+  // All three created AFTER the tax fix and each one verified on its live
+  // checkout page — subtotal and order total identical, no tax line.
   //
-  // That toggle is now OFF — Dashboard → Settings → Payments → Sales taxes →
-  // Virginia (22307) → "Apply tax to custom amounts".
-  //
-  // BUT it only applies to links created AFTER the change. A link bakes its
-  // tax into its order at creation time, so the four originals are still
-  // taxed and are being replaced.
-  //
-  // PROVEN CLEAN — this one was created after the fix and its live checkout
-  // reads Subtotal $375.00 / Order total $375.00 with no tax line at all:
-  yearly: "https://square.link/u/j2eiFThn", // $375.00 · one-time · VERIFIED CLEAN
+  // The tax cause, for the record: Square's "Virginia (22307)" tax had
+  // "Apply tax to custom amounts" ON, and payment links built as
+  // "Take a payment / Exact amount" ARE custom amounts. Catalog items (the
+  // certs) were never affected. That toggle is now OFF. It only applies to
+  // links created after the change, which is why the first four were binned.
+  yearly: "https://square.link/u/j2eiFThn", // $375.00 · one-time · verified
+  monthly: "https://square.link/u/FM2S5MP0", // $40.00 · monthly · verified
+  referralYearly: "https://square.link/u/rUwkBEdc", // $200.00 · one-time · verified
 
-  // ── STILL TO RECREATE ──────────────────────────────────────────────────
-  // These three still point at the ORIGINAL taxed links. Recreate each one in
-  // Square (Payment links → Create link → Take a payment → Exact amount) and
-  // paste the new URL here. They will come out clean automatically now.
-  //
-  //   monthly         $40  · Frequency: Monthly
-  //   referralYearly  $200 · Frequency: One-time
-  //   referralMonthly $27  · Frequency: Monthly
-  //
-  // Old taxed links, kept only so the buttons are not dead in the meantime.
-  // DELETE them in Square once replaced so nobody can pay the taxed amount:
-  monthly: "https://square.link/u/wlZPawtu", // $40 → charges $42.40 ⚠️ TAXED
-  referralYearly: "https://square.link/u/EGus1VxS", // $200 → charges $212.00 ⚠️ TAXED
-  referralMonthly: "https://square.link/u/JysS1vqh", // $27 → charges $28.62 ⚠️ TAXED
+  // NO $27 LINK ON PURPOSE. $27/mo is grandfathered only — it belongs to
+  // people already paying it as of Aug 3 2026 and their existing Square
+  // subscriptions are untouched. It is not sold, not linked, and not shown
+  // anywhere on the site. Public pricing is $40/mo and $375/yr; $200/yr is
+  // what a member's referral link offers.
+  referralMonthly: "",
 } as const;
-
-// The taxed amounts do not match AMOUNT_ROUTES (4000 / 20000 / 2700), so a
-// payment through any of the three above provisions NOTHING — no role, no quiz
-// code, no welcome email. The yearly link is clean and safe to ship.
 
 export const CHECKOUT_LIVE = Boolean(CHECKOUT.yearly || CHECKOUT.monthly);
 export const REFERRAL_LIVE = Boolean(CHECKOUT.referralYearly || CHECKOUT.referralMonthly);
