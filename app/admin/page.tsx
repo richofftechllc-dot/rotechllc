@@ -1547,7 +1547,10 @@ export default function AdminCRM() {
                           {l.phone && <a href={`tel:${l.phone}`} className="text-blue-700 hover:underline">{l.phone}</a>}
                           {!l.email && !l.phone && <span className="text-gray-400">—</span>}
                         </td>
-                        <td className="px-4 py-2.5 text-gray-600">{l.kind}{l.cohort ? ` · ${l.cohort}` : ""}</td>
+                        <td className="px-4 py-2.5 text-gray-600">
+                          {l.kind}{l.cohort ? ` · ${l.cohort}` : ""}
+                          {l.cert && <span className="ml-1.5 text-[11px] font-semibold uppercase tracking-wide text-blue-700 bg-blue-50 border border-blue-200 rounded-full px-2 py-0.5">{l.cert}</span>}
+                        </td>
                         <td className="px-4 py-2.5 text-gray-500 whitespace-nowrap">
                           {l.createdAt ? new Date(l.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—"}
                         </td>
