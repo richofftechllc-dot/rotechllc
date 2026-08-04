@@ -1,4 +1,4 @@
-import { CERTS, money } from "@/lib/pricing";
+import { CERTS, CERT_FROM_PRICE, money } from "@/lib/pricing";
 
 // OFFERS — the paid cert tracks and the Discord-only add-on, at regular rates.
 //
@@ -87,12 +87,12 @@ export default function Offers({ showDiscord = true }: { showDiscord?: boolean }
     <section id="offers" className="bg-black py-20 border-t border-white/5 scroll-mt-20">
       <div className="max-w-5xl mx-auto px-6">
         <div className="text-center mb-10">
-          <div className="text-orange-500 font-bold tracking-widest text-sm mb-4">BEST SELLERS</div>
-          <h2 className="text-4xl md:text-5xl font-black mb-3">Our two best sellers.</h2>
+          <div className="text-orange-500 font-bold tracking-widest text-sm mb-4">CERTIFICATIONS · FROM {money(CERT_FROM_PRICE)}</div>
+          <h2 className="text-4xl md:text-5xl font-black mb-3">Certifications, coached.</h2>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            Security+ and ServiceNow CSA are what most people come to us for. Voucher,
-            quiz engine, study plan, resume rebuild, and a year in the Discord — one
-            price, no upsells. We coach plenty more; these are the two you can buy right
+            Coached packages start at {money(CERT_FROM_PRICE)} — voucher, quiz engine,
+            study plan, resume rebuild, and a year in the Discord. We coach any cert you
+            can sit online; these two are our best sellers and the two you can buy right
             now.
           </p>
         </div>
@@ -132,7 +132,12 @@ export default function Offers({ showDiscord = true }: { showDiscord?: boolean }
 
         {showDiscord && <div className="mt-6"><DiscordAccessCard /></div>}
 
-        <p className="text-gray-500 text-sm text-center mt-8">
+        <p className="text-gray-400 text-center mt-8">
+          <a href="/certifications" className="text-orange-400 font-bold hover:text-orange-300">
+            Network+, PMP, CASP+, CySA+, CISSP and the rest — see every cert we coach →
+          </a>
+        </p>
+        <p className="text-gray-500 text-sm text-center mt-3">
           Afterpay available at checkout.
         </p>
       </div>
