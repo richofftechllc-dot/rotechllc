@@ -31,6 +31,10 @@ export const PRICING = {
 
 export const money = (n: number) => `$${n.toLocaleString("en-US")}`;
 
+/** What a member saves by paying yearly instead of monthly. Derived, never typed:
+ *  12 x $40 = $480 against $375, so $105. If either rate moves this follows. */
+export const YEARLY_SAVING = PRICING.monthly * 12 - PRICING.yearly;
+
 // ─── CHECKOUT ────────────────────────────────────────────────────────────────
 // A link here MUST charge the amount shown next to it. The old $227 quick_pay
 // (square.link/u/c8X7TC0z) and the $27/mo subscription are still live in Square

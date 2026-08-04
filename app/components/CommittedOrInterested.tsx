@@ -1,5 +1,5 @@
 import InterestedCapture from "./InterestedCapture";
-import { PRICING, money } from "@/lib/pricing";
+import { PRICING, YEARLY_SAVING, money } from "@/lib/pricing";
 
 // THE FORK — the first thing on the home page, above the hero.
 //
@@ -131,6 +131,7 @@ export default function CommittedOrInterested() {
                 <span className="text-rot-muted mb-1">/year</span>
               </div>
               <div className="text-rot-muted text-sm text-center mt-2">or {money(PRICING.monthly)}/month — cancel anytime</div>
+              <div className="text-rot-accent text-xs font-semibold text-center mt-2">Save {money(YEARLY_SAVING)} a year by paying yearly</div>
             </div>
 
             <div className="mt-auto flex flex-col gap-3">

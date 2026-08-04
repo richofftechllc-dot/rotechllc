@@ -67,24 +67,47 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── MARBLE ───────────────────────────────────────────────────────────────────
-   Soft stone, not a photo. Layered wide radial gradients drift the value across
-   the page so large flat areas aren't dead, plus two faint diagonal veins. Fixed
-   so it behaves like a slab the content moves over rather than a tiling texture.
-   Costs nothing: no image request, no JS. */
+/* ── MARBLE FLOOR ─────────────────────────────────────────────────────────────
+   Real veining, not a tint. An SVG fractalNoise turbulence is displaced and
+   pushed through a steep colour matrix, which is what actually produces stone —
+   soft cloudy fields broken by hard thin veins. Baked to a data URI so it costs
+   one decode and zero requests; a marble JPG would be ~400KB and still tile.
+
+   Three stacked layers, bottom to top: the stone itself, a warm wash so it reads
+   as honed limestone rather than grey granite, and a gloss sweep so the surface
+   looks polished and lit from the upper left rather than flat.
+
+   Fixed, so the content moves over the slab instead of dragging it. */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-color: var(--rot-bg);
+  background-image:
+    /* gloss: a wide specular sweep across the slab */
+    linear-gradient(112deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.15) 26%, rgba(255,255,255,0) 42%, rgba(255,255,255,0.28) 62%, rgba(255,255,255,0) 78%),
+    /* warmth + a whisper of brand in the stone */
+    radial-gradient(1100px 800px at 85% 6%, rgba(232,69,31,0.05), transparent 60%),
+    radial-gradient(900px 900px at 8% 96%, rgba(28,22,16,0.07), transparent 62%),
+    /* the stone */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.045' numOctaves='6' seed='7' result='n'/%3E%3CfeDisplacementMap in='n' in2='n' scale='38' xChannelSelector='R' yChannelSelector='G' result='d'/%3E%3CfeColorMatrix in='d' type='matrix' values='0 0 0 0 0.94 0 0 0 0 0.925 0 0 0 0 0.90 0 0 0 -1.35 1.06'/%3E%3C/filter%3E%3Crect width='900' height='900' filter='url(%23m)'/%3E%3C/svg%3E");
+  background-size: cover, cover, cover, 900px 900px;
+  background-repeat: no-repeat, no-repeat, no-repeat, repeat;
+  opacity: 1;
+}
+
+/* Polished-floor reflection under the fold: a soft sheen that keeps large empty
+   bands from going dead flat. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: auto 0 0 0;
+  height: 45vh;
   z-index: -1;
   pointer-events: none;
-  background:
-    radial-gradient(1200px 800px at 12% -5%, rgba(255, 255, 255, 0.55), transparent 58%),
-    radial-gradient(900px 700px at 88% 8%, rgba(232, 69, 31, 0.045), transparent 62%),
-    radial-gradient(1000px 900px at 70% 105%, rgba(28, 22, 16, 0.075), transparent 60%),
-    linear-gradient(118deg, transparent 42%, rgba(28, 22, 16, 0.028) 43%, transparent 44%),
-    linear-gradient(101deg, transparent 71%, rgba(28, 22, 16, 0.022) 72%, transparent 73%),
-    var(--rot-bg);
+  background: linear-gradient(to top, rgba(255,255,255,0.5), rgba(255,255,255,0) 70%);
 }
 
 h1, h2, h3 {
@@ -109,9 +132,13 @@ h1, h2, h3 {
 /* Card: white on marble, lifted by a whisper of shadow rather than a border
    alone — on a light ground a border-only card looks like a table cell. */
 .rot-card {
-  background: var(--rot-surface);
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.86));
+  backdrop-filter: blur(8px);
   border: 1px solid var(--rot-line);
-  box-shadow: 0 1px 2px rgba(28, 22, 16, 0.04), 0 8px 24px -12px rgba(28, 22, 16, 0.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 1px 2px rgba(28, 22, 16, 0.04),
+    0 8px 24px -12px rgba(28, 22, 16, 0.10);
   transition: box-shadow 220ms ease, transform 220ms ease, border-color 220ms ease;
 }
 .rot-card:hover {
@@ -216,4 +243,75 @@ h1, h2, h3 {
 @media (prefers-reduced-motion: reduce) {
   .rot-left, .rot-right { animation: none; }
   .rot-marquee { overflow-x: auto; }
+}
+
+/* ── ORBIT (app/components/Orbit.tsx) ─────────────────────────────────────────
+   Platform wordmarks circling Bo. Rings spin; each chip counter-spins at the
+   same duration so its text stays upright while it travels — that trick is the
+   whole effect, and it costs no JS per frame. */
+.rot-orbit-core {
+  width: 132px;
+  height: 132px;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #ffffff, #f4f1ec);
+  border: 1px solid var(--rot-line);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 18px 44px -18px rgba(28,22,16,0.35);
+}
+
+.rot-orbit-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: calc(-1 * var(--half, 0px));
+  transform-origin: center;
+  border-radius: 9999px;
+  border: 1px dashed var(--rot-line);
+  translate: -50% -50%;
+  animation-name: rot-orbit-spin;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.rot-orbit-slot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+}
+
+.rot-orbit-chip {
+  position: absolute;
+  translate: -50% -50%;
+  white-space: nowrap;
+  padding: 0.4rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--rot-fg);
+  background: linear-gradient(180deg, #ffffff, #f7f5f1);
+  border: 1px solid var(--rot-line);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 8px 20px -12px rgba(28,22,16,0.35);
+  animation-name: rot-orbit-spin;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  cursor: default;
+}
+
+@keyframes rot-orbit-spin {
+  from { rotate: 0deg; }
+  to   { rotate: 360deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rot-orbit-ring, .rot-orbit-chip { animation: none; }
+}
+
+@media (max-width: 640px) {
+  .rot-orbit-chip { font-size: 0.6875rem; padding: 0.3rem 0.6rem; }
+  .rot-orbit-core { width: 108px; height: 108px; }
 }

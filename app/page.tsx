@@ -1,4 +1,5 @@
 import BoAvatarFlip from "./components/BoAvatarFlip";
+import Orbit from "./components/Orbit";
 import Reveal from "./components/Reveal";
 import CommittedOrInterested from "./components/CommittedOrInterested";
 // BirthdayBanner retired Aug 2 2026 — the drop ended Jul 27 and the countdown
@@ -68,7 +69,13 @@ export default async function Home() {
             </Reveal>
             <p className="text-rot-faint text-sm mt-6">Free to join — or grab <a href="#founding" className="text-rot-fg underline underline-offset-4 decoration-rot-line-strong hover:decoration-rot-fg">full membership</a> below. 🤎</p>
           </div>
-          <BoAvatarFlip />
+          <Reveal delay={120}>
+            <Orbit />
+            <p className="text-rot-faint text-xs text-center mt-6 max-w-sm mx-auto leading-relaxed">
+              We prepare you for these platforms&apos; certifications. ROT is not affiliated
+              with, endorsed by, or partnered with any of them.
+            </p>
+          </Reveal>
         </div>
       </main>
 
