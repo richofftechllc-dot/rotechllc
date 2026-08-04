@@ -1,5 +1,6 @@
 import { getAuthedAdmin } from "@/lib/admin";
 import { coll } from "@/lib/firebase";
+import { COACH_SERVICES } from "@/lib/pricing";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -10,13 +11,9 @@ type Msg = { role: "user" | "assistant"; content: string };
 // request ("invoice X for CSA Essential") onto one of these keys; the bot enforces the
 // $300 coach discount cap + attribution. These are the FULL base prices — coaches apply
 // a discount on top; the July promo numbers are the public self-serve links, not these.
-const COACH_SERVICES = [
-  { key: "sec-essential", label: "CompTIA Security+ — Essential (voucher + coaching)", amount: 85000 },
-  { key: "sec-selfguided", label: "CompTIA Security+ — Self-Guided (voucher + plan)", amount: 50000 },
-  { key: "csa-essential", label: "ServiceNow CSA — Essential", amount: 160000 },
-  { key: "csa-accelerated", label: "ServiceNow CSA — Accelerated", amount: 280000 },
-  { key: "aws", label: "AWS Cloud Practitioner", amount: 100000 },
-];
+// COACH_SERVICES comes from lib/pricing.ts. This file used to carry its own copy
+// saying Security+ Essential was $850 while the CRM button said $1,500 — same coach,
+// same client, two different prices depending on which one they used.
 
 // --- live member lookup -----------------------------------------------------
 // The roster string handed in from the CRM is truncated and lossy — Bo kept telling

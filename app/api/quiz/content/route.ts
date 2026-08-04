@@ -3,6 +3,7 @@ import { coll } from "@/lib/firebase";
 import { getAuthedAdmin } from "@/lib/admin";
 import { allowedPrefixes } from "@/lib/access";
 import { TRACKS, LESSONS, LIVE_SESSION } from "@/lib/quizData";
+import { CERTS, PRICING, CHECKOUT, COACH_FALLBACK, money } from "@/lib/pricing";
 import crypto from "crypto";
 
 export const runtime = "nodejs";
@@ -14,11 +15,17 @@ export const dynamic = "force-dynamic";
 // (role-based, via getAuthedAdmin) get all three tracks.
 const SESSION_SECRET = process.env.SESSION_SECRET || "";
 
-// Upgrade-card copy for locked tracks. Buy links are the durable member-only cert links.
+// Upgrade-card copy for locked tracks.
+//
+// Aug 4 2026: these were hardcoded at $901 / $1,113 / $227-yr against three dead
+// URLs — Lh7MBczC, Gas5gOVh, and c8X7TC0z (the retired founding checkout, which is
+// still live in Square and still charges $227 for a $375 membership). A locked-track
+// upsell was quoting prices the rest of the site had already replaced and taking
+// payment at the old amount. Everything now comes from lib/pricing.ts.
 const LOCKED_META: Record<string, { name: string; price: string; blurb: string; buyUrl: string }> = {
-  sp:  { name: "CompTIA Security+", price: "$901", blurb: "Voucher + guaranteed-pass coaching. Unlocks the full Security+ quiz track.", buyUrl: "https://square.link/u/Lh7MBczC" },
-  csa: { name: "ServiceNow CSA", price: "$1,113", blurb: "Voucher + retake + coaching. Unlocks the full ServiceNow CSA quiz track.", buyUrl: "https://square.link/u/Gas5gOVh" },
-  ai:  { name: "AWS AI Practitioner", price: "$227/yr", blurb: "Join founding to unlock the AWS AI track — free with membership.", buyUrl: "https://square.link/u/c8X7TC0z" },
+  sp:  { name: CERTS.securityPlus.name, price: money(CERTS.securityPlus.price), blurb: "Voucher + guaranteed-pass coaching. Unlocks the full Security+ quiz track.", buyUrl: CERTS.securityPlus.url },
+  csa: { name: CERTS.csa.name, price: money(CERTS.csa.price), blurb: "Voucher + retake + coaching. Unlocks the full ServiceNow CSA quiz track.", buyUrl: CERTS.csa.url },
+  ai:  { name: "AWS AI Practitioner", price: `${money(PRICING.yearly)}/yr`, blurb: "The AWS AI track is included with membership — join to unlock it.", buyUrl: CHECKOUT.yearly || COACH_FALLBACK },
 };
 
 function verify(token: string | undefined): { kind: "code"; code: string } | { kind: "discord"; userId: string } | null {

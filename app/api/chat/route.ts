@@ -3,6 +3,7 @@ import { coll } from "@/lib/firebase";
 import { getAuthedCode } from "@/lib/session";
 import { LESSONS } from "@/lib/quizData";
 import { LINKS } from "@/lib/links";
+import { CERTS, PRICING, money } from "@/lib/pricing";
 
 // Strip a lesson's HTML to plain text so Bo can be grounded in it via the system prompt.
 function lessonToText(html: string): string {
@@ -33,15 +34,18 @@ const SHARED_FACTS = `
 ROT facts — AUGUST 2026. The July "Bo's 30th Birthday Drop" is OVER and founding is CLOSED (sold out). Do NOT sell a deadline that has passed and do NOT mention founding spots — there are none. Regular pricing is live and it is not a discount, so sell the value, not urgency.
 
 MEMBERSHIP (Discord all-access — AI tutors, quizzes, job drops, coaching). Founding membership INCLUDES the AWS AI Practitioner quiz track FREE (lessons + practice + labs). Security+ and ServiceNow CSA are SEPARATE paid cert tracks (see below) — they are NOT free with base founding.
-- Founding is CLOSED (sold out, closed Jul 27 2026). Membership is now $375/year. Anyone who bought at $227/yr or $96 keeps that rate as long as they stay active — say so plainly, it matters to people.
-- Monthly: $40/mo, live now. Anyone who locked the $27/mo birthday rate BEFORE July 27 keeps $27/mo for life; everyone joining now pays $40. ${LINKS.foundingMonthly ? `To start monthly, hand over the $40/mo link → ${LINKS.foundingMonthly}` : `To start monthly, tell them to ask a coach in Discord.`} NEVER hand out a $27/mo link — that rate is grandfathered to existing members only and is not for sale.
+- Founding is CLOSED (sold out, closed Jul 27 2026). Membership IS the Discord access and it is now ${money(PRICING.yearly)}/year. Anyone who bought at ${money(PRICING.legacy.foundingYearly)}/yr or ${money(PRICING.legacy.firstHundred)} keeps that rate as long as they stay active — say so plainly, it matters to people.
+- Monthly: ${money(PRICING.monthly)}/mo, live now. Anyone who locked the ${money(PRICING.legacy.foundingMonthly)}/mo birthday rate BEFORE July 27 keeps it for life; everyone joining now pays ${money(PRICING.monthly)}. ${LINKS.foundingMonthly ? `To start monthly, hand over the ${money(PRICING.monthly)}/mo link → ${LINKS.foundingMonthly}` : `To start monthly, tell them to ask a coach in Discord.`} NEVER hand out a ${money(PRICING.legacy.foundingMonthly)}/mo link — that rate is grandfathered to existing members only and is not for sale.
 
 CERTIFICATIONS. The Birthday Drop is CLOSED, so these are the live prices — quote them as the price, not as a discount off something. Afterpay pay-in-4 - payments as little as $133. Essential = voucher + GUARANTEED PASS (coached till you pass) + coaching. Self-Guided = voucher + plan; recommend adding a retake voucher (+$200 add-on):
 GATING RULE: Essential AND Self-Guided cert tracks are both open to ANYONE — share the checkout links freely when someone wants to buy. Clearance is NEVER a direct checkout — it requires the free qualifier call first.
-- ServiceNow CSA Essential (voucher + GUARANTEED PASS + coaching): $1,050 (reg $1,600) → https://square.link/u/Gas5gOVh
-- ServiceNow CSA Self-Guided (anyone): $600 (reg $1,000) → https://square.link/u/R6wQFhgo
-- Security+ Essential (voucher + GUARANTEED PASS + coaching): $850 (reg $1,500) → https://square.link/u/Lh7MBczC
+- ${CERTS.csa.name} (voucher + GUARANTEED PASS + coaching): ${money(CERTS.csa.price)} → ${CERTS.csa.url}
+- ServiceNow CSA Self-Guided (anyone): $600 → https://square.link/u/R6wQFhgo
+- ${CERTS.securityPlus.name} (voucher + GUARANTEED PASS + coaching): ${money(CERTS.securityPlus.price)} → ${CERTS.securityPlus.url}
 - Security+ Self-Guided (anyone): $500 → https://square.link/u/Hv53MUYx
+- ${CERTS.discordAccess.name} on its own, 12 months: ${money(CERTS.discordAccess.price)} → ${CERTS.discordAccess.url}
+These are the live prices. Quote them AS the price, never as a discount off a higher
+number and never with a deadline attached — there is no sale running.
 
 CLEARANCE COACHING — requires the FREE Clearance Qualifier call FIRST, no instant checkout:
 - Secret $3,600 (10% off) · TS $4,250 (15% off) · TS/SCI $4,400 (20% off)
@@ -168,7 +172,7 @@ export async function POST(req: Request) {
     const rec = rateLimit.get(ip);
     if (rec && now < rec.reset) {
       if (rec.count >= LIMIT) {
-        return NextResponse.json({ reply: "Slow down. Hit the membership button if you're serious — $375/year unlocks the real coaching." });
+        return NextResponse.json({ reply: `Slow down. Hit the membership button if you're serious — ${money(PRICING.yearly)}/year unlocks the real coaching.` });
       }
       rec.count++;
     } else {

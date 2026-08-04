@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback, Fragment } from "react";
 import Image from "next/image";
+import { CERTS, COACH_SERVICES, money } from "@/lib/pricing";
 
 type Member = {
   id: string; email: string; name: string; discordTag: string; discordId: string;
@@ -23,14 +24,10 @@ type Followup = {
 };
 type Schedule = { id?: string; discordId: string; name: string; days: Record<string, string>; note?: string; updatedAt?: string };
 type Call = { id: string; title: string; date: string | null; type?: string; summary?: string; actionItems?: string; keywords?: string; participants: string[]; grade: string; transcriptUrl: string; gradedAt: number | null };
-// Coach-invoice programs (mirror coachinvoice.SERVICES in the bot). Click one to invoice.
-const COACH_SERVICES = [
-  { key: "sec-essential", label: "Security+ Essential", amount: 150000 },
-  { key: "sec-accelerated", label: "Security+ Accelerated", amount: 240000 },
-  { key: "csa-essential", label: "CSA Essential", amount: 160000 },
-  { key: "csa-accelerated", label: "CSA Accelerated", amount: 280000 },
-  { key: "aws", label: "AWS Cloud Practitioner", amount: 100000 },
-];
+// Coach-invoice programs come from lib/pricing.ts COACH_SERVICES, which the bot
+// mirrors in prices.js. "Security+ Accelerated" ($240,000c) was dropped: it existed
+// only in this file — not in the bot menu and not in AMOUNT_ROUTES — so invoicing it
+// took the money and provisioned nothing.
 // Canonical access tracks — the clean set to toggle a member into. $40/mo =
 // "General Access" only; cert tracks are add-ons. Existing docs may hold legacy labels
 // (e.g. "Security+ + ServiceNow CSA + AWS AI Practitioner") — the editor surfaces those
@@ -713,14 +710,16 @@ export default function AdminCRM() {
             "ends <date>" line read it back through /api/deal, so no deploy is needed. */}
         <div className="bg-white border border-[#dadce0] rounded-xl p-4 mb-6 flex flex-wrap items-center gap-3">
           <div className="mr-auto">
-            <div className="text-[11px] uppercase tracking-wide text-gray-500">Live deal window</div>
+            <div className="text-[11px] uppercase tracking-wide text-gray-500">Promo window</div>
             <div className="text-lg font-semibold text-[#202124]">
-              Birthday Drop {dealEndLabel ? <>runs through <span className="text-orange-700">{dealEndLabel}</span></> : "— loading…"}
-              {dealDeadline && new Date(dealDeadline).getTime() < Date.now() && (
-                <span className="ml-2 text-xs font-semibold text-red-600 uppercase">closed</span>
-              )}
+              {dealDeadline && new Date(dealDeadline).getTime() < Date.now()
+                ? <>No promo running <span className="ml-2 text-xs font-semibold text-red-600 uppercase">closed</span></>
+                : dealEndLabel ? <>Runs through <span className="text-orange-700">{dealEndLabel}</span></> : "— loading…"}
             </div>
-            <div className="text-xs text-gray-500 mt-0.5">Sec+ $727 · CSA $727 · Discord 12mo $100. Changing this updates the homepage countdown and Bo instantly.</div>
+            {/* Was "Birthday Drop ... Sec+ $727 · CSA $727 · Discord 12mo $100" — that
+                promo closed Jul 27 2026 and nothing on the public site reads this window
+                any more, so quoting dead prices here only misleads a coach. */}
+            <div className="text-xs text-gray-500 mt-0.5">Live prices: Sec+ {money(CERTS.securityPlus.price)} · CSA {money(CERTS.csa.price)} · Discord 12mo {money(CERTS.discordAccess.price)}. Extending re-opens the window for the next drop.</div>
           </div>
           <button onClick={() => extendDeal(1)} className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black font-medium">Extend 1 day</button>
           <button onClick={() => extendDeal(3)} className="text-xs px-3 py-1.5 rounded-lg border border-[#dadce0] text-gray-700 hover:bg-gray-50 font-medium">Extend 3 days</button>
@@ -1412,15 +1411,16 @@ export default function AdminCRM() {
             <div className="px-4 py-2 border-b border-[#e8eaed] bg-[#faf7f4] flex flex-wrap items-center gap-2">
               <span className="text-[11px] uppercase tracking-wide text-gray-500">🧾 Quick invoice{expanded ? " (sends for open member)" : " (opens a member = 1-click send)"}:</span>
               {[
-                // BIRTHDAY DROP first — while the drop is live it's the price we lead with,
-                // and it undercuts the Essential tiers below. Labels carry the promo price so
-                // a coach can't quote the old number by accident.
-                { label: "🎂 Sec+ Birthday Drop · $727", svc: "Security+ Birthday Drop ($727 promo, $777.89 with fee)" },
-                { label: "🎂 CSA Birthday Drop · $727", svc: "ServiceNow CSA Birthday Drop ($727 promo, $777.89 with fee)" },
-                { label: "🎂 Discord 12mo · $100", svc: "ROT Discord Access, 12 months ($100 promo)" },
-                { label: "Security+ Essential · $850", svc: "Security+ Essential" },
+                // The three "🎂 Birthday Drop" buttons ($727 / $727 / $100) were removed
+                // Aug 4 2026. The drop closed Jul 27 and Square was repriced, so a coach
+                // clicking one invoiced a promo that no longer exists at an amount the bot
+                // could not route — money in, no access out. Prices come from CERTS now so
+                // this menu cannot drift from the catalog again.
+                { label: `Security+ Essential · ${money(CERTS.securityPlus.price)}`, svc: "Security+ Essential" },
                 { label: "Security+ Self-Guided · $500", svc: "Security+ Self-Guided" },
-                { label: "ServiceNow CSA Essential", svc: "ServiceNow CSA Essential" },
+                { label: `ServiceNow CSA Essential · ${money(CERTS.csa.price)}`, svc: "ServiceNow CSA Essential" },
+                { label: "ServiceNow CSA Self-Guided · $600", svc: "ServiceNow CSA Self-Guided" },
+                { label: `ROT Discord Access 12mo · ${money(CERTS.discordAccess.price)}`, svc: "ROT Discord Access, 12 months" },
                 { label: "AWS Cloud Practitioner", svc: "AWS Cloud Practitioner" },
               ].map(b => (
                 <button key={b.svc} onClick={() => certQuick(b.svc)} disabled={boBusy}
@@ -1626,7 +1626,7 @@ export default function AdminCRM() {
             <div className="grid sm:grid-cols-2 gap-3">
               {[
                 { title: "ROT Content Engine Workshop — Clip It, Caption It, Post It", tag: "Community Session · Follow-Along", desc: "The 1-hour hands-on session: connect Opus Clip to Claude, turn one long video into captioned clips by talking to AI, plus the bulk/automation level-ups. Has the pre-work checklist — send it to members BEFORE the session so they come ready.", path: "/resources/rot-content-engine-workshop.html" },
-                { title: "ROT July 2026 Offers", tag: "July Promo · Bo's 30th Birthday Drop", desc: "The full July offer sheet — membership, ServiceNow CSA, Security+ ($850), and the clearance birthday-drop pricing, plus the referral program. Client-facing — send it to a warm lead or pull it up on a call.", path: "/resources/rot-july-2026-offers.html" },
+                { title: "ROT July 2026 Offers (ARCHIVED)", tag: "Archive · not live pricing", desc: "The July campaign sheet, kept as a dated record. Its prices are RETIRED — do NOT send this to a lead. Live pricing is on rotechllc.com/certifications.", path: "/resources/rot-july-2026-offers.html" },
                 { title: "ServiceNow CSA — Study Plan + PDI Setup", tag: "ServiceNow · Client Study Plan", desc: "The full CSA roadmap: free PDI setup, the exam domains, a 30/60/90-day plan with study hours, and exam-day tips. Send to any CSA client.", path: "/resources/rot-csa-study-plan.html" },
                 { title: "Security+ — Study Plan", tag: "CompTIA · Client Study Plan", desc: "The Security+ (SY0-701) roadmap: the 5 domains with weights, a 30/60/90-day plan with study hours, acronym drills, and PBQ exam tips. Send to any Sec+ client.", path: "/resources/rot-secplus-study-plan.html" },
                 { title: "AWS AI Practitioner — Study Plan", tag: "AWS · Client Study Plan", desc: "The AIF-C01 roadmap (founding members get this track): the 5 exam domains, a 30/60/90-day plan with study hours, the AWS service map, and what's proven to pass fast. Send to any AWS AI client.", path: "/resources/rot-aws-ai-study-plan.html" },

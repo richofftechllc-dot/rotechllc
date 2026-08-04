@@ -1,4 +1,4 @@
-import { LINKS } from "@/lib/links";
+import { CERTS, money } from "@/lib/pricing";
 
 // OFFERS — the paid cert tracks and the Discord-only add-on, at regular rates.
 //
@@ -23,22 +23,24 @@ type Pkg = {
   cta: string;
 };
 
+// Prices and URLs both come from CERTS — nothing is retyped here, so a Square
+// reprice is one edit in lib/pricing.ts and the whole site follows.
 const PACKAGES: Pkg[] = [
   {
-    name: "CompTIA Security+",
+    name: CERTS.securityPlus.name,
     blurb: "The cert that opens cleared and commercial security roles.",
     system: "ROT quiz + lesson system (5 Sec+ domains)",
-    price: "$1,500",
-    href: LINKS.certSecPlus,
-    cta: "Get Security+ — $1,500 →",
+    price: money(CERTS.securityPlus.price),
+    href: CERTS.securityPlus.url,
+    cta: `Get Security+ — ${money(CERTS.securityPlus.price)} →`,
   },
   {
-    name: "ServiceNow CSA",
+    name: CERTS.csa.name,
     blurb: "The fastest lane into platform and admin work.",
     system: "ROT quiz + lesson system (8 CSA modules)",
-    price: "$1,600",
-    href: LINKS.certCsa,
-    cta: "Get CSA — $1,600 →",
+    price: money(CERTS.csa.price),
+    href: CERTS.csa.url,
+    cta: `Get CSA — ${money(CERTS.csa.price)} →`,
   },
 ];
 
@@ -59,20 +61,22 @@ export function DiscordAccessCard() {
   return (
     <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h3 className="text-lg font-bold mb-1">ROT Discord Access</h3>
+        <h3 className="text-lg font-bold mb-1">{CERTS.discordAccess.name}</h3>
         <p className="text-gray-400 text-sm">
-          <span className="font-bold text-white">$375</span> for 12 months — the community,
-          the AI tutors, weekly calls, and job drops. No exam voucher, no cert track.
+          <span className="font-bold text-white">{money(CERTS.discordAccess.price)}</span> for
+          12 months — the community, the AI tutors, weekly calls, and job drops. No exam
+          voucher, no cert track.
         </p>
       </div>
-      {/* A $40/mo Discord option is pending: no Square subscription plan exists for this
-          product yet, so there is deliberately no monthly button here. Do not point one
-          at CHECKOUT.monthly — that link is the MEMBERSHIP subscription, not this. */}
+      {/* Membership IS Discord access, so the $40/mo membership subscription is the
+          monthly option — same provisioning ('founding' + General Access) on the bot
+          side. Shown as a secondary line rather than a second button so the 12-month
+          price stays the headline. */}
       <a
-        href={LINKS.discordAccess}
+        href={CERTS.discordAccess.url}
         className="shrink-0 text-center px-6 py-3 border border-orange-500/50 text-orange-300 font-bold text-sm rounded-xl hover:bg-orange-500/10 uppercase tracking-wide"
       >
-        Get Discord access — $375 →
+        Get Discord access — {money(CERTS.discordAccess.price)} →
       </a>
     </div>
   );
