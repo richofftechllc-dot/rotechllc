@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { coll, IS_PROD } from "@/lib/firebase";
+import { coll } from "@/lib/firebase";
+import { notifyLead } from "@/lib/notifyLead";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,32 +23,6 @@ function normalizeEmail(raw: string): string | null {
   // address over a clever regex costs more than storing a bad one.
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return null;
   return email;
-}
-
-async function notifyDiscord(name: string, email: string, id: string) {
-  const url = process.env.DISCORD_LEADS_WEBHOOK;
-  if (!url) return;
-  try {
-    await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        content: `👀 **New interested lead**${name ? ` — **${name}**` : ""}`,
-        embeds: [{
-          title: "Interested (not committed)",
-          color: 0x60A5FA,
-          fields: [
-            { name: "Name", value: name || "—", inline: true },
-            { name: "Email", value: email, inline: true },
-          ],
-          footer: { text: `ID: ${id}${IS_PROD ? "" : " · TEST"}` },
-          timestamp: new Date().toISOString(),
-        }],
-      }),
-    });
-  } catch {
-    /* non-fatal — a webhook hiccup must never lose the lead */
-  }
 }
 
 export async function POST(req: NextRequest) {
@@ -79,7 +54,7 @@ export async function POST(req: NextRequest) {
       userAgent: req.headers.get("user-agent") || "",
     });
 
-    await notifyDiscord(name, email, ref.id);
+    await notifyLead({ title: "New interested lead", source: "home-interested-fork", id: ref.id, name, email, note: "Interested, not committed — free side of the home fork." });
 
     return NextResponse.json({ ok: true, id: ref.id });
   } catch (e) {

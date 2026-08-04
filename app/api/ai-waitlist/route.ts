@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { coll, IS_PROD } from "@/lib/firebase";
+import { notifyLead } from "@/lib/notifyLead";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,31 +14,8 @@ function normalizePhone(raw: string): string | null {
   return null;
 }
 
-async function notifyDiscord(name: string, phone: string, id: string) {
-  const url = process.env.DISCORD_LEADS_WEBHOOK;
-  if (!url) return;
-  try {
-    await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        content: `🚀 **New AI waitlist lead**${name ? ` — **${name}**` : ""}`,
-        embeds: [{
-          title: "rotechllc.com/ai waitlist",
-          color: 0x2F7BFF,
-          fields: [
-            { name: "Name", value: name || "—", inline: true },
-            { name: "Phone", value: phone, inline: true },
-          ],
-          footer: { text: `ID: ${id}${IS_PROD ? "" : " · TEST"}` },
-          timestamp: new Date().toISOString(),
-        }],
-      }),
-    });
-  } catch {
-    /* non-fatal */
-  }
-}
+// Was a local DISCORD_LEADS_WEBHOOK post. That env var has never been set in
+// production, so this notified nobody. See lib/notifyLead.ts.
 
 export async function POST(req: NextRequest) {
   try {
@@ -67,7 +45,7 @@ export async function POST(req: NextRequest) {
       userAgent: req.headers.get("user-agent") || "",
     });
 
-    await notifyDiscord(name, phone, ref.id);
+    await notifyLead({ title: "New AI waitlist lead", source: "ai-waitlist", id: ref.id, name, phone, note: "rotechllc.com/ai waitlist" });
 
     return NextResponse.json({ ok: true, id: ref.id });
   } catch (e) {
