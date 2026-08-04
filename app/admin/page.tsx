@@ -1558,6 +1558,9 @@ export default function AdminCRM() {
                           {l.converted
                             ? <span className="text-[11px] font-semibold uppercase tracking-wide text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5">Bought</span>
                             : <span className="text-[11px] font-semibold uppercase tracking-wide text-orange-700 bg-orange-50 border border-orange-200 rounded-full px-2 py-0.5">Follow up</span>}
+                          {!l.emailQueued && !l.converted && (
+                            <span className="ml-1.5 text-[11px] font-semibold uppercase tracking-wide text-gray-600 bg-gray-100 border border-gray-200 rounded-full px-2 py-0.5" title="No auto-email went out for this lead">No email sent</span>
+                          )}
                         </td>
                       </tr>
                     ))}
