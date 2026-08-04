@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { coll } from "@/lib/firebase";
 import { notifyLead } from "@/lib/notifyLead";
+import { sendLeadEmail } from "@/lib/leadEmail";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -47,8 +48,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, already: true });
     }
 
+    const emailQueued = await sendLeadEmail({ kind: "cert-request", email, name, cert });
+
     const ref = await coll("certRequests").add({
       cert,
+      // False whenever no sender is configured — see lib/leadEmail.ts.
+      emailQueued,
       // Stored lowercase alongside the original so the de-dupe query above is
       // exact-match — Firestore has no case-insensitive where().
       certLower: cert.toLowerCase(),

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { coll } from "@/lib/firebase";
 import { notifyLead } from "@/lib/notifyLead";
+import { sendLeadEmail, freeResources } from "@/lib/leadEmail";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -42,14 +43,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, already: true });
     }
 
+    // Hand the guides off to the Zap BEFORE writing, so the record can record
+    // truthfully whether mail was actually queued rather than assuming it.
+    const origin = new URL(req.url).origin;
+    const emailQueued = await sendLeadEmail({ kind: "interested", email, name, resources: freeResources(origin) });
+
     const ref = await coll("interestedLeads").add({
       name,
       email,
       source: "home-interested-fork",
-      // No mail send is wired for this list yet. Store the lead now; flip
-      // emailSent when a sequence actually exists, so nobody is silently
-      // marked as contacted.
-      emailSent: false,
+      // False whenever no sender is configured, so nobody is ever falsely
+      // marked as contacted. See lib/leadEmail.ts.
+      emailQueued,
       createdAt: new Date().toISOString(),
       userAgent: req.headers.get("user-agent") || "",
     });

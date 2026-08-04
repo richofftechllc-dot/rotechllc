@@ -33,6 +33,8 @@ export type Lead = {
   createdAt: string;
   /** True once a customers doc exists for this email — they converted. */
   converted: boolean;
+  /** Whether an auto-email was actually handed to the sender. */
+  emailQueued: boolean;
 };
 
 export async function GET(req: Request) {
@@ -72,6 +74,7 @@ export async function GET(req: Request) {
           cert: String(v.cert || ""),
           createdAt: String(v.createdAt || ""),
           converted: !!email && paidEmails.has(email),
+          emailQueued: v.emailQueued === true,
         });
       });
     }
