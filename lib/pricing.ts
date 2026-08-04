@@ -99,6 +99,12 @@ export const CERTS = {
 //
 // "Anything you can sit online" is the real offer. This list is the recognisable
 // names, not the limit.
+// The "from" price for coached certification packages. Security+ and CSA are the two
+// with instant checkout, but they are options among many and leading with $1,500 makes
+// the whole category look like that. $1,000 is the AWS Cloud Practitioner full track in
+// COACH_SERVICES, which is the entry point for a coached package.
+export const CERT_FROM_PRICE = 1000;
+
 export const CERT_CATALOG: Array<{ group: string; certs: string[] }> = [
   { group: "CompTIA", certs: ["Network+", "A+", "CySA+", "PenTest+", "CASP+ / SecX", "Linux+", "Cloud+", "Project+"] },
   { group: "Cloud", certs: ["AWS Cloud Practitioner", "AWS Solutions Architect", "AZ-900", "AZ-104", "Google Cloud Digital Leader"] },

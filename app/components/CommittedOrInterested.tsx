@@ -1,5 +1,5 @@
 import InterestedCapture from "./InterestedCapture";
-import { CERTS, PRICING, money } from "@/lib/pricing";
+import { PRICING, money } from "@/lib/pricing";
 
 // THE FORK — the first thing on the home page, above the hero.
 //
@@ -8,9 +8,13 @@ import { CERTS, PRICING, money } from "@/lib/pricing";
 // nobody should be shamed for sitting there. COMMITTED is who he actually works
 // with, and it costs money.
 //
-// Both sides are a genuine offer. The interested column is not a paywall teaser
-// with the value removed; those study plans and the FAQ are the same documents a
-// paying member gets pointed at. The honesty is the conversion mechanism.
+// Both sides are a genuine offer. The interested column is not a paywall teaser —
+// the AWS AI plan, the FAQ and how-it-works are the real documents, not trailers.
+// The two cert roadmaps are NOT here; they are paid product. The honesty is the
+// conversion mechanism, which is exactly why the free things have to be real.
+//
+// COMMITTED IS MEMBERSHIP ONLY. Cert prices belong on /certifications and in the
+// Offers section — one other place on the home page, not three.
 //
 // Prices come from lib/pricing.ts. Nothing is retyped here.
 
@@ -52,7 +56,7 @@ export default function CommittedOrInterested() {
             <p className="text-gray-400 mb-6">
               You&apos;re curious, you&apos;re researching, you&apos;re not ready to spend
               money. Good — don&apos;t. Come in free, read everything, ask questions,
-              and take the study plans with you whether you ever pay us or not.
+              and take the guides with you whether you ever pay us or not.
             </p>
 
             <ul className="space-y-2 text-sm text-gray-300 mb-6">
@@ -105,21 +109,28 @@ export default function CommittedOrInterested() {
             <h3 className="text-2xl md:text-3xl font-black mb-3">You&apos;re changing your life.</h3>
             <p className="text-gray-400 mb-6">
               You&apos;ve decided. You want the cert, the clearance path, the job — and
-              you want somebody in it with you until you get there. This is the side
-              that costs money, and it&apos;s the side we actually coach.
+              you want somebody in it with you until you get there. Membership is the
+              door: get in, meet your coach, and they map the cert track around your
+              life from there.
             </p>
 
+            {/* Membership is the ONLY thing on this side. Committing means joining —
+                a cert track is a separate decision a coach walks you through once
+                you're in, so putting $1,500 next to $375 here just made the step
+                look bigger than it is. Cert prices live on /certifications. */}
             <ul className="space-y-2 text-sm text-gray-300 mb-6">
-              <li className="flex gap-2"><span className="text-orange-400 shrink-0">✓</span><span>A coach who knows your name and your exam date</span></li>
-              <li className="flex gap-2"><span className="text-orange-400 shrink-0">✓</span><span>Your exam voucher and a 30/60/90-day plan built around your life</span></li>
+              <li className="flex gap-2"><span className="text-orange-400 shrink-0">✓</span><span>A coach who knows your name and what you&apos;re working toward</span></li>
+              <li className="flex gap-2"><span className="text-orange-400 shrink-0">✓</span><span>Bo Tech and the quiz engine — your AI tutor, in your Discord, at 3 AM</span></li>
               <li className="flex gap-2"><span className="text-orange-400 shrink-0">✓</span><span>Resume rebuilt in ROT format, and the recruiter roster</span></li>
-              <li className="flex gap-2"><span className="text-orange-400 shrink-0">✓</span><span><b className="text-white">Guaranteed pass</b> — we keep coaching you until you do</span></li>
+              <li className="flex gap-2"><span className="text-orange-400 shrink-0">✓</span><span>Weekly calls and job drops Mon/Wed/Fri</span></li>
             </ul>
 
-            <div className="bg-black/40 border border-white/10 rounded-xl p-4 mb-6 text-sm">
-              <div className="flex justify-between py-1"><span className="text-gray-400">Membership</span><span className="font-bold">{money(PRICING.yearly)}/yr · {money(PRICING.monthly)}/mo</span></div>
-              <div className="flex justify-between py-1 border-t border-white/5"><span className="text-gray-400">{CERTS.securityPlus.name}</span><span className="font-bold">{money(CERTS.securityPlus.price)}</span></div>
-              <div className="flex justify-between py-1 border-t border-white/5"><span className="text-gray-400">{CERTS.csa.name}</span><span className="font-bold">{money(CERTS.csa.price)}</span></div>
+            <div className="bg-black/40 border border-white/10 rounded-xl p-4 mb-6">
+              <div className="flex items-end justify-center gap-2">
+                <span className="text-4xl font-black leading-none">{money(PRICING.yearly)}</span>
+                <span className="text-gray-400 mb-0.5">/year</span>
+              </div>
+              <div className="text-gray-400 text-sm text-center mt-1">or {money(PRICING.monthly)}/month — cancel anytime</div>
             </div>
 
             <div className="mt-auto flex flex-col gap-3">
