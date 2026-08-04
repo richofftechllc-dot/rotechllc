@@ -101,8 +101,9 @@ export default async function Pricing() {
         </div>
       </div>
 
-      {/* PROJECT BUILD — Build-an-estimate, separate funnel from the membership tiers */}
-      <div className="mt-16">
+      {/* PROJECT BUILD — Build-an-estimate, separate funnel from the membership tiers.
+          id="estimate" because /hub already deep-links to /pricing#estimate. */}
+      <div id="estimate" className="mt-16 scroll-mt-20">
         <div className="text-center mb-8">
           <div className="text-orange-500 font-bold tracking-widest text-sm mb-3">PROJECT BUILD</div>
           <h2 className="text-3xl md:text-4xl font-black">Need something built?</h2>

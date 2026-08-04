@@ -5,17 +5,22 @@ import { useEffect, useState } from "react";
 
 type Me = { ok: true; code: string; name: string } | { ok: false };
 
+// Public nav mirrors the Aug 4 2026 route split, so the top-level sections of the
+// site are visible instead of buried in one long scroll. Pricing, Sundays and the
+// bot command reference are still reachable — they are linked from /help and
+// /membership rather than each taking a top-level slot, because eleven desktop
+// links wrapped the bar.
 const LINKS: Array<{ href: string; label: string; external?: boolean; authOnly?: boolean }> = [
   { href: "/home", label: "Home", authOnly: true },
   { href: "/plan", label: "My Plan", authOnly: true },
   { href: "/account", label: "Profile", authOnly: true },
-  { href: "/roster", label: "Community" },
-  { href: "/#about", label: "About" },
   { href: "/quiz", label: "Quiz", authOnly: true },
   { href: "/resume", label: "Resume", authOnly: true },
-  { href: "/calls", label: "Sundays" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/commands", label: "Bot" },
+  { href: "/certifications", label: "What We Offer" },
+  { href: "/membership", label: "Membership" },
+  { href: "/roster", label: "Community" },
+  { href: "/about", label: "About" },
+  { href: "/help", label: "Help" },
   { href: "https://discord.gg/dtcYf8PTNa", label: "Discord", external: true },
 ];
 

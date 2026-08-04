@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { PRICING } from "@/lib/pricing";
 
 const ERRORS: Record<string, string> = {
   not_in_server: "You're not in the ROT Discord server. Join first then try again.",
@@ -78,7 +79,11 @@ export default function Login() {
 
         {err && <div className="text-red-400 text-sm text-center mt-3">{err}</div>}
         <div className="text-center text-xs text-gray-500 mt-6">
-          Not a member? <a href="https://square.link/u/c8X7TC0z" className="text-orange-500">Join ROT — $227</a>
+          {/* Was a hardcoded square.link/u/c8X7TC0z "Join ROT — $227". That link is the
+              RETIRED founding checkout and it is still live in Square, so every click
+              took $227 for a membership that costs $375. Routes to /membership now:
+              one page, both tiers, prices from lib/pricing.ts. */}
+          Not a member? <a href="/membership" className="text-orange-500">Join ROT — ${PRICING.yearly}/year</a>
         </div>
       </div>
     </main>
