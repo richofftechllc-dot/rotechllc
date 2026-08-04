@@ -9,6 +9,8 @@ import WatchCarousel from "./components/WatchCarousel";
 // the tree for the next drop; just not mounted.
 // import BirthdayBanner from "./components/BirthdayBanner";
 import FoundingSlot from "./components/FoundingSlot";
+import BirthdayDrop from "./components/BirthdayDrop";
+import ResultsWall from "./components/ResultsWall";
 
 async function getMemberCount() {
   try {
@@ -30,6 +32,11 @@ export default async function Home() {
   const memberCount = await getMemberCount();
   return (
     <>
+      {/* BIRTHDAY DROP — headlines the site while the drop is live (July 26–27, 2026).
+          Sits ABOVE the hero on purpose: it's the offer we're driving traffic to this
+          week. Move it back below the hero (or remove it) once the drop closes. */}
+      <BirthdayDrop />
+
       {/* HERO */}
       <main className="max-w-6xl mx-auto px-6 py-16 md:py-24">
         <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -67,7 +74,11 @@ export default async function Home() {
         </div>
       </main>
 
-      {/* MEMBERSHIP — $375/yr regular rate, live Aug 2 2026. Founding ($227/$96) closed and retired. */}
+      {/* RESULTS WALL — real redacted cert passes + quoted job outcomes. Sits right
+          under the drop so the proof lands before the membership pitch. */}
+      <ResultsWall />
+
+      {/* MEMBERSHIP — $375/yr regular rate, live Aug 2026. Founding ($227/$96) closed and retired. */}
       <FoundingSlot />
 
       {/* WHO IT'S FOR — audience paths (cleared / commercial / recruiters / businesses) */}

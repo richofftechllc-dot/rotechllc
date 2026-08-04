@@ -7,6 +7,9 @@ type Member = {
   tier: string; status: string; paymentStatus: string; invoiced: boolean;
   tracks: string[]; roles: string[]; certs?: string[]; phone?: string; quizCode: string; accessEndDate: string; daysLeft?: number | null; plan?: string; referredBy?: string; rolesAssigned: boolean;
   sentLog?: { type?: string; title?: string; detail?: string; at?: string }[];
+  // Birthday Drop follow-through flags (customers doc) — coach-toggled below.
+  voucherPurchased?: boolean;
+  resumeNeeded?: boolean;
   referralEligible?: boolean;
   referralCode?: string;
   foundingTier?: number;
@@ -73,6 +76,12 @@ export default function AdminCRM() {
   const [sopDraft, setSopDraft] = useState<Record<string, string>>({});
   const [newSop, setNewSop] = useState({ title: "", body: "" });
   const [referralPayout, setReferralPayoutState] = useState(20);
+  // Live promo deadline (crmConfig/settings.dealDeadline). The public site reads the same
+  // value through /api/deal, so extending here moves the homepage countdown and every
+  // "ends <date>" line with no deploy.
+  const [dealDeadline, setDealDeadline] = useState<string>("");
+  const [dealEndLabel, setDealEndLabel] = useState<string>("");
+  const [dealMsg, setDealMsg] = useState("");
   const [payoutDraft, setPayoutDraft] = useState("");
   const [payouts, setPayouts] = useState<{ referrer: string; amount: number; method: string; at: string }[]>([]);
   const [vouchers, setVouchers] = useState<{ id: string; code: string; cert: string; expiry?: string; assignedTo?: string; forClient?: string; status: string; source?: string; sentAt?: string; confirmedByCoach?: boolean; confirmedAt?: string; confirmedBy?: string }[]>([]);
@@ -190,7 +199,11 @@ export default function AdminCRM() {
     const r = await fetch("/api/admin/config");
     if (!r.ok) return;
     const d = await r.json();
-    if (d.ok) setReferralPayoutState(d.referralPayout);
+    if (d.ok) {
+      setReferralPayoutState(d.referralPayout);
+      if (d.dealDeadline) setDealDeadline(d.dealDeadline);
+      if (d.dealEndLabel) setDealEndLabel(d.dealEndLabel);
+    }
   }, []);
   const loadPayouts = useCallback(async () => {
     const r = await fetch("/api/admin/referral-payout");
@@ -255,6 +268,33 @@ export default function AdminCRM() {
     await fetch("/api/admin/referral-block", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: m.email, name: m.name, blocked: true }) });
     loadMembers();
   }
+  // Extend (or pull in) the live promo deadline. Days are added to the CURRENT deadline
+  // when it's still in the future, otherwise to now — so clicking "+1 day" the morning
+  // after it lapsed restarts from today instead of landing in the past.
+  async function extendDeal(days: number) {
+    const base = dealDeadline && new Date(dealDeadline).getTime() > Date.now() ? new Date(dealDeadline) : new Date();
+    const next = new Date(base);
+    next.setDate(next.getDate() + days);
+    next.setHours(23, 59, 59, 0);
+    await setDealDate(next.toISOString());
+  }
+
+  async function setDealDate(iso: string) {
+    setDealMsg("…");
+    const r = await fetch("/api/admin/config", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dealDeadline: iso }),
+    });
+    const d = await r.json();
+    if (r.ok && d.ok) {
+      setDealDeadline(d.dealDeadline);
+      setDealEndLabel(d.dealEndLabel);
+      setDealMsg(`✓ Deal now runs through ${d.dealEndLabel} — the site updated`);
+    } else {
+      setDealMsg(`Error: ${d.error || r.status}`);
+    }
+  }
+
   async function savePayout() {
     const v = Number(payoutDraft);
     if (isNaN(v)) return;
@@ -284,6 +324,27 @@ export default function AdminCRM() {
     const d = await r.json();
     setResetMsg(s => ({ ...s, [m.email]: d.ok ? `New code: ${d.quizCode}` : `Error: ${d.error}` }));
     if (d.ok) loadMembers();
+  }
+
+  // Birthday Drop coach flags — voucher bought yet, resume still owed. Optimistically
+  // flips the local row so the badge reacts instantly, then reloads from Firestore.
+  async function setFlag(m: Member, flag: "voucherPurchased" | "resumeNeeded", value: boolean) {
+    setMembers(list => list.map(x => (x.id === m.id ? { ...x, [flag]: value } : x)));
+    setActionMsg(s => ({ ...s, [m.email]: "…" }));
+    const r = await fetch("/api/admin/member-flags", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: m.email, [flag]: value }),
+    });
+    const d = await r.json();
+    setActionMsg(s => ({
+      ...s,
+      [m.email]: r.ok && d.ok
+        ? (flag === "voucherPurchased"
+            ? (value ? "✓ Voucher marked PURCHASED" : "✓ Voucher marked NOT PURCHASED")
+            : (value ? "✓ Flagged NEEDS RESUME" : "✓ Resume cleared"))
+        : `Error: ${d.error || r.status}`,
+    }));
+    if (r.ok && d.ok) loadMembers(); else setMembers(list => list.map(x => (x.id === m.id ? { ...x, [flag]: !value } : x)));
   }
 
   // CRM → bot actions (the bot executes these from the botCommands queue).
@@ -647,6 +708,33 @@ export default function AdminCRM() {
           ))}
         </div>
 
+        {/* LIVE DEAL — the promo window every price on the public site quotes. Extending here
+            writes crmConfig/settings.dealDeadline; the homepage countdown and every
+            "ends <date>" line read it back through /api/deal, so no deploy is needed. */}
+        <div className="bg-white border border-[#dadce0] rounded-xl p-4 mb-6 flex flex-wrap items-center gap-3">
+          <div className="mr-auto">
+            <div className="text-[11px] uppercase tracking-wide text-gray-500">Live deal window</div>
+            <div className="text-lg font-semibold text-[#202124]">
+              Birthday Drop {dealEndLabel ? <>runs through <span className="text-orange-700">{dealEndLabel}</span></> : "— loading…"}
+              {dealDeadline && new Date(dealDeadline).getTime() < Date.now() && (
+                <span className="ml-2 text-xs font-semibold text-red-600 uppercase">closed</span>
+              )}
+            </div>
+            <div className="text-xs text-gray-500 mt-0.5">Sec+ $727 · CSA $727 · Discord 12mo $100. Changing this updates the homepage countdown and Bo instantly.</div>
+          </div>
+          <button onClick={() => extendDeal(1)} className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black font-medium">Extend 1 day</button>
+          <button onClick={() => extendDeal(3)} className="text-xs px-3 py-1.5 rounded-lg border border-[#dadce0] text-gray-700 hover:bg-gray-50 font-medium">Extend 3 days</button>
+          <button onClick={() => extendDeal(7)} className="text-xs px-3 py-1.5 rounded-lg border border-[#dadce0] text-gray-700 hover:bg-gray-50 font-medium">Extend 1 week</button>
+          <input
+            type="date"
+            value={dealDeadline ? new Date(dealDeadline).toISOString().slice(0, 10) : ""}
+            onChange={e => { if (e.target.value) setDealDate(new Date(`${e.target.value}T23:59:59`).toISOString()); }}
+            className="text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500"
+            title="Or pick an exact end date"
+          />
+          {dealMsg && <div className="text-xs text-gray-600 basis-full">{dealMsg}</div>}
+        </div>
+
         {/* Tabs */}
         <div className="flex gap-6 border-b border-[#dadce0] mb-6">
           {TABS.map(t => (
@@ -910,6 +998,39 @@ export default function AdminCRM() {
                                   {actionMsg[m.email] && <span className="text-[11px] text-gray-600 ml-2">{actionMsg[m.email]}</span>}
                                 </div>
                               )}
+                            </div>
+                            {/* Exam voucher — coach flips this once it's actually bought from GC4L.
+                                Birthday Drop packages include a voucher, and it has to be activated
+                                within 14 days of purchase, so this row is the follow-through check. */}
+                            <div>
+                              <span className="text-gray-400">Exam voucher</span>
+                              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                                <span className={`text-[11px] px-2 py-0.5 rounded font-semibold ${m.voucherPurchased ? "bg-emerald-50 border border-emerald-200 text-emerald-700" : "bg-amber-50 border border-amber-200 text-amber-700"}`}>
+                                  {m.voucherPurchased ? "PURCHASED" : "NOT PURCHASED"}
+                                </span>
+                                <button onClick={() => setFlag(m, "voucherPurchased", !m.voucherPurchased)}
+                                  className="text-[10px] px-2 py-0.5 rounded border border-[#dadce0] text-gray-600 hover:bg-gray-50">
+                                  {m.voucherPurchased ? "Mark not purchased" : "Mark purchased"}
+                                </button>
+                                <a href="https://getcertified4less.com" target="_blank" rel="noopener noreferrer"
+                                  className="text-[10px] px-2 py-0.5 rounded border border-[#dadce0] text-gray-700 hover:bg-gray-50">
+                                  Buy Voucher (GC4L) ↗
+                                </a>
+                              </div>
+                            </div>
+                            {/* Resume — the bot sets this when a resume lands in the Discord intake.
+                                Coach toggles it off after sending the rebuilt ROT-format copy back. */}
+                            <div>
+                              <span className="text-gray-400">Resume</span>
+                              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                                <span className={`text-[11px] px-2 py-0.5 rounded font-semibold ${m.resumeNeeded ? "bg-red-50 border border-red-200 text-red-700" : "bg-gray-100 border border-gray-200 text-gray-600"}`}>
+                                  {m.resumeNeeded ? "NEEDS RESUME" : "Nothing outstanding"}
+                                </span>
+                                <button onClick={() => setFlag(m, "resumeNeeded", !m.resumeNeeded)}
+                                  className="text-[10px] px-2 py-0.5 rounded border border-[#dadce0] text-gray-600 hover:bg-gray-50">
+                                  {m.resumeNeeded ? "Mark sent" : "Flag needs resume"}
+                                </button>
+                              </div>
                             </div>
                             <div><span className="text-gray-400">Roles</span><div className="font-medium">{m.roles?.length ? m.roles.join(", ") : "—"}</div></div>
                             <div><span className="text-gray-400">Certs</span><div className="font-medium">{m.certs?.length ? m.certs.join(", ") : "—"}</div></div>
@@ -1291,6 +1412,12 @@ export default function AdminCRM() {
             <div className="px-4 py-2 border-b border-[#e8eaed] bg-[#faf7f4] flex flex-wrap items-center gap-2">
               <span className="text-[11px] uppercase tracking-wide text-gray-500">🧾 Quick invoice{expanded ? " (sends for open member)" : " (opens a member = 1-click send)"}:</span>
               {[
+                // BIRTHDAY DROP first — while the drop is live it's the price we lead with,
+                // and it undercuts the Essential tiers below. Labels carry the promo price so
+                // a coach can't quote the old number by accident.
+                { label: "🎂 Sec+ Birthday Drop · $727", svc: "Security+ Birthday Drop ($727 promo, $777.89 with fee)" },
+                { label: "🎂 CSA Birthday Drop · $727", svc: "ServiceNow CSA Birthday Drop ($727 promo, $777.89 with fee)" },
+                { label: "🎂 Discord 12mo · $100", svc: "ROT Discord Access, 12 months ($100 promo)" },
                 { label: "Security+ Essential · $850", svc: "Security+ Essential" },
                 { label: "Security+ Self-Guided · $500", svc: "Security+ Self-Guided" },
                 { label: "ServiceNow CSA Essential", svc: "ServiceNow CSA Essential" },

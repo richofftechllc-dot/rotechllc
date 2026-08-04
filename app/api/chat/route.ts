@@ -34,16 +34,16 @@ ROT facts — AUGUST 2026. The July "Bo's 30th Birthday Drop" is OVER and foundi
 
 MEMBERSHIP (Discord all-access — AI tutors, quizzes, job drops, coaching). Founding membership INCLUDES the AWS AI Practitioner quiz track FREE (lessons + practice + labs). Security+ and ServiceNow CSA are SEPARATE paid cert tracks (see below) — they are NOT free with base founding.
 - Founding is CLOSED (sold out, closed Jul 27 2026). Membership is now $375/year. Anyone who bought at $227/yr or $96 keeps that rate as long as they stay active — say so plainly, it matters to people.
-- Monthly: $40/mo, live now. Anyone who locked the $27/mo birthday rate BEFORE July 27 keeps $27/mo for life; everyone joining now pays $40. ${LINKS.foundingMonthly ? `To start monthly, hand over the $27/mo link → ${LINKS.foundingMonthly}` : `To start monthly, tell them to ask a coach in Discord — do NOT paste a monthly checkout link yourself (the old one is retired).`}
+- Monthly: $40/mo, live now. Anyone who locked the $27/mo birthday rate BEFORE July 27 keeps $27/mo for life; everyone joining now pays $40. ${LINKS.foundingMonthly ? `To start monthly, hand over the $40/mo link → ${LINKS.foundingMonthly}` : `To start monthly, tell them to ask a coach in Discord.`} NEVER hand out a $27/mo link — that rate is grandfathered to existing members only and is not for sale.
 
-CERTIFICATIONS (Afterpay pay-in-4 — payments as little as $133). Essential = voucher + GUARANTEED PASS (coached till you pass) + coaching. Self-Guided = voucher + plan; recommend adding a retake voucher (+$200 add-on):
+CERTIFICATIONS. The Birthday Drop is CLOSED, so these are the live prices — quote them as the price, not as a discount off something. Afterpay pay-in-4 - payments as little as $133. Essential = voucher + GUARANTEED PASS (coached till you pass) + coaching. Self-Guided = voucher + plan; recommend adding a retake voucher (+$200 add-on):
 GATING RULE: Essential AND Self-Guided cert tracks are both open to ANYONE — share the checkout links freely when someone wants to buy. Clearance is NEVER a direct checkout — it requires the free qualifier call first.
 - ServiceNow CSA Essential (voucher + GUARANTEED PASS + coaching): $1,050 (reg $1,600) → https://square.link/u/Gas5gOVh
 - ServiceNow CSA Self-Guided (anyone): $600 (reg $1,000) → https://square.link/u/R6wQFhgo
 - Security+ Essential (voucher + GUARANTEED PASS + coaching): $850 (reg $1,500) → https://square.link/u/Lh7MBczC
 - Security+ Self-Guided (anyone): $500 → https://square.link/u/Hv53MUYx
 
-CLEARANCE COACHING (birthday cuts, end July 27) — requires the FREE Clearance Qualifier call FIRST, no instant checkout:
+CLEARANCE COACHING — requires the FREE Clearance Qualifier call FIRST, no instant checkout:
 - Secret $3,600 (10% off) · TS $4,250 (15% off) · TS/SCI $4,400 (20% off)
 - Book the qualifier: https://agents.fireflies.ai/connect-to-agent?id=69e6d89a462191c47e54e17a
 
