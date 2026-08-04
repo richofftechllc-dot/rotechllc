@@ -31,7 +31,7 @@ const COACH_SERVICES = [
   { key: "csa-accelerated", label: "CSA Accelerated", amount: 280000 },
   { key: "aws", label: "AWS Cloud Practitioner", amount: 100000 },
 ];
-// Canonical access tracks — the clean set to toggle a member into. $27/mo founding =
+// Canonical access tracks — the clean set to toggle a member into. $40/mo =
 // "General Access" only; cert tracks are add-ons. Existing docs may hold legacy labels
 // (e.g. "Security+ + ServiceNow CSA + AWS AI Practitioner") — the editor surfaces those
 // as removable chips so they can be cleaned up.
@@ -1546,7 +1546,7 @@ export default function AdminCRM() {
         {/* ── Referrals ── */}
         {tab === "referrals" && (
           <div>
-            {/* Who is allowed to refer — active founding members + coaches. Share the $127 link with these people. */}
+            {/* Who is allowed to refer — active members + coaches. Share the $200 referral link with these people. */}
             <div className="bg-white border border-[#dadce0] rounded-xl p-4 mb-5">
               <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
                 <div className="font-semibold text-sm">✅ Eligible referrers <span className="text-gray-400 font-normal">({eligibleReferrers.length}) — each gets a unique link</span></div>
@@ -1585,7 +1585,7 @@ export default function AdminCRM() {
             </div>
             {referrers.length === 0 ? (
               <div className="bg-white border border-[#dadce0] rounded-xl p-6 text-sm text-gray-500">
-                No referrals yet. This fills <b>automatically</b> — anyone who buys through the <b>$127 referral link</b> (square.link/u/jSF7J4zp) and types who referred them shows up here, and the referrer gets DM&apos;d that their $50 is coming.
+                No referrals yet. This fills <b>automatically</b> — anyone who buys through a member&apos;s <b>$200 referral link</b> (rotechllc.com/r/[code]) and types who referred them shows up here, and the referrer gets DM&apos;d that their $50 is coming.
               </div>
             ) : (
               <div className="bg-white border border-[#dadce0] rounded-xl overflow-x-auto">
@@ -1630,7 +1630,7 @@ export default function AdminCRM() {
                 { title: "ServiceNow CSA — Study Plan + PDI Setup", tag: "ServiceNow · Client Study Plan", desc: "The full CSA roadmap: free PDI setup, the exam domains, a 30/60/90-day plan with study hours, and exam-day tips. Send to any CSA client.", path: "/resources/rot-csa-study-plan.html" },
                 { title: "Security+ — Study Plan", tag: "CompTIA · Client Study Plan", desc: "The Security+ (SY0-701) roadmap: the 5 domains with weights, a 30/60/90-day plan with study hours, acronym drills, and PBQ exam tips. Send to any Sec+ client.", path: "/resources/rot-secplus-study-plan.html" },
                 { title: "AWS AI Practitioner — Study Plan", tag: "AWS · Client Study Plan", desc: "The AIF-C01 roadmap (founding members get this track): the 5 exam domains, a 30/60/90-day plan with study hours, the AWS service map, and what's proven to pass fast. Send to any AWS AI client.", path: "/resources/rot-aws-ai-study-plan.html" },
-                { title: "FAQ — Onboarding, Billing, Add-ons, Referrals", tag: "General · Send to anyone", desc: "The member FAQ: getting in (auto-role), how the $27/$227 billing works, what's included vs paid add-ons (cert/clearance), studying/pace, and referrals. Send to any prospect or new member.", path: "/resources/rot-faq.html" },
+                { title: "FAQ — Onboarding, Billing, Add-ons, Referrals", tag: "General · Send to anyone", desc: "The member FAQ: getting in (auto-role), how the $40/$375 billing works, what's included vs paid add-ons (cert/clearance), studying/pace, and referrals. Send to any prospect or new member.", path: "/resources/rot-faq.html" },
                 { title: "How Rich Off Tech Works — Founding Member Guide", tag: "Onboarding · Send to founding members", desc: "The full breakdown: the 3 places (Discord/site/AI tutors), how the Discord runs (auto-role, channels, Bo Tech, calls, job drops), how the quiz/study engine works (domains, 75-80% target, labs, 30/60/90 plan), and a first-week checklist.", path: "/resources/rot-how-it-works.html" },
                 { title: "PB&J Challenge", tag: "Business Analyst · Requirements Lab", desc: "Interactive lab that teaches how a BA writes requirements. The client builds the steps, then runs it live with a coach (who plays the “machine”). No answer included — the lesson is them finding their own gaps.", path: "/labs/pbj-challenge.html" },
                 { title: "ServiceNow CSA Study Guide", tag: "ServiceNow CSA · Client Study Plan", desc: "The full CSA path, mapped to our 8 quiz domains + free PDI (developer instance) setup. 30/60/90-day pace the client picks with their coach on the call — never longer. Send it right after the intro/intake.", path: "/labs/servicenow-csa-study-guide.html" },

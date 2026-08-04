@@ -66,12 +66,12 @@ export default function BirthdayBanner() {
       </div>
       <div className="flex flex-wrap gap-2 mt-3">
         {/* $227/yr — durable quick_pay link (reusable), always the annual founding rate. */}
-        <a href={LINKS.foundingYearly} className={btn + " bg-white text-black hover:opacity-90"}>Founding — $227 / year</a>
+        <a href={LINKS.foundingYearly} className={btn + " bg-white text-black hover:opacity-90"}>Membership — $375 / year</a>
         {/* $27/mo monthly subscription (through July 27, then $40/mo). Shows once a durable
             REUSABLE link is set in lib/links.ts (foundingMonthly); blank = no button so a
             dead link can't appear. */}
         {LINKS.foundingMonthly && (
-          <a href={LINKS.foundingMonthly} className={btn + " bg-white text-black hover:opacity-90"}>Founding — $27 / mo</a>
+          <a href={LINKS.foundingMonthly} className={btn + " bg-white text-black hover:opacity-90"}>Membership — $40 / mo</a>
         )}
         <a href="/resources/rot-july-2026-offers.html" className={btn + " border border-white/30 text-white hover:bg-white/10"}>See the full deal →</a>
       </div>

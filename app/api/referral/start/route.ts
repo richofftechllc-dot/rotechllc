@@ -4,10 +4,13 @@ import { coll } from "@/lib/firebase";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// $127 referral-rate yearly. DURABLE quick_pay link (reusable — every buyer gets a
+// $200 referral-rate yearly (was $127 until Aug 2 2026). DURABLE quick_pay link (reusable — every buyer gets a
 // fresh order, so it never dies). The old jSF7J4zp was `order`-based = single-use and
 // would have bounced to /welcome after the first referral sale. Do not revert.
-const CHECKOUT_URL = "https://square.link/u/bLYKQOxs";
+// Blank until the $200/yr Square link exists. The old bLYKQOxs link charges
+// $127 and is NOT reused — see lib/pricing.ts.
+import { CHECKOUT, COACH_FALLBACK } from "@/lib/pricing";
+const CHECKOUT_URL = CHECKOUT.referralYearly || COACH_FALLBACK;
 
 // POST /api/referral/start  { code, email } — public.
 // Records email → referrer so the payment webhook can auto-credit by email match

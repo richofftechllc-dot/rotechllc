@@ -4,7 +4,10 @@ import AboutMontage from "./components/AboutMontage";
 import BoAvatarFlip from "./components/BoAvatarFlip";
 import EstimateBuilderTrigger from "./components/EstimateBuilderTrigger";
 import WatchCarousel from "./components/WatchCarousel";
-import BirthdayBanner from "./components/BirthdayBanner";
+// BirthdayBanner retired Aug 2 2026 — the drop ended Jul 27 and the countdown
+// was stuck rendering "It's the 27th 🎂" on the live homepage. Component kept in
+// the tree for the next drop; just not mounted.
+// import BirthdayBanner from "./components/BirthdayBanner";
 import FoundingSlot from "./components/FoundingSlot";
 import BirthdayDrop from "./components/BirthdayDrop";
 import ResultsWall from "./components/ResultsWall";
@@ -39,7 +42,7 @@ export default async function Home() {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
             <div className="text-orange-500 font-bold tracking-widest text-sm mb-4">BO TECH · YOUR AI-POWERED CAREER COMMAND CENTER</div>
-            <BirthdayBanner />
+            {/* <BirthdayBanner /> — retired, see import note */}
             <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-4">
               Break into Tech.<br />
               <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">No shortcuts.</span>
@@ -72,10 +75,10 @@ export default async function Home() {
       </main>
 
       {/* RESULTS WALL — real redacted cert passes + quoted job outcomes. Sits right
-          under the drop so the proof lands before the founding pitch. */}
+          under the drop so the proof lands before the membership pitch. */}
       <ResultsWall />
 
-      {/* FOUNDING — $227/yr founding rate ($375 after the deal deadline). The $96 seat is retired. */}
+      {/* MEMBERSHIP — $375/yr regular rate, live Aug 2026. Founding ($227/$96) closed and retired. */}
       <FoundingSlot />
 
       {/* WHO IT'S FOR — audience paths (cleared / commercial / recruiters / businesses) */}
