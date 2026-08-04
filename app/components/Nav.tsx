@@ -53,7 +53,9 @@ export default function Nav() {
             lockup's "RICH OFF TECH" line is 3px tall at this size and turns to
             mush, so the wordmark is set in type beside it instead.
             priority: it is above the fold on every route. */}
-        <Link href="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
+        {/* shrink-0 + nowrap, or flex squeezes the brand until "Rich Off Tech"
+            breaks onto three lines and collides with the first nav link. */}
+        <Link href="/" className="flex items-center gap-2.5 shrink-0" onClick={() => setOpen(false)}>
           <Image
             src="/rot-mark-ink.png"
             alt=""
@@ -62,21 +64,26 @@ export default function Nav() {
             priority
             className="w-[34px] h-auto"
           />
-          <span className="font-semibold tracking-tight text-rot-fg">Rich Off Tech</span>
+          <span className="font-semibold tracking-tight text-rot-fg whitespace-nowrap">Rich Off Tech</span>
         </Link>
 
-        {/* DESKTOP NAV */}
-        <div className="hidden md:flex items-center gap-7 text-sm text-rot-muted">
+        {/* DESKTOP NAV
+            Breaks at xl, not md. Signed in there are ELEVEN links plus the name
+            and Sign Out, and at 768px that wrapped into an unreadable pile —
+            every multi-word label ("What We Offer", "My Plan") broken mid-phrase
+            across three lines and overlapping the wordmark. The hamburger holds
+            until there is genuinely room for a single row. */}
+        <div className="hidden xl:flex items-center gap-6 text-sm text-rot-muted">
           {visibleLinks.map(l => l.external ? (
-            <a key={l.href} href={l.href} target="_blank" rel="noopener" className="hover:text-rot-fg transition-colors">{l.label}</a>
+            <a key={l.href} href={l.href} target="_blank" rel="noopener" className="hover:text-rot-fg transition-colors whitespace-nowrap">{l.label}</a>
           ) : (
-            <Link key={l.href} href={l.href} className="hover:text-rot-fg transition-colors">{l.label}</Link>
+            <Link key={l.href} href={l.href} className="hover:text-rot-fg transition-colors whitespace-nowrap">{l.label}</Link>
           ))}
           {me === null ? (
             <span className="px-4 py-2 text-rot-faint">…</span>
           ) : me.ok ? (
-            <div className="flex items-center gap-3">
-              <span className="text-rot-fg font-medium">{me.name}</span>
+            <div className="flex items-center gap-3 shrink-0">
+              <span className="text-rot-fg font-medium whitespace-nowrap">{me.name}</span>
               <button onClick={logout} className="px-3 py-1.5 text-xs text-rot-muted hover:text-rot-fg border border-rot-line hover:border-rot-line-strong transition">Sign Out</button>
             </div>
           ) : (
@@ -89,18 +96,20 @@ export default function Nav() {
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           onClick={() => setOpen(o => !o)}
-          className="md:hidden flex flex-col items-center justify-center w-10 h-10 gap-1.5 -mr-2"
+          className="xl:hidden flex flex-col items-center justify-center w-10 h-10 gap-1.5 -mr-2"
         >
-          <span className={`block w-6 h-0.5 bg-white transition-transform ${open ? "translate-y-2 rotate-45" : ""}`} />
-          <span className={`block w-6 h-0.5 bg-white transition-opacity ${open ? "opacity-0" : ""}`} />
-          <span className={`block w-6 h-0.5 bg-white transition-transform ${open ? "-translate-y-2 -rotate-45" : ""}`} />
+          {/* bg-rot-fg, not bg-white — white bars on the light nav meant the
+              menu button was invisible on every screen below the breakpoint. */}
+          <span className={`block w-6 h-0.5 bg-rot-fg transition-transform ${open ? "translate-y-2 rotate-45" : ""}`} />
+          <span className={`block w-6 h-0.5 bg-rot-fg transition-opacity ${open ? "opacity-0" : ""}`} />
+          <span className={`block w-6 h-0.5 bg-rot-fg transition-transform ${open ? "-translate-y-2 -rotate-45" : ""}`} />
         </button>
       </div>
 
       {/* MOBILE DROPDOWN — drops down below the nav bar, 2-col grid so all 8 links fit on screen */}
       {open && (
         <div
-          className="md:hidden absolute inset-x-0 top-full border-t border-rot-line shadow-2xl"
+          className="xl:hidden absolute inset-x-0 top-full border-t border-rot-line shadow-2xl"
           style={{ backgroundColor: "var(--rot-bg)" }}
         >
           <div className="px-4 py-4">

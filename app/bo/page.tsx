@@ -240,7 +240,7 @@ export default function BoFrontFace() {
                 <div key={i} className={`flex gap-3 ${m.role === "user" ? "flex-row-reverse" : ""}`}>
                   {m.role === "assistant" && <div className="mt-1 shrink-0"><Avatar t={tutor} size={28} /></div>}
                   <div className="min-w-0">
-                    <div className={`rounded-2xl px-4 py-2.5 ${m.role === "user" ? "text-black" : "border border-rot-line bg-rot-surface text-gray-100"}`}
+                    <div className={`rounded-2xl px-4 py-2.5 ${m.role === "user" ? "text-black" : "border border-rot-line bg-rot-surface text-rot-fg"}`}
                       style={m.role === "user" ? { background: tutor.color } : undefined}>
                       {m.role === "assistant"
                         ? (m.content ? <Markdown text={m.content} /> : <span className="text-rot-accent animate-pulse" style={{ color: tutor.color }}>▍</span>)

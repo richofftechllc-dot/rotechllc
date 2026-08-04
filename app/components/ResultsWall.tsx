@@ -133,7 +133,7 @@ export default function ResultsWall() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {OUTCOMES.map((o) => (
               <blockquote key={o.who + o.detail} className="bg-rot-surface/80 border border-rot-line rounded-2xl p-5 backdrop-blur">
-                <p className="text-gray-200 text-sm leading-relaxed">&ldquo;{o.quote}&rdquo;</p>
+                <p className="text-rot-fg text-sm leading-relaxed">&ldquo;{o.quote}&rdquo;</p>
                 <footer className="mt-3 text-xs">
                   <span className="text-rot-fg font-bold">{o.who}</span>
                   <span className="text-rot-faint"> — {o.detail}</span>

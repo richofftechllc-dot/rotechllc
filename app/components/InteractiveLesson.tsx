@@ -108,7 +108,7 @@ function ServiceNowMock() {
     <div className="mb-5 rounded-xl border border-rot-line bg-gradient-to-b from-zinc-950 to-black p-3">
       <p className="mb-2 text-[11px] uppercase tracking-wide text-rot-faint">This is what an instance actually looks like ↓</p>
       {/* Banner */}
-      <div className="flex items-center gap-2 rounded-t-lg bg-rot-sunken px-3 py-2 text-gray-200 ring-1 ring-orange-500/30">
+      <div className="flex items-center gap-2 rounded-t-lg bg-rot-sunken px-3 py-2 text-rot-fg ring-1 ring-orange-500/30">
         <UIcon name="menu" className="w-4 h-4 text-rot-accent" />
         <span className="text-sm font-bold text-rot-fg">now<span className="text-rot-accent">.</span></span>
         <div className="ml-2 flex flex-1 items-center gap-1 rounded bg-rot-surface px-2 py-1 text-[11px] text-rot-faint"><UIcon name="search" className="w-3 h-3" />Search</div>
@@ -228,7 +228,7 @@ export default function InteractiveLesson({ html }: { html: string }) {
                             <span className="text-xs font-bold">{term}</span>
                             <span className="ml-auto text-emerald-600">✓</span>
                           </div>
-                          <p className="text-sm leading-snug text-gray-200">{def}</p>
+                          <p className="text-sm leading-snug text-rot-fg">{def}</p>
                         </div>
                       </div>
                     </button>
@@ -276,7 +276,7 @@ export default function InteractiveLesson({ html }: { html: string }) {
                       <button key={i} onClick={() => toggle(`${step}-${i}`)} className={`flex items-start gap-2 rounded-xl border p-4 text-left transition-all ${open ? "border-green-500/40 bg-green-500/5" : "border-rot-line bg-rot-sunken hover:border-rot-accent/30"}`}>
                         <span className={open ? "text-emerald-600" : "text-rot-accent/70"}>{open ? "✓" : "•"}</span>
                         {icon && <span className="text-rot-accent"><UIcon name={icon} className="w-5 h-5" /></span>}
-                        <span className="text-sm text-gray-200">{key}</span>
+                        <span className="text-sm text-rot-fg">{key}</span>
                       </button>
                     );
                   }

@@ -243,7 +243,7 @@ export default function Bo30() {
 
       <div className="bg-rot-accent/10 border border-rot-accent/30 rounded-xl px-5 py-4 mb-6">
         <div className="text-rot-accent text-xs font-bold uppercase tracking-wide mb-1">{prompt?.label}</div>
-        <p className="text-gray-200 text-sm">{prompt?.teleprompter}</p>
+        <p className="text-rot-fg text-sm">{prompt?.teleprompter}</p>
       </div>
 
       {/* mode switch */}
@@ -306,7 +306,7 @@ export default function Bo30() {
               </button>
             )}
             {previewUrl && (
-              <button onClick={retake} className="px-5 py-2.5 rounded-lg border border-rot-line-strong text-gray-200 font-semibold text-sm hover:bg-rot-sunken">
+              <button onClick={retake} className="px-5 py-2.5 rounded-lg border border-rot-line-strong text-rot-fg font-semibold text-sm hover:bg-rot-sunken">
                 Retake
               </button>
             )}
