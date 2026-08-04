@@ -43,9 +43,11 @@ export const config = {
   // public: the FAQ, how-it-works and the AWS AI plan are lead magnets on purpose.
   //
   // A client who bought has a quiz code, so they log in and read it. That is the gate.
+  // /book is members-only: a 1-on-1 is coaching time, and coaching time is what
+  // membership buys. Prospects get the free qualifier agents on /help instead.
   matcher: [
     "/home", "/plan", "/plan/:path*", "/account", "/account/:path*",
-    "/quiz/:path*", "/lab/:path*", "/hub", "/hub/:path*",
+    "/quiz/:path*", "/lab/:path*", "/hub", "/hub/:path*", "/book",
     "/resources/rot-secplus-study-plan.html",
     "/resources/rot-csa-study-plan.html",
   ],

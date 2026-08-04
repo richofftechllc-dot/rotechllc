@@ -54,7 +54,7 @@ function build(p: LeadEmail): { subject: string; html: string } {
         <p>You asked about <strong>${p.cert}</strong>. If there's an online exam for it, we coach it.</p>
         <p>A member of the team will come back to you with a plan and a price ASAP. Pricing on these
         is per person — it depends on the voucher, your timeline, and how much coaching you want.</p>
-        <p>Want to move faster? Grab time: <a href="${SITE}/book">rotechllc.com/book</a></p>
+        <p>Want to move faster? <a href="${SITE}/help#agents">Talk to the Cert Qualifier</a> — it is free and takes about five minutes.</p>
         <p>— Bo</p>
       `,
     };

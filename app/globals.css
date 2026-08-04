@@ -1,56 +1,234 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   ROT DESIGN TOKENS — Aug 2026 light/marble theme.
+
+   The site was black-on-black. Dark reads "indie dev"; Randy wants the room to
+   feel like a firm you'd hand money to. So: warm marble ground, near-black type,
+   and the ROT orange kept as the single brand signature rather than the wallpaper.
+
+   Every component reads these tokens instead of Tailwind's palette, so the next
+   theme change is this file and nothing else.
+   ───────────────────────────────────────────────────────────────────────────── */
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Marble ground. Three steps: page, raised card, sunken band. */
+  --rot-bg: #faf8f5;
+  --rot-surface: #ffffff;
+  --rot-sunken: #f2efe9;
+
+  /* Hairlines carry the structure. Warm, never pure grey — pure grey on warm
+     white reads dirty. */
+  --rot-line: rgba(28, 22, 16, 0.10);
+  --rot-line-strong: rgba(28, 22, 16, 0.22);
+
+  /* Type. Warm near-black, not #000 — true black on off-white is harsh.
+     These are DARKER than the dark-theme values they replaced. Inverting the
+     surfaces without re-tuning the greys is what made the first marble pass read
+     washed out: a grey that sits comfortably on near-black has nowhere near
+     enough contrast on off-white. --rot-muted clears 7:1 on the marble ground and
+     --rot-faint clears 4.5:1, so body copy is readable and kickers are legible
+     rather than decorative. */
+  --rot-fg: #14100c;
+  --rot-muted: #4a423a;
+  --rot-faint: #736a61;
+
+  /* Brand. Unchanged from the old site; it just isn't the background any more. */
+  --rot-accent: #e8451f;
+  --rot-accent-2: #ff7a00;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-display);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-rot-bg: var(--rot-bg);
+  --color-rot-surface: var(--rot-surface);
+  --color-rot-sunken: var(--rot-sunken);
+  --color-rot-line: var(--rot-line);
+  --color-rot-line-strong: var(--rot-line-strong);
+  --color-rot-fg: var(--rot-fg);
+  --color-rot-muted: var(--rot-muted);
+  --color-rot-faint: var(--rot-faint);
+  --color-rot-accent: var(--rot-accent);
+  --color-rot-accent-2: var(--rot-accent-2);
 }
 
 html, body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--rot-bg);
+  color: var(--rot-fg);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   overflow-x: hidden;
   max-width: 100vw;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── MARBLE FLOOR ─────────────────────────────────────────────────────────────
+   Real veining, not a tint. An SVG fractalNoise turbulence is displaced and
+   pushed through a steep colour matrix, which is what actually produces stone —
+   soft cloudy fields broken by hard thin veins. Baked to a data URI so it costs
+   one decode and zero requests; a marble JPG would be ~400KB and still tile.
+
+   Three stacked layers, bottom to top: the stone itself, a warm wash so it reads
+   as honed limestone rather than grey granite, and a gloss sweep so the surface
+   looks polished and lit from the upper left rather than flat.
+
+   Fixed, so the content moves over the slab instead of dragging it. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-color: var(--rot-bg);
+  background-image:
+    /* gloss: a wide specular sweep across the slab */
+    linear-gradient(112deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.15) 26%, rgba(255,255,255,0) 42%, rgba(255,255,255,0.28) 62%, rgba(255,255,255,0) 78%),
+    /* warmth + a whisper of brand in the stone */
+    radial-gradient(1100px 800px at 85% 6%, rgba(232,69,31,0.05), transparent 60%),
+    radial-gradient(900px 900px at 8% 96%, rgba(28,22,16,0.07), transparent 62%),
+    /* the stone */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.045' numOctaves='6' seed='7' result='n'/%3E%3CfeDisplacementMap in='n' in2='n' scale='38' xChannelSelector='R' yChannelSelector='G' result='d'/%3E%3CfeColorMatrix in='d' type='matrix' values='0 0 0 0 0.94 0 0 0 0 0.925 0 0 0 0 0.90 0 0 0 -1.35 1.06'/%3E%3C/filter%3E%3Crect width='900' height='900' filter='url(%23m)'/%3E%3C/svg%3E");
+  background-size: cover, cover, cover, 900px 900px;
+  background-repeat: no-repeat, no-repeat, no-repeat, repeat;
+  opacity: 1;
+}
+
+/* Polished-floor reflection under the fold: a soft sheen that keeps large empty
+   bands from going dead flat. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: auto 0 0 0;
+  height: 45vh;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(255,255,255,0.5), rgba(255,255,255,0) 70%);
 }
 
 h1, h2, h3 {
+  font-family: var(--font-display), var(--font-inter), ui-sans-serif, sans-serif;
+  letter-spacing: -0.03em;
   overflow-wrap: break-word;
   word-break: break-word;
 }
 
+/* ── Primitives ───────────────────────────────────────────────────────────── */
+
+.rot-kicker {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--rot-faint);
+}
+
+.rot-rule { height: 1px; background: linear-gradient(to right, transparent, var(--rot-line), transparent); }
+
+/* Card: white on marble, lifted by a whisper of shadow rather than a border
+   alone — on a light ground a border-only card looks like a table cell. */
+.rot-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.86));
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--rot-line);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 1px 2px rgba(28, 22, 16, 0.04),
+    0 8px 24px -12px rgba(28, 22, 16, 0.10);
+  transition: box-shadow 220ms ease, transform 220ms ease, border-color 220ms ease;
+}
+.rot-card:hover {
+  box-shadow: 0 2px 4px rgba(28, 22, 16, 0.05), 0 18px 40px -16px rgba(28, 22, 16, 0.18);
+  transform: translateY(-2px);
+}
+
+/* Primary: near-black. Reads as the serious option on a light page. */
+.rot-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  background: var(--rot-fg);
+  color: #ffffff;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  border: 1px solid var(--rot-fg);
+  transition: opacity 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+.rot-btn:hover { opacity: 0.9; box-shadow: 0 10px 24px -12px rgba(28, 22, 16, 0.5); }
+.rot-btn:active { transform: translateY(1px); }
+
+/* Brand action. ONE per view — the buy button. This is where the orange lives. */
+.rot-btn-accent {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  background: linear-gradient(100deg, var(--rot-accent), var(--rot-accent-2));
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  border: 1px solid transparent;
+  transition: filter 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+.rot-btn-accent:hover { filter: brightness(1.06); box-shadow: 0 12px 28px -12px rgba(232, 69, 31, 0.6); }
+.rot-btn-accent:active { transform: translateY(1px); }
+
+/* Secondary: hairline outline. */
+.rot-btn-ghost {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  background: transparent;
+  color: var(--rot-fg);
+  font-weight: 500;
+  border: 1px solid var(--rot-line-strong);
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+.rot-btn-ghost:hover { background: rgba(28, 22, 16, 0.045); border-color: var(--rot-fg); }
+
+/* ── SCROLL REVEAL ────────────────────────────────────────────────────────────
+   Sections rise and fade as they enter. Driven by app/components/Reveal.tsx,
+   which toggles .is-in via IntersectionObserver.
+
+   Elements start VISIBLE and are hidden by the observer on mount, so anyone with
+   JS disabled — and every crawler — still sees the whole page. Hiding first and
+   revealing later is how content disappears for the people you least want to
+   hide it from. */
+.rot-reveal {
+  opacity: 1;
+  transform: none;
+}
+.rot-reveal[data-armed="1"] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 620ms cubic-bezier(0.16, 1, 0.3, 1), transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--rot-delay, 0ms);
+  will-change: opacity, transform;
+}
+.rot-reveal[data-armed="1"].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rot-reveal[data-armed="1"],
+  .rot-reveal[data-armed="1"].is-in {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .rot-card:hover { transform: none; }
+}
+
 /* ── RESULTS WALL marquee (app/components/ResultsWall.tsx) ──────────────────
-   Two rows of win screenshots drifting in opposite directions over a static
-   background. Pure CSS so there's no JS on the critical path.
-   Each track renders its cards TWICE and translates exactly -50%, so the wrap
-   point lands on an identical frame and the loop looks seamless. */
+   Two rows of win screenshots drifting in opposite directions. Pure CSS so
+   there's no JS on the critical path. Each track renders its cards TWICE and
+   translates exactly -50%, so the wrap lands on an identical frame. */
 .rot-marquee {
   overflow: hidden;
-  /* Fade both edges so cards enter and leave instead of popping at the border. */
   mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
   -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
 }
-.rot-track {
-  display: flex;
-  width: max-content;
-  will-change: transform;
-}
+.rot-track { display: flex; width: max-content; will-change: transform; }
 .rot-left  { animation: rot-scroll-left  70s linear infinite; }
 .rot-right { animation: rot-scroll-right 70s linear infinite; }
-/* Pause on hover so someone can actually read a score. */
 .rot-marquee:hover .rot-track { animation-play-state: paused; }
 
 @keyframes rot-scroll-left {
@@ -62,8 +240,78 @@ h1, h2, h3 {
   to   { transform: translate3d(0, 0, 0); }
 }
 
-/* Motion is decorative — hold the rows still for anyone who asked for less of it. */
 @media (prefers-reduced-motion: reduce) {
   .rot-left, .rot-right { animation: none; }
   .rot-marquee { overflow-x: auto; }
+}
+
+/* ── ORBIT (app/components/Orbit.tsx) ─────────────────────────────────────────
+   Platform wordmarks circling Bo. Rings spin; each chip counter-spins at the
+   same duration so its text stays upright while it travels — that trick is the
+   whole effect, and it costs no JS per frame. */
+.rot-orbit-core {
+  width: 132px;
+  height: 132px;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #ffffff, #f4f1ec);
+  border: 1px solid var(--rot-line);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 18px 44px -18px rgba(28,22,16,0.35);
+}
+
+.rot-orbit-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: calc(-1 * var(--half, 0px));
+  transform-origin: center;
+  border-radius: 9999px;
+  border: 1px dashed var(--rot-line);
+  translate: -50% -50%;
+  animation-name: rot-orbit-spin;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.rot-orbit-slot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+}
+
+.rot-orbit-chip {
+  position: absolute;
+  translate: -50% -50%;
+  white-space: nowrap;
+  padding: 0.4rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--rot-fg);
+  background: linear-gradient(180deg, #ffffff, #f7f5f1);
+  border: 1px solid var(--rot-line);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 8px 20px -12px rgba(28,22,16,0.35);
+  animation-name: rot-orbit-spin;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  cursor: default;
+}
+
+@keyframes rot-orbit-spin {
+  from { rotate: 0deg; }
+  to   { rotate: 360deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rot-orbit-ring, .rot-orbit-chip { animation: none; }
+}
+
+@media (max-width: 640px) {
+  .rot-orbit-chip { font-size: 0.6875rem; padding: 0.3rem 0.6rem; }
+  .rot-orbit-core { width: 108px; height: 108px; }
 }

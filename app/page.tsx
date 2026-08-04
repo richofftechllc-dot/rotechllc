@@ -1,4 +1,6 @@
 import BoAvatarFlip from "./components/BoAvatarFlip";
+import Orbit from "./components/Orbit";
+import Reveal from "./components/Reveal";
 import CommittedOrInterested from "./components/CommittedOrInterested";
 // BirthdayBanner retired Aug 2 2026 — the drop ended Jul 27 and the countdown
 // was stuck rendering "It's the 27th 🎂" on the live homepage. Component kept in
@@ -17,11 +19,11 @@ async function getMemberCount() {
       "https://discord.com/api/v10/guilds/1488597128329822369?with_counts=true",
       { headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` }, next: { revalidate: 120 } }
     );
-    if (!res.ok) return 72;
+    if (!res.ok) return 114;
     const data = await res.json();
     return data.approximate_member_count || 72;
   } catch {
-    return 72;
+    return 114;
   }
 }
 
@@ -37,70 +39,80 @@ export default async function Home() {
           whether you're interested or committed, and everything below reads
           differently once you've picked. Interested is a real free offer, not a
           teaser — see the component. */}
-      <CommittedOrInterested />
+      <Reveal><CommittedOrInterested /></Reveal>
 
       {/* 1 — BO TECH: the AI-powered career command center */}
-      <main className="max-w-6xl mx-auto px-6 py-16 md:py-24">
+      <main className="max-w-6xl mx-auto px-6 pt-16 md:pt-20 pb-24 md:pb-32">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <div className="text-orange-500 font-bold tracking-widest text-sm mb-4">BO TECH · YOUR AI-POWERED CAREER COMMAND CENTER</div>
+            <Reveal><div className="rot-kicker mb-8">Bo Tech · AI-powered career command center</div></Reveal>
             {/* <BirthdayBanner /> — retired, see import note */}
-            <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-4">
+            <Reveal delay={60}><h1 className="text-5xl md:text-7xl font-semibold leading-[0.95] mb-6">
               Your AI-powered<br />
-              <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">career command center.</span>
-            </h1>
-            <div className="text-gray-300 font-bold tracking-wide text-sm mb-6">Tech · GovTech · Commercial Tech · AI</div>
-            <p className="text-gray-400 text-lg mb-8 max-w-md">
+              <span className="text-rot-accent">career command center.</span>
+            </h1></Reveal>
+            <Reveal delay={120}><div className="text-rot-faint text-sm mb-8 tracking-wide">Tech · GovTech · Commercial Tech · AI</div></Reveal>
+            <Reveal delay={160}><p className="text-rot-muted text-lg mb-10 max-w-md leading-relaxed">
               Self-paced and live-cohort certification tracks, an AI tutor that lives in your Discord, exam vouchers, clearance guidance, and real project work — the guided system Bo built for breaking into Tech, GovTech, Commercial Tech, and AI.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <a href="https://discord.gg/dtcYf8PTNa" target="_blank" rel="noopener noreferrer" className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90">
+            </p></Reveal>
+            <Reveal delay={210}><div className="flex flex-wrap gap-4">
+              <a href="https://discord.gg/dtcYf8PTNa" target="_blank" rel="noopener noreferrer" className="rot-btn-accent px-6 py-3.5 text-sm">
                 Join the Discord — Free
               </a>
-              <a href="/help#agents" className="px-6 py-3 border border-white/20 rounded-lg hover:bg-white/5">
+              <a href="/help#agents" className="rot-btn-ghost px-6 py-3.5 text-sm">
                 Talk to an AI agent
               </a>
-              <a href="#founding" className="px-6 py-3 border border-orange-500/40 text-orange-400 rounded-lg hover:bg-orange-500/10 font-bold">
+              <a href="#founding" className="rot-btn-ghost px-6 py-3.5 text-sm">
                 See membership →
               </a>
             </div>
-            <p className="text-gray-500 text-sm mt-4">Free to join — or grab <a href="#founding" className="text-orange-400 underline underline-offset-2">full membership</a> below. 🤎</p>
+            </Reveal>
+            <p className="text-rot-faint text-sm mt-6">Free to join — or grab <a href="#founding" className="text-rot-fg underline underline-offset-4 decoration-rot-line-strong hover:decoration-rot-fg">full membership</a> below. 🤎</p>
           </div>
-          <BoAvatarFlip />
+          <Reveal delay={120}>
+            <Orbit />
+            <p className="text-rot-faint text-xs text-center mt-6 max-w-sm mx-auto leading-relaxed">
+              We prepare you for these platforms&apos; certifications. ROT is not affiliated
+              with, endorsed by, or partnered with any of them.
+            </p>
+          </Reveal>
         </div>
       </main>
 
       {/* 2 — BREAKING INTO TECH */}
-      <section id="breaking-in" className="bg-zinc-950 py-20 border-t border-white/5 scroll-mt-20">
+      <Reveal>
+      <section id="breaking-in" className="bg-rot-sunken py-24 md:py-32 border-t border-rot-line scroll-mt-20">
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <h2 className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-4">
+          <h2 className="text-5xl md:text-7xl font-semibold leading-[0.95] mb-6">
             Break into Tech.<br />
-            <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">No shortcuts.</span>
+            <span className="text-rot-accent">No shortcuts.</span>
           </h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-4">
+          <p className="text-rot-muted text-lg max-w-2xl mx-auto mb-6 leading-relaxed">
             Not a video dump — a guided system. Self-paced or live-cohort cert tracks, a live AI tutor, your exam voucher, clearance guidance, and real project work. You move, Bo Tech moves with you.
           </p>
-          <a href="/certifications" className="inline-block text-orange-400 font-bold hover:text-orange-300">See everything you get inside ROT →</a>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8 mt-16 text-center">
-            <div><div className="text-3xl sm:text-5xl font-black text-orange-500">{memberCount}</div><div className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2">Active members (live)</div></div>
-            <div><div className="text-3xl sm:text-5xl font-black text-orange-500">200+</div><div className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2">online certifications</div></div>
-            <div><div className="text-3xl sm:text-5xl font-black text-orange-500">14+</div><div className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2">States represented</div></div>
-            <div><div className="text-3xl sm:text-5xl font-black text-orange-500">100%</div><div className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2">Virtual &amp; flexible</div></div>
+          <a href="/certifications" className="inline-block text-sm text-rot-fg underline underline-offset-4 decoration-rot-line-strong hover:decoration-rot-fg">See everything you get inside ROT →</a>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-rot-line border border-rot-line mt-20 text-center">
+            <div className="bg-rot-bg py-8 px-4"><div className="text-3xl sm:text-5xl font-semibold tracking-tight">{memberCount}</div><div className="rot-kicker mt-3">Active members (live)</div></div>
+            <div className="bg-rot-bg py-8 px-4"><div className="text-3xl sm:text-5xl font-semibold tracking-tight">200+</div><div className="rot-kicker mt-3">online certifications</div></div>
+            <div className="bg-rot-bg py-8 px-4"><div className="text-3xl sm:text-5xl font-semibold tracking-tight">16+</div><div className="rot-kicker mt-3">States represented</div></div>
+            <div className="bg-rot-bg py-8 px-4"><div className="text-3xl sm:text-5xl font-semibold tracking-tight">100%</div><div className="rot-kicker mt-3">Virtual &amp; flexible</div></div>
           </div>
         </div>
       </section>
 
+      </Reveal>
+
       {/* 3 — RECEIPTS, NOT PROMISES */}
-      <ResultsWall />
+      <Reveal><ResultsWall /></Reveal>
 
       {/* 4 — OFFERS */}
-      <Offers />
+      <Reveal><Offers /></Reveal>
 
       {/* 5 — FOUNDER FULL MEMBERSHIP */}
-      <FoundingSlot />
+      <Reveal><FoundingSlot /></Reveal>
 
       {/* 6 — PICK YOUR LANE */}
-      <WhoItsFor />
+      <Reveal><WhoItsFor /></Reveal>
     </>
   );
 }

@@ -48,7 +48,7 @@ export default function AiWaitlist() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-white">
+    <main className="relative min-h-screen overflow-hidden bg-rot-bg text-rot-fg">
       {/* Rotating montage background */}
       <div className="absolute inset-0 z-0">
         {MONTAGE.map((src, i) => (
@@ -60,7 +60,7 @@ export default function AiWaitlist() {
         ))}
         {/* gradient base (always visible, and the fallback if images aren't added yet) */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-950 via-black to-black" />
-        <div className="absolute inset-0 bg-black/55" />
+        <div className="absolute inset-0 bg-rot-sunken" />
         <div className="absolute -top-32 -right-24 h-96 w-96 rounded-full bg-blue-600/20 blur-3xl" />
         <div className="absolute bottom-0 -left-24 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl" />
       </div>
@@ -69,13 +69,13 @@ export default function AiWaitlist() {
       <div className="relative z-10 mx-auto flex min-h-screen max-w-xl flex-col items-center justify-center px-6 py-16 text-center">
         <Image src="/rot-logo.png" alt="Rich Off Tech" width={64} height={64} className="mb-6 opacity-90" />
 
-        <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.3em] text-blue-400">
+        <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.3em] text-blue-600">
           Rich Off Tech · AI
         </p>
         <h1 className="text-4xl font-black leading-[1.05] sm:text-5xl">
-          Daily Tech &amp; <span className="text-blue-400">AI Intel.</span>
+          Daily Tech &amp; <span className="text-blue-600">AI Intel.</span>
         </h1>
-        <p className="mt-4 max-w-md text-sm text-gray-300 sm:text-base">
+        <p className="mt-4 max-w-md text-sm text-rot-muted sm:text-base">
           The headlines that move careers and markets — read, analyzed, and sent straight to your
           phone. Join the waitlist to get the drop first.
         </p>
@@ -84,7 +84,7 @@ export default function AiWaitlist() {
           <div className="mt-10 w-full rounded-2xl border border-blue-500/40 bg-blue-950/40 p-8">
             <div className="text-3xl">✅</div>
             <p className="mt-3 text-lg font-bold text-blue-300">{msg}</p>
-            <p className="mt-1 text-sm text-gray-400">
+            <p className="mt-1 text-sm text-rot-muted">
               We&apos;ll text you when the daily intel goes live. Welcome to the inside.
             </p>
           </div>
@@ -95,7 +95,7 @@ export default function AiWaitlist() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name (optional)"
-              className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-white placeholder-gray-500 outline-none focus:border-blue-400"
+              className="w-full rounded-xl border border-rot-line bg-rot-sunken px-4 py-3 text-rot-fg placeholder-rot-faint outline-none focus:border-blue-400"
             />
             <input
               type="tel"
@@ -103,7 +103,7 @@ export default function AiWaitlist() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="Phone number to join"
-              className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-white placeholder-gray-500 outline-none focus:border-blue-400"
+              className="w-full rounded-xl border border-rot-line bg-rot-sunken px-4 py-3 text-rot-fg placeholder-rot-faint outline-none focus:border-blue-400"
             />
             <button
               type="submit"
@@ -112,14 +112,14 @@ export default function AiWaitlist() {
             >
               {status === "loading" ? "Joining…" : "Join the Waitlist"}
             </button>
-            {status === "error" && <p className="text-sm text-red-400">{msg}</p>}
-            <p className="pt-1 text-center text-[11px] text-gray-500">
+            {status === "error" && <p className="text-sm text-red-600">{msg}</p>}
+            <p className="pt-1 text-center text-[11px] text-rot-faint">
               We&apos;ll only text you ROT tech intel. No spam. Opt out anytime.
             </p>
           </form>
         )}
 
-        <p className="mt-10 text-[11px] font-bold uppercase tracking-[0.3em] text-gray-500">
+        <p className="mt-10 text-[11px] font-bold uppercase tracking-[0.3em] text-rot-faint">
           Read · Analyze · Move
         </p>
       </div>

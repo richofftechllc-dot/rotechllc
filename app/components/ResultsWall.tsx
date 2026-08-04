@@ -65,17 +65,17 @@ const OUTCOMES: Outcome[] = [
 function Card({ w }: { w: Win }) {
   return (
     <figure className="shrink-0 w-[300px] sm:w-[380px] mx-3">
-      <div className="rounded-xl overflow-hidden border border-white/15 bg-white">
+      <div className="rounded-xl overflow-hidden border border-rot-line bg-white">
         {/* Plain img, not next/image: these are fixed-size local assets inside a
             transform-animated track, where the fill/layout machinery buys nothing. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={w.img} alt={`${w.cert} pass — ${w.first}`} loading="lazy" className="w-full h-auto block" />
       </div>
-      <figcaption className="mt-2 text-xs text-gray-400 flex flex-wrap gap-x-2">
-        <span className="text-white font-bold">{w.first}</span>
-        <span className="text-orange-400 font-semibold">{w.cert}</span>
+      <figcaption className="mt-2 text-xs text-rot-muted flex flex-wrap gap-x-2">
+        <span className="text-rot-fg font-bold">{w.first}</span>
+        <span className="text-rot-accent font-semibold">{w.cert}</span>
         {w.score && <span>scored {w.score}</span>}
-        {w.location && <span className="text-gray-500">· {w.location}</span>}
+        {w.location && <span className="text-rot-faint">· {w.location}</span>}
       </figcaption>
     </figure>
   );
@@ -88,7 +88,7 @@ export default function ResultsWall() {
   const rowB = [...WINS].reverse();
 
   return (
-    <section id="results" className="relative border-t border-white/5 overflow-hidden bg-black">
+    <section id="results" className="relative border-t border-rot-line overflow-hidden bg-rot-bg">
       {/* Static background — fixed gradient wash, deliberately not animated so the moving
           screenshots are the only thing in motion. */}
       <div
@@ -98,11 +98,11 @@ export default function ResultsWall() {
 
       <div className="relative py-20">
         <div className="max-w-6xl mx-auto px-6 text-center mb-12">
-          <div className="text-orange-500 font-bold tracking-widest text-sm mb-4">REAL RESULTS</div>
+          <div className="text-rot-accent font-bold tracking-widest text-sm mb-4">REAL RESULTS</div>
           <h2 className="text-4xl md:text-5xl font-black mb-4">Receipts, not promises.</h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            Every member here who landed a role holds <span className="text-white font-bold">Security+</span>,{" "}
-            <span className="text-white font-bold">ServiceNow CSA</span>, or both. Names and exam
+          <p className="text-rot-muted text-lg max-w-2xl mx-auto">
+            Every member here who landed a role holds <span className="text-rot-fg font-bold">Security+</span>,{" "}
+            <span className="text-rot-fg font-bold">ServiceNow CSA</span>, or both. Names and exam
             codes are redacted — the scores are not.
           </p>
         </div>
@@ -127,21 +127,21 @@ export default function ResultsWall() {
 
         {/* Job outcomes — quoted */}
         <div className="max-w-6xl mx-auto px-6 mt-16">
-          <div className="text-center text-orange-500 font-bold tracking-widest text-sm mb-6">
+          <div className="text-center text-rot-accent font-bold tracking-widest text-sm mb-6">
             THEN THE OFFERS CAME
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {OUTCOMES.map((o) => (
-              <blockquote key={o.who + o.detail} className="bg-zinc-900/80 border border-white/10 rounded-2xl p-5 backdrop-blur">
+              <blockquote key={o.who + o.detail} className="bg-rot-surface/80 border border-rot-line rounded-2xl p-5 backdrop-blur">
                 <p className="text-gray-200 text-sm leading-relaxed">&ldquo;{o.quote}&rdquo;</p>
                 <footer className="mt-3 text-xs">
-                  <span className="text-white font-bold">{o.who}</span>
-                  <span className="text-gray-500"> — {o.detail}</span>
+                  <span className="text-rot-fg font-bold">{o.who}</span>
+                  <span className="text-rot-faint"> — {o.detail}</span>
                 </footer>
               </blockquote>
             ))}
           </div>
-          <p className="text-gray-500 text-xs text-center mt-6">
+          <p className="text-rot-faint text-xs text-center mt-6">
             Shared with permission. Full names, exam access codes, and employer documents are withheld.
           </p>
         </div>

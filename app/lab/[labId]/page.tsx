@@ -109,8 +109,8 @@ export default function LabPage({ params }: { params: Promise<{ labId: string }>
 
   if (!lab) {
     return (
-      <main className="min-h-screen bg-black px-4 py-10 text-white">
-        <div className="mx-auto max-w-2xl"><Link href="/quiz" className="text-sm text-gray-500 hover:text-orange-500">← Back</Link><h1 className="mt-4 text-2xl font-black">Lab not found</h1></div>
+      <main className="min-h-screen bg-rot-bg px-4 py-10 text-rot-fg">
+        <div className="mx-auto max-w-2xl"><Link href="/quiz" className="text-sm text-rot-faint hover:text-rot-accent">← Back</Link><h1 className="mt-4 text-2xl font-black">Lab not found</h1></div>
       </main>
     );
   }
@@ -118,9 +118,9 @@ export default function LabPage({ params }: { params: Promise<{ labId: string }>
   const pct = Math.round((done.filter(Boolean).length / lab.steps.length) * 100);
 
   return (
-    <main className="min-h-screen bg-black px-4 py-8 text-white">
+    <main className="min-h-screen bg-rot-bg px-4 py-8 text-rot-fg">
       <div className="mx-auto max-w-6xl">
-        <Link href="/quiz" className="text-sm text-gray-500 hover:text-orange-500">← Back to tracks</Link>
+        <Link href="/quiz" className="text-sm text-rot-faint hover:text-rot-accent">← Back to tracks</Link>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
           <div>
             <p className="font-mono text-xs" style={{ color: accent }}>🧪 LAB · {lab.cert} · {lab.est}</p>
@@ -128,20 +128,20 @@ export default function LabPage({ params }: { params: Promise<{ labId: string }>
           </div>
           <a href={lab.pdiUrl} target="_blank" rel="noreferrer" className="rounded-lg px-4 py-2 text-sm font-bold text-black hover:opacity-90" style={{ background: accent }}>{lab.envLabel || "🚀 Open my PDI ↗"}</a>
         </div>
-        <p className="mt-1 text-gray-400">{lab.objective}</p>
+        <p className="mt-1 text-rot-muted">{lab.objective}</p>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           {/* Steps */}
           <div>
-            <div className="mb-2 h-1.5 rounded bg-white/10"><div className="h-full rounded bg-fuchsia-500 transition-all" style={{ width: `${pct}%` }} /></div>
+            <div className="mb-2 h-1.5 rounded bg-rot-sunken"><div className="h-full rounded bg-fuchsia-500 transition-all" style={{ width: `${pct}%` }} /></div>
             <div className="space-y-2">
               {lab.steps.map((s, i) => (
-                <div key={i} className={`rounded-xl border p-3 ${i === step ? "border-fuchsia-500/50 bg-fuchsia-500/5" : done[i] ? "border-green-500/30 bg-green-500/5" : "border-white/10 bg-zinc-900/60"}`}>
+                <div key={i} className={`rounded-xl border p-3 ${i === step ? "border-fuchsia-500/50 bg-fuchsia-500/5" : done[i] ? "border-emerald-600/25 bg-green-500/5" : "border-rot-line bg-rot-surface/60"}`}>
                   <div className="flex items-start gap-2">
-                    <span className={done[i] ? "text-green-400" : i === step ? "text-fuchsia-400" : "text-gray-600"}>{done[i] ? "✓" : i + 1}</span>
+                    <span className={done[i] ? "text-emerald-600" : i === step ? "text-fuchsia-400" : "text-rot-faint"}>{done[i] ? "✓" : i + 1}</span>
                     <div className="min-w-0 flex-1">
                       <div className="text-sm font-bold">{s.title}</div>
-                      {(i === step || done[i]) && <div className="mt-1 text-xs text-gray-300">{s.do}</div>}
+                      {(i === step || done[i]) && <div className="mt-1 text-xs text-rot-muted">{s.do}</div>}
                       {i === step && (
                         <button onClick={markStepDone} disabled={busy} className="mt-2 rounded-lg bg-fuchsia-500 px-3 py-1 text-xs font-bold text-black hover:bg-fuchsia-400 disabled:opacity-40">✓ I did it — check &amp; continue</button>
                       )}
@@ -149,34 +149,34 @@ export default function LabPage({ params }: { params: Promise<{ labId: string }>
                   </div>
                 </div>
               ))}
-              {pct === 100 && <p className="text-sm font-semibold text-green-400">🎉 Lab complete — you did the real thing.</p>}
+              {pct === 100 && <p className="text-sm font-semibold text-emerald-600">🎉 Lab complete — you did the real thing.</p>}
             </div>
           </div>
 
           {/* Coach chat */}
-          <div className="flex h-[70vh] flex-col rounded-xl border bg-zinc-900" style={{ borderColor: `${accent}55` }}>
-            <div className="flex items-center justify-between border-b border-white/10 p-3">
+          <div className="flex h-[70vh] flex-col rounded-xl border bg-rot-surface" style={{ borderColor: `${accent}55` }}>
+            <div className="flex items-center justify-between border-b border-rot-line p-3">
               <div className="flex items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-black text-white" style={{ background: accent }}>{coachName[0]}</span>
+                <span className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-black text-rot-fg" style={{ background: accent }}>{coachName[0]}</span>
                 <span className="text-sm font-bold">{coachName} · lab coach</span>
               </div>
               <div className="flex items-center gap-1 text-xs">
                 {speaking && <button onClick={stopSpeak} className="rounded border border-red-500/40 bg-red-500/10 px-2 py-1 text-red-300">⏹ Stop</button>}
-                <button onClick={() => { const n = !autoSpeak; setAutoSpeak(n); if (!n) stopSpeak(); }} className={`rounded border px-2 py-1 ${autoSpeak ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300" : "border-white/10 text-gray-400"}`}>{autoSpeak ? "🔊" : "🔈"}</button>
+                <button onClick={() => { const n = !autoSpeak; setAutoSpeak(n); if (!n) stopSpeak(); }} className={`rounded border px-2 py-1 ${autoSpeak ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300" : "border-rot-line text-rot-muted"}`}>{autoSpeak ? "🔊" : "🔈"}</button>
               </div>
             </div>
             <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto p-3 text-sm">
               {messages.map((m, i) => (
-                <div key={i} className={m.role === "user" ? "ml-auto max-w-[85%] rounded-2xl bg-fuchsia-500 px-3 py-2 text-black" : "max-w-[90%] rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-gray-100"}>
+                <div key={i} className={m.role === "user" ? "ml-auto max-w-[85%] rounded-2xl bg-fuchsia-500 px-3 py-2 text-black" : "max-w-[90%] rounded-2xl border border-rot-line bg-rot-sunken px-3 py-2 text-gray-100"}>
                   {m.role === "assistant" ? <Markdown text={m.content} /> : <span className="whitespace-pre-wrap">{m.content}</span>}
                 </div>
               ))}
               {busy && <div className="text-xs text-fuchsia-300 animate-pulse">Flo&apos;s thinking…</div>}
               <div ref={endRef} />
             </div>
-            <div className="flex gap-2 border-t border-white/10 p-2">
-              <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && ask(input)} placeholder={listening ? "Listening…" : "Ask Flo, or tell her what you see…"} disabled={busy} className="flex-1 rounded bg-zinc-800 border border-white/10 px-3 py-2 text-sm outline-none focus:border-fuchsia-500" />
-              <button onClick={toggleMic} title="Talk to Flo" className={`rounded px-3 font-bold ${listening ? "bg-red-500 text-white animate-pulse" : "bg-zinc-800 text-gray-300 border border-white/10"}`}>🎤</button>
+            <div className="flex gap-2 border-t border-rot-line p-2">
+              <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && ask(input)} placeholder={listening ? "Listening…" : "Ask Flo, or tell her what you see…"} disabled={busy} className="flex-1 rounded bg-rot-sunken border border-rot-line px-3 py-2 text-sm outline-none focus:border-fuchsia-500" />
+              <button onClick={toggleMic} title="Talk to Flo" className={`rounded px-3 font-bold ${listening ? "bg-red-500 text-rot-fg animate-pulse" : "bg-rot-sunken text-rot-muted border border-rot-line"}`}>🎤</button>
               <button onClick={() => ask(input)} disabled={busy || !input.trim()} className="rounded bg-fuchsia-500 px-3 font-bold text-black disabled:opacity-40">↑</button>
             </div>
           </div>

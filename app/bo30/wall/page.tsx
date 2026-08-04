@@ -45,45 +45,45 @@ export default function TributeWall() {
   return (
     <main className="max-w-5xl mx-auto px-6 py-12">
       <h1 className="text-3xl font-black mb-1">Birthday tributes</h1>
-      <p className="text-gray-500 text-sm mb-8">
-        Private. Share <span className="font-mono text-gray-300">rotechllc.com/bo30</span> to collect more.
+      <p className="text-rot-faint text-sm mb-8">
+        Private. Share <span className="font-mono text-rot-muted">rotechllc.com/bo30</span> to collect more.
         {rows && ` · ${videos.length} video${videos.length === 1 ? "" : "s"} (${ready} ready) · ${notes.length} written`}
       </p>
 
       {error && <p className="text-red-400 text-sm mb-6">{error}</p>}
-      {!rows && !error && <p className="text-gray-500 text-sm">Loading…</p>}
-      {rows && rows.length === 0 && <p className="text-gray-500 text-sm">Nothing yet. Send the link out.</p>}
+      {!rows && !error && <p className="text-rot-faint text-sm">Loading…</p>}
+      {rows && rows.length === 0 && <p className="text-rot-faint text-sm">Nothing yet. Send the link out.</p>}
 
       {videos.length > 0 && (
         <>
-          <h2 className="text-xs uppercase tracking-widest text-orange-500 font-bold mb-3">Video</h2>
+          <h2 className="text-xs uppercase tracking-widest text-rot-accent font-bold mb-3">Video</h2>
           <div className="grid sm:grid-cols-2 gap-5 mb-12">
             {videos.map((t) => (
-              <div key={t.id} className="bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden">
+              <div key={t.id} className="bg-rot-surface border border-rot-line rounded-2xl overflow-hidden">
                 {t.muxPlaybackId ? (
                   // Native video on the HLS url — Safari plays it directly, and Chrome
                   // falls back to the MP4 source below it.
-                  <video controls playsInline preload="metadata" className="w-full aspect-video bg-black">
+                  <video controls playsInline preload="metadata" className="w-full aspect-video bg-rot-bg">
                     <source src={HLS(t.muxPlaybackId)} type="application/x-mpegURL" />
                     <source src={MP4(t.muxPlaybackId)} type="video/mp4" />
                   </video>
                 ) : (
-                  <div className="aspect-video bg-black/60 grid place-items-center text-gray-500 text-sm text-center px-4">
+                  <div className="aspect-video bg-rot-sunken grid place-items-center text-rot-faint text-sm text-center px-4">
                     {t.status === "errored" ? "Upload failed" : "Still processing — reload in a minute"}
                   </div>
                 )}
                 <div className="p-4">
-                  <div className="font-bold">{t.name}{t.city ? <span className="text-gray-500 font-normal"> · {t.city}</span> : null}</div>
-                  <div className="text-orange-400 text-xs mt-0.5">{promptById(t.promptId)?.label || t.promptId}</div>
-                  <div className="text-gray-600 text-[11px] mt-1">{new Date(t.createdAt).toLocaleString()}</div>
+                  <div className="font-bold">{t.name}{t.city ? <span className="text-rot-faint font-normal"> · {t.city}</span> : null}</div>
+                  <div className="text-rot-accent text-xs mt-0.5">{promptById(t.promptId)?.label || t.promptId}</div>
+                  <div className="text-rot-faint text-[11px] mt-1">{new Date(t.createdAt).toLocaleString()}</div>
                   {t.muxPlaybackId && (
                     <div className="flex flex-wrap gap-2 mt-3">
                       <button onClick={() => copy(MP4(t.muxPlaybackId!), t.id)}
-                        className="text-[11px] px-2.5 py-1 rounded border border-white/20 text-gray-200 hover:bg-white/5">
+                        className="text-[11px] px-2.5 py-1 rounded border border-rot-line-strong text-gray-200 hover:bg-rot-sunken">
                         {copied === t.id ? "Copied" : "Copy MP4 link (for Opus)"}
                       </button>
                       <a href={MP4(t.muxPlaybackId)} download
-                        className="text-[11px] px-2.5 py-1 rounded border border-white/20 text-gray-200 hover:bg-white/5">
+                        className="text-[11px] px-2.5 py-1 rounded border border-rot-line-strong text-gray-200 hover:bg-rot-sunken">
                         Download
                       </a>
                     </div>
@@ -97,15 +97,15 @@ export default function TributeWall() {
 
       {notes.length > 0 && (
         <>
-          <h2 className="text-xs uppercase tracking-widest text-orange-500 font-bold mb-3">Written</h2>
+          <h2 className="text-xs uppercase tracking-widest text-rot-accent font-bold mb-3">Written</h2>
           <div className="grid sm:grid-cols-2 gap-4">
             {notes.map((t) => (
-              <blockquote key={t.id} className="bg-zinc-900 border border-white/10 rounded-2xl p-5">
+              <blockquote key={t.id} className="bg-rot-surface border border-rot-line rounded-2xl p-5">
                 <p className="text-gray-200 text-sm whitespace-pre-wrap">{t.text}</p>
                 <footer className="mt-3 text-xs">
-                  <span className="font-bold text-white">{t.name}</span>
-                  {t.city && <span className="text-gray-500"> · {t.city}</span>}
-                  <span className="text-orange-400"> — {promptById(t.promptId)?.label || t.promptId}</span>
+                  <span className="font-bold text-rot-fg">{t.name}</span>
+                  {t.city && <span className="text-rot-faint"> · {t.city}</span>}
+                  <span className="text-rot-accent"> — {promptById(t.promptId)?.label || t.promptId}</span>
                 </footer>
               </blockquote>
             ))}

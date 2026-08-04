@@ -109,7 +109,7 @@ export default function LessonVideo({ url, domainId, domainName }: { url: string
 
   if (!videoId) {
     return (
-      <div className="bg-zinc-950 border border-yellow-500/30 rounded-xl p-4 mb-6 text-sm text-yellow-200">
+      <div className="bg-rot-sunken border border-yellow-500/30 rounded-xl p-4 mb-6 text-sm text-yellow-200">
         Video link present but not a recognized YouTube URL: <code>{url}</code>
       </div>
     );
@@ -127,17 +127,17 @@ export default function LessonVideo({ url, domainId, domainName }: { url: string
 
   return (
     <div className="relative mb-6">
-      <div className="aspect-video rounded-xl overflow-hidden border border-white/10 bg-black">
+      <div className="aspect-video rounded-xl overflow-hidden border border-rot-line bg-rot-bg">
         <div ref={containerRef} className="w-full h-full" />
       </div>
 
       {pausePromptOpen && (
-        <div className="absolute bottom-3 left-3 right-3 md:left-auto md:right-3 md:max-w-sm bg-zinc-900 border border-orange-500/50 rounded-xl p-4 shadow-2xl">
-          <div className="text-orange-500 font-bold tracking-widest text-[10px] mb-1">📍 BO NOTICED</div>
-          <p className="text-sm text-white mb-3 leading-snug">Caught you stopping. What&apos;s the question? I&apos;ll answer in your sidebar.</p>
+        <div className="absolute bottom-3 left-3 right-3 md:left-auto md:right-3 md:max-w-sm bg-rot-surface border border-rot-accent/30 rounded-xl p-4 shadow-2xl">
+          <div className="text-rot-accent font-bold tracking-widest text-[10px] mb-1">📍 BO NOTICED</div>
+          <p className="text-sm text-rot-fg mb-3 leading-snug">Caught you stopping. What&apos;s the question? I&apos;ll answer in your sidebar.</p>
           <div className="flex gap-2">
             <button onClick={openBoTech} className="flex-1 px-3 py-2 bg-orange-500 text-black font-bold text-xs rounded">Ask Bo Tech →</button>
-            <button onClick={() => setPausePromptOpen(false)} className="px-3 py-2 text-xs text-gray-400 hover:text-white">Dismiss</button>
+            <button onClick={() => setPausePromptOpen(false)} className="px-3 py-2 text-xs text-rot-muted hover:text-rot-fg">Dismiss</button>
           </div>
         </div>
       )}

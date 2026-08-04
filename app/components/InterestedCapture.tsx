@@ -40,7 +40,7 @@ export default function InterestedCapture() {
     return (
       <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-5 text-center">
         <div className="font-bold text-blue-300 mb-1">Got you.</div>
-        <p className="text-gray-300 text-sm">
+        <p className="text-rot-muted text-sm">
           Nothing to pay and nothing to unsubscribe from twice — we&apos;ll send the guides
           and tell you when something worth your time drops.
         </p>
@@ -49,8 +49,8 @@ export default function InterestedCapture() {
   }
 
   return (
-    <form onSubmit={submit} className="bg-black/40 border border-white/10 rounded-xl p-5">
-      <label className="block text-xs uppercase tracking-widest text-gray-500 mb-3 font-bold">
+    <form onSubmit={submit} className="bg-rot-sunken border border-rot-line rounded-xl p-5">
+      <label className="block text-xs uppercase tracking-widest text-rot-faint mb-3 font-bold">
         Send me the free guides
       </label>
       <div className="grid sm:grid-cols-2 gap-3 mb-3">
@@ -58,7 +58,7 @@ export default function InterestedCapture() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="First name"
-          className="w-full px-4 py-3 bg-black border border-white/15 rounded-lg text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none"
+          className="w-full px-4 py-3 bg-rot-bg border border-rot-line rounded-lg text-rot-fg placeholder-rot-faint focus:border-blue-400 focus:outline-none"
         />
         <input
           value={email}
@@ -66,18 +66,18 @@ export default function InterestedCapture() {
           type="email"
           required
           placeholder="Email"
-          className="w-full px-4 py-3 bg-black border border-white/15 rounded-lg text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none"
+          className="w-full px-4 py-3 bg-rot-bg border border-rot-line rounded-lg text-rot-fg placeholder-rot-faint focus:border-blue-400 focus:outline-none"
         />
       </div>
       <button
         type="submit"
         disabled={status === "loading"}
-        className="w-full py-3 bg-white text-black font-bold rounded-lg hover:bg-gray-200 disabled:opacity-50"
+        className="rot-btn w-full py-3.5 text-sm disabled:opacity-50"
       >
         {status === "loading" ? "Sending…" : "Send them over"}
       </button>
-      {status === "error" && <div className="text-red-400 text-sm mt-3 text-center">{msg}</div>}
-      <p className="text-gray-600 text-xs mt-3 text-center">No card. No spam. Unsubscribe whenever.</p>
+      {status === "error" && <div className="text-red-600 text-sm mt-3 text-center">{msg}</div>}
+      <p className="text-rot-faint text-xs mt-3 text-center">No card. No spam. Unsubscribe whenever.</p>
     </form>
   );
 }

@@ -105,38 +105,38 @@ function UIcon({ name, className = "w-6 h-6" }: { name: string; className?: stri
 // ─── Labeled mock of a ServiceNow instance (the "real demo") ──────────────
 function ServiceNowMock() {
   return (
-    <div className="mb-5 rounded-xl border border-white/10 bg-gradient-to-b from-zinc-950 to-black p-3">
-      <p className="mb-2 text-[11px] uppercase tracking-wide text-gray-500">This is what an instance actually looks like ↓</p>
+    <div className="mb-5 rounded-xl border border-rot-line bg-gradient-to-b from-zinc-950 to-black p-3">
+      <p className="mb-2 text-[11px] uppercase tracking-wide text-rot-faint">This is what an instance actually looks like ↓</p>
       {/* Banner */}
-      <div className="flex items-center gap-2 rounded-t-lg bg-zinc-800 px-3 py-2 text-gray-200 ring-1 ring-orange-500/30">
-        <UIcon name="menu" className="w-4 h-4 text-orange-400" />
-        <span className="text-sm font-bold text-white">now<span className="text-orange-400">.</span></span>
-        <div className="ml-2 flex flex-1 items-center gap-1 rounded bg-zinc-900 px-2 py-1 text-[11px] text-gray-500"><UIcon name="search" className="w-3 h-3" />Search</div>
-        <UIcon name="gear" className="w-4 h-4 text-orange-400" />
+      <div className="flex items-center gap-2 rounded-t-lg bg-rot-sunken px-3 py-2 text-gray-200 ring-1 ring-orange-500/30">
+        <UIcon name="menu" className="w-4 h-4 text-rot-accent" />
+        <span className="text-sm font-bold text-rot-fg">now<span className="text-rot-accent">.</span></span>
+        <div className="ml-2 flex flex-1 items-center gap-1 rounded bg-rot-surface px-2 py-1 text-[11px] text-rot-faint"><UIcon name="search" className="w-3 h-3" />Search</div>
+        <UIcon name="gear" className="w-4 h-4 text-rot-accent" />
         <div className="h-5 w-5 rounded-full bg-orange-500/80" />
       </div>
       <div className="flex">
         {/* Navigator */}
-        <div className="w-2/5 rounded-bl-lg bg-zinc-900 p-2 ring-1 ring-white/5">
-          <div className="mb-2 flex items-center gap-1 rounded bg-black/50 px-2 py-1 text-[10px] text-gray-500"><UIcon name="search" className="w-3 h-3" />Filter navigator</div>
-          <div className="mb-1 flex items-center gap-1 text-[11px] text-yellow-400"><UIcon name="star" className="w-3 h-3" /> Favorites <span className="mx-1 text-gray-600">·</span><UIcon name="clock" className="w-3 h-3 text-gray-400" /> History</div>
+        <div className="w-2/5 rounded-bl-lg bg-rot-surface p-2 ring-1 ring-white/5">
+          <div className="mb-2 flex items-center gap-1 rounded bg-rot-sunken px-2 py-1 text-[10px] text-rot-faint"><UIcon name="search" className="w-3 h-3" />Filter navigator</div>
+          <div className="mb-1 flex items-center gap-1 text-[11px] text-amber-600"><UIcon name="star" className="w-3 h-3" /> Favorites <span className="mx-1 text-rot-faint">·</span><UIcon name="clock" className="w-3 h-3 text-rot-muted" /> History</div>
           {["Incident", "Problem", "Change", "Service Catalog"].map((m) => (
-            <div key={m} className="truncate py-0.5 text-[11px] text-gray-400">{m}</div>
+            <div key={m} className="truncate py-0.5 text-[11px] text-rot-muted">{m}</div>
           ))}
         </div>
         {/* Content frame */}
-        <div className="w-3/5 rounded-br-lg bg-zinc-950 p-2 ring-1 ring-white/5">
-          <div className="mb-1 text-[10px] uppercase tracking-wide text-gray-600">Content frame</div>
+        <div className="w-3/5 rounded-br-lg bg-rot-sunken p-2 ring-1 ring-white/5">
+          <div className="mb-1 text-[10px] uppercase tracking-wide text-rot-faint">Content frame</div>
           {["INC0012345  ·  Email down", "INC0012346  ·  VPN issue", "INC0012347  ·  Laptop swap"].map((r) => (
-            <div key={r} className="truncate border-b border-white/5 py-1 text-[11px] text-gray-300">{r}</div>
+            <div key={r} className="truncate border-b border-rot-line py-1 text-[11px] text-rot-muted">{r}</div>
           ))}
         </div>
       </div>
-      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-gray-500">
-        <span><span className="text-orange-400">☰</span> hamburger = collapse sidebar</span>
-        <span><span className="text-orange-400">⚙</span> gear = personal settings</span>
-        <span><span className="text-yellow-400">★</span> favorites</span>
-        <span><span className="text-gray-300">🕐</span> history</span>
+      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-rot-faint">
+        <span><span className="text-rot-accent">☰</span> hamburger = collapse sidebar</span>
+        <span><span className="text-rot-accent">⚙</span> gear = personal settings</span>
+        <span><span className="text-amber-600">★</span> favorites</span>
+        <span><span className="text-rot-muted">🕐</span> history</span>
       </div>
     </div>
   );
@@ -167,7 +167,7 @@ export default function InteractiveLesson({ html }: { html: string }) {
     return () => window.removeEventListener("keydown", onKey);
   });
 
-  if (!n) return <div className="bg-zinc-900 border border-orange-500/30 rounded-xl p-6" dangerouslySetInnerHTML={{ __html: html }} />;
+  if (!n) return <div className="bg-rot-surface border border-rot-accent/30 rounded-xl p-6" dangerouslySetInnerHTML={{ __html: html }} />;
 
   const sec = sections[step];
   const toggle = (key: string) => setRevealed((p) => { const s = new Set(p); s.has(key) ? s.delete(key) : s.add(key); return s; });
@@ -177,8 +177,8 @@ export default function InteractiveLesson({ html }: { html: string }) {
   const showMock = sec.kind === "concepts" && sec.items.some((li) => /navigator|banner|content frame|gear/i.test(li));
 
   return (
-    <div className="bg-zinc-900 border border-orange-500/30 rounded-xl overflow-hidden mb-6">
-      <div className="h-1.5 bg-black/40">
+    <div className="bg-rot-surface border border-rot-accent/30 rounded-xl overflow-hidden mb-6">
+      <div className="h-1.5 bg-rot-sunken">
         <div className="h-full bg-orange-500 transition-all duration-300" style={{ width: `${((step + 1) / n) * 100}%` }} />
       </div>
 
@@ -190,15 +190,15 @@ export default function InteractiveLesson({ html }: { html: string }) {
                 className={`h-2 rounded-full transition-all ${i === step ? "w-6 bg-orange-500" : "w-2 bg-white/20 hover:bg-white/40"}`} />
             ))}
           </div>
-          <span className="text-xs font-mono text-gray-500">{step + 1} / {n} · ← → keys</span>
+          <span className="text-xs font-mono text-rot-faint">{step + 1} / {n} · ← → keys</span>
         </div>
 
         <div className={`transition-opacity duration-150 ${vis ? "opacity-100" : "opacity-0"}`}>
-          <h3 className="text-xl font-black text-white mb-4">{sec.title}</h3>
+          <h3 className="text-xl font-black text-rot-fg mb-4">{sec.title}</h3>
 
           {(sec.kind === "intro" || sec.kind === "prose" || sec.kind === "realworld") && (
             <div className="space-y-3">
-              {sec.paras.map((p, i) => <p key={i} className="text-gray-300 leading-relaxed">{p}</p>)}
+              {sec.paras.map((p, i) => <p key={i} className="text-rot-muted leading-relaxed">{p}</p>)}
             </div>
           )}
 
@@ -206,8 +206,8 @@ export default function InteractiveLesson({ html }: { html: string }) {
             <>
               {showMock && <ServiceNowMock />}
               <div className="mb-3 flex items-center justify-between">
-                <p className="text-xs text-orange-400/80">Tap a card to flip it · {revealedCount}/{sec.items.length}</p>
-                {!allRevealed && <button onClick={revealAll} className="text-[11px] text-gray-400 hover:text-orange-400 underline">reveal all</button>}
+                <p className="text-xs text-rot-accent/80">Tap a card to flip it · {revealedCount}/{sec.items.length}</p>
+                {!allRevealed && <button onClick={revealAll} className="text-[11px] text-rot-muted hover:text-rot-accent underline">reveal all</button>}
               </div>
               <div className="grid sm:grid-cols-2 gap-3">
                 {sec.items.map((li, i) => {
@@ -217,16 +217,16 @@ export default function InteractiveLesson({ html }: { html: string }) {
                   return (
                     <button key={i} onClick={() => toggle(`${step}-${i}`)} className="text-left h-40 w-full" style={{ perspective: "1000px" }}>
                       <div className="relative h-full w-full transition-transform duration-500" style={{ transformStyle: "preserve-3d", transform: open ? "rotateY(180deg)" : "" }}>
-                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-xl border border-white/10 bg-black/40 p-4 hover:border-orange-500/50" style={{ backfaceVisibility: "hidden" }}>
-                          {icon && <span className="text-orange-400"><UIcon name={icon} className="w-8 h-8" /></span>}
-                          <span className="text-center text-base font-bold text-orange-400">{term}</span>
-                          <span className="text-[11px] uppercase tracking-wide text-gray-500">tap to reveal</span>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-xl border border-rot-line bg-rot-sunken p-4 hover:border-rot-accent/30" style={{ backfaceVisibility: "hidden" }}>
+                          {icon && <span className="text-rot-accent"><UIcon name={icon} className="w-8 h-8" /></span>}
+                          <span className="text-center text-base font-bold text-rot-accent">{term}</span>
+                          <span className="text-[11px] uppercase tracking-wide text-rot-faint">tap to reveal</span>
                         </div>
-                        <div className="absolute inset-0 overflow-y-auto rounded-xl border border-orange-500/40 bg-orange-500/5 p-4" style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}>
-                          <div className="mb-1 flex items-center gap-1.5 text-orange-400">
+                        <div className="absolute inset-0 overflow-y-auto rounded-xl border border-rot-accent/30 bg-orange-500/5 p-4" style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}>
+                          <div className="mb-1 flex items-center gap-1.5 text-rot-accent">
                             {icon && <UIcon name={icon} className="w-4 h-4" />}
                             <span className="text-xs font-bold">{term}</span>
-                            <span className="ml-auto text-green-400">✓</span>
+                            <span className="ml-auto text-emerald-600">✓</span>
                           </div>
                           <p className="text-sm leading-snug text-gray-200">{def}</p>
                         </div>
@@ -244,15 +244,15 @@ export default function InteractiveLesson({ html }: { html: string }) {
                 const { head, detail } = splitPitfall(li);
                 const open = revealed.has(`${step}-${i}`);
                 return (
-                  <button key={i} onClick={() => toggle(`${step}-${i}`)} className="block w-full rounded-xl border border-white/10 bg-black/40 p-4 text-left transition-colors hover:border-red-500/40">
+                  <button key={i} onClick={() => toggle(`${step}-${i}`)} className="block w-full rounded-xl border border-rot-line bg-rot-sunken p-4 text-left transition-colors hover:border-red-500/40">
                     <div className="flex items-start gap-2">
-                      <span className={open ? "text-green-400" : "text-red-500"}>{open ? "✓" : "✕"}</span>
-                      <span className="font-semibold text-white">{head}</span>
+                      <span className={open ? "text-emerald-600" : "text-red-500"}>{open ? "✓" : "✕"}</span>
+                      <span className="font-semibold text-rot-fg">{head}</span>
                     </div>
                     <div className={`grid transition-all duration-300 ${open ? "mt-2 grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
-                      <p className="overflow-hidden pl-6 text-sm text-gray-300">{detail || "—"}</p>
+                      <p className="overflow-hidden pl-6 text-sm text-rot-muted">{detail || "—"}</p>
                     </div>
-                    {!open && <span className="mt-1 block pl-6 text-[11px] uppercase tracking-wide text-gray-500">tap to see why</span>}
+                    {!open && <span className="mt-1 block pl-6 text-[11px] uppercase tracking-wide text-rot-faint">tap to see why</span>}
                   </button>
                 );
               })}
@@ -262,8 +262,8 @@ export default function InteractiveLesson({ html }: { html: string }) {
           {sec.kind === "cheatsheet" && (
             <>
               <div className="mb-3 flex items-center justify-between">
-                <p className="text-xs text-orange-400/80">Quiz yourself — tap to reveal · {revealedCount}/{sec.items.length}</p>
-                {!allRevealed && <button onClick={revealAll} className="text-[11px] text-gray-400 hover:text-orange-400 underline">reveal all</button>}
+                <p className="text-xs text-rot-accent/80">Quiz yourself — tap to reveal · {revealedCount}/{sec.items.length}</p>
+                {!allRevealed && <button onClick={revealAll} className="text-[11px] text-rot-muted hover:text-rot-accent underline">reveal all</button>}
               </div>
               <div className="grid sm:grid-cols-2 gap-3">
                 {sec.items.map((li, i) => {
@@ -273,20 +273,20 @@ export default function InteractiveLesson({ html }: { html: string }) {
                   // Fact card (no "key = value"): single statement you tap to mark known.
                   if (!val) {
                     return (
-                      <button key={i} onClick={() => toggle(`${step}-${i}`)} className={`flex items-start gap-2 rounded-xl border p-4 text-left transition-all ${open ? "border-green-500/40 bg-green-500/5" : "border-white/10 bg-black/40 hover:border-orange-500/40"}`}>
-                        <span className={open ? "text-green-400" : "text-orange-400/70"}>{open ? "✓" : "•"}</span>
-                        {icon && <span className="text-orange-400"><UIcon name={icon} className="w-5 h-5" /></span>}
+                      <button key={i} onClick={() => toggle(`${step}-${i}`)} className={`flex items-start gap-2 rounded-xl border p-4 text-left transition-all ${open ? "border-green-500/40 bg-green-500/5" : "border-rot-line bg-rot-sunken hover:border-rot-accent/30"}`}>
+                        <span className={open ? "text-emerald-600" : "text-rot-accent/70"}>{open ? "✓" : "•"}</span>
+                        {icon && <span className="text-rot-accent"><UIcon name={icon} className="w-5 h-5" /></span>}
                         <span className="text-sm text-gray-200">{key}</span>
                       </button>
                     );
                   }
                   // Recall card: prompt on front, answer revealed on tap.
                   return (
-                    <button key={i} onClick={() => toggle(`${step}-${i}`)} className={`rounded-xl border p-4 text-left transition-all ${open ? "border-orange-500/50 bg-orange-500/5" : "border-white/10 bg-black/40 hover:border-orange-500/40"}`}>
-                      <div className="flex items-center gap-2 text-sm font-bold text-white">{icon && <UIcon name={icon} className="w-5 h-5 text-orange-400" />}{key}</div>
+                    <button key={i} onClick={() => toggle(`${step}-${i}`)} className={`rounded-xl border p-4 text-left transition-all ${open ? "border-rot-accent/30 bg-orange-500/5" : "border-rot-line bg-rot-sunken hover:border-rot-accent/30"}`}>
+                      <div className="flex items-center gap-2 text-sm font-bold text-rot-fg">{icon && <UIcon name={icon} className="w-5 h-5 text-rot-accent" />}{key}</div>
                       {open
-                        ? <div className="mt-1 text-sm text-orange-300">{val}</div>
-                        : <div className="mt-1 text-[11px] uppercase tracking-wide text-gray-500">tap to reveal</div>}
+                        ? <div className="mt-1 text-sm text-rot-accent">{val}</div>
+                        : <div className="mt-1 text-[11px] uppercase tracking-wide text-rot-faint">tap to reveal</div>}
                     </button>
                   );
                 })}
@@ -295,16 +295,16 @@ export default function InteractiveLesson({ html }: { html: string }) {
           )}
 
           {allRevealed && (sec.kind === "concepts" || sec.kind === "cheatsheet") && (
-            <p className="mt-4 text-sm font-semibold text-green-400">✓ Nice — you went through them all.</p>
+            <p className="mt-4 text-sm font-semibold text-emerald-600">✓ Nice — you went through them all.</p>
           )}
         </div>
 
         <div className="mt-6 flex items-center justify-between">
           <button onClick={() => go(step - 1)} disabled={step === 0}
-            className="rounded-lg bg-zinc-800 px-4 py-2 text-sm font-bold text-white hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-30">← Back</button>
+            className="rounded-lg bg-rot-sunken px-4 py-2 text-sm font-bold text-rot-fg hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-30">← Back</button>
           {step < n - 1
             ? <button onClick={() => go(step + 1)} className="rounded-lg bg-orange-500 px-5 py-2 text-sm font-bold text-black hover:bg-orange-400">Next →</button>
-            : <span className="text-sm font-semibold text-green-400">✓ Lesson complete — start the quiz below ↓</span>}
+            : <span className="text-sm font-semibold text-emerald-600">✓ Lesson complete — start the quiz below ↓</span>}
         </div>
       </div>
     </div>

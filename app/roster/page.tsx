@@ -102,66 +102,66 @@ export default function Roster() {
     <main className="max-w-6xl mx-auto px-6 py-12">
       <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-8">
         The bridge<br />
-        between <span className="text-green-500">my people</span><br />
+        between <span className="text-emerald-600">my people</span><br />
         & the <span className="text-yellow-500">corporate world</span>
       </h1>
-      <p className="text-gray-400 max-w-3xl mb-8">
+      <p className="text-rot-muted max-w-3xl mb-8">
         A live roster of <b>Rich Off Tech LLC</b> community members — cleared professionals, certified operators, and rising talent across cyber, cloud, ServiceNow, and federal IT. Hiring managers and recruiters: this is your shortlist.
       </p>
 
-      <div className="bg-gradient-to-br from-orange-500/10 via-zinc-950 to-zinc-950 border border-orange-500/30 rounded-2xl p-6 mb-12">
-        <div className="text-orange-500 font-bold tracking-widest text-xs mb-3">WHY THIS EXISTS</div>
-        <p className="text-gray-300 leading-relaxed mb-3">
+      <div className="bg-gradient-to-br from-orange-500/10 via-zinc-950 to-zinc-950 border border-rot-accent/30 rounded-2xl p-6 mb-12">
+        <div className="text-rot-accent font-bold tracking-widest text-xs mb-3">WHY THIS EXISTS</div>
+        <p className="text-rot-muted leading-relaxed mb-3">
           When federal DEI programs got cancelled, a generation of cleared talent got left in the cold. This roster is the alternative — a pipeline that puts people who look like me in the door, on merit, no quotas. All races, all genders, one rule: come ready to learn.
         </p>
-        <p className="text-gray-400 text-sm leading-relaxed">
+        <p className="text-rot-muted text-sm leading-relaxed">
           Browse the full community freely — no login required to see who&apos;s here. To get added, request CVs, or update your own row, you need a member code.{" "}
-          <a href="https://discord.gg/dtcYf8PTNa" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:text-orange-300 font-bold">Join the Discord</a> to get yours.
+          <a href="https://discord.gg/dtcYf8PTNa" target="_blank" rel="noopener noreferrer" className="text-rot-accent hover:text-rot-accent font-bold">Join the Discord</a> to get yours.
         </p>
       </div>
 
       <div className="grid grid-cols-3 gap-4 sm:gap-8 mb-10 text-center">
-        <div><div className="text-3xl sm:text-5xl font-black text-green-500">{members.length}</div><div className="text-gray-500 text-[10px] sm:text-xs uppercase tracking-wider mt-1">Members</div></div>
-        <div><div className="text-3xl sm:text-5xl font-black text-green-500">{cleared}</div><div className="text-gray-500 text-[10px] sm:text-xs uppercase tracking-wider mt-1">Cleared</div></div>
-        <div><div className="text-3xl sm:text-5xl font-black text-yellow-500">{totalCerts}</div><div className="text-gray-500 text-[10px] sm:text-xs uppercase tracking-wider mt-1">Certs Held</div></div>
+        <div><div className="text-3xl sm:text-5xl font-black text-emerald-600">{members.length}</div><div className="text-rot-faint text-[10px] sm:text-xs uppercase tracking-wider mt-1">Members</div></div>
+        <div><div className="text-3xl sm:text-5xl font-black text-emerald-600">{cleared}</div><div className="text-rot-faint text-[10px] sm:text-xs uppercase tracking-wider mt-1">Cleared</div></div>
+        <div><div className="text-3xl sm:text-5xl font-black text-yellow-500">{totalCerts}</div><div className="text-rot-faint text-[10px] sm:text-xs uppercase tracking-wider mt-1">Certs Held</div></div>
       </div>
 
       <div className="flex gap-3 mb-6 flex-wrap">
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search name, role, cert, location..." className="flex-1 min-w-0 sm:min-w-[260px] bg-zinc-900 border border-white/10 rounded-full px-5 sm:px-6 py-3 outline-none focus:border-green-500" />
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search name, role, cert, location..." className="flex-1 min-w-0 sm:min-w-[260px] bg-rot-surface border border-rot-line rounded-full px-5 sm:px-6 py-3 outline-none focus:border-green-500" />
         <button onClick={exportCSV} className="px-4 sm:px-5 py-3 border border-yellow-500 text-yellow-500 rounded-full font-bold hover:bg-yellow-500/10 text-sm sm:text-base whitespace-nowrap">⇩ CSV</button>
       </div>
 
       <div className="flex flex-wrap gap-3 mb-10">
         {filters.map(f => (
-          <button key={f} onClick={() => setFilter(f)} className={`px-5 py-2 rounded-full text-sm font-bold ${filter === f ? "bg-green-500 text-black" : "border border-white/20 text-gray-400 hover:bg-white/5"}`}>
+          <button key={f} onClick={() => setFilter(f)} className={`px-5 py-2 rounded-full text-sm font-bold ${filter === f ? "bg-green-500 text-black" : "border border-rot-line-strong text-rot-muted hover:bg-rot-sunken"}`}>
             {f}
           </button>
         ))}
       </div>
 
-      {loading && <div className="text-center text-gray-500 py-12">Loading members...</div>}
+      {loading && <div className="text-center text-rot-faint py-12">Loading members...</div>}
 
       {!loading && (
         <div className="grid md:grid-cols-2 gap-4">
           {filtered.map((m, i) => {
             const verified = m.status && /verified|founding|alumni/i.test(m.status);
             return (
-              <div key={i} className={`bg-zinc-900 border rounded-xl p-6 transition ${verified ? "border-green-500/50" : "border-white/10 hover:border-green-500/30"}`}>
+              <div key={i} className={`bg-rot-surface border rounded-xl p-6 transition ${verified ? "border-green-500/50" : "border-rot-line hover:border-emerald-600/25"}`}>
                 <div className="flex items-start justify-between mb-2 gap-2">
                   <div>
                     <h3 className="text-xl font-bold">{m.name}</h3>
                     {verified && <span className="inline-block text-[10px] px-2 py-0.5 bg-green-500 text-black rounded font-bold tracking-wider mt-1">{m.status.toUpperCase()}</span>}
                   </div>
-                  {m.clearance && <span className="text-xs px-2 py-1 bg-green-500/10 text-green-500 rounded whitespace-nowrap">{m.clearance}</span>}
+                  {m.clearance && <span className="text-xs px-2 py-1 bg-emerald-600/[0.07] text-emerald-600 rounded whitespace-nowrap">{m.clearance}</span>}
                 </div>
-                <div className="text-gray-400 text-sm mb-3">{m.role}{m.location && ` · ${m.location}`}{m.years && ` · ${m.years} yrs`}</div>
+                <div className="text-rot-muted text-sm mb-3">{m.role}{m.location && ` · ${m.location}`}{m.years && ` · ${m.years} yrs`}</div>
                 {m.certs.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-3">
                     {m.certs.map(c => <span key={c} className="text-xs px-2 py-1 bg-yellow-500/10 text-yellow-500 rounded">{c}</span>)}
                   </div>
                 )}
-                <div className="flex gap-3 text-xs text-gray-500">
-                  {safeUrl(m.linkedin) && <a href={safeUrl(m.linkedin)} target="_blank" rel="noopener noreferrer" className="text-green-500 hover:text-green-400 font-bold">LinkedIn ↗</a>}
+                <div className="flex gap-3 text-xs text-rot-faint">
+                  {safeUrl(m.linkedin) && <a href={safeUrl(m.linkedin)} target="_blank" rel="noopener noreferrer" className="text-emerald-600 hover:text-emerald-600 font-bold">LinkedIn ↗</a>}
                   {m.discord && <span>@{m.discord}</span>}
                 </div>
               </div>
@@ -170,7 +170,7 @@ export default function Roster() {
         </div>
       )}
 
-      {!loading && filtered.length === 0 && <div className="text-center text-gray-500 py-12">No members match your filters.</div>}
+      {!loading && filtered.length === 0 && <div className="text-center text-rot-faint py-12">No members match your filters.</div>}
     </main>
   );
 }

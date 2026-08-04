@@ -187,7 +187,7 @@ export default function Bo30() {
       <main className="max-w-2xl mx-auto px-6 py-24 text-center">
         <div className="text-6xl mb-6">🤎</div>
         <h1 className="text-4xl font-black mb-4">That&apos;s in.</h1>
-        <p className="text-gray-400 mb-8">
+        <p className="text-rot-muted mb-8">
           Thank you. Bo is going to see this one. If you want to send another — a different
           memory, a different prompt — go right ahead.
         </p>
@@ -205,11 +205,11 @@ export default function Bo30() {
   if (step === "pick") {
     return (
       <main className="max-w-3xl mx-auto px-6 py-16 md:py-24">
-        <div className="text-orange-500 font-bold tracking-widest text-sm mb-4">BO TURNS 30</div>
+        <div className="text-rot-accent font-bold tracking-widest text-sm mb-4">BO TURNS 30</div>
         <h1 className="text-4xl md:text-6xl font-black leading-tight mb-4">
           Tell him something.
         </h1>
-        <p className="text-gray-400 text-lg mb-10 max-w-xl">
+        <p className="text-rot-muted text-lg mb-10 max-w-xl">
           Funny, serious, mad, sentimental — it doesn&apos;t matter. Pick whatever you actually
           want to say. Takes about a minute.
         </p>
@@ -219,15 +219,15 @@ export default function Bo30() {
             <button
               key={p.id}
               onClick={() => { setPrompt(p); setStep("make"); if (mode === "video") openCamera(); }}
-              className="text-left bg-zinc-900 border border-white/10 rounded-2xl p-5 hover:border-orange-500/60 transition"
+              className="text-left bg-rot-surface border border-rot-line rounded-2xl p-5 hover:border-orange-500/60 transition"
             >
               <div className="font-bold mb-1">{p.label}</div>
-              <div className="text-gray-500 text-xs">{p.teleprompter}</div>
+              <div className="text-rot-faint text-xs">{p.teleprompter}</div>
             </button>
           ))}
         </div>
 
-        <p className="text-gray-500 text-sm">
+        <p className="text-rot-faint text-sm">
           Record on camera, or type it if you&apos;d rather not be on video.
         </p>
       </main>
@@ -237,12 +237,12 @@ export default function Bo30() {
   // ── MAKE IT ─────────────────────────────────────────────────────────────────
   return (
     <main className="max-w-2xl mx-auto px-6 py-12 md:py-16">
-      <button onClick={() => { stopTracks(); setStep("pick"); }} className="text-gray-500 text-sm hover:text-white mb-6">
+      <button onClick={() => { stopTracks(); setStep("pick"); }} className="text-rot-faint text-sm hover:text-rot-fg mb-6">
         ← pick a different prompt
       </button>
 
-      <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl px-5 py-4 mb-6">
-        <div className="text-orange-400 text-xs font-bold uppercase tracking-wide mb-1">{prompt?.label}</div>
+      <div className="bg-rot-accent/10 border border-rot-accent/30 rounded-xl px-5 py-4 mb-6">
+        <div className="text-rot-accent text-xs font-bold uppercase tracking-wide mb-1">{prompt?.label}</div>
         <p className="text-gray-200 text-sm">{prompt?.teleprompter}</p>
       </div>
 
@@ -250,13 +250,13 @@ export default function Bo30() {
       <div className="flex gap-2 mb-5">
         <button
           onClick={() => { setMode("video"); if (!camReady) openCamera(); }}
-          className={`text-sm px-4 py-2 rounded-lg font-semibold border ${mode === "video" ? "bg-white text-black border-white" : "border-white/20 text-gray-300 hover:bg-white/5"}`}
+          className={`text-sm px-4 py-2 rounded-lg font-semibold border ${mode === "video" ? "bg-rot-fg text-white border-white" : "border-rot-line-strong text-rot-muted hover:bg-rot-sunken"}`}
         >
           Record video
         </button>
         <button
           onClick={() => { setMode("text"); stopTracks(); }}
-          className={`text-sm px-4 py-2 rounded-lg font-semibold border ${mode === "text" ? "bg-white text-black border-white" : "border-white/20 text-gray-300 hover:bg-white/5"}`}
+          className={`text-sm px-4 py-2 rounded-lg font-semibold border ${mode === "text" ? "bg-rot-fg text-white border-white" : "border-rot-line-strong text-rot-muted hover:bg-rot-sunken"}`}
         >
           Type it instead
         </button>
@@ -264,7 +264,7 @@ export default function Bo30() {
 
       {mode === "video" && (
         <div className="mb-6">
-          <div className="relative rounded-2xl overflow-hidden bg-black border border-white/15 aspect-video">
+          <div className="relative rounded-2xl overflow-hidden bg-rot-bg border border-rot-line aspect-video">
             {previewUrl ? (
               <video src={previewUrl} controls playsInline className="w-full h-full object-contain" />
             ) : (
@@ -278,9 +278,9 @@ export default function Bo30() {
               />
             )}
             {recording && (
-              <div className="absolute top-3 left-3 flex items-center gap-2 bg-black/70 rounded-full px-3 py-1">
+              <div className="absolute top-3 left-3 flex items-center gap-2 bg-rot-sunken rounded-full px-3 py-1">
                 <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
-                <span className="text-white text-xs font-mono tabular-nums">
+                <span className="text-rot-fg text-xs font-mono tabular-nums">
                   {fmt(seconds)} / {fmt(MAX_SECONDS)}
                 </span>
               </div>
@@ -291,7 +291,7 @@ export default function Bo30() {
 
           <div className="flex flex-wrap gap-2 mt-3">
             {!camReady && !previewUrl && (
-              <button onClick={openCamera} className="px-5 py-2.5 rounded-lg bg-white text-black font-bold text-sm">
+              <button onClick={openCamera} className="px-5 py-2.5 rounded-lg bg-rot-fg text-white font-bold text-sm">
                 Turn on camera
               </button>
             )}
@@ -301,18 +301,18 @@ export default function Bo30() {
               </button>
             )}
             {recording && (
-              <button onClick={stopRec} className="px-5 py-2.5 rounded-lg bg-red-600 text-white font-bold text-sm">
+              <button onClick={stopRec} className="px-5 py-2.5 rounded-lg bg-red-600 text-rot-fg font-bold text-sm">
                 Stop
               </button>
             )}
             {previewUrl && (
-              <button onClick={retake} className="px-5 py-2.5 rounded-lg border border-white/25 text-gray-200 font-semibold text-sm hover:bg-white/5">
+              <button onClick={retake} className="px-5 py-2.5 rounded-lg border border-rot-line-strong text-gray-200 font-semibold text-sm hover:bg-rot-sunken">
                 Retake
               </button>
             )}
           </div>
 
-          <p className="text-gray-500 text-xs mt-3">
+          <p className="text-rot-faint text-xs mt-3">
             Up to {MAX_SECONDS} seconds. Tip: stand in front of a plain wall with a light in
             front of you — it makes the clip much easier to edit later.
           </p>
@@ -325,7 +325,7 @@ export default function Bo30() {
           onChange={(e) => setText(e.target.value)}
           rows={7}
           placeholder="Write it how you'd say it."
-          className="w-full bg-zinc-900 border border-white/15 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-orange-500 focus:outline-none mb-6"
+          className="w-full bg-rot-surface border border-rot-line rounded-xl px-4 py-3 text-rot-fg placeholder-rot-faint focus:border-rot-accent focus:outline-none mb-6"
         />
       )}
 
@@ -333,18 +333,18 @@ export default function Bo30() {
         <input
           value={name} onChange={(e) => setName(e.target.value)}
           placeholder="Your name"
-          className="w-full bg-zinc-900 border border-white/15 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-orange-500 focus:outline-none"
+          className="w-full bg-rot-surface border border-rot-line rounded-xl px-4 py-3 text-rot-fg placeholder-rot-faint focus:border-rot-accent focus:outline-none"
         />
         <input
           value={city} onChange={(e) => setCity(e.target.value)}
           placeholder="Where you're from (optional)"
-          className="w-full bg-zinc-900 border border-white/15 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-orange-500 focus:outline-none"
+          className="w-full bg-rot-surface border border-rot-line rounded-xl px-4 py-3 text-rot-fg placeholder-rot-faint focus:border-rot-accent focus:outline-none"
         />
       </div>
 
       {/* Explicit consent. These clips may end up in a public edit or a documentary, so it
           has to be a deliberate tick — never a default or a buried line. */}
-      <label className="flex gap-3 items-start text-sm text-gray-300 mb-6 cursor-pointer">
+      <label className="flex gap-3 items-start text-sm text-rot-muted mb-6 cursor-pointer">
         <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 accent-orange-500 w-4 h-4" />
         <span>
           Bo can share this — post it, play it at the party, or use it in a video or
@@ -356,10 +356,10 @@ export default function Bo30() {
 
       {busy && progress > 0 && progress < 100 && (
         <div className="mb-4">
-          <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+          <div className="h-2 bg-rot-sunken rounded-full overflow-hidden">
             <div className="h-full bg-gradient-to-r from-orange-500 to-red-500 transition-[width]" style={{ width: `${progress}%` }} />
           </div>
-          <p className="text-gray-500 text-xs mt-1">Uploading… {progress}% — keep this page open.</p>
+          <p className="text-rot-faint text-xs mt-1">Uploading… {progress}% — keep this page open.</p>
         </div>
       )}
 
