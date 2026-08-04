@@ -34,57 +34,57 @@ export default function FoundingSlot() {
     : "Founding slots are open.";
 
   return (
-    <section id="founding" className="bg-black py-20 border-t border-white/5 scroll-mt-20">
+    <section id="founding" className="bg-rot-sunken py-24 md:py-32 border-t border-rot-line scroll-mt-20">
       <div className="max-w-3xl mx-auto px-6">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-orange-500/15 border border-orange-500/40 text-orange-400 text-sm font-bold px-4 py-1.5 rounded-full mb-4 uppercase tracking-wide">
+        <div className="text-center mb-12">
+          <div className="rot-kicker mb-6">
             {soldOut ? "Founding full" : "Founding slots open"}
           </div>
-          <h2 className="text-4xl md:text-5xl font-black mb-3">Founder Full Membership</h2>
-          <p className="text-gray-400 text-lg">
+          <h2 className="text-4xl md:text-6xl font-semibold mb-6 leading-[0.98]">Founder Full Membership</h2>
+          <p className="text-rot-muted text-lg leading-relaxed">
             One year of full access — the community, the AI tutors, the quiz/study engine
             (Security+, ServiceNow CSA, AWS AI), weekly calls, and job drops.
             {soldOut ? " Founding is closed for this cohort." : " Lock founding pricing before we close the cohort."}
           </p>
         </div>
 
-        <div className="bg-zinc-900 border-2 border-orange-500/40 rounded-3xl p-8 md:p-10 text-center relative">
+        <div className="bg-rot-surface border border-rot-line p-10 md:p-14 text-center relative">
           {!soldOut && left !== null && left <= 1 && (
-            <div className="absolute top-5 right-5 text-[11px] font-bold uppercase tracking-wider text-orange-400 bg-orange-500/10 border border-orange-500/30 px-3 py-1 rounded-full">
+            <div className="absolute top-6 right-6 rot-kicker text-rot-accent">
               Final seat
             </div>
           )}
 
           <div className="flex items-end justify-center gap-2 mb-1">
-            <span className="text-6xl md:text-7xl font-black leading-none">$375</span>
-            <span className="text-gray-400 text-xl mb-2">/year</span>
+            <span className="text-6xl md:text-8xl font-semibold leading-none tracking-tight">$375</span>
+            <span className="text-rot-muted text-xl mb-3">/year</span>
           </div>
 
           {/* Founding closed Jul 27 2026. Members who bought in keep their rate. */}
-          <div className="text-gray-400 text-sm mb-6">
+          <div className="text-rot-muted text-sm mb-8">
             Founding is closed. Everyone who got in <span className="font-bold text-white">keeps their rate</span>.
           </div>
 
           <a
             href={CHECKOUT.yearly || COACH_FALLBACK}
-            className="inline-block w-full max-w-xs px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-black text-lg rounded-xl hover:opacity-90 uppercase tracking-wide"
+            className="rot-btn w-full max-w-xs px-8 py-4 text-sm"
           >
             {CHECKOUT.yearly ? `Join — $${PRICING.yearly}/year →` : "Talk to a coach to join →"}
           </a>
 
           {/* $40/mo monthly. $27/mo is grandfathered only — never shown or sold. */}
-          <div className="mt-4 text-gray-400 text-sm">or go month to month at <b className="text-white">$40/month</b> — cancel anytime</div>
+          <div className="mt-6 text-rot-muted text-sm">or go month to month at <b className="text-white">$40/month</b> — cancel anytime</div>
           {CHECKOUT.monthly && (
-            <a href={CHECKOUT.monthly} className="inline-block w-full max-w-xs px-8 py-3 mt-2 border border-orange-500/50 text-orange-300 font-bold text-sm rounded-xl hover:bg-orange-500/10 uppercase tracking-wide">Start — ${PRICING.monthly} / month →</a>
+            <a href={CHECKOUT.monthly} className="rot-btn-ghost w-full max-w-xs px-8 py-3.5 mt-3 text-sm">Start — ${PRICING.monthly} / month →</a>
           )}
 
 
-          <div className="text-orange-300/90 text-sm font-semibold mt-4">{seatLine}</div>
+          <div className="text-rot-muted text-sm mt-6">{seatLine}</div>
           {/* Founding closed Jul 27 2026 — existing members keep their rate for life. */}
-          <div className="mt-3 inline-flex items-center gap-2 bg-white/5 border border-white/15 text-gray-300 text-xs font-bold px-3 py-1.5 rounded-full">
+          <div className="mt-4 inline-flex items-center gap-2 border border-rot-line text-rot-faint text-xs px-3 py-1.5">
             Founding closed — members who locked $227/yr or $27/mo keep it.
           </div>
-          <div className="text-gray-500 text-xs mt-2">Secure checkout via Square · instant access</div>
+          <div className="text-rot-faint text-xs mt-4">Secure checkout via Square · instant access</div>
         </div>
       </div>
     </section>

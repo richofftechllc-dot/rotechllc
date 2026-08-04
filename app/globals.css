@@ -1,15 +1,50 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   ROT DESIGN TOKENS — Aug 2026 redesign.
+   Direction: stark monochrome editorial, the Blazity storefront look. The old
+   site leaned on orange→red gradients for almost every emphasis, which reads
+   loud rather than expensive. Here the page is near-black, type does the work,
+   and the accent appears rarely enough that it still means something.
+   ───────────────────────────────────────────────────────────────────────────── */
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Surfaces. Three steps, not a gradient — page, raised, sunken. */
+  --rot-bg: #070707;
+  --rot-surface: #0e0e0e;
+  --rot-sunken: #050505;
+
+  /* Hairlines. Borders carry the structure now that gradients don't. */
+  --rot-line: rgba(255, 255, 255, 0.09);
+  --rot-line-strong: rgba(255, 255, 255, 0.18);
+
+  /* Text */
+  --rot-fg: #f5f5f5;
+  --rot-muted: #8f8f8f;
+  --rot-faint: #5c5c5c;
+
+  /* One accent. Used for state and a single emphasis per view, not for chrome. */
+  --rot-accent: #ff5a1f;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-display);
   --font-mono: var(--font-geist-mono);
+
+  --color-rot-bg: var(--rot-bg);
+  --color-rot-surface: var(--rot-surface);
+  --color-rot-sunken: var(--rot-sunken);
+  --color-rot-line: var(--rot-line);
+  --color-rot-line-strong: var(--rot-line-strong);
+  --color-rot-fg: var(--rot-fg);
+  --color-rot-muted: var(--rot-muted);
+  --color-rot-faint: var(--rot-faint);
+  --color-rot-accent: var(--rot-accent);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,16 +55,82 @@
 }
 
 html, body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--rot-bg);
+  color: var(--rot-fg);
+  /* Was Arial/Helvetica. A system default is the loudest possible signal that
+     nobody chose a typeface, and it was undoing every other design decision. */
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   overflow-x: hidden;
   max-width: 100vw;
+  -webkit-font-smoothing: antialiased;
 }
 
+/* Display type: tighter tracking and optical sizing so large headings read as
+   set rather than scaled up. */
 h1, h2, h3 {
+  font-family: var(--font-display), var(--font-inter), ui-sans-serif, sans-serif;
+  letter-spacing: -0.03em;
   overflow-wrap: break-word;
   word-break: break-word;
+}
+
+/* ── Utilities the redesign leans on ─────────────────────────────────────── */
+
+/* Eyebrow / kicker above a heading. */
+.rot-kicker {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--rot-faint);
+}
+
+/* Hairline rule that fades out — used to separate bands without a hard line. */
+.rot-rule {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--rot-line), transparent);
+}
+
+/* Card. One border, one surface, no shadow — depth comes from contrast. */
+.rot-card {
+  background: var(--rot-surface);
+  border: 1px solid var(--rot-line);
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+.rot-card:hover { border-color: var(--rot-line-strong); }
+
+/* Primary action: solid white on black. Highest contrast on the page, so it
+   never needs a gradient to be found. */
+.rot-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  color: #000000;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  border: 1px solid #ffffff;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+.rot-btn:hover { opacity: 0.88; }
+.rot-btn:active { transform: translateY(1px); }
+
+/* Secondary: hairline outline, fills on hover. */
+.rot-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: var(--rot-fg);
+  font-weight: 500;
+  border: 1px solid var(--rot-line-strong);
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+.rot-btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.32);
 }
 
 /* ── RESULTS WALL marquee (app/components/ResultsWall.tsx) ──────────────────

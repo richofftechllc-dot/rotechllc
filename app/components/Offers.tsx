@@ -59,10 +59,10 @@ function included(system: string): string[] {
 /** Discord-only add-on. Exported so /membership can show it next to the membership card. */
 export function DiscordAccessCard() {
   return (
-    <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="bg-rot-surface border border-rot-line p-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
       <div>
-        <h3 className="text-lg font-bold mb-1">{CERTS.discordAccess.name}</h3>
-        <p className="text-gray-400 text-sm">
+        <h3 className="text-xl font-semibold mb-2">{CERTS.discordAccess.name}</h3>
+        <p className="text-rot-muted text-sm leading-relaxed">
           <span className="font-bold text-white">{money(CERTS.discordAccess.price)}</span> for
           12 months — the community, the AI tutors, weekly calls, and job drops. No exam
           voucher, no cert track.
@@ -74,7 +74,7 @@ export function DiscordAccessCard() {
           price stays the headline. */}
       <a
         href={CERTS.discordAccess.url}
-        className="shrink-0 text-center px-6 py-3 border border-orange-500/50 text-orange-300 font-bold text-sm rounded-xl hover:bg-orange-500/10 uppercase tracking-wide"
+        className="rot-btn-ghost shrink-0 px-6 py-3.5 text-sm"
       >
         Get Discord access — {money(CERTS.discordAccess.price)} →
       </a>
@@ -84,12 +84,12 @@ export function DiscordAccessCard() {
 
 export default function Offers({ showDiscord = true }: { showDiscord?: boolean }) {
   return (
-    <section id="offers" className="bg-black py-20 border-t border-white/5 scroll-mt-20">
+    <section id="offers" className="bg-rot-bg py-24 md:py-32 border-t border-rot-line scroll-mt-20">
       <div className="max-w-5xl mx-auto px-6">
-        <div className="text-center mb-10">
-          <div className="text-orange-500 font-bold tracking-widest text-sm mb-4">CERTIFICATIONS · FROM {money(CERT_FROM_PRICE)}</div>
-          <h2 className="text-4xl md:text-5xl font-black mb-3">Certifications, coached.</h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+        <div className="text-center mb-16">
+          <div className="rot-kicker mb-6">Certifications · from {money(CERT_FROM_PRICE)}</div>
+          <h2 className="text-4xl md:text-6xl font-semibold mb-6 leading-[0.98]">Certifications, coached.</h2>
+          <p className="text-rot-muted text-lg max-w-2xl mx-auto leading-relaxed">
             Coached packages start at {money(CERT_FROM_PRICE)} — voucher, quiz engine,
             study plan, resume rebuild, and a year in the Discord. We coach any cert you
             can sit online; these two are our best sellers and the two you can buy right
@@ -97,23 +97,23 @@ export default function Offers({ showDiscord = true }: { showDiscord?: boolean }
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-px bg-rot-line border border-rot-line">
           {PACKAGES.map((p) => (
             <div
               key={p.name}
-              className="bg-zinc-900 border-2 border-orange-500/40 rounded-3xl p-8 flex flex-col"
+              className="bg-rot-surface p-8 md:p-10 flex flex-col"
             >
-              <h3 className="text-2xl font-black mb-2">{p.name}</h3>
-              <p className="text-gray-400 text-sm mb-6">{p.blurb}</p>
+              <h3 className="text-2xl md:text-3xl font-semibold mb-3">{p.name}</h3>
+              <p className="text-rot-muted text-sm mb-8 leading-relaxed">{p.blurb}</p>
 
-              <div className="flex items-end gap-3 mb-6">
-                <span className="text-5xl md:text-6xl font-black leading-none">{p.price}</span>
+              <div className="flex items-end gap-3 mb-8 pb-8 border-b border-rot-line">
+                <span className="text-5xl md:text-6xl font-semibold leading-none tracking-tight">{p.price}</span>
               </div>
 
-              <ul className="space-y-2 mb-8 text-sm text-gray-300">
+              <ul className="space-y-3 mb-10 text-sm text-rot-muted">
                 {included(p.system).map((item) => (
                   <li key={item} className="flex gap-2">
-                    <span className="text-orange-400 shrink-0">✓</span>
+                    <span className="text-rot-faint shrink-0">—</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -122,7 +122,7 @@ export default function Offers({ showDiscord = true }: { showDiscord?: boolean }
               {/* mt-auto keeps both buttons on the same baseline when the lists differ in height */}
               <a
                 href={p.href}
-                className="mt-auto block text-center px-6 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-black rounded-xl hover:opacity-90 uppercase tracking-wide"
+                className="rot-btn mt-auto w-full px-6 py-4 text-sm"
               >
                 {p.cta}
               </a>
@@ -130,14 +130,14 @@ export default function Offers({ showDiscord = true }: { showDiscord?: boolean }
           ))}
         </div>
 
-        {showDiscord && <div className="mt-6"><DiscordAccessCard /></div>}
+        {showDiscord && <div className="mt-px"><DiscordAccessCard /></div>}
 
-        <p className="text-gray-400 text-center mt-8">
-          <a href="/certifications" className="text-orange-400 font-bold hover:text-orange-300">
+        <p className="text-center mt-12">
+          <a href="/certifications" className="text-sm text-rot-fg underline underline-offset-4 decoration-rot-line-strong hover:decoration-rot-fg">
             Network+, PMP, CASP+, CySA+, CISSP and the rest — see every cert we coach →
           </a>
         </p>
-        <p className="text-gray-500 text-sm text-center mt-3">
+        <p className="text-rot-faint text-xs text-center mt-4">
           Afterpay available at checkout.
         </p>
       </div>
