@@ -35,5 +35,18 @@ export async function middleware(req: NextRequest) {
 export const config = {
   // /roster is public on purpose — recruiters and hiring managers need to browse without an account.
   // /hub is admin-only; middleware enforces a valid session, the page enforces the admin code.
-  matcher: ["/home", "/plan", "/plan/:path*", "/account", "/account/:path*", "/quiz/:path*", "/lab/:path*", "/hub", "/hub/:path*"],
+  //
+  // The two cert study plans are gated because they are PAID PRODUCT — a Security+ or
+  // ServiceNow CSA buyer pays for the voucher, the coaching AND that roadmap. They used to
+  // sit in public/ and were reachable by anyone who had or guessed the URL, which is the
+  // same leak as listing them as a free download. Everything else in /resources stays
+  // public: the FAQ, how-it-works and the AWS AI plan are lead magnets on purpose.
+  //
+  // A client who bought has a quiz code, so they log in and read it. That is the gate.
+  matcher: [
+    "/home", "/plan", "/plan/:path*", "/account", "/account/:path*",
+    "/quiz/:path*", "/lab/:path*", "/hub", "/hub/:path*",
+    "/resources/rot-secplus-study-plan.html",
+    "/resources/rot-csa-study-plan.html",
+  ],
 };
