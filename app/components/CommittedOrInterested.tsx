@@ -39,7 +39,7 @@ export default function CommittedOrInterested() {
         <div className="text-center mb-16">
           <div className="rot-kicker mb-6">Start here</div>
           <h2 className="text-5xl md:text-7xl font-semibold mb-6 leading-[0.95] max-w-4xl mx-auto">
-            Are you <span className="text-rot-faint">interested</span>,<br className="sm:hidden" />{" "}
+            Are you <span className="text-rot-muted/70">interested</span>,<br className="sm:hidden" />{" "}
             or are you <span className="italic">committed</span>?
           </h2>
           <p className="text-rot-muted text-lg max-w-xl mx-auto leading-relaxed">

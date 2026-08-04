@@ -24,10 +24,16 @@
   --rot-line: rgba(28, 22, 16, 0.10);
   --rot-line-strong: rgba(28, 22, 16, 0.22);
 
-  /* Type. Warm near-black, not #000 — true black on off-white is harsh. */
-  --rot-fg: #17130f;
-  --rot-muted: #6b635a;
-  --rot-faint: #9c9289;
+  /* Type. Warm near-black, not #000 — true black on off-white is harsh.
+     These are DARKER than the dark-theme values they replaced. Inverting the
+     surfaces without re-tuning the greys is what made the first marble pass read
+     washed out: a grey that sits comfortably on near-black has nowhere near
+     enough contrast on off-white. --rot-muted clears 7:1 on the marble ground and
+     --rot-faint clears 4.5:1, so body copy is readable and kickers are legible
+     rather than decorative. */
+  --rot-fg: #14100c;
+  --rot-muted: #4a423a;
+  --rot-faint: #736a61;
 
   /* Brand. Unchanged from the old site; it just isn't the background any more. */
   --rot-accent: #e8451f;
@@ -73,9 +79,9 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(1200px 800px at 12% -5%, rgba(255, 255, 255, 0.95), transparent 60%),
+    radial-gradient(1200px 800px at 12% -5%, rgba(255, 255, 255, 0.55), transparent 58%),
     radial-gradient(900px 700px at 88% 8%, rgba(232, 69, 31, 0.045), transparent 62%),
-    radial-gradient(1000px 900px at 70% 105%, rgba(28, 22, 16, 0.055), transparent 60%),
+    radial-gradient(1000px 900px at 70% 105%, rgba(28, 22, 16, 0.075), transparent 60%),
     linear-gradient(118deg, transparent 42%, rgba(28, 22, 16, 0.028) 43%, transparent 44%),
     linear-gradient(101deg, transparent 71%, rgba(28, 22, 16, 0.022) 72%, transparent 73%),
     var(--rot-bg);

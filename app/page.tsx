@@ -48,7 +48,7 @@ export default async function Home() {
             {/* <BirthdayBanner /> — retired, see import note */}
             <Reveal delay={60}><h1 className="text-5xl md:text-7xl font-semibold leading-[0.95] mb-6">
               Your AI-powered<br />
-              <span className="text-rot-muted">career command center.</span>
+              <span className="text-rot-accent">career command center.</span>
             </h1></Reveal>
             <Reveal delay={120}><div className="text-rot-faint text-sm mb-8 tracking-wide">Tech · GovTech · Commercial Tech · AI</div></Reveal>
             <Reveal delay={160}><p className="text-rot-muted text-lg mb-10 max-w-md leading-relaxed">
@@ -78,7 +78,7 @@ export default async function Home() {
         <div className="max-w-6xl mx-auto px-6 text-center">
           <h2 className="text-5xl md:text-7xl font-semibold leading-[0.95] mb-6">
             Break into Tech.<br />
-            <span className="text-rot-muted">No shortcuts.</span>
+            <span className="text-rot-accent">No shortcuts.</span>
           </h2>
           <p className="text-rot-muted text-lg max-w-2xl mx-auto mb-6 leading-relaxed">
             Not a video dump — a guided system. Self-paced or live-cohort cert tracks, a live AI tutor, your exam voucher, clearance guidance, and real project work. You move, Bo Tech moves with you.
