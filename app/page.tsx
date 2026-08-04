@@ -1,4 +1,5 @@
 import BoAvatarFlip from "./components/BoAvatarFlip";
+import CommittedOrInterested from "./components/CommittedOrInterested";
 // BirthdayBanner retired Aug 2 2026 — the drop ended Jul 27 and the countdown
 // was stuck rendering "It's the 27th 🎂" on the live homepage. Component kept in
 // the tree for the next drop; just not mounted.
@@ -32,6 +33,12 @@ export default async function Home() {
   const memberCount = await getMemberCount();
   return (
     <>
+      {/* 0 — THE FORK. Sits above the hero on purpose: the first decision is
+          whether you're interested or committed, and everything below reads
+          differently once you've picked. Interested is a real free offer, not a
+          teaser — see the component. */}
+      <CommittedOrInterested />
+
       {/* 1 — BO TECH: the AI-powered career command center */}
       <main className="max-w-6xl mx-auto px-6 py-16 md:py-24">
         <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -53,11 +60,11 @@ export default async function Home() {
               <a href="/help#agents" className="px-6 py-3 border border-white/20 rounded-lg hover:bg-white/5">
                 Talk to an AI agent
               </a>
-              <a href="#membership" className="px-6 py-3 border border-orange-500/40 text-orange-400 rounded-lg hover:bg-orange-500/10 font-bold">
+              <a href="#founding" className="px-6 py-3 border border-orange-500/40 text-orange-400 rounded-lg hover:bg-orange-500/10 font-bold">
                 See membership →
               </a>
             </div>
-            <p className="text-gray-500 text-sm mt-4">Free to join — or grab <a href="#membership" className="text-orange-400 underline underline-offset-2">full membership</a> below. 🤎</p>
+            <p className="text-gray-500 text-sm mt-4">Free to join — or grab <a href="#founding" className="text-orange-400 underline underline-offset-2">full membership</a> below. 🤎</p>
           </div>
           <BoAvatarFlip />
         </div>
