@@ -28,10 +28,14 @@ export type LeadEmail =
 
 export const LEAD_EMAIL_LIVE = Boolean(process.env.ZAPIER_LEAD_EMAIL_HOOK);
 
-/** The free guides an interested lead is promised on the home fork. One list. */
+/** The free guides an interested lead is promised on the home fork. One list.
+ *
+ * The Security+ and ServiceNow CSA study plans are deliberately NOT here. Those
+ * roadmaps are part of what a cert buyer pays for; emailing them to anyone who
+ * types an address gives the product away. Keep this list and the one in
+ * CommittedOrInterested.tsx identical - the site must not promise something the
+ * email doesn't send. */
 export const FREE_RESOURCES: Array<{ label: string; path: string }> = [
-  { label: "Security+ study plan", path: "/resources/rot-secplus-study-plan.html" },
-  { label: "ServiceNow CSA study plan", path: "/resources/rot-csa-study-plan.html" },
   { label: "AWS AI study plan", path: "/resources/rot-aws-ai-study-plan.html" },
   { label: "FAQ", path: "/resources/rot-faq.html" },
   { label: "How it works", path: "/resources/rot-how-it-works.html" },
@@ -59,12 +63,15 @@ function build(p: LeadEmail): { subject: string; html: string } {
     .map((r) => `<li><a href="${SITE}${r.path}">${r.label}</a></li>`)
     .join("\n");
   return {
-    subject: "Your ROT study plans 🤎",
+    subject: "Your free ROT guides 🤎",
     html: `
       <p>${greet(p.name)}</p>
       <p>You said you're interested, so here's the stuff. No card, no catch.</p>
       <ul>${list}</ul>
       <p>Read them. Use them. Pass without us if you want — that's a real option and I mean it.</p>
+      <p>Chasing Security+ or ServiceNow CSA? Those roadmaps come with the coaching —
+      <a href="${SITE}/certifications">have a look</a> and a coach will build yours around
+      your exam date.</p>
       <p>When you're ready to stop researching and start moving, the Discord is free too:
       <a href="${DISCORD}">discord.gg/rotechllc</a></p>
       <p>— Bo</p>
