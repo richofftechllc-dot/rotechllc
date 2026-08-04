@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { CERTS, CERT_FROM_PRICE, money } from "@/lib/pricing";
 
 // OFFERS — the paid cert tracks and the Discord-only add-on, at regular rates.
@@ -11,8 +12,12 @@ import { CERTS, CERT_FROM_PRICE, money } from "@/lib/pricing";
 // No longer a client component: the only reason it was one was the /api/deal fetch
 // that drove the promo countdown, and there is no countdown to drive.
 //
-// Styling deliberately mirrors FoundingSlot (zinc-900 card, orange border, black
-// section) so the offers read as part of the same stack.
+// The two cert cards are METAL CARDS — platinum and black, styled in globals.css
+// as .rot-metal / .rot-metal-platinum / .rot-metal-onyx. Randy's brief: "make them
+// look like platinum amex cards or black cards but that say rich off tech". Each
+// carries the RT mark, the issuer line, a chip and a tier badge, and a specular
+// highlight travels across the metal on a loop, because a metal card only reads
+// as metal when the light moves on it.
 
 type Pkg = {
   name: string;
@@ -21,6 +26,7 @@ type Pkg = {
   price: string;
   href: string;
   cta: string;
+  tier: "Platinum" | "Onyx"; // which metal the card is milled from
 };
 
 // Prices and URLs both come from CERTS — nothing is retyped here, so a Square
@@ -33,6 +39,7 @@ const PACKAGES: Pkg[] = [
     price: money(CERTS.securityPlus.price),
     href: CERTS.securityPlus.url,
     cta: `Get Security+ — ${money(CERTS.securityPlus.price)} →`,
+    tier: "Platinum",
   },
   {
     name: CERTS.csa.name,
@@ -41,6 +48,7 @@ const PACKAGES: Pkg[] = [
     price: money(CERTS.csa.price),
     href: CERTS.csa.url,
     cta: `Get CSA — ${money(CERTS.csa.price)} →`,
+    tier: "Onyx",
   },
 ];
 
@@ -97,37 +105,69 @@ export default function Offers({ showDiscord = true }: { showDiscord?: boolean }
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-px bg-rot-line border border-rot-line">
-          {PACKAGES.map((p) => (
-            <div
-              key={p.name}
-              className="bg-rot-surface p-8 md:p-10 flex flex-col"
-            >
-              <h3 className="text-2xl md:text-3xl font-semibold mb-3">{p.name}</h3>
-              <p className="text-rot-muted text-sm mb-8 leading-relaxed">{p.blurb}</p>
+        {/* The two tracks as metal charge cards. The plain white cards these
+            replaced described the same package but signalled nothing about the
+            tier of the thing; a platinum and a black card say "this is the
+            serious purchase" before a word is read.
 
-              <div className="flex items-end gap-3 mb-8 pb-8 border-b border-rot-line">
-                <span className="text-5xl md:text-6xl font-semibold leading-none tracking-tight">{p.price}</span>
-              </div>
-
-              <ul className="space-y-3 mb-10 text-sm text-rot-muted">
-                {included(p.system).map((item) => (
-                  <li key={item} className="flex gap-2">
-                    <span className="text-rot-faint shrink-0">—</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-
-              {/* mt-auto keeps both buttons on the same baseline when the lists differ in height */}
-              <a
-                href={p.href}
-                className="rot-btn-accent mt-auto w-full px-6 py-4 text-sm"
+            gap-8 rather than the old gap-px seam: these are objects sitting on
+            the marble, not two halves of one table. */}
+        <div className="grid md:grid-cols-2 gap-8">
+          {PACKAGES.map((p) => {
+            const onyx = p.tier === "Onyx";
+            return (
+              <div
+                key={p.name}
+                className={`rot-metal ${onyx ? "rot-metal-onyx" : "rot-metal-platinum"} p-8 md:p-10 flex flex-col`}
               >
-                {p.cta}
-              </a>
-            </div>
-          ))}
+                {/* Issuer row — the mark and the company, as embossed on a real
+                    card. Ink mark on platinum, white on onyx. */}
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-2.5">
+                    <Image
+                      src={onyx ? "/rot-mark.png" : "/rot-mark-ink.png"}
+                      alt=""
+                      width={26}
+                      height={24}
+                      className="w-[26px] h-auto"
+                    />
+                    <span className="rot-metal-issuer">Rich Off Tech</span>
+                  </div>
+                  <span className="rot-metal-tier">{p.tier}</span>
+                </div>
+
+                <div className="rot-metal-chip mb-8" aria-hidden />
+
+                <h3 className="text-2xl md:text-3xl font-semibold mb-3">{p.name}</h3>
+                <p className={`text-sm mb-8 leading-relaxed ${onyx ? "rot-onyx-muted" : "text-rot-muted"}`}>
+                  {p.blurb}
+                </p>
+
+                <div
+                  className={`flex items-end gap-3 mb-8 pb-8 border-b ${onyx ? "border-rot-onyx-line" : "border-rot-line"}`}
+                >
+                  <span className="text-5xl md:text-6xl font-semibold leading-none tracking-tight">{p.price}</span>
+                </div>
+
+                <ul className={`space-y-3 mb-10 text-sm ${onyx ? "rot-onyx-muted" : "text-rot-muted"}`}>
+                  {included(p.system).map((item) => (
+                    <li key={item} className="flex gap-2">
+                      <span className={`shrink-0 ${onyx ? "text-rot-accent-2" : "text-rot-faint"}`}>—</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* mt-auto keeps both buttons on the same baseline when the lists differ in height */}
+                <a
+                  href={p.href}
+                  className="rot-btn-accent mt-auto w-full px-6 py-4 text-sm"
+                >
+                  {p.cta}
+                </a>
+              </div>
+            );
+          })}
         </div>
 
         {showDiscord && <div className="mt-px"><DiscordAccessCard /></div>}

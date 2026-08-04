@@ -38,6 +38,28 @@
   /* Brand. Unchanged from the old site; it just isn't the background any more. */
   --rot-accent: #e8451f;
   --rot-accent-2: #ff7a00;
+
+  /* ONYX — the dark material in a light system.
+     Reserved for surfaces that have to read as the expensive option: the
+     Committed panel on the home fork, and the black cert card in Offers. Both
+     are points of sale, which is the rule — onyx marks what costs money, it is
+     not a decorative dark section. Keep it to those; the moment ordinary
+     sections go dark, this is just the old dark site again.
+     Not pure #000 — polished black stone is warm and slightly blue-lifted in
+     its highlights, and pure black next to warm marble looks like a hole. */
+  --rot-onyx: #100d0b;
+  --rot-onyx-2: #221c17;
+  --rot-onyx-fg: #f7f4ef;
+  --rot-onyx-muted: #b8ada0;
+  --rot-onyx-faint: #8d8377;
+  --rot-onyx-line: rgba(255, 255, 255, 0.13);
+
+  /* CHAMPAGNE — the warm metal edge on the Interested side.
+     A hairline of warm gold is enough to stop white-on-marble reading as
+     unstyled default. It is deliberately NOT orange: orange means "this costs
+     money" everywhere else on the site, and the free side must not borrow it. */
+  --rot-champagne: #c2a76b;
+  --rot-champagne-hi: #e8d9b4;
 }
 
 @theme inline {
@@ -56,6 +78,14 @@
   --color-rot-faint: var(--rot-faint);
   --color-rot-accent: var(--rot-accent);
   --color-rot-accent-2: var(--rot-accent-2);
+
+  --color-rot-onyx: var(--rot-onyx);
+  --color-rot-onyx-fg: var(--rot-onyx-fg);
+  --color-rot-onyx-muted: var(--rot-onyx-muted);
+  --color-rot-onyx-faint: var(--rot-onyx-faint);
+  --color-rot-onyx-line: var(--rot-onyx-line);
+  --color-rot-champagne: var(--rot-champagne);
+  --color-rot-champagne-hi: var(--rot-champagne-hi);
 }
 
 html, body {
@@ -67,17 +97,21 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── MARBLE FLOOR ─────────────────────────────────────────────────────────────
+/* ── MARBLE SLAB ──────────────────────────────────────────────────────────────
    Real veining, not a tint. An SVG fractalNoise turbulence is displaced and
    pushed through a steep colour matrix, which is what actually produces stone —
    soft cloudy fields broken by hard thin veins. Baked to a data URI so it costs
-   one decode and zero requests; a marble JPG would be ~400KB and still tile.
+   one decode and zero requests; a marble JPG would be ~400KB.
 
-   Three stacked layers, bottom to top: the stone itself, a warm wash so it reads
-   as honed limestone rather than grey granite, and a gloss sweep so the surface
-   looks polished and lit from the upper left rather than flat.
+   ONE SLAB, NOT A TILE. The first version repeated a 900px square, and a repeat
+   is the one thing that instantly reads as fake: the eye finds the seam and the
+   same vein arrives again every 900px. This is a single 1600x1000 stone scaled to
+   cover, so there is no second copy of anything to notice — which is also what
+   makes it sit still. Fixed, so content moves over the slab rather than dragging
+   it, and the veins never travel while you scroll.
 
-   Fixed, so the content moves over the slab instead of dragging it. */
+   Layers, top to bottom: specular sweep, secondary sheen, warm wash, brand
+   whisper, corner weight, vignette, then the stone itself. */
 body::before {
   content: "";
   position: fixed;
@@ -86,16 +120,24 @@ body::before {
   pointer-events: none;
   background-color: var(--rot-bg);
   background-image:
-    /* gloss: a wide specular sweep across the slab */
-    linear-gradient(112deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.15) 26%, rgba(255,255,255,0) 42%, rgba(255,255,255,0.28) 62%, rgba(255,255,255,0) 78%),
-    /* warmth + a whisper of brand in the stone */
-    radial-gradient(1100px 800px at 85% 6%, rgba(232,69,31,0.05), transparent 60%),
-    radial-gradient(900px 900px at 8% 96%, rgba(28,22,16,0.07), transparent 62%),
-    /* the stone */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.045' numOctaves='6' seed='7' result='n'/%3E%3CfeDisplacementMap in='n' in2='n' scale='38' xChannelSelector='R' yChannelSelector='G' result='d'/%3E%3CfeColorMatrix in='d' type='matrix' values='0 0 0 0 0.94 0 0 0 0 0.925 0 0 0 0 0.90 0 0 0 -1.35 1.06'/%3E%3C/filter%3E%3Crect width='900' height='900' filter='url(%23m)'/%3E%3C/svg%3E");
-  background-size: cover, cover, cover, 900px 900px;
-  background-repeat: no-repeat, no-repeat, no-repeat, repeat;
-  opacity: 1;
+    /* gloss: the primary specular sweep, lit from the upper left */
+    linear-gradient(112deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.30) 22%, rgba(255,255,255,0) 40%, rgba(255,255,255,0.34) 60%, rgba(255,255,255,0) 74%),
+    /* gloss: a second, tighter highlight at a different angle — two sweeps is
+       what separates "polished stone" from "gradient" */
+    linear-gradient(68deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.22) 47%, rgba(255,255,255,0) 58%),
+    /* warmth: honed limestone, not grey granite */
+    radial-gradient(1200px 900px at 22% 0%, rgba(255,252,246,0.55), transparent 62%),
+    /* a whisper of brand in the stone */
+    radial-gradient(1100px 800px at 85% 6%, rgba(232,69,31,0.045), transparent 60%),
+    /* fine cross-veining */
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%221600%22%20height%3D%221000%22%3E%3Cfilter%20id%3D%22f%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.006%200.020%22%20numOctaves%3D%224%22%20seed%3D%2241%22%20result%3D%22n%22%2F%3E%3CfeDisplacementMap%20in%3D%22n%22%20in2%3D%22n%22%20scale%3D%2230%22%20xChannelSelector%3D%22R%22%20yChannelSelector%3D%22G%22%20result%3D%22n%22%2F%3E%3CfeColorMatrix%20in%3D%22n%22%20type%3D%22matrix%22%20values%3D%220%200%200%200%200.55%200%200%200%200%200.53%200%200%200%200%200.5%200.33%200.34%200.33%200%200%22%20result%3D%22s%22%2F%3E%3CfeComponentTransfer%20in%3D%22s%22%20result%3D%22t%22%3E%3CfeFuncA%20type%3D%22table%22%20tableValues%3D%220%200%200%200.128%200%200%200%22%2F%3E%3C%2FfeComponentTransfer%3E%3CfeGaussianBlur%20in%3D%22t%22%20stdDeviation%3D%220.4%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%221600%22%20height%3D%221000%22%20filter%3D%22url(%23f)%22%2F%3E%3C%2Fsvg%3E"),
+    /* the primary vein set */
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%221600%22%20height%3D%221000%22%3E%3Cfilter%20id%3D%22f%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.0022%200.008%22%20numOctaves%3D%225%22%20seed%3D%227%22%20result%3D%22n%22%2F%3E%3CfeDisplacementMap%20in%3D%22n%22%20in2%3D%22n%22%20scale%3D%2255%22%20xChannelSelector%3D%22R%22%20yChannelSelector%3D%22G%22%20result%3D%22n%22%2F%3E%3CfeColorMatrix%20in%3D%22n%22%20type%3D%22matrix%22%20values%3D%220%200%200%200%200.42%200%200%200%200%200.4%200%200%200%200%200.37%200.33%200.34%200.33%200%200%22%20result%3D%22s%22%2F%3E%3CfeComponentTransfer%20in%3D%22s%22%20result%3D%22t%22%3E%3CfeFuncA%20type%3D%22table%22%20tableValues%3D%220%200%200%200.272%200%200%200%22%2F%3E%3C%2FfeComponentTransfer%3E%3CfeGaussianBlur%20in%3D%22t%22%20stdDeviation%3D%220.6%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%221600%22%20height%3D%221000%22%20filter%3D%22url(%23f)%22%2F%3E%3C%2Fsvg%3E"),
+    /* broad clouding — real slabs have both veins and soft fields */
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%221600%22%20height%3D%221000%22%3E%3Cfilter%20id%3D%22f%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22100%25%22%20height%3D%22100%25%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.0015%200.004%22%20numOctaves%3D%224%22%20seed%3D%225%22%20result%3D%22n%22%2F%3E%3CfeColorMatrix%20in%3D%22n%22%20type%3D%22matrix%22%20values%3D%220%200%200%200%200.8%200%200%200%200%200.785%200%200%200%200%200.75%200.33%200.34%200.33%200%200%22%20result%3D%22s%22%2F%3E%3CfeComponentTransfer%20in%3D%22s%22%20result%3D%22t%22%3E%3CfeFuncA%20type%3D%22table%22%20tableValues%3D%220.000%200.032%200.058%200.070%200.058%200.032%200.000%22%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%221600%22%20height%3D%221000%22%20filter%3D%22url(%23f)%22%2F%3E%3C%2Fsvg%3E");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 /* Polished-floor reflection under the fold: a soft sheen that keeps large empty
@@ -107,7 +149,7 @@ body::after {
   height: 45vh;
   z-index: -1;
   pointer-events: none;
-  background: linear-gradient(to top, rgba(255,255,255,0.5), rgba(255,255,255,0) 70%);
+  background: linear-gradient(to top, rgba(255,255,255,0.55), rgba(255,255,255,0) 70%);
 }
 
 h1, h2, h3 {
@@ -144,6 +186,253 @@ h1, h2, h3 {
 .rot-card:hover {
   box-shadow: 0 2px 4px rgba(28, 22, 16, 0.05), 0 18px 40px -16px rgba(28, 22, 16, 0.18);
   transform: translateY(-2px);
+}
+
+/* ── ONYX PANEL ───────────────────────────────────────────────────────────────
+   Polished black stone, built the same way as the floor but inverted: the
+   colour matrix emits pale veins over a dark ground instead of dark veins over
+   a pale one, so both materials come from one technique and look quarried from
+   the same building.
+
+   ONE per page. The dark is doing a job — marking the option that costs money —
+   and a second onyx panel spends that signal for nothing.
+
+   ::before is the stone and ::after is the gloss. Both sit at z-index -1 and the
+   panel isolates, which keeps them under the content while leaving children
+   untouched. Do NOT swap this for a `.rot-onyx > *` rule that sets
+   `position: relative` — the panel has an absolutely positioned corner label,
+   and forcing every child to relative silently drops it back into the flow. */
+.rot-onyx {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: var(--rot-onyx);
+  color: var(--rot-onyx-fg);
+}
+
+.rot-onyx::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--rot-onyx);
+  background-image:
+    /* warm lift in the top-left so the slab has the same light direction as
+       the marble it sits next to */
+    radial-gradient(120% 100% at 12% 0%, rgba(255, 240, 220, 0.10), transparent 58%),
+    /* the stone: pale veining over black */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1000' height='1200'%3E%3Cfilter id='o'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.006 0.021' numOctaves='6' seed='23' result='n'/%3E%3CfeDisplacementMap in='n' in2='n' scale='58' xChannelSelector='R' yChannelSelector='G' result='d'/%3E%3CfeColorMatrix in='d' type='matrix' values='0 0 0 0 0.82 0 0 0 0 0.79 0 0 0 0 0.74 0 0 0 -1.25 0.82'/%3E%3C/filter%3E%3Crect width='1000' height='1200' filter='url(%23o)'/%3E%3C/svg%3E");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.5;
+}
+
+.rot-onyx::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(118deg, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.02) 24%, rgba(255,255,255,0) 44%, rgba(255,255,255,0.055) 62%, rgba(255,255,255,0) 76%),
+    /* the brand, banked low in the stone rather than painted on it */
+    radial-gradient(600px 420px at 88% 100%, rgba(232, 69, 31, 0.16), transparent 68%);
+}
+
+/* Type helpers for inside onyx. Explicit classes rather than re-scoping the
+   light-theme utilities, so reading the markup tells you which surface you are
+   on instead of leaving it to cascade order. */
+.rot-onyx-fg    { color: var(--rot-onyx-fg); }
+.rot-onyx-muted { color: var(--rot-onyx-muted); }
+.rot-onyx-faint { color: var(--rot-onyx-faint); }
+.rot-onyx .rot-kicker { color: var(--rot-onyx-faint); }
+
+/* Ghost button, onyx variant — the light-theme one is invisible on black. */
+.rot-btn-ghost-onyx {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  background: transparent;
+  color: var(--rot-onyx-fg);
+  font-weight: 500;
+  border: 1px solid var(--rot-onyx-line);
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+.rot-btn-ghost-onyx:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.34); }
+
+/* ── METAL CARDS (app/components/Offers.tsx) ─────────────────────────────────
+   The cert packages as metal charge cards — platinum and black — because that is
+   the object people already associate with "this is the serious tier", and the
+   old plain white cards were doing none of that work.
+
+   Three layers per card: a banded base gradient (metal is never one flat colour,
+   it is bands of light and shadow), a brushed grain, and a specular sweep that
+   travels — a real metal card only looks like metal when the light moves on it.
+
+   The sweep is transform-only, so it runs on the compositor and costs no layout.
+   It is the one animation on the page that never stops, which is why it is slow
+   and low-contrast; a fast bright shimmer reads as a casino, not a bank. */
+.rot-metal {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow:
+    0 1px 1px rgba(28,22,16,0.10),
+    0 18px 40px -18px rgba(28,22,16,0.45);
+  transition: transform 280ms cubic-bezier(0.16,1,0.3,1), box-shadow 280ms ease;
+}
+.rot-metal:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 2px 3px rgba(28,22,16,0.12),
+    0 30px 60px -20px rgba(28,22,16,0.55);
+}
+
+/* Brushed grain. baseFrequency is slow in x and fast in y, which draws the fine
+   horizontal lines of a brushed finish; swapping the axes gives vertical
+   scoring, which reads as corrugated rather than machined. */
+.rot-metal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.42;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Cfilter id='b'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.004 0.75' numOctaves='3' seed='3'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0.2 0.2 0.2 0 0'/%3E%3C/filter%3E%3Crect width='600' height='400' filter='url(%23b)'/%3E%3C/svg%3E");
+  background-size: cover;
+  mix-blend-mode: overlay;
+}
+
+/* The travelling highlight. */
+.rot-metal::after {
+  content: "";
+  position: absolute;
+  top: -60%;
+  bottom: -60%;
+  left: 0;
+  width: 45%;
+  z-index: -1;
+  pointer-events: none;
+  transform: translateX(-160%) rotate(14deg);
+  animation: rot-metal-sweep 7.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+@keyframes rot-metal-sweep {
+  0%   { transform: translateX(-160%) rotate(14deg); }
+  55%  { transform: translateX(320%)  rotate(14deg); }
+  100% { transform: translateX(320%)  rotate(14deg); }
+}
+
+/* PLATINUM — brushed warm silver. Ink type, because a platinum card is engraved
+   dark and white-on-silver is unreadable. */
+.rot-metal-platinum {
+  color: var(--rot-fg);
+  background-image: linear-gradient(
+    134deg,
+    #f4f2ee 0%, #d6d0c6 14%, #fbfaf8 27%, #c3bcb0 41%,
+    #ece8e1 55%, #cac3b7 68%, #f6f4f0 82%, #d9d3c9 100%
+  );
+  border: 1px solid rgba(28,22,16,0.16);
+}
+.rot-metal-platinum::after {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.75), transparent);
+}
+
+/* ONYX CARD — the black card. Same material language as the Committed panel, so
+   the two dark surfaces on the site read as the same brand object rather than
+   two unrelated dark boxes. */
+.rot-metal-onyx {
+  color: var(--rot-onyx-fg);
+  background-image: linear-gradient(
+    134deg,
+    #221c17 0%, #0a0807 15%, #2e2620 29%, #0d0a09 44%,
+    #251e19 58%, #0a0807 74%, #1d1712 88%, #0d0a09 100%
+  );
+  border: 1px solid rgba(255,255,255,0.14);
+}
+.rot-metal-onyx::after {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.20), transparent);
+}
+
+/* The issuer line — "RICH OFF TECH" across the top of every card. */
+.rot-metal-issuer {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+/* Tier badge, engraved rather than printed: a hairline box, no fill. */
+.rot-metal-tier {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  opacity: 0.75;
+}
+
+/* The chip. Every metal card has one and its absence is felt immediately. */
+.rot-metal-chip {
+  width: 42px;
+  height: 32px;
+  border-radius: 5px;
+  background-image:
+    linear-gradient(135deg, #e7cf95 0%, #b8994f 38%, #f0e1b6 55%, #a98c47 78%, #dcc888 100%);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.5);
+  position: relative;
+}
+/* contact pads */
+.rot-metal-chip::after {
+  content: "";
+  position: absolute;
+  inset: 5px 7px;
+  border: 1px solid rgba(0,0,0,0.22);
+  border-radius: 2px;
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rot-metal::after { animation: none; opacity: 0.35; }
+  .rot-metal:hover { transform: none; }
+}
+
+/* Ivory panel — the light counterpart to onyx. Flat white next to polished black
+   looks like paper next to stone, so the free side gets its own quiet warmth and
+   a top-left sheen borrowed from the same light source. */
+.rot-ivory {
+  background-color: var(--rot-surface);
+  background-image:
+    linear-gradient(150deg, rgba(255, 252, 245, 0.95) 0%, rgba(255,255,255,0) 46%),
+    radial-gradient(90% 70% at 8% 0%, rgba(194, 167, 107, 0.07), transparent 62%);
+}
+
+/* ── CHAMPAGNE EDGE ───────────────────────────────────────────────────────────
+   A hairline of warm metal along the top of the free side. White on marble was
+   reading as unstyled rather than as a choice; this is enough to make it
+   deliberate without giving the free column a colour loud enough to compete
+   with the buy button.
+
+   Deliberately not orange — orange means "this costs money" everywhere else. */
+.rot-champagne-edge { position: relative; }
+.rot-champagne-edge::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  z-index: 2;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--rot-champagne) 16%,
+    var(--rot-champagne-hi) 50%,
+    var(--rot-champagne) 84%,
+    transparent
+  );
 }
 
 /* Primary: near-black. Reads as the serious option on a light page. */

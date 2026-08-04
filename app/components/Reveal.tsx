@@ -36,23 +36,58 @@ export default function Reveal({
     // Arm only now that JS is running.
     el.setAttribute("data-armed", "1");
 
+    let revealed = false;
+    const reveal = () => {
+      if (revealed) return;
+      revealed = true;
+      el.classList.add("is-in");
+      teardown();
+    };
+
     // Anything already on screen at mount reveals immediately — otherwise the
     // hero would sit invisible until the first scroll.
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          entry.target.classList.add("is-in");
-          io.unobserve(entry.target);
+          if (entry.isIntersecting) reveal();
         }
       },
       // Fire slightly before the element is fully in view so it lands settled
       // rather than mid-animation.
       { threshold: 0.08, rootMargin: "0px 0px -8% 0px" },
     );
-
     io.observe(el);
-    return () => io.disconnect();
+
+    // SAFETY NET — do not remove.
+    //
+    // IntersectionObserver only fires when a threshold is CROSSED. Move past an
+    // element in a single frame and it goes from "below the fold, not
+    // intersecting" straight to "above the fold, not intersecting" without ever
+    // being intersecting on a sampled frame, so the callback never runs and the
+    // content stays at opacity 0 PERMANENTLY. That is not a rare edge case:
+    // clicking an in-page anchor, dragging the scrollbar, a hard flick on a
+    // trackpad, and the browser restoring scroll position on reload all do it.
+    // It stranded most of the home page invisible.
+    //
+    // So the observer is treated as the nice-to-have and this is the guarantee:
+    // if the element has reached or passed the fold, it gets shown. The 0.92
+    // matches the observer's -8% bottom margin, so both paths reveal at the
+    // same point and the choreography is unchanged.
+    const check = () => {
+      if (el.getBoundingClientRect().top < window.innerHeight * 0.92) reveal();
+    };
+
+    function teardown() {
+      io.disconnect();
+      window.removeEventListener("scroll", check);
+      window.removeEventListener("resize", check);
+    }
+
+    window.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("resize", check);
+    check();
+
+    return teardown;
   }, []);
 
   return (
