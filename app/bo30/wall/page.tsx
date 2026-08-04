@@ -79,11 +79,11 @@ export default function TributeWall() {
                   {t.muxPlaybackId && (
                     <div className="flex flex-wrap gap-2 mt-3">
                       <button onClick={() => copy(MP4(t.muxPlaybackId!), t.id)}
-                        className="text-[11px] px-2.5 py-1 rounded border border-rot-line-strong text-gray-200 hover:bg-rot-sunken">
+                        className="text-[11px] px-2.5 py-1 rounded border border-rot-line-strong text-rot-fg hover:bg-rot-sunken">
                         {copied === t.id ? "Copied" : "Copy MP4 link (for Opus)"}
                       </button>
                       <a href={MP4(t.muxPlaybackId)} download
-                        className="text-[11px] px-2.5 py-1 rounded border border-rot-line-strong text-gray-200 hover:bg-rot-sunken">
+                        className="text-[11px] px-2.5 py-1 rounded border border-rot-line-strong text-rot-fg hover:bg-rot-sunken">
                         Download
                       </a>
                     </div>
@@ -101,7 +101,7 @@ export default function TributeWall() {
           <div className="grid sm:grid-cols-2 gap-4">
             {notes.map((t) => (
               <blockquote key={t.id} className="bg-rot-surface border border-rot-line rounded-2xl p-5">
-                <p className="text-gray-200 text-sm whitespace-pre-wrap">{t.text}</p>
+                <p className="text-rot-fg text-sm whitespace-pre-wrap">{t.text}</p>
                 <footer className="mt-3 text-xs">
                   <span className="font-bold text-rot-fg">{t.name}</span>
                   {t.city && <span className="text-rot-faint"> · {t.city}</span>}

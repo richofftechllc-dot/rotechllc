@@ -40,7 +40,7 @@ export default function Markdown({ text }: { text: string }) {
       i++;
       while (i < lines.length && !lines[i].trim().startsWith("```")) { code.push(lines[i]); i++; }
       i++; // closing fence
-      blocks.push(<pre key={key++} className="my-2 overflow-x-auto rounded-lg bg-rot-sunken p-3 text-xs text-gray-200"><code>{code.join("\n")}</code></pre>);
+      blocks.push(<pre key={key++} className="my-2 overflow-x-auto rounded-lg bg-rot-sunken p-3 text-xs text-rot-fg"><code>{code.join("\n")}</code></pre>);
       continue;
     }
     // blank

@@ -111,8 +111,14 @@ export default function PlanPage() {
                   </div>
                   <div className="text-xs text-rot-faint mt-0.5">Days {m.startDay}–{m.endDay}</div>
                   <div className="flex gap-2 mt-2">
-                    <Link href="/quiz" className="text-xs px-2.5 py-1 rounded-md bg-rot-sunken border border-rot-line hover:border-orange-500 text-gray-200">📚 Study + Quiz</Link>
-                    {m.labCount > 0 && <Link href="/lab" className="text-xs px-2.5 py-1 rounded-md bg-rot-sunken border border-rot-line hover:border-orange-500 text-gray-200">🧪 Lab ({m.labCount})</Link>}
+                    {/* text-rot-fg, not text-gray-200. These were left over from the
+                        dark theme: near-white type on the light sunken chip, i.e.
+                        two invisible buttons on the page a paying member uses most.
+                        And the lab link pointed at bare /lab, which is not a route —
+                        the only one is /lab/[labId] — so it 404'd. It now lands on
+                        the lab index filtered to this milestone's domain. */}
+                    <Link href="/quiz" className="text-xs px-2.5 py-1 rounded-md bg-rot-sunken border border-rot-line hover:border-rot-accent text-rot-fg font-medium transition">📚 Study + Quiz</Link>
+                    {m.labCount > 0 && <Link href={`/lab?domain=${m.domainId}`} className="text-xs px-2.5 py-1 rounded-md bg-rot-sunken border border-rot-line hover:border-rot-accent text-rot-fg font-medium transition">🧪 Lab ({m.labCount})</Link>}
                   </div>
                 </div>
               </li>

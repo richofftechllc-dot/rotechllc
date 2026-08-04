@@ -666,7 +666,7 @@ ${missedText}]
               </div>
             )}
             {chat.map((m, i) => (
-              <div key={i} className={m.role === "user" ? "bg-rot-sunken rounded p-2 text-rot-muted" : "bg-rot-accent/10 border border-rot-accent/30 rounded p-2 text-gray-200"}>
+              <div key={i} className={m.role === "user" ? "bg-rot-sunken rounded p-2 text-rot-muted" : "bg-rot-accent/10 border border-rot-accent/30 rounded p-2 text-rot-fg"}>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs text-rot-faint">{m.role === "user" ? "You" : (persona === "bo" ? "Bo" : "Flo")}</span>
                   {m.role === "assistant" && m.content && (

@@ -102,14 +102,22 @@ export default function Roster() {
     <main className="max-w-6xl mx-auto px-6 py-12">
       <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-8">
         The bridge<br />
-        between <span className="text-emerald-600">my people</span><br />
-        & the <span className="text-yellow-500">corporate world</span>
+        {/* Was emerald + yellow — two colours the brand does not own, on the
+            biggest type on the page. Same treatment as the home hero now: the
+            brand orange takes the phrase that matters and the other recedes. */}
+        between <span className="text-rot-accent">my people</span><br />
+        & the <span className="text-rot-faint">corporate world</span>
       </h1>
       <p className="text-rot-muted max-w-3xl mb-8">
         A live roster of <b>Rich Off Tech LLC</b> community members — cleared professionals, certified operators, and rising talent across cyber, cloud, ServiceNow, and federal IT. Hiring managers and recruiters: this is your shortlist.
       </p>
 
-      <div className="bg-gradient-to-br from-orange-500/10 via-zinc-950 to-zinc-950 border border-rot-accent/30 rounded-2xl p-6 mb-12">
+      {/* Was a zinc-950 panel left over from the dark theme, still carrying
+          text-rot-muted — dark ink on a near-black card, so the whole "why this
+          exists" statement was unreadable. It is an explainer, not a point of
+          sale, so it goes light rather than onyx; onyx is reserved for the two
+          places that take money. */}
+      <div className="rot-ivory rot-champagne-edge border border-rot-line rounded-2xl p-6 mb-12">
         <div className="text-rot-accent font-bold tracking-widest text-xs mb-3">WHY THIS EXISTS</div>
         <p className="text-rot-muted leading-relaxed mb-3">
           When federal DEI programs got cancelled, a generation of cleared talent got left in the cold. This roster is the alternative — a pipeline that puts people who look like me in the door, on merit, no quotas. All races, all genders, one rule: come ready to learn.
@@ -121,9 +129,11 @@ export default function Roster() {
       </div>
 
       <div className="grid grid-cols-3 gap-4 sm:gap-8 mb-10 text-center">
-        <div><div className="text-3xl sm:text-5xl font-black text-emerald-600">{members.length}</div><div className="text-rot-faint text-[10px] sm:text-xs uppercase tracking-wider mt-1">Members</div></div>
-        <div><div className="text-3xl sm:text-5xl font-black text-emerald-600">{cleared}</div><div className="text-rot-faint text-[10px] sm:text-xs uppercase tracking-wider mt-1">Cleared</div></div>
-        <div><div className="text-3xl sm:text-5xl font-black text-yellow-500">{totalCerts}</div><div className="text-rot-faint text-[10px] sm:text-xs uppercase tracking-wider mt-1">Certs Held</div></div>
+        {/* Counts are near-black like every other number on the site; the orange
+            is spent on the buy actions, not on three stats. */}
+        <div><div className="text-3xl sm:text-5xl font-black text-rot-fg">{members.length}</div><div className="text-rot-faint text-[10px] sm:text-xs uppercase tracking-wider mt-1">Members</div></div>
+        <div><div className="text-3xl sm:text-5xl font-black text-rot-fg">{cleared}</div><div className="text-rot-faint text-[10px] sm:text-xs uppercase tracking-wider mt-1">Cleared</div></div>
+        <div><div className="text-3xl sm:text-5xl font-black text-rot-fg">{totalCerts}</div><div className="text-rot-faint text-[10px] sm:text-xs uppercase tracking-wider mt-1">Certs Held</div></div>
       </div>
 
       <div className="flex gap-3 mb-6 flex-wrap">
