@@ -14,10 +14,15 @@ import { CERTS, PRICING, money } from "@/lib/pricing";
 //
 // Prices come from lib/pricing.ts. Nothing is retyped here.
 
-// The free docs that already exist in public/resources. Linked, never duplicated.
+// The free docs. Linked, never duplicated.
+//
+// The Security+ and ServiceNow CSA study plans are NOT here and must not be added.
+// Those are the paid product - a Sec+ or CSA buyer is paying for the voucher, the
+// coaching AND that roadmap - so handing them out on the free side is giving the
+// thing away. They stay coach-send-only via the CRM Resources tab, which sends them
+// to clients who bought. The AWS AI plan is fair game: that track is included with
+// membership rather than sold on its own.
 const FREE_RESOURCES: Array<{ label: string; href: string }> = [
-  { label: "Security+ study plan", href: "/resources/rot-secplus-study-plan.html" },
-  { label: "ServiceNow CSA study plan", href: "/resources/rot-csa-study-plan.html" },
   { label: "AWS AI study plan", href: "/resources/rot-aws-ai-study-plan.html" },
   { label: "FAQ", href: "/resources/rot-faq.html" },
   { label: "How it works", href: "/resources/rot-how-it-works.html" },
@@ -52,7 +57,7 @@ export default function CommittedOrInterested() {
 
             <ul className="space-y-2 text-sm text-gray-300 mb-6">
               <li className="flex gap-2"><span className="text-gray-500 shrink-0">✓</span><span>The Discord, free — including the daily tech-intel channels</span></li>
-              <li className="flex gap-2"><span className="text-gray-500 shrink-0">✓</span><span>Every study plan and guide below, no card</span></li>
+              <li className="flex gap-2"><span className="text-gray-500 shrink-0">✓</span><span>The guides below — the AWS AI plan, the FAQ, how this works — no card</span></li>
               <li className="flex gap-2"><span className="text-gray-500 shrink-0">✓</span><span>Read the whole site — real member results, the roster, what we charge</span></li>
             </ul>
 
