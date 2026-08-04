@@ -9,7 +9,7 @@ import WatchCarousel from "./components/WatchCarousel";
 // the tree for the next drop; just not mounted.
 // import BirthdayBanner from "./components/BirthdayBanner";
 import FoundingSlot from "./components/FoundingSlot";
-import BirthdayDrop from "./components/BirthdayDrop";
+import Offers from "./components/Offers";
 import ResultsWall from "./components/ResultsWall";
 
 async function getMemberCount() {
@@ -32,10 +32,9 @@ export default async function Home() {
   const memberCount = await getMemberCount();
   return (
     <>
-      {/* BIRTHDAY DROP — headlines the site while the drop is live (July 26–27, 2026).
-          Sits ABOVE the hero on purpose: it's the offer we're driving traffic to this
-          week. Move it back below the hero (or remove it) once the drop closes. */}
-      <BirthdayDrop />
+      {/* OFFERS — regular-rate cert tracks. The drop closed Jul 27 2026, so this no
+          longer headlines the page; it moves below the proof in the restructure. */}
+      <Offers />
 
       {/* HERO */}
       <main className="max-w-6xl mx-auto px-6 py-16 md:py-24">
