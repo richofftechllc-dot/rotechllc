@@ -19,11 +19,11 @@ async function getMemberCount() {
       "https://discord.com/api/v10/guilds/1488597128329822369?with_counts=true",
       { headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` }, next: { revalidate: 120 } }
     );
-    if (!res.ok) return 72;
+    if (!res.ok) return 114;
     const data = await res.json();
     return data.approximate_member_count || 72;
   } catch {
-    return 72;
+    return 114;
   }
 }
 
@@ -94,7 +94,7 @@ export default async function Home() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-rot-line border border-rot-line mt-20 text-center">
             <div className="bg-rot-bg py-8 px-4"><div className="text-3xl sm:text-5xl font-semibold tracking-tight">{memberCount}</div><div className="rot-kicker mt-3">Active members (live)</div></div>
             <div className="bg-rot-bg py-8 px-4"><div className="text-3xl sm:text-5xl font-semibold tracking-tight">200+</div><div className="rot-kicker mt-3">online certifications</div></div>
-            <div className="bg-rot-bg py-8 px-4"><div className="text-3xl sm:text-5xl font-semibold tracking-tight">14+</div><div className="rot-kicker mt-3">States represented</div></div>
+            <div className="bg-rot-bg py-8 px-4"><div className="text-3xl sm:text-5xl font-semibold tracking-tight">16+</div><div className="rot-kicker mt-3">States represented</div></div>
             <div className="bg-rot-bg py-8 px-4"><div className="text-3xl sm:text-5xl font-semibold tracking-tight">100%</div><div className="rot-kicker mt-3">Virtual &amp; flexible</div></div>
           </div>
         </div>

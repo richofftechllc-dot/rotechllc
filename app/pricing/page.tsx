@@ -9,11 +9,11 @@ async function getMemberCount() {
       "https://discord.com/api/v10/guilds/1488597128329822369?with_counts=true",
       { headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` }, next: { revalidate: 120 } }
     );
-    if (!res.ok) return 72;
+    if (!res.ok) return 114;
     const data = await res.json();
     return data.approximate_member_count || 72;
   } catch {
-    return 72;
+    return 114;
   }
 }
 

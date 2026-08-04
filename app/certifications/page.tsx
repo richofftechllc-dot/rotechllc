@@ -99,12 +99,12 @@ export default function Certifications() {
             <div className="bg-rot-surface border border-rot-line rounded-2xl p-6">
               <div className="text-3xl mb-3">🤖</div>
               <div className="font-bold text-lg mb-2">Quiz System + Bo Tech Tutor</div>
-              <p className="text-rot-muted text-sm leading-relaxed">Your access code unlocks the quiz engine at <span className="text-rot-accent">rotechllc.com/learn</span>. <b className="text-rot-fg">Bo Tech</b> is your live AI instructor — explains every question, drafts your resume, and answers at 3 AM in Discord.</p>
+              <p className="text-rot-muted text-sm leading-relaxed">Your access code unlocks the quiz engine at <span className="text-rot-accent">rotechllc.com/quiz</span>. <b className="text-rot-fg">Bo Tech</b> is your live AI instructor — explains every question, drafts your resume, and answers at 3 AM in Discord.</p>
             </div>
             <div className="bg-rot-surface border border-rot-line rounded-2xl p-6">
               <div className="text-3xl mb-3">🎟️</div>
               <div className="font-bold text-lg mb-2">Exam Voucher + Test-Day Setup</div>
-              <p className="text-rot-muted text-sm leading-relaxed">We get you the official cert voucher and run your OnVUE / UltraViewer setup so you walk into exam day ready. You keep and test under your own account.</p>
+              <p className="text-rot-muted text-sm leading-relaxed">We get you the official cert voucher and run your OnVUE setup so you walk into exam day ready — plus remote desktop sessions for tutoring and lab help. You keep and test under your own account.</p>
             </div>
             <div className="bg-rot-surface border border-emerald-600/25 rounded-2xl p-6">
               <div className="text-3xl mb-3">🛡️</div>
