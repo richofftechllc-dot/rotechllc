@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Offers from "../components/Offers";
+import { CERT_CATALOG } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: "Certifications & What We Offer — Rich Off Tech",
@@ -18,11 +19,62 @@ export default function Certifications() {
         <h1 className="text-5xl md:text-6xl font-black mb-4">Certifications, coached.</h1>
         <p className="text-gray-400 text-lg max-w-2xl mx-auto">
           Pick a track, get the voucher, and work the system with a coach and an AI tutor
-          until you pass.
+          until you pass. Security+ and ServiceNow CSA are what most people come for —
+          but if you can sit it online, we coach it.
         </p>
       </section>
 
       <Offers showDiscord={false} />
+
+      {/* THE REST OF THE CATALOG — coached, but priced per person by a coach, so no
+          price and no checkout button. Inventing either would be a chargeback or a
+          payment the bot can't route. */}
+      <section id="catalog" className="bg-black py-20 border-t border-white/5 scroll-mt-20">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="text-center mb-10">
+            <div className="text-orange-500 font-bold tracking-widest text-sm mb-4">EVERYTHING ELSE</div>
+            <h2 className="text-4xl md:text-5xl font-black mb-3">If you can sit it online, we coach it.</h2>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+              Security+ and CSA are the two with instant checkout above because they&apos;re
+              what people buy. Everything here runs the same system — voucher, quiz engine,
+              study plan, a coach — priced for your situation. These are the common ones,
+              not the whole list.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-5 mb-10">
+            {CERT_CATALOG.map((g) => (
+              <div key={g.group} className="bg-zinc-900 border border-white/10 rounded-2xl p-6">
+                <div className="text-orange-400 font-bold tracking-widest text-xs mb-4 uppercase">{g.group}</div>
+                <div className="flex flex-wrap gap-2">
+                  {g.certs.map((c) => (
+                    <span key={c} className="text-sm px-3 py-1.5 bg-black/50 border border-white/10 rounded-lg text-gray-300">
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-zinc-900 border border-orange-500/30 rounded-2xl p-6 text-center">
+            <h3 className="text-xl font-bold mb-2">Don&apos;t see yours?</h3>
+            <p className="text-gray-400 text-sm mb-5 max-w-xl mx-auto">
+              Ask. If there&apos;s an online exam for it, we&apos;ll build you a track and quote
+              you a price. Pricing on these is per person — it depends on the voucher, the
+              timeline, and how much coaching you want.
+            </p>
+            <div className="flex flex-wrap gap-3 justify-center">
+              <a href="/help#agents" className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90">
+                Talk to the Cert Qualifier — free
+              </a>
+              <a href="/book" className="px-6 py-3 border border-white/20 rounded-lg hover:bg-white/5">
+                Book a coach
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* WHAT'S INSIDE — value-first explainer (no prices) */}
       <section id="inside" className="bg-zinc-950 py-24 border-t border-white/5 scroll-mt-20">

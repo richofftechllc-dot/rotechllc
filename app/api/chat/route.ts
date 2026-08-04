@@ -3,7 +3,7 @@ import { coll } from "@/lib/firebase";
 import { getAuthedCode } from "@/lib/session";
 import { LESSONS } from "@/lib/quizData";
 import { LINKS } from "@/lib/links";
-import { CERTS, PRICING, money } from "@/lib/pricing";
+import { CERTS, CERT_CATALOG, PRICING, money } from "@/lib/pricing";
 
 // Strip a lesson's HTML to plain text so Bo can be grounded in it via the system prompt.
 function lessonToText(html: string): string {
@@ -46,6 +46,12 @@ GATING RULE: Essential AND Self-Guided cert tracks are both open to ANYONE — s
 - ${CERTS.discordAccess.name} on its own, 12 months: ${money(CERTS.discordAccess.price)} → ${CERTS.discordAccess.url}
 These are the live prices. Quote them AS the price, never as a discount off a higher
 number and never with a deadline attached — there is no sale running.
+
+EVERY OTHER CERT. Security+ and CSA are just the two with instant checkout — ROT coaches
+ANY cert you can sit online, including ${CERT_CATALOG.map((g) => g.certs.join(", ")).join(", ")}.
+If somebody asks about one of those, say YES we coach it, then send them to the free Cert
+Qualifier (https://rotechllc.com/help#agents) or /book, because those are priced per person
+by a coach. NEVER invent a price or a checkout link for them — you do not have one.
 
 CLEARANCE COACHING — requires the FREE Clearance Qualifier call FIRST, no instant checkout:
 - Secret $3,600 (10% off) · TS $4,250 (15% off) · TS/SCI $4,400 (20% off)
