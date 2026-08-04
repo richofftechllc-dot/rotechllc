@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 const RESOURCES: Array<{ title: string; desc: string; href: string; external?: boolean }> = [
   { title: "FAQ", desc: "The questions we get asked most — vouchers, timelines, refunds, access.", href: "/resources/rot-faq.html" },
   { title: "How it works", desc: "Start to certified: what happens after you buy, step by step.", href: "/resources/rot-how-it-works.html" },
-  { title: "Book a 1-on-1", desc: "Grab time with a coach for anything a page can't answer.", href: "/book" },
+  { title: "Book a 1-on-1 · members", desc: "Members: grab time with your coach. Not a member yet? The free qualifier agents above take anyone.", href: "/book" },
   { title: "Sunday calls", desc: "The weekly live call schedule and what each one covers.", href: "/calls" },
   { title: "Bot commands", desc: "Everything Bo Tech responds to in Discord.", href: "/commands" },
   { title: "Pricing", desc: "Membership tiers side by side, plus the project estimate builder.", href: "/pricing" },
@@ -109,8 +109,8 @@ export default function Help() {
             <a href="https://discord.gg/dtcYf8PTNa" target="_blank" rel="noopener noreferrer" className="inline-block px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg text-lg hover:opacity-90">
               Join the Discord — Free
             </a>
-            <a href="/book" className="inline-block px-8 py-4 border border-rot-line-strong rounded-lg text-lg hover:bg-rot-sunken">
-              Book a 1-on-1
+            <a href="/membership" className="inline-block px-8 py-4 border border-rot-line-strong rounded-lg text-lg hover:bg-rot-sunken">
+              Become a member
             </a>
           </div>
         </div>

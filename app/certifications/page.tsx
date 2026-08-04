@@ -73,8 +73,8 @@ export default function Certifications() {
               <a href="/help#agents" className="px-6 py-3 border border-rot-accent/30 text-rot-accent font-bold rounded-lg hover:bg-rot-accent/10">
                 Or talk to the Cert Qualifier — free
               </a>
-              <a href="/book" className="px-6 py-3 border border-rot-line-strong rounded-lg hover:bg-rot-sunken">
-                Book a coach
+              <a href="/membership" className="px-6 py-3 border border-rot-line-strong rounded-lg hover:bg-rot-sunken">
+                Become a member
               </a>
             </div>
           </div>
