@@ -40,7 +40,7 @@ export default async function Home() {
       <CommittedOrInterested />
 
       {/* 1 — BO TECH: the AI-powered career command center */}
-      <main className="max-w-6xl mx-auto px-6 py-24 md:py-32">
+      <main className="max-w-6xl mx-auto px-6 pt-16 md:pt-20 pb-24 md:pb-32">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
             <div className="rot-kicker mb-8">Bo Tech · AI-powered career command center</div>

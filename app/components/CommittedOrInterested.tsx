@@ -35,10 +35,10 @@ const FREE_RESOURCES: Array<{ label: string; href: string }> = [
 export default function CommittedOrInterested() {
   return (
     <section id="start" className="bg-rot-bg border-b border-rot-line">
-      <div className="max-w-6xl mx-auto px-6 py-24 md:py-32">
+      <div className="max-w-6xl mx-auto px-6 py-20 md:py-28">
         <div className="text-center mb-16">
           <div className="rot-kicker mb-6">Start here</div>
-          <h2 className="text-5xl md:text-7xl font-semibold mb-6 leading-[0.95]">
+          <h2 className="text-5xl md:text-7xl font-semibold mb-6 leading-[0.95] max-w-4xl mx-auto">
             Are you <span className="text-rot-faint">interested</span>,<br className="sm:hidden" />{" "}
             or are you <span className="italic">committed</span>?
           </h2>
