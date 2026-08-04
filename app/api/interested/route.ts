@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { coll } from "@/lib/firebase";
 import { notifyLead } from "@/lib/notifyLead";
-import { sendLeadEmail, freeResources } from "@/lib/leadEmail";
+import { sendLeadEmail } from "@/lib/leadEmail";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -43,10 +43,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, already: true });
     }
 
-    // Hand the guides off to the Zap BEFORE writing, so the record can record
-    // truthfully whether mail was actually queued rather than assuming it.
-    const origin = new URL(req.url).origin;
-    const emailQueued = await sendLeadEmail({ kind: "interested", email, name, resources: freeResources(origin) });
+    // Hand off to the Zap BEFORE writing, so the record can state truthfully
+    // whether mail was actually queued rather than assuming it.
+    const emailQueued = await sendLeadEmail({ kind: "interested", email, name });
 
     const ref = await coll("interestedLeads").add({
       name,
