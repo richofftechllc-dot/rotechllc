@@ -17,7 +17,7 @@ function inline(text: string, keyBase: string): React.ReactNode[] {
     const tok = m[0];
     const k = `${keyBase}-${i++}`;
     if (tok.startsWith("**")) out.push(<strong key={k}>{tok.slice(2, -2)}</strong>);
-    else if (tok.startsWith("`")) out.push(<code key={k} className="rounded bg-black/40 px-1 py-0.5 text-[0.85em] text-orange-300">{tok.slice(1, -1)}</code>);
+    else if (tok.startsWith("`")) out.push(<code key={k} className="rounded bg-rot-sunken px-1 py-0.5 text-[0.85em] text-rot-accent">{tok.slice(1, -1)}</code>);
     else out.push(<em key={k}>{tok.slice(1, -1)}</em>);
     last = m.index + tok.length;
   }
@@ -40,7 +40,7 @@ export default function Markdown({ text }: { text: string }) {
       i++;
       while (i < lines.length && !lines[i].trim().startsWith("```")) { code.push(lines[i]); i++; }
       i++; // closing fence
-      blocks.push(<pre key={key++} className="my-2 overflow-x-auto rounded-lg bg-black/50 p-3 text-xs text-gray-200"><code>{code.join("\n")}</code></pre>);
+      blocks.push(<pre key={key++} className="my-2 overflow-x-auto rounded-lg bg-rot-sunken p-3 text-xs text-gray-200"><code>{code.join("\n")}</code></pre>);
       continue;
     }
     // blank
@@ -69,7 +69,7 @@ export default function Markdown({ text }: { text: string }) {
     }
     // blockquote
     if (/^\s*>\s?/.test(line)) {
-      blocks.push(<blockquote key={key++} className="my-1 border-l-2 border-white/20 pl-3 text-gray-300">{inline(line.replace(/^\s*>\s?/, ""), `bq${key}`)}</blockquote>);
+      blocks.push(<blockquote key={key++} className="my-1 border-l-2 border-rot-line-strong pl-3 text-rot-muted">{inline(line.replace(/^\s*>\s?/, ""), `bq${key}`)}</blockquote>);
       i++; continue;
     }
     // paragraph (merge consecutive non-special lines)

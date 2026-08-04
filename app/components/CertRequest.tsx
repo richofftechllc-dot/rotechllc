@@ -39,9 +39,9 @@ export default function CertRequest() {
 
   if (status === "done") {
     return (
-      <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-6 text-center">
-        <div className="font-bold text-lg text-green-400 mb-1">Asked and answered — soon.</div>
-        <p className="text-gray-300 text-sm">
+      <div className="bg-emerald-600/[0.07] border border-emerald-600/25 rounded-xl p-6 text-center">
+        <div className="font-bold text-lg text-emerald-600 mb-1">Asked and answered — soon.</div>
+        <p className="text-rot-muted text-sm">
           That went straight to Bo. If there&apos;s an online exam for it, you&apos;ll get a
           plan and a price back.
         </p>
@@ -57,13 +57,13 @@ export default function CertRequest() {
           onChange={(e) => setCert(e.target.value)}
           required
           placeholder="Which cert? (e.g. CCNA)"
-          className="w-full px-4 py-3 bg-black border border-orange-500/40 rounded-lg text-white placeholder-gray-500 focus:border-orange-500 focus:outline-none"
+          className="w-full px-4 py-3 bg-rot-bg border border-rot-accent/30 rounded-lg text-rot-fg placeholder-rot-faint focus:border-rot-accent focus:outline-none"
         />
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="First name"
-          className="w-full px-4 py-3 bg-black border border-white/15 rounded-lg text-white placeholder-gray-500 focus:border-orange-500 focus:outline-none"
+          className="w-full px-4 py-3 bg-rot-bg border border-rot-line rounded-lg text-rot-fg placeholder-rot-faint focus:border-rot-accent focus:outline-none"
         />
         <input
           value={email}
@@ -71,18 +71,18 @@ export default function CertRequest() {
           type="email"
           required
           placeholder="Email"
-          className="w-full px-4 py-3 bg-black border border-white/15 rounded-lg text-white placeholder-gray-500 focus:border-orange-500 focus:outline-none"
+          className="w-full px-4 py-3 bg-rot-bg border border-rot-line rounded-lg text-rot-fg placeholder-rot-faint focus:border-rot-accent focus:outline-none"
         />
       </div>
       <button
         type="submit"
         disabled={status === "loading"}
-        className="w-full py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-black rounded-lg hover:opacity-90 disabled:opacity-50 uppercase tracking-wide"
+        className="rot-btn-accent w-full py-3.5 text-sm disabled:opacity-50"
       >
         {status === "loading" ? "Sending…" : "Ask about this cert →"}
       </button>
-      {status === "error" && <div className="text-red-400 text-sm mt-3 text-center">{msg}</div>}
-      <p className="text-gray-600 text-xs mt-3 text-center">Goes straight to Bo. No card, no commitment.</p>
+      {status === "error" && <div className="text-red-600 text-sm mt-3 text-center">{msg}</div>}
+      <p className="text-rot-faint text-xs mt-3 text-center">Goes straight to Bo. No card, no commitment.</p>
     </form>
   );
 }

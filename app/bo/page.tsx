@@ -14,7 +14,7 @@ type Msg = { role: "user" | "assistant"; content: string; resume?: string };
 function Avatar({ t, size = 40 }: { t: Tutor; size?: number }) {
   if (t.avatar) return <Image src={t.avatar} alt={t.name} width={size} height={size} className="rounded-full" style={{ boxShadow: `0 0 0 2px ${t.color}` }} />;
   return (
-    <div className="flex items-center justify-center rounded-full font-black text-white"
+    <div className="flex items-center justify-center rounded-full font-black text-rot-fg"
       style={{ width: size, height: size, fontSize: size * 0.4, background: `linear-gradient(135deg, ${t.color}, ${t.color}aa)`, boxShadow: `0 0 0 2px ${t.color}` }}>
       {t.initial}
     </div>
@@ -155,59 +155,59 @@ export default function BoFrontFace() {
   const career = TUTORS.filter((t) => t.category === "Career & Tech");
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#0a0a0a] text-white">
+    <div className="flex h-screen overflow-hidden bg-[#0a0a0a] text-rot-fg">
       {/* Sidebar */}
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-white/10 bg-black p-3 md:flex">
+      <aside className="hidden w-64 shrink-0 flex-col border-r border-rot-line bg-rot-bg p-3 md:flex">
         <div className="mb-4 px-1 text-lg font-black tracking-tight">RICH<span style={{ color: tutor.color }}>OFF</span>TECH</div>
-        <button onClick={newChat} className="mb-4 flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-zinc-900 py-2 text-sm font-semibold hover:bg-zinc-800" style={{ borderColor: `${tutor.color}55` }}>
+        <button onClick={newChat} className="mb-4 flex items-center justify-center gap-2 rounded-lg border border-rot-line bg-rot-surface py-2 text-sm font-semibold hover:bg-rot-sunken" style={{ borderColor: `${tutor.color}55` }}>
           <span style={{ color: tutor.color }}>＋</span> New chat
         </button>
-        <div className="mb-1 px-1 text-[11px] uppercase tracking-wide text-gray-600">Tutors</div>
+        <div className="mb-1 px-1 text-[11px] uppercase tracking-wide text-rot-faint">Tutors</div>
         <div className="space-y-1 overflow-y-auto">
           {career.map((t) => (
             <button key={t.id} onClick={() => { setTutorId(t.id); setMenuOpen(false); }}
-              className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm hover:bg-zinc-900 ${t.id === tutorId ? "bg-zinc-900" : ""}`}>
+              className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm hover:bg-rot-surface ${t.id === tutorId ? "bg-rot-surface" : ""}`}>
               <Avatar t={t} size={24} />
               <span className="min-w-0">
                 <span className="block truncate font-semibold">{t.name}</span>
-                <span className="block truncate text-[11px] text-gray-500">{t.subject} · {t.gradeBand}</span>
+                <span className="block truncate text-[11px] text-rot-faint">{t.subject} · {t.gradeBand}</span>
               </span>
             </button>
           ))}
         </div>
-        <div className="mt-auto border-t border-white/10 pt-2 text-[11px] text-gray-600">AI Tutoring Platform · local demo</div>
+        <div className="mt-auto border-t border-rot-line pt-2 text-[11px] text-rot-faint">AI Tutoring Platform · local demo</div>
       </aside>
 
       {/* Main */}
       <main className="flex min-w-0 flex-1 flex-col">
-        <div className="relative flex items-center justify-between border-b border-white/10 px-4 py-3">
-          <button onClick={() => setMenuOpen((o) => !o)} className="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-zinc-900">
+        <div className="relative flex items-center justify-between border-b border-rot-line px-4 py-3">
+          <button onClick={() => setMenuOpen((o) => !o)} className="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-rot-surface">
             <Avatar t={tutor} size={24} />
             <span className="font-bold">{tutor.name}</span>
-            <span className="text-xs text-gray-500">{tutor.subject}</span>
-            <span className="text-gray-500">▾</span>
+            <span className="text-xs text-rot-faint">{tutor.subject}</span>
+            <span className="text-rot-faint">▾</span>
           </button>
           <div className="flex items-center gap-2 text-[11px]">
             <button onClick={() => setAutoSpeak((v) => !v)} title="Auto-speak replies (ElevenLabs)"
-              className={`rounded-full border px-2 py-0.5 ${autoSpeak ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300" : "border-white/10 text-gray-400 hover:text-white"}`}>
+              className={`rounded-full border px-2 py-0.5 ${autoSpeak ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300" : "border-rot-line text-rot-muted hover:text-rot-fg"}`}>
               {autoSpeak ? "🔊 Auto-speak on" : "🔈 Auto-speak"}
             </button>
             {tutor.kidSafe && <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-emerald-400">● Kid-safe</span>}
-            <span className="rounded-full border border-white/10 px-2 py-0.5 text-gray-400">{tutor.gradeBand}</span>
+            <span className="rounded-full border border-rot-line px-2 py-0.5 text-rot-muted">{tutor.gradeBand}</span>
           </div>
 
           {menuOpen && (
-            <div className="absolute left-4 top-14 z-20 w-80 rounded-xl border border-white/10 bg-zinc-900 p-1.5 shadow-2xl">
+            <div className="absolute left-4 top-14 z-20 w-80 rounded-xl border border-rot-line bg-rot-surface p-1.5 shadow-2xl">
               {[["Career & Tech", career]].map(([label, list]) => (
                 <div key={label as string}>
-                  <div className="px-2 py-1 text-[10px] uppercase tracking-wide text-gray-600">{label as string}</div>
+                  <div className="px-2 py-1 text-[10px] uppercase tracking-wide text-rot-faint">{label as string}</div>
                   {(list as Tutor[]).map((t) => (
                     <button key={t.id} onClick={() => { setTutorId(t.id); setMenuOpen(false); }}
-                      className={`flex w-full items-start gap-3 rounded-lg p-2.5 text-left hover:bg-zinc-800 ${t.id === tutorId ? "bg-zinc-800" : ""}`}>
+                      className={`flex w-full items-start gap-3 rounded-lg p-2.5 text-left hover:bg-rot-sunken ${t.id === tutorId ? "bg-rot-sunken" : ""}`}>
                       <Avatar t={t} size={28} />
                       <span className="min-w-0">
-                        <span className="flex items-center gap-2 text-sm font-bold">{t.name}<span className="text-[10px] font-normal text-gray-500">{t.subject} · {t.gradeBand}</span>{t.id === tutorId && <span style={{ color: t.color }}>✓</span>}</span>
-                        <span className="block text-xs text-gray-400">{t.blurb}</span>
+                        <span className="flex items-center gap-2 text-sm font-bold">{t.name}<span className="text-[10px] font-normal text-rot-faint">{t.subject} · {t.gradeBand}</span>{t.id === tutorId && <span style={{ color: t.color }}>✓</span>}</span>
+                        <span className="block text-xs text-rot-muted">{t.blurb}</span>
                       </span>
                     </button>
                   ))}
@@ -223,11 +223,11 @@ export default function BoFrontFace() {
             <div className="mx-auto flex h-full max-w-2xl flex-col items-center justify-center px-4 text-center">
               <Avatar t={tutor} size={72} />
               <h1 className="mt-4 text-3xl font-black">{tutor.name}</h1>
-              <p className="mt-1 text-gray-400">{tutor.tagline}</p>
+              <p className="mt-1 text-rot-muted">{tutor.tagline}</p>
               <div className="mt-8 grid w-full gap-3 sm:grid-cols-2">
                 {tutor.suggestions.map((s) => (
                   <button key={s} onClick={() => send(s)}
-                    className="rounded-xl border border-white/10 bg-zinc-900/60 p-3 text-left text-sm font-medium transition-colors hover:bg-zinc-900"
+                    className="rounded-xl border border-rot-line bg-rot-surface/60 p-3 text-left text-sm font-medium transition-colors hover:bg-rot-surface"
                     style={{ borderColor: `${tutor.color}33` }}>
                     {s}
                   </button>
@@ -240,17 +240,17 @@ export default function BoFrontFace() {
                 <div key={i} className={`flex gap-3 ${m.role === "user" ? "flex-row-reverse" : ""}`}>
                   {m.role === "assistant" && <div className="mt-1 shrink-0"><Avatar t={tutor} size={28} /></div>}
                   <div className="min-w-0">
-                    <div className={`rounded-2xl px-4 py-2.5 ${m.role === "user" ? "text-black" : "border border-white/10 bg-zinc-900 text-gray-100"}`}
+                    <div className={`rounded-2xl px-4 py-2.5 ${m.role === "user" ? "text-black" : "border border-rot-line bg-rot-surface text-gray-100"}`}
                       style={m.role === "user" ? { background: tutor.color } : undefined}>
                       {m.role === "assistant"
-                        ? (m.content ? <Markdown text={m.content} /> : <span className="text-orange-400 animate-pulse" style={{ color: tutor.color }}>▍</span>)
+                        ? (m.content ? <Markdown text={m.content} /> : <span className="text-rot-accent animate-pulse" style={{ color: tutor.color }}>▍</span>)
                         : <span className="whitespace-pre-wrap text-sm">{m.content}</span>}
                     </div>
                     {m.resume && (
                       <button onClick={() => downloadResume(m.resume!)} className="mt-2 rounded-lg border px-3 py-1.5 text-xs font-bold" style={{ borderColor: `${tutor.color}66`, color: tutor.color }}>⬇ Download resume (.md)</button>
                     )}
                     {m.role === "assistant" && m.content && (
-                      <button onClick={() => (speakingIdx === i ? stopSpeak() : speak(m.content, i))} className="ml-1 mt-1 text-xs text-gray-500 hover:text-white">
+                      <button onClick={() => (speakingIdx === i ? stopSpeak() : speak(m.content, i))} className="ml-1 mt-1 text-xs text-rot-faint hover:text-rot-fg">
                         {speakingIdx === i ? "⏹ stop" : "🔊 play"}
                       </button>
                     )}
@@ -263,34 +263,34 @@ export default function BoFrontFace() {
         </div>
 
         {/* composer */}
-        <div className="border-t border-white/10 p-4">
+        <div className="border-t border-rot-line p-4">
           <div className="mx-auto max-w-2xl">
             {resumeOpen && (
-              <div className="mb-2 rounded-xl border border-white/15 bg-zinc-900 p-3">
+              <div className="mb-2 rounded-xl border border-rot-line bg-rot-surface p-3">
                 <div className="mb-2 flex items-center justify-between">
                   <span className="text-sm font-semibold">📄 Resume rework — paste it, get it back sharper</span>
-                  <button onClick={() => setResumeOpen(false)} className="text-xs text-gray-500 hover:text-white">close</button>
+                  <button onClick={() => setResumeOpen(false)} className="text-xs text-rot-faint hover:text-rot-fg">close</button>
                 </div>
-                <input value={role} onChange={(e) => setRole(e.target.value)} placeholder="Target role (optional) — e.g. SOC Analyst" className="mb-2 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none" />
-                <textarea value={resumeText} onChange={(e) => setResumeText(e.target.value)} rows={5} placeholder="Paste your resume text here…" className="w-full resize-none rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none" />
+                <input value={role} onChange={(e) => setRole(e.target.value)} placeholder="Target role (optional) — e.g. SOC Analyst" className="mb-2 w-full rounded-lg border border-rot-line bg-rot-sunken px-3 py-2 text-sm outline-none" />
+                <textarea value={resumeText} onChange={(e) => setResumeText(e.target.value)} rows={5} placeholder="Paste your resume text here…" className="w-full resize-none rounded-lg border border-rot-line bg-rot-sunken px-3 py-2 text-sm outline-none" />
                 <div className="mt-2 flex items-center justify-between">
-                  <label className="cursor-pointer text-xs text-gray-400 hover:text-white">＋ upload .txt/.md<input type="file" accept=".txt,.md,.text,text/plain" onChange={onResumeFile} className="hidden" /></label>
+                  <label className="cursor-pointer text-xs text-rot-muted hover:text-rot-fg">＋ upload .txt/.md<input type="file" accept=".txt,.md,.text,text/plain" onChange={onResumeFile} className="hidden" /></label>
                   <button onClick={improveResume} disabled={busy || resumeText.trim().length < 40} className="rounded-lg px-4 py-1.5 text-sm font-bold text-black disabled:opacity-30" style={{ background: tutor.color }}>Improve my resume →</button>
                 </div>
               </div>
             )}
-            <div className="flex items-end gap-2 rounded-2xl border border-white/15 bg-zinc-900 p-2">
+            <div className="flex items-end gap-2 rounded-2xl border border-rot-line bg-rot-surface p-2">
               <button onClick={() => setMenuOpen((o) => !o)} className="shrink-0 rounded-lg px-2 py-1 text-xs font-bold" style={{ background: `${tutor.color}26`, color: tutor.color }}>{tutor.name}</button>
               {tutor.capabilities?.includes("resume") && (
-                <button onClick={() => setResumeOpen((o) => !o)} title="Improve your resume" className="shrink-0 rounded-lg px-2 py-1 text-gray-400 hover:text-white">📎</button>
+                <button onClick={() => setResumeOpen((o) => !o)} title="Improve your resume" className="shrink-0 rounded-lg px-2 py-1 text-rot-muted hover:text-rot-fg">📎</button>
               )}
               <button onClick={toggleMic} title="Talk to your tutor"
-                className={`shrink-0 rounded-lg px-2 py-1 ${listening ? "animate-pulse bg-red-500 text-white" : "text-gray-400 hover:text-white"}`}>🎤</button>
+                className={`shrink-0 rounded-lg px-2 py-1 ${listening ? "animate-pulse bg-red-500 text-rot-fg" : "text-rot-muted hover:text-rot-fg"}`}>🎤</button>
               <textarea value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); } }}
-                rows={1} placeholder={`Message ${tutor.name}…`} className="max-h-40 flex-1 resize-none bg-transparent px-1 py-1.5 text-sm outline-none placeholder:text-gray-600" />
+                rows={1} placeholder={`Message ${tutor.name}…`} className="max-h-40 flex-1 resize-none bg-transparent px-1 py-1.5 text-sm outline-none placeholder:text-rot-faint" />
               <button onClick={() => send(input)} disabled={busy || !input.trim()} className="shrink-0 rounded-lg px-3 py-1.5 font-bold text-black disabled:opacity-30" style={{ background: tutor.color }}>↑</button>
             </div>
-            <p className="mt-2 text-center text-[11px] text-gray-600">{tutor.kidSafe ? "Kid-safe tutor · " : ""}Rich Off Tech · AI Tutoring Platform</p>
+            <p className="mt-2 text-center text-[11px] text-rot-faint">{tutor.kidSafe ? "Kid-safe tutor · " : ""}Rich Off Tech · AI Tutoring Platform</p>
           </div>
         </div>
       </main>

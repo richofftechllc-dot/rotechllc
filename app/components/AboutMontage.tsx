@@ -18,16 +18,16 @@ const k26Thumbs = [
 export default function AboutMontage() {
   return (
     <details className="mt-16 group">
-      <summary className="cursor-pointer list-none flex items-center justify-between gap-4 py-4 border-y border-white/10 hover:border-orange-500/40 transition">
+      <summary className="cursor-pointer list-none flex items-center justify-between gap-4 py-4 border-y border-rot-line hover:border-rot-accent/30 transition">
         <div>
-          <div className="text-orange-500 font-bold tracking-widest text-[11px] mb-1">SERVICENOW KNOWLEDGE 2026 · LAS VEGAS · PARTNER</div>
-          <div className="text-gray-400 text-sm">See me at the conference — 10 photos</div>
+          <div className="text-rot-accent font-bold tracking-widest text-[11px] mb-1">SERVICENOW KNOWLEDGE 2026 · LAS VEGAS · PARTNER</div>
+          <div className="text-rot-muted text-sm">See me at the conference — 10 photos</div>
         </div>
-        <div className="text-orange-500 text-xl group-open:rotate-180 transition-transform">↓</div>
+        <div className="text-rot-accent text-xl group-open:rotate-180 transition-transform">↓</div>
       </summary>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
         {/* HERO — K26 badge */}
-        <div className="relative aspect-[4/5] md:row-span-2 md:col-span-2 rounded-xl overflow-hidden border border-orange-500/30">
+        <div className="relative aspect-[4/5] md:row-span-2 md:col-span-2 rounded-xl overflow-hidden border border-rot-accent/30">
           <Image
             src={`${BASE}/k26-badge-card.jpg`}
             alt="Randy Allen — ServiceNow Knowledge 2026 Partner badge + Challenger Level 2 card, Rich Off Tech LLC"
@@ -36,13 +36,13 @@ export default function AboutMontage() {
             className="object-cover"
           />
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/70 to-transparent p-4">
-            <div className="text-orange-400 text-[10px] font-bold tracking-widest uppercase mb-1">Knowledge 2026</div>
-            <div className="text-white text-sm font-bold leading-tight">Partner · Rich Off Tech LLC</div>
+            <div className="text-rot-accent text-[10px] font-bold tracking-widest uppercase mb-1">Knowledge 2026</div>
+            <div className="text-rot-fg text-sm font-bold leading-tight">Partner · Rich Off Tech LLC</div>
           </div>
         </div>
 
         {k26Thumbs.map((p) => (
-          <div key={p.src} className="relative aspect-square rounded-xl overflow-hidden border border-white/10">
+          <div key={p.src} className="relative aspect-square rounded-xl overflow-hidden border border-rot-line">
             <Image
               src={`${BASE}/${p.src}`}
               alt={p.alt}

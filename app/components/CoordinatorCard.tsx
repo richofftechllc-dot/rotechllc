@@ -7,24 +7,24 @@ type Accent = "yellow" | "green" | "orange";
 const ACCENT: Record<Accent, { border: string; chip: string; eyebrow: string; ringGlow: string; cta: string }> = {
   yellow: {
     border: "border-yellow-500/40 hover:border-yellow-500/70",
-    chip:   "text-yellow-400 border-yellow-500/40",
-    eyebrow:"text-yellow-400",
+    chip:   "text-amber-600 border-yellow-500/40",
+    eyebrow:"text-amber-600",
     ringGlow:"from-yellow-500/10",
-    cta: "border-yellow-500/40 text-yellow-400 hover:bg-yellow-500/10",
+    cta: "border-yellow-500/40 text-amber-600 hover:bg-yellow-500/10",
   },
   green: {
     border: "border-green-500/40 hover:border-green-500/70",
-    chip:   "text-green-400 border-green-500/40",
-    eyebrow:"text-green-400",
+    chip:   "text-emerald-600 border-green-500/40",
+    eyebrow:"text-emerald-600",
     ringGlow:"from-green-500/10",
-    cta: "border-green-500/40 text-green-400 hover:bg-green-500/10",
+    cta: "border-green-500/40 text-emerald-600 hover:bg-emerald-600/[0.07]",
   },
   orange: {
-    border: "border-orange-500/40 hover:border-orange-500/70",
-    chip:   "text-orange-400 border-orange-500/40",
-    eyebrow:"text-orange-400",
+    border: "border-rot-accent/30 hover:border-orange-500/70",
+    chip:   "text-rot-accent border-rot-accent/30",
+    eyebrow:"text-rot-accent",
     ringGlow:"from-orange-500/10",
-    cta: "border-orange-500/40 text-orange-400 hover:bg-orange-500/10",
+    cta: "border-rot-accent/30 text-rot-accent hover:bg-rot-accent/10",
   },
 };
 
@@ -77,7 +77,7 @@ export default function CoordinatorCard({
       <button
         type="button"
         onClick={() => { setOpen(true); if (agents.length === 1) setPicked(agents[0].agent_id); }}
-        className={`relative block aspect-[941/1672] rounded-2xl overflow-hidden border ${a.border} bg-zinc-950 transition group w-full text-left`}
+        className={`relative block aspect-[941/1672] rounded-2xl overflow-hidden border ${a.border} bg-rot-sunken transition group w-full text-left`}
       >
         {photo && (
           <Image
@@ -93,13 +93,13 @@ export default function CoordinatorCard({
 
         <div className="absolute top-4 left-4 right-4 flex items-center gap-2">
           <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-black text-sm shadow-lg">R</div>
-          <div className="text-white font-bold tracking-[0.18em] text-[10px]">RICH OFF TECH</div>
+          <div className="text-rot-fg font-bold tracking-[0.18em] text-[10px]">RICH OFF TECH</div>
         </div>
 
         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-6 text-center">
           <div className={`${a.eyebrow} font-bold tracking-[0.22em] text-[10px] uppercase mb-3`}>{title}</div>
-          {scope && <div className="text-white/70 font-semibold tracking-[0.15em] text-[9px] uppercase mb-4">· {scope} ·</div>}
-          <div className="text-white font-black leading-[0.95] text-4xl md:text-5xl drop-shadow-[0_2px_24px_rgba(0,0,0,0.8)]">{name}</div>
+          {scope && <div className="text-rot-fg/70 font-semibold tracking-[0.15em] text-[9px] uppercase mb-4">· {scope} ·</div>}
+          <div className="text-rot-fg font-black leading-[0.95] text-4xl md:text-5xl drop-shadow-[0_2px_24px_rgba(0,0,0,0.8)]">{name}</div>
         </div>
 
         <div className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-black to-transparent">
@@ -108,22 +108,22 @@ export default function CoordinatorCard({
               <span key={h} className={`text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded border ${a.chip}`}>{h}</span>
             ))}
           </div>
-          <div className="text-center text-white/60 text-[10px] font-bold tracking-widest uppercase">Book a Consult →</div>
+          <div className="text-center text-rot-fg/60 text-[10px] font-bold tracking-widest uppercase">Book a Consult →</div>
         </div>
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6" onClick={close}>
+        <div className="fixed inset-0 z-50 bg-rot-bg/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6" onClick={close}>
           <div
             onClick={e => e.stopPropagation()}
-            className={`relative bg-zinc-950 border ${a.border.split(" ")[0]} rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto`}
+            className={`relative bg-rot-sunken border ${a.border.split(" ")[0]} rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto`}
           >
-            <button onClick={close} aria-label="Close" className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-zinc-900 border border-white/10 text-gray-400 hover:text-white hover:border-white/30">✕</button>
+            <button onClick={close} aria-label="Close" className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-rot-surface border border-rot-line text-rot-muted hover:text-rot-fg hover:border-rot-line-strong">✕</button>
 
-            <div className="p-5 sm:p-6 border-b border-white/10">
+            <div className="p-5 sm:p-6 border-b border-rot-line">
               <div className={`${a.eyebrow} font-bold tracking-widest text-[10px] uppercase mb-1`}>{title}</div>
               <div className="text-2xl font-black">Talk to {name.split(" ")[0]}</div>
-              <p className="text-gray-400 text-sm mt-1">Start with a 5-minute AI qualification call — pick the topic that fits.</p>
+              <p className="text-rot-muted text-sm mt-1">Start with a 5-minute AI qualification call — pick the topic that fits.</p>
             </div>
 
             {agents.length > 1 && (
@@ -133,7 +133,7 @@ export default function CoordinatorCard({
                     key={ag.agent_id}
                     type="button"
                     onClick={() => startCall(ag.agent_id)}
-                    className={`px-4 py-2 rounded-lg border text-sm font-bold tracking-wider uppercase ${picked === ag.agent_id ? `${a.border.split(" ")[0]} bg-white/5 text-white` : `border-white/10 text-gray-400 hover:border-white/30`}`}
+                    className={`px-4 py-2 rounded-lg border text-sm font-bold tracking-wider uppercase ${picked === ag.agent_id ? `${a.border.split(" ")[0]} bg-rot-sunken text-rot-fg` : `border-rot-line text-rot-muted hover:border-rot-line-strong`}`}
                   >
                     {ag.label}
                   </button>
@@ -143,23 +143,23 @@ export default function CoordinatorCard({
 
             <div className="p-5 sm:p-6">
               {!picked ? (
-                <div className="text-center text-gray-400 py-12 text-sm">Pick which call you want to start above ↑</div>
+                <div className="text-center text-rot-muted py-12 text-sm">Pick which call you want to start above ↑</div>
               ) : (
                 <>
-                  <div className="rounded-lg overflow-hidden bg-zinc-950 border border-white/10">
+                  <div className="rounded-lg overflow-hidden bg-rot-sunken border border-rot-line">
                     <iframe
                       key={picked}
                       src={`https://agents.fireflies.ai/connect-to-agent?id=${picked}`}
                       title={`${name} qualification`}
-                      className="w-full bg-zinc-950"
+                      className="w-full bg-rot-sunken"
                       height={500}
                       allow="microphone; autoplay"
                     />
                   </div>
 
-                  <div className="mt-4 bg-green-500/10 border border-green-500/30 rounded-lg p-4">
-                    <div className="text-green-400 font-bold text-xs tracking-widest uppercase mb-1">After the call</div>
-                    <p className="text-gray-300 text-sm leading-relaxed">
+                  <div className="mt-4 bg-emerald-600/[0.07] border border-emerald-600/25 rounded-lg p-4">
+                    <div className="text-emerald-600 font-bold text-xs tracking-widest uppercase mb-1">After the call</div>
+                    <p className="text-rot-muted text-sm leading-relaxed">
                       Instructions complete. The team will review your responses and reach out by email to schedule a live meeting with <b>{name.split(" ")[0]}</b>. Keep an eye on your inbox.
                     </p>
                   </div>

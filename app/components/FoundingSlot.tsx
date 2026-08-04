@@ -62,18 +62,18 @@ export default function FoundingSlot() {
 
           {/* Founding closed Jul 27 2026. Members who bought in keep their rate. */}
           <div className="text-rot-muted text-sm mb-8">
-            Founding is closed. Everyone who got in <span className="font-bold text-white">keeps their rate</span>.
+            Founding is closed. Everyone who got in <span className="font-bold text-rot-fg">keeps their rate</span>.
           </div>
 
           <a
             href={CHECKOUT.yearly || COACH_FALLBACK}
-            className="rot-btn w-full max-w-xs px-8 py-4 text-sm"
+            className="rot-btn-accent w-full max-w-xs px-8 py-4 text-sm"
           >
             {CHECKOUT.yearly ? `Join — $${PRICING.yearly}/year →` : "Talk to a coach to join →"}
           </a>
 
           {/* $40/mo monthly. $27/mo is grandfathered only — never shown or sold. */}
-          <div className="mt-6 text-rot-muted text-sm">or go month to month at <b className="text-white">$40/month</b> — cancel anytime</div>
+          <div className="mt-6 text-rot-muted text-sm">or go month to month at <b className="text-rot-fg">$40/month</b> — cancel anytime</div>
           {CHECKOUT.monthly && (
             <a href={CHECKOUT.monthly} className="rot-btn-ghost w-full max-w-xs px-8 py-3.5 mt-3 text-sm">Start — ${PRICING.monthly} / month →</a>
           )}

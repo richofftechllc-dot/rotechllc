@@ -1,4 +1,5 @@
 import BoAvatarFlip from "./components/BoAvatarFlip";
+import Reveal from "./components/Reveal";
 import CommittedOrInterested from "./components/CommittedOrInterested";
 // BirthdayBanner retired Aug 2 2026 — the drop ended Jul 27 and the countdown
 // was stuck rendering "It's the 27th 🎂" on the live homepage. Component kept in
@@ -37,24 +38,24 @@ export default async function Home() {
           whether you're interested or committed, and everything below reads
           differently once you've picked. Interested is a real free offer, not a
           teaser — see the component. */}
-      <CommittedOrInterested />
+      <Reveal><CommittedOrInterested /></Reveal>
 
       {/* 1 — BO TECH: the AI-powered career command center */}
       <main className="max-w-6xl mx-auto px-6 pt-16 md:pt-20 pb-24 md:pb-32">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <div className="rot-kicker mb-8">Bo Tech · AI-powered career command center</div>
+            <Reveal><div className="rot-kicker mb-8">Bo Tech · AI-powered career command center</div></Reveal>
             {/* <BirthdayBanner /> — retired, see import note */}
-            <h1 className="text-5xl md:text-7xl font-semibold leading-[0.95] mb-6">
+            <Reveal delay={60}><h1 className="text-5xl md:text-7xl font-semibold leading-[0.95] mb-6">
               Your AI-powered<br />
               <span className="text-rot-muted">career command center.</span>
-            </h1>
-            <div className="text-rot-faint text-sm mb-8 tracking-wide">Tech · GovTech · Commercial Tech · AI</div>
-            <p className="text-rot-muted text-lg mb-10 max-w-md leading-relaxed">
+            </h1></Reveal>
+            <Reveal delay={120}><div className="text-rot-faint text-sm mb-8 tracking-wide">Tech · GovTech · Commercial Tech · AI</div></Reveal>
+            <Reveal delay={160}><p className="text-rot-muted text-lg mb-10 max-w-md leading-relaxed">
               Self-paced and live-cohort certification tracks, an AI tutor that lives in your Discord, exam vouchers, clearance guidance, and real project work — the guided system Bo built for breaking into Tech, GovTech, Commercial Tech, and AI.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <a href="https://discord.gg/dtcYf8PTNa" target="_blank" rel="noopener noreferrer" className="rot-btn px-6 py-3.5 text-sm">
+            </p></Reveal>
+            <Reveal delay={210}><div className="flex flex-wrap gap-4">
+              <a href="https://discord.gg/dtcYf8PTNa" target="_blank" rel="noopener noreferrer" className="rot-btn-accent px-6 py-3.5 text-sm">
                 Join the Discord — Free
               </a>
               <a href="/help#agents" className="rot-btn-ghost px-6 py-3.5 text-sm">
@@ -64,6 +65,7 @@ export default async function Home() {
                 See membership →
               </a>
             </div>
+            </Reveal>
             <p className="text-rot-faint text-sm mt-6">Free to join — or grab <a href="#founding" className="text-rot-fg underline underline-offset-4 decoration-rot-line-strong hover:decoration-rot-fg">full membership</a> below. 🤎</p>
           </div>
           <BoAvatarFlip />
@@ -71,6 +73,7 @@ export default async function Home() {
       </main>
 
       {/* 2 — BREAKING INTO TECH */}
+      <Reveal>
       <section id="breaking-in" className="bg-rot-sunken py-24 md:py-32 border-t border-rot-line scroll-mt-20">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <h2 className="text-5xl md:text-7xl font-semibold leading-[0.95] mb-6">
@@ -90,17 +93,19 @@ export default async function Home() {
         </div>
       </section>
 
+      </Reveal>
+
       {/* 3 — RECEIPTS, NOT PROMISES */}
-      <ResultsWall />
+      <Reveal><ResultsWall /></Reveal>
 
       {/* 4 — OFFERS */}
-      <Offers />
+      <Reveal><Offers /></Reveal>
 
       {/* 5 — FOUNDER FULL MEMBERSHIP */}
-      <FoundingSlot />
+      <Reveal><FoundingSlot /></Reveal>
 
       {/* 6 — PICK YOUR LANE */}
-      <WhoItsFor />
+      <Reveal><WhoItsFor /></Reveal>
     </>
   );
 }

@@ -42,7 +42,7 @@ export default function LessonPlayer({ lessonId }: { lessonId: string }) {
 
   if (s.status === "loading") {
     return (
-      <div className="aspect-video w-full grid place-items-center rounded-xl bg-zinc-900 text-gray-400">
+      <div className="aspect-video w-full grid place-items-center rounded-xl bg-rot-surface text-rot-muted">
         Loading…
       </div>
     );
@@ -50,11 +50,11 @@ export default function LessonPlayer({ lessonId }: { lessonId: string }) {
 
   if (s.status === "locked") {
     return (
-      <div className="aspect-video w-full grid place-items-center rounded-xl border border-orange-500/30 bg-zinc-900 px-6 text-center">
+      <div className="aspect-video w-full grid place-items-center rounded-xl border border-rot-accent/30 bg-rot-surface px-6 text-center">
         <div>
           <div className="mb-2 text-3xl">🔒</div>
-          <p className="font-semibold text-orange-400">{s.msg}</p>
-          <p className="mt-1 text-sm text-gray-500">DM Bo in Discord to unlock this track.</p>
+          <p className="font-semibold text-rot-accent">{s.msg}</p>
+          <p className="mt-1 text-sm text-rot-faint">DM Bo in Discord to unlock this track.</p>
         </div>
       </div>
     );
@@ -62,7 +62,7 @@ export default function LessonPlayer({ lessonId }: { lessonId: string }) {
 
   if (s.status === "error") {
     return (
-      <div className="aspect-video w-full grid place-items-center rounded-xl bg-zinc-900 text-red-400">
+      <div className="aspect-video w-full grid place-items-center rounded-xl bg-rot-surface text-red-600">
         {s.msg}
       </div>
     );

@@ -60,7 +60,7 @@ export default function Nav() {
             <Link key={l.href} href={l.href} className="hover:text-rot-fg transition-colors">{l.label}</Link>
           ))}
           {me === null ? (
-            <span className="px-4 py-2 text-gray-500">…</span>
+            <span className="px-4 py-2 text-rot-faint">…</span>
           ) : me.ok ? (
             <div className="flex items-center gap-3">
               <span className="text-rot-fg font-medium">{me.name}</span>
@@ -118,7 +118,7 @@ export default function Nav() {
 
             <div className="mt-3">
               {me === null ? (
-                <div className="text-gray-500 text-sm text-center py-2">Loading…</div>
+                <div className="text-rot-faint text-sm text-center py-2">Loading…</div>
               ) : me.ok ? (
                 <div className="flex items-center justify-between gap-3 bg-rot-surface border border-rot-line px-4 py-3">
                   <div className="min-w-0">

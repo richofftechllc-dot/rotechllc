@@ -136,7 +136,7 @@ export default function CommittedOrInterested() {
             <div className="mt-auto flex flex-col gap-3">
               <a
                 href="/membership"
-                className="rot-btn w-full px-6 py-4 text-sm"
+                className="rot-btn-accent w-full px-6 py-4 text-sm"
               >
                 I&apos;m committed — start here →
               </a>

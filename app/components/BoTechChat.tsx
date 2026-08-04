@@ -83,28 +83,28 @@ export default function BoTechChat() {
         </button>
       )}
       {open && (
-        <div className="fixed bottom-3 right-3 sm:bottom-6 sm:right-6 w-[380px] max-w-[calc(100vw-1.5rem)] sm:max-w-[calc(100vw-3rem)] h-[80vh] sm:h-[560px] max-h-[calc(100vh-1.5rem)] sm:max-h-[calc(100vh-3rem)] bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl flex flex-col z-50">
-          <div className="flex items-center justify-between p-4 border-b border-white/10">
+        <div className="fixed bottom-3 right-3 sm:bottom-6 sm:right-6 w-[380px] max-w-[calc(100vw-1.5rem)] sm:max-w-[calc(100vw-3rem)] h-[80vh] sm:h-[560px] max-h-[calc(100vh-1.5rem)] sm:max-h-[calc(100vh-3rem)] bg-rot-surface border border-rot-line rounded-2xl shadow-2xl flex flex-col z-50">
+          <div className="flex items-center justify-between p-4 border-b border-rot-line">
             <div className="flex items-center gap-3">
               <Image src="/bo-avatar.png" alt="Bo" width={32} height={32} className="rounded-full" />
               <div>
                 <div className="font-bold text-sm">Bo Tech</div>
-                <div className="text-xs text-green-500">● Online</div>
+                <div className="text-xs text-emerald-600">● Online</div>
               </div>
             </div>
-            <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-white text-2xl leading-none">×</button>
+            <button onClick={() => setOpen(false)} className="text-rot-muted hover:text-rot-fg text-2xl leading-none">×</button>
           </div>
           <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
             {msgs.map((m, i) => (
               <div key={i} className={m.role === "user" ? "text-right" : ""}>
-                <div className={`inline-block px-4 py-2 rounded-2xl text-sm ${m.role === "user" ? "bg-white text-black" : "bg-white/[0.06] text-rot-fg"}`}>
+                <div className={`inline-block px-4 py-2 rounded-2xl text-sm ${m.role === "user" ? "bg-rot-fg text-white" : "bg-white/[0.06] text-rot-fg"}`}>
                   {m.content}
                 </div>
               </div>
             ))}
-            {loading && <div className="text-gray-500 text-xs">Bo is typing...</div>}
+            {loading && <div className="text-rot-faint text-xs">Bo is typing...</div>}
           </div>
-          <div className="p-3 border-t border-white/10 flex gap-2">
+          <div className="p-3 border-t border-rot-line flex gap-2">
             <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()} placeholder="Ask Bo anything..." className="flex-1 bg-rot-bg border border-rot-line px-3 py-2 text-sm outline-none focus:border-rot-line-strong" />
             <button onClick={send} disabled={loading} className="rot-btn px-4 py-2 text-sm disabled:opacity-50">Send</button>
           </div>

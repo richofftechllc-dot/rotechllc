@@ -357,13 +357,13 @@ export default function EstimateBuilder() {
   if (savedId) {
     return (
       <div className="max-w-3xl mx-auto px-6 py-12">
-        <div className="bg-zinc-950 border border-green-500/40 rounded-2xl p-10 text-center">
-          <div className="text-green-500 font-bold tracking-widest text-xs mb-3">SAVED ✓</div>
+        <div className="bg-rot-sunken border border-green-500/40 rounded-2xl p-10 text-center">
+          <div className="text-emerald-600 font-bold tracking-widest text-xs mb-3">SAVED ✓</div>
           <h3 className="text-3xl font-black mb-4">Your estimate is in.</h3>
-          <p className="text-gray-400 mb-3">
-            We&apos;ll email you a fixed quote within 24 hours{email ? <> at <b className="text-white">{email}</b></> : null}.
+          <p className="text-rot-muted mb-3">
+            We&apos;ll email you a fixed quote within 24 hours{email ? <> at <b className="text-rot-fg">{email}</b></> : null}.
           </p>
-          <p className="text-gray-500 text-xs mt-6">Reference: <code className="bg-zinc-900 px-2 py-1 rounded text-orange-500 font-mono">{savedId}</code></p>
+          <p className="text-rot-faint text-xs mt-6">Reference: <code className="bg-rot-surface px-2 py-1 rounded text-rot-accent font-mono">{savedId}</code></p>
         </div>
       </div>
     );

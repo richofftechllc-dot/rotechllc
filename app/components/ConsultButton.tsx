@@ -4,9 +4,9 @@ import { useState } from "react";
 type Accent = "yellow" | "green" | "orange";
 
 const ACCENT: Record<Accent, { border: string; cta: string }> = {
-  yellow: { border: "border-yellow-500/40", cta: "border-yellow-500/40 text-yellow-400 hover:bg-yellow-500/10" },
-  green:  { border: "border-green-500/40",  cta: "border-green-500/40 text-green-400 hover:bg-green-500/10" },
-  orange: { border: "border-orange-500/40", cta: "border-orange-500/40 text-orange-400 hover:bg-orange-500/10" },
+  yellow: { border: "border-yellow-500/40", cta: "border-yellow-500/40 text-amber-600 hover:bg-yellow-500/10" },
+  green:  { border: "border-green-500/40",  cta: "border-green-500/40 text-emerald-600 hover:bg-emerald-600/[0.07]" },
+  orange: { border: "border-rot-accent/30", cta: "border-rot-accent/30 text-rot-accent hover:bg-rot-accent/10" },
 };
 
 type AgentOption = { label: string; agent_id: string };
@@ -54,17 +54,17 @@ export default function ConsultButton({
       <button type="button" onClick={openModal} className={className}>{children}</button>
 
       {open && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6" onClick={close}>
+        <div className="fixed inset-0 z-50 bg-rot-bg/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6" onClick={close}>
           <div
             onClick={e => e.stopPropagation()}
-            className={`relative bg-zinc-950 border ${a.border} rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto`}
+            className={`relative bg-rot-sunken border ${a.border} rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto`}
           >
-            <button onClick={close} aria-label="Close" className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-zinc-900 border border-white/10 text-gray-400 hover:text-white hover:border-white/30">✕</button>
+            <button onClick={close} aria-label="Close" className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-rot-surface border border-rot-line text-rot-muted hover:text-rot-fg hover:border-rot-line-strong">✕</button>
 
-            <div className="p-5 sm:p-6 border-b border-white/10">
+            <div className="p-5 sm:p-6 border-b border-rot-line">
               {title && <div className="font-bold tracking-widest text-[10px] uppercase mb-1 opacity-70">{title}</div>}
               <div className="text-2xl font-black">Talk to {name.split(" ")[0]}</div>
-              <p className="text-gray-400 text-sm mt-1">Start with a 5-minute AI qualification call — pick the topic that fits.</p>
+              <p className="text-rot-muted text-sm mt-1">Start with a 5-minute AI qualification call — pick the topic that fits.</p>
             </div>
 
             {agents.length > 1 && (
@@ -74,7 +74,7 @@ export default function ConsultButton({
                     key={ag.agent_id}
                     type="button"
                     onClick={() => setPicked(ag.agent_id)}
-                    className={`px-4 py-2 rounded-lg border text-sm font-bold tracking-wider uppercase ${picked === ag.agent_id ? `${a.border} bg-white/5 text-white` : `border-white/10 text-gray-400 hover:border-white/30`}`}
+                    className={`px-4 py-2 rounded-lg border text-sm font-bold tracking-wider uppercase ${picked === ag.agent_id ? `${a.border} bg-rot-sunken text-rot-fg` : `border-rot-line text-rot-muted hover:border-rot-line-strong`}`}
                   >
                     {ag.label}
                   </button>
@@ -84,23 +84,23 @@ export default function ConsultButton({
 
             <div className="p-5 sm:p-6">
               {!picked ? (
-                <div className="text-center text-gray-400 py-12 text-sm">Pick which call you want to start above ↑</div>
+                <div className="text-center text-rot-muted py-12 text-sm">Pick which call you want to start above ↑</div>
               ) : (
                 <>
-                  <div className="rounded-lg overflow-hidden bg-zinc-950 border border-white/10">
+                  <div className="rounded-lg overflow-hidden bg-rot-sunken border border-rot-line">
                     <iframe
                       key={picked}
                       src={`https://agents.fireflies.ai/connect-to-agent?id=${picked}`}
                       title={`${name} qualification`}
-                      className="w-full bg-zinc-950"
+                      className="w-full bg-rot-sunken"
                       height={500}
                       allow="microphone; autoplay"
                     />
                   </div>
 
-                  <div className="mt-4 bg-green-500/10 border border-green-500/30 rounded-lg p-4">
-                    <div className="text-green-400 font-bold text-xs tracking-widest uppercase mb-1">After the call</div>
-                    <p className="text-gray-300 text-sm leading-relaxed">
+                  <div className="mt-4 bg-emerald-600/[0.07] border border-emerald-600/25 rounded-lg p-4">
+                    <div className="text-emerald-600 font-bold text-xs tracking-widest uppercase mb-1">After the call</div>
+                    <p className="text-rot-muted text-sm leading-relaxed">
                       Instructions complete. The team will review your responses and reach out by email to schedule a live meeting with <b>{name.split(" ")[0]}</b>. Keep an eye on your inbox.
                     </p>
                   </div>

@@ -6,34 +6,34 @@ const DISCORD_INVITE = "https://discord.gg/dtcYf8PTNa";
 
 export default function Team() {
   return (
-    <section className="bg-gradient-to-br from-orange-500/10 to-black py-24 border-t border-white/5">
+    <section className="bg-gradient-to-br from-orange-500/10 to-black py-24 border-t border-rot-line">
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center mb-12">
-          <div className="text-orange-500 font-bold tracking-widest text-sm mb-4">THE TEAM</div>
+          <div className="text-rot-accent font-bold tracking-widest text-sm mb-4">THE TEAM</div>
           <h2 className="text-5xl md:text-6xl font-black mb-6">Meet the coordinators.</h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-rot-muted text-lg max-w-2xl mx-auto">
             The humans behind the agents. After you qualify, these are the people you'll be working with.
           </p>
         </div>
         <div className="grid md:grid-cols-3 gap-6">
 
           {/* TY — Cert */}
-          <div className="bg-zinc-900 border border-yellow-500/20 rounded-2xl p-6 flex flex-col">
+          <div className="bg-rot-surface border border-yellow-500/20 rounded-2xl p-6 flex flex-col">
             <div className="flex items-start gap-4 mb-4">
               <div className="relative w-16 h-16 rounded-full border border-yellow-500/30 overflow-hidden shrink-0">
                 <Image src="/team/ty.jpg" alt="Ty" fill sizes="64px" className="object-cover" />
               </div>
               <div className="min-w-0">
                 <div className="font-bold text-lg leading-tight">Ty</div>
-                <div className="text-gray-400 text-sm mt-0.5">Certification Coordinator</div>
+                <div className="text-rot-muted text-sm mt-0.5">Certification Coordinator</div>
               </div>
             </div>
             <div className="flex flex-wrap gap-2 mb-4">
               <span className="text-xs px-2 py-1 bg-yellow-500/10 text-yellow-500 rounded">Cert</span>
               <span className="text-xs px-2 py-1 bg-yellow-500/10 text-yellow-500 rounded">ServiceNow</span>
             </div>
-            <p className="text-gray-400 text-sm leading-relaxed mb-5">
-              Broke into tech in <span className="text-gray-300">2024</span> and hasn&apos;t slowed down since — building her foundation on <span className="text-gray-300">Linux</span> before excelling through the <span className="text-gray-300">ServiceNow Rise Up</span> program. She specializes in <span className="text-gray-300">business process</span> on the Now Platform and in guiding people through their <span className="text-gray-300">certification</span> journeys. Equal parts technologist and coach — she maps the fastest line from stuck to certified and hired.
+            <p className="text-rot-muted text-sm leading-relaxed mb-5">
+              Broke into tech in <span className="text-rot-muted">2024</span> and hasn&apos;t slowed down since — building her foundation on <span className="text-rot-muted">Linux</span> before excelling through the <span className="text-rot-muted">ServiceNow Rise Up</span> program. She specializes in <span className="text-rot-muted">business process</span> on the Now Platform and in guiding people through their <span className="text-rot-muted">certification</span> journeys. Equal parts technologist and coach — she maps the fastest line from stuck to certified and hired.
             </p>
             <ConsultButton
               name="Ty"
@@ -48,23 +48,23 @@ export default function Team() {
           </div>
 
           {/* D. KNIGHT — Career & Clearance */}
-          <div className="bg-zinc-900 border border-green-500/20 rounded-2xl p-6 flex flex-col">
+          <div className="bg-rot-surface border border-emerald-600/25 rounded-2xl p-6 flex flex-col">
             <div className="flex items-start gap-4 mb-4">
-              <div className="relative w-16 h-16 rounded-full border border-green-500/30 overflow-hidden shrink-0">
+              <div className="relative w-16 h-16 rounded-full border border-emerald-600/25 overflow-hidden shrink-0">
                 <Image src="/team/dk.jpg" alt="Daquan Knight" fill sizes="64px" className="object-cover" />
               </div>
               <div className="min-w-0">
                 <div className="font-bold text-lg leading-tight">Daquan Knight</div>
-                <div className="text-gray-400 text-sm mt-0.5">Career &amp; Clearance Coordinator</div>
+                <div className="text-rot-muted text-sm mt-0.5">Career &amp; Clearance Coordinator</div>
               </div>
             </div>
             <div className="flex flex-wrap gap-2 mb-4">
-              <span className="text-xs px-2 py-1 bg-white/5 text-gray-300 border border-white/10 rounded">Intro</span>
+              <span className="text-xs px-2 py-1 bg-rot-sunken text-rot-muted border border-rot-line rounded">Intro</span>
               <span className="text-xs px-2 py-1 bg-yellow-500/10 text-yellow-500 rounded">Cert</span>
-              <span className="text-xs px-2 py-1 bg-green-500/10 text-green-500 rounded">Clearance</span>
+              <span className="text-xs px-2 py-1 bg-emerald-600/[0.07] text-emerald-600 rounded">Clearance</span>
             </div>
-            <p className="text-gray-400 text-sm leading-relaxed mb-5">
-              28-year-old IT professional from Newport News, Virginia, with a lifelong passion for technology and hands-on experience across enterprise, healthcare, and MSP environments. He&apos;s supported major organizations including <span className="text-gray-300">Apple, Ferguson Enterprises, Canon, IntellecTechs, and The Pavilion</span> — from hardware repair to system administration. His background spans Active Directory, Azure AD, MDM (Intune/Jamf), Windows Server, virtualization, and large-scale deployments. Whether leading onsite IT operations or supporting 300+ remote clients, he&apos;s known for strong troubleshooting, clear communication, and keeping systems running smoothly.
+            <p className="text-rot-muted text-sm leading-relaxed mb-5">
+              28-year-old IT professional from Newport News, Virginia, with a lifelong passion for technology and hands-on experience across enterprise, healthcare, and MSP environments. He&apos;s supported major organizations including <span className="text-rot-muted">Apple, Ferguson Enterprises, Canon, IntellecTechs, and The Pavilion</span> — from hardware repair to system administration. His background spans Active Directory, Azure AD, MDM (Intune/Jamf), Windows Server, virtualization, and large-scale deployments. Whether leading onsite IT operations or supporting 300+ remote clients, he&apos;s known for strong troubleshooting, clear communication, and keeping systems running smoothly.
             </p>
             <ConsultButton
               name="Daquan Knight"
@@ -72,31 +72,31 @@ export default function Team() {
               handles={["Cert", "Clearance"]}
               accent="green"
               discordInvite={DISCORD_INVITE}
-              className="mt-auto inline-block w-full text-center px-4 py-2.5 border border-green-500/30 text-green-500 font-bold rounded-lg text-sm hover:bg-green-500/10"
+              className="mt-auto inline-block w-full text-center px-4 py-2.5 border border-emerald-600/25 text-emerald-600 font-bold rounded-lg text-sm hover:bg-emerald-600/[0.07]"
             >
               Book a Consult →
             </ConsultButton>
           </div>
 
           {/* BO — Founder */}
-          <div className="bg-zinc-900 border border-orange-500/40 rounded-2xl p-6 flex flex-col">
+          <div className="bg-rot-surface border border-rot-accent/30 rounded-2xl p-6 flex flex-col">
             <div className="flex items-start gap-4 mb-4">
-              <div className="relative w-16 h-16 rounded-full border border-orange-500/40 overflow-hidden shrink-0">
+              <div className="relative w-16 h-16 rounded-full border border-rot-accent/30 overflow-hidden shrink-0">
                 <Image src="/about/knowledge-2026/k26-smile.jpg" alt="Bo" fill sizes="64px" className="object-cover" />
               </div>
               <div className="min-w-0">
-                <div className="font-bold text-lg leading-tight">Bo <span className="text-gray-500 font-medium text-sm">(Randy Allen)</span></div>
-                <div className="text-gray-400 text-sm mt-0.5">Founder · Developer &amp; AI Engineer</div>
+                <div className="font-bold text-lg leading-tight">Bo <span className="text-rot-faint font-medium text-sm">(Randy Allen)</span></div>
+                <div className="text-rot-muted text-sm mt-0.5">Founder · Developer &amp; AI Engineer</div>
               </div>
             </div>
             <div className="flex flex-wrap gap-2 mb-5">
-              <span className="text-xs px-2 py-1 bg-white/5 text-gray-300 border border-white/10 rounded">Intro</span>
+              <span className="text-xs px-2 py-1 bg-rot-sunken text-rot-muted border border-rot-line rounded">Intro</span>
               <span className="text-xs px-2 py-1 bg-yellow-500/10 text-yellow-500 rounded">Cert</span>
-              <span className="text-xs px-2 py-1 bg-green-500/10 text-green-500 rounded">Clearance</span>
+              <span className="text-xs px-2 py-1 bg-emerald-600/[0.07] text-emerald-600 rounded">Clearance</span>
               <span className="text-xs px-2 py-1 bg-blue-500/10 text-blue-500 rounded">Project Intake</span>
             </div>
-            <p className="text-gray-400 text-sm leading-relaxed mb-5">
-              I&apos;m Randy — developer, AI engineer, and founder of Rich Off Tech. From zero to <span className="text-gray-300">TS/SCI Full Scope Poly</span> clearance in under four years, now building cleared-tech platforms at <span className="text-gray-300">GDIT</span>. I started ROT to share exactly what works — cert tracks, clearance guidance, and real AI builds — no fluff, no gatekeeping. Come ready to learn and I&apos;ll show you the line.
+            <p className="text-rot-muted text-sm leading-relaxed mb-5">
+              I&apos;m Randy — developer, AI engineer, and founder of Rich Off Tech. From zero to <span className="text-rot-muted">TS/SCI Full Scope Poly</span> clearance in under four years, now building cleared-tech platforms at <span className="text-rot-muted">GDIT</span>. I started ROT to share exactly what works — cert tracks, clearance guidance, and real AI builds — no fluff, no gatekeeping. Come ready to learn and I&apos;ll show you the line.
             </p>
             <ConsultButton
               name="Bo"
@@ -114,19 +114,19 @@ export default function Team() {
 
         {/* COORDINATOR SPOTLIGHT — full-bleed marketing units. */}
         <details className="mt-16 group">
-          <summary className="cursor-pointer list-none flex items-center justify-between gap-4 py-4 border-y border-white/10 hover:border-orange-500/40 transition">
+          <summary className="cursor-pointer list-none flex items-center justify-between gap-4 py-4 border-y border-rot-line hover:border-rot-accent/30 transition">
             <div>
-              <div className="text-orange-500 font-bold tracking-widest text-[11px] mb-1">COORDINATOR SPOTLIGHT</div>
-              <div className="text-gray-400 text-sm">Full coordinator pages with deeper info</div>
+              <div className="text-rot-accent font-bold tracking-widest text-[11px] mb-1">COORDINATOR SPOTLIGHT</div>
+              <div className="text-rot-muted text-sm">Full coordinator pages with deeper info</div>
             </div>
-            <div className="text-orange-500 text-xl group-open:rotate-180 transition-transform">↓</div>
+            <div className="text-rot-accent text-xl group-open:rotate-180 transition-transform">↓</div>
           </summary>
           <div className="grid md:grid-cols-3 gap-4 mt-6">
             <a
               href={DISCORD_INVITE}
               target="_blank"
               rel="noopener noreferrer"
-              className="relative block rounded-2xl overflow-hidden border border-yellow-500/30 hover:border-yellow-500/60 transition aspect-[941/1672] bg-black"
+              className="relative block rounded-2xl overflow-hidden border border-yellow-500/30 hover:border-yellow-500/60 transition aspect-[941/1672] bg-rot-bg"
             >
               <Image
                 src="/team/ty-flyer.jpg"
@@ -140,7 +140,7 @@ export default function Team() {
               href={DISCORD_INVITE}
               target="_blank"
               rel="noopener noreferrer"
-              className="relative block rounded-2xl overflow-hidden border border-green-500/30 hover:border-green-500/60 transition aspect-[561/701] bg-black"
+              className="relative block rounded-2xl overflow-hidden border border-emerald-600/25 hover:border-green-500/60 transition aspect-[561/701] bg-rot-bg"
             >
               <Image
                 src="/team/dk-flyer.jpg"

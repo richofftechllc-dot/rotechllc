@@ -55,25 +55,25 @@ export default function BirthdayBanner() {
   const btn = "inline-block px-4 py-2 rounded-lg font-bold text-sm";
 
   return (
-    <div className="mb-6 rounded-xl border border-orange-500/40 bg-gradient-to-r from-orange-500/10 to-red-500/10 px-5 py-4">
-      <div className="text-orange-400 font-bold text-xs tracking-widest uppercase">🎂 Bo&apos;s 30th Birthday Drop · ends {endsOn}</div>
-      <div className="text-white text-2xl md:text-3xl font-black mt-1 tabular-nums">
+    <div className="mb-6 rounded-xl border border-rot-accent/30 bg-gradient-to-r from-orange-500/10 to-red-500/10 px-5 py-4">
+      <div className="text-rot-accent font-bold text-xs tracking-widest uppercase">🎂 Bo&apos;s 30th Birthday Drop · ends {endsOn}</div>
+      <div className="text-rot-fg text-2xl md:text-3xl font-black mt-1 tabular-nums">
         {cd}
         {spots !== null && !soldOut && (
-          <span className="text-gray-400 text-base font-semibold"> · {spots} founding spots left</span>
+          <span className="text-rot-muted text-base font-semibold"> · {spots} founding spots left</span>
         )}
-        {soldOut && left > 0 && <span className="text-gray-400 text-base font-semibold"> · founding full (new pricing after {endsOn})</span>}
+        {soldOut && left > 0 && <span className="text-rot-muted text-base font-semibold"> · founding full (new pricing after {endsOn})</span>}
       </div>
       <div className="flex flex-wrap gap-2 mt-3">
         {/* $227/yr — durable quick_pay link (reusable), always the annual founding rate. */}
-        <a href={LINKS.foundingYearly} className={btn + " bg-white text-black hover:opacity-90"}>Membership — $375 / year</a>
+        <a href={LINKS.foundingYearly} className={btn + " bg-rot-fg text-white hover:opacity-90"}>Membership — $375 / year</a>
         {/* $27/mo monthly subscription (through July 27, then $40/mo). Shows once a durable
             REUSABLE link is set in lib/links.ts (foundingMonthly); blank = no button so a
             dead link can't appear. */}
         {LINKS.foundingMonthly && (
-          <a href={LINKS.foundingMonthly} className={btn + " bg-white text-black hover:opacity-90"}>Membership — $40 / mo</a>
+          <a href={LINKS.foundingMonthly} className={btn + " bg-rot-fg text-white hover:opacity-90"}>Membership — $40 / mo</a>
         )}
-        <a href="/resources/rot-july-2026-offers.html" className={btn + " border border-white/30 text-white hover:bg-white/10"}>See the full deal →</a>
+        <a href="/resources/rot-july-2026-offers.html" className={btn + " border border-rot-line-strong text-rot-fg hover:bg-rot-sunken"}>See the full deal →</a>
       </div>
     </div>
   );

@@ -63,7 +63,7 @@ export function DiscordAccessCard() {
       <div>
         <h3 className="text-xl font-semibold mb-2">{CERTS.discordAccess.name}</h3>
         <p className="text-rot-muted text-sm leading-relaxed">
-          <span className="font-bold text-white">{money(CERTS.discordAccess.price)}</span> for
+          <span className="font-bold text-rot-fg">{money(CERTS.discordAccess.price)}</span> for
           12 months — the community, the AI tutors, weekly calls, and job drops. No exam
           voucher, no cert track.
         </p>
@@ -122,7 +122,7 @@ export default function Offers({ showDiscord = true }: { showDiscord?: boolean }
               {/* mt-auto keeps both buttons on the same baseline when the lists differ in height */}
               <a
                 href={p.href}
-                className="rot-btn mt-auto w-full px-6 py-4 text-sm"
+                className="rot-btn-accent mt-auto w-full px-6 py-4 text-sm"
               >
                 {p.cta}
               </a>

@@ -20,7 +20,7 @@ const TRACK_COLORS: Record<string, string> = {
   csa: "border-yellow-400/40 hover:border-yellow-400",
   ai: "border-blue-400/40 hover:border-blue-400",
 };
-const TRACK_TEXT: Record<string, string> = { sp: "text-green-400", csa: "text-yellow-400", ai: "text-blue-400" };
+const TRACK_TEXT: Record<string, string> = { sp: "text-emerald-600", csa: "text-amber-600", ai: "text-blue-600" };
 
 // Old quiz schema uses prefixed keys: secplus_sp1, csa_csa1, ai_ai1
 function progKey(domainId: string): string {
@@ -188,8 +188,8 @@ export default function Quiz() {
     <main className="max-w-2xl mx-auto px-6 py-24 text-center">
       <Image src="/bo-avatar.png" alt="ROT" width={80} height={80} className="rounded-full mx-auto mb-6" />
       <h1 className="text-3xl font-black mb-4">Welcome, {me.name}</h1>
-      <p className="text-gray-400 mb-8">Discord signed in but no quiz code linked. DM Bo in Discord for your code.</p>
-      <a href="https://discord.gg/dtcYf8PTNa" target="_blank" rel="noopener" className="inline-block px-6 py-3 text-white font-bold rounded-lg" style={{backgroundColor:"#5865F2"}}>Open ROT Discord</a>
+      <p className="text-rot-muted mb-8">Discord signed in but no quiz code linked. DM Bo in Discord for your code.</p>
+      <a href="https://discord.gg/dtcYf8PTNa" target="_blank" rel="noopener" className="inline-block px-6 py-3 text-rot-fg font-bold rounded-lg" style={{backgroundColor:"#5865F2"}}>Open ROT Discord</a>
     </main>
   );
 
@@ -359,35 +359,35 @@ ${missedText}]
     return (
       <main className="max-w-6xl mx-auto px-6 py-12">
         <div className="mb-10">
-          <h1 className="text-5xl font-black mb-2">Your <span className="text-orange-500">Quiz</span></h1>
-          <p className="text-gray-400">Signed in as <span className="text-orange-500 font-semibold">{me.name}</span> <span className="font-mono text-sm text-gray-500 ml-2">{me.code}</span></p>
-          {me.track && <p className="text-gray-500 text-sm mt-1">{me.track}</p>}
+          <h1 className="text-5xl font-black mb-2">Your <span className="text-rot-accent">Quiz</span></h1>
+          <p className="text-rot-muted">Signed in as <span className="text-rot-accent font-semibold">{me.name}</span> <span className="font-mono text-sm text-rot-faint ml-2">{me.code}</span></p>
+          {me.track && <p className="text-rot-faint text-sm mt-1">{me.track}</p>}
           <div className="text-[11px] mt-2 font-mono">
-            {progressStatus === "loading" && <span className="text-gray-500">↻ Loading progress…</span>}
+            {progressStatus === "loading" && <span className="text-rot-faint">↻ Loading progress…</span>}
             {progressStatus === "loaded" && progressMeta && (
-              <span className="text-green-500">✓ Synced ({progressMeta.rawKeys} raw → {progressMeta.normalizedKeys} domain entries)</span>
+              <span className="text-emerald-600">✓ Synced ({progressMeta.rawKeys} raw → {progressMeta.normalizedKeys} domain entries)</span>
             )}
             {progressStatus === "empty" && (
               <span className="text-yellow-500">⚠ No saved progress for <code className="text-yellow-300">{me.code}</code> in Firestore. If you completed domains on rotechllc.com/learn, the data should appear here automatically — verify the doc exists at <code>quizProgress/{me.code}</code> in Firebase console.</span>
             )}
-            {progressStatus === "unauth" && <span className="text-red-400">✗ Progress endpoint returned 401. Session cookie may not be reaching the API.</span>}
-            {progressStatus === "error" && <span className="text-red-400">✗ Progress fetch errored. Check /api/progress in the Network tab.</span>}
+            {progressStatus === "unauth" && <span className="text-red-600">✗ Progress endpoint returned 401. Session cookie may not be reaching the API.</span>}
+            {progressStatus === "error" && <span className="text-red-600">✗ Progress fetch errored. Check /api/progress in the Network tab.</span>}
           </div>
         </div>
         {visibleTracks.length === 0 ? (
-          <div className="bg-zinc-900 border border-orange-500/30 rounded-xl p-8 text-center">
-            <p className="text-gray-400">Your track <span className="text-orange-500 font-semibold">{me.track || "(unset)"}</span> doesn&apos;t match any quiz tracks yet. DM Bo in Discord.</p>
+          <div className="bg-rot-surface border border-rot-accent/30 rounded-xl p-8 text-center">
+            <p className="text-rot-muted">Your track <span className="text-rot-accent font-semibold">{me.track || "(unset)"}</span> doesn&apos;t match any quiz tracks yet. DM Bo in Discord.</p>
           </div>
         ) : (
           <div className="grid sm:grid-cols-3 gap-4">
             {visibleTracks.map(t => {
               const done = t.domains.filter(d => progress[d.id]?.completed).length;
               return (
-                <button key={t.id} onClick={() => setTrack(t)} className={`bg-zinc-900 border rounded-xl p-6 text-left transition hover:scale-[1.02] ${TRACK_COLORS[t.id] || "border-white/10"}`}>
+                <button key={t.id} onClick={() => setTrack(t)} className={`bg-rot-surface border rounded-xl p-6 text-left transition hover:scale-[1.02] ${TRACK_COLORS[t.id] || "border-rot-line"}`}>
                   <div className="text-3xl mb-2">{t.id === "sp" ? "🛡️" : t.id === "csa" ? "⚙️" : "🤖"}</div>
                   <div className={`font-bold text-xl mb-1 ${TRACK_TEXT[t.id] || ""}`}>{t.name}</div>
-                  <div className="text-xs text-gray-500 font-mono">{t.domains.length} domains · {t.domains.reduce((s, d) => s + d.questions.length, 0)} questions</div>
-                  <div className="text-xs text-orange-400 font-mono mt-2">{done}/{t.domains.length} complete</div>
+                  <div className="text-xs text-rot-faint font-mono">{t.domains.length} domains · {t.domains.reduce((s, d) => s + d.questions.length, 0)} questions</div>
+                  <div className="text-xs text-rot-accent font-mono mt-2">{done}/{t.domains.length} complete</div>
                 </button>
               );
             })}
@@ -395,16 +395,16 @@ ${missedText}]
         )}
         {lockedCards.length > 0 && (
           <div className="mt-8">
-            <div className="text-xs uppercase tracking-widest text-gray-500 mb-3">Add a track</div>
+            <div className="text-xs uppercase tracking-widest text-rot-faint mb-3">Add a track</div>
             <div className="grid sm:grid-cols-3 gap-4">
               {lockedCards.map(lc => (
-                <div key={lc.id} className="relative bg-zinc-900/60 border border-white/10 rounded-xl p-6">
+                <div key={lc.id} className="relative bg-rot-surface/60 border border-rot-line rounded-xl p-6">
                   <div className="absolute top-3 right-3 text-lg">🔒</div>
                   <div className="text-3xl mb-2 opacity-50">{lc.id === "sp" ? "🛡️" : lc.id === "csa" ? "⚙️" : "🤖"}</div>
-                  <div className="font-bold text-xl mb-1 text-gray-300">{lc.name}</div>
-                  <div className="text-xs text-gray-500 mb-3">{lc.blurb}</div>
+                  <div className="font-bold text-xl mb-1 text-rot-muted">{lc.name}</div>
+                  <div className="text-xs text-rot-faint mb-3">{lc.blurb}</div>
                   <div className="flex items-center justify-between">
-                    <span className="font-black text-lg text-white">{lc.price}</span>
+                    <span className="font-black text-lg text-rot-fg">{lc.price}</span>
                     {lc.buyUrl && (
                       <a href={lc.buyUrl} className="text-xs font-bold px-3 py-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 text-white uppercase tracking-wide">Unlock →</a>
                     )}
@@ -421,7 +421,7 @@ ${missedText}]
   if (!domain) {
     return (
       <main className="max-w-4xl mx-auto px-6 py-12">
-        <button onClick={reset} className="text-gray-500 text-sm mb-6 hover:text-orange-500">← Tracks</button>
+        <button onClick={reset} className="text-rot-faint text-sm mb-6 hover:text-rot-accent">← Tracks</button>
         <h1 className={`text-4xl font-black mb-8 ${TRACK_TEXT[track.id] || ""}`}>{track.name}</h1>
         <div className="space-y-2">
           {track.domains.map((d, i) => {
@@ -430,15 +430,15 @@ ${missedText}]
             const completed = !!p?.completed;
             const hasLesson = !!content?.lessons?.[d.id];
             return (
-              <div key={d.id} className={`w-full bg-zinc-900 border rounded-lg p-4 flex items-center justify-between transition ${completed ? "border-green-500/40" : "border-white/10 hover:border-orange-500"}`}>
+              <div key={d.id} className={`w-full bg-rot-surface border rounded-lg p-4 flex items-center justify-between transition ${completed ? "border-green-500/40" : "border-rot-line hover:border-orange-500"}`}>
                 <div className="flex items-center gap-4">
                   <span className="text-2xl font-black text-gray-700">{String(i+1).padStart(2,"0")}</span>
                   <div>
                     <div className="font-bold">
                       {d.name}
-                      {completed && <span className="text-green-400 text-xs ml-2 font-mono">✓ {score}%</span>}
+                      {completed && <span className="text-emerald-600 text-xs ml-2 font-mono">✓ {score}%</span>}
                     </div>
-                    <div className="text-xs text-gray-500 font-mono">
+                    <div className="text-xs text-rot-faint font-mono">
                       {d.questions.length} questions · {d.id}
                       {hasLesson ? " · 📖 lesson" : ""}
                     </div>
@@ -455,7 +455,7 @@ ${missedText}]
                       </button>
                       <button
                         onClick={() => start(d)}
-                        className="px-3 py-1.5 text-xs border border-white/15 text-gray-400 rounded hover:border-orange-500/40 hover:text-orange-400"
+                        className="px-3 py-1.5 text-xs border border-rot-line text-rot-muted rounded hover:border-rot-accent/30 hover:text-rot-accent"
                       >
                         Skip
                       </button>
@@ -480,9 +480,9 @@ ${missedText}]
   if (done && showLesson && lesson && answers.length === 0) {
     return (
       <main className="max-w-7xl mx-auto px-6 py-12">
-        <button onClick={() => setDomain(null)} className="text-gray-500 text-sm mb-6 hover:text-orange-500">← {track.name}</button>
+        <button onClick={() => setDomain(null)} className="text-rot-faint text-sm mb-6 hover:text-rot-accent">← {track.name}</button>
         <h1 className="text-3xl font-black mb-2">{domain.name}</h1>
-        <p className="text-gray-500 text-sm mb-6 font-mono">📖 Lesson · {domain.id}</p>
+        <p className="text-rot-faint text-sm mb-6 font-mono">📖 Lesson · {domain.id}</p>
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             {domain.video_url && <LessonVideo url={domain.video_url} domainId={domain.id} domainName={domain.name} />}
@@ -500,15 +500,15 @@ ${missedText}]
     return (
       <main className="max-w-2xl mx-auto px-6 py-12 text-center">
         <h1 className="text-3xl font-black mb-3">Hold up ⚠️</h1>
-        <p className="text-gray-300 mb-1">
-          You left <span className="text-orange-400 font-bold">{unanswered.length}</span> question{unanswered.length > 1 ? "s" : ""} unanswered.
+        <p className="text-rot-muted mb-1">
+          You left <span className="text-rot-accent font-bold">{unanswered.length}</span> question{unanswered.length > 1 ? "s" : ""} unanswered.
         </p>
-        <p className="text-gray-500 text-sm mb-6">
+        <p className="text-rot-faint text-sm mb-6">
           Question{unanswered.length > 1 ? "s" : ""}: {unanswered.map(i => i + 1).join(", ")}
         </p>
         <div className="flex gap-3 justify-center flex-wrap">
           <button onClick={() => setQIdx(unanswered[0])} className="px-6 py-3 bg-orange-500 text-black font-bold rounded-lg">Answer them →</button>
-          <button onClick={() => setFinished(true)} className="px-6 py-3 bg-zinc-800 text-white font-bold rounded-lg">Finish anyway</button>
+          <button onClick={() => setFinished(true)} className="px-6 py-3 bg-rot-sunken text-rot-fg font-bold rounded-lg">Finish anyway</button>
         </div>
       </main>
     );
@@ -522,35 +522,35 @@ ${missedText}]
     return (
       <main className="max-w-2xl mx-auto px-6 py-12 text-center">
         <h1 className="text-5xl font-black mb-4">Done</h1>
-        <div className={`text-7xl font-black mb-2 ${pct >= 75 ? "text-green-400" : pct >= 50 ? "text-yellow-400" : "text-red-400"}`}>{pct}%</div>
-        <p className="text-gray-400 mb-1">{correct} / {domain.questions.length} correct</p>
-        {skipped > 0 && <p className="text-orange-400 text-sm mb-2">{skipped} left unanswered</p>}
+        <div className={`text-7xl font-black mb-2 ${pct >= 75 ? "text-emerald-600" : pct >= 50 ? "text-amber-600" : "text-red-600"}`}>{pct}%</div>
+        <p className="text-rot-muted mb-1">{correct} / {domain.questions.length} correct</p>
+        {skipped > 0 && <p className="text-rot-accent text-sm mb-2">{skipped} left unanswered</p>}
         {progress[domain.id]?.highScore !== undefined && progress[domain.id].highScore! > pct && (
-          <p className="text-gray-500 text-xs mb-6">Best: {progress[domain.id].highScore}%</p>
+          <p className="text-rot-faint text-xs mb-6">Best: {progress[domain.id].highScore}%</p>
         )}
 
         {/* Bo/Flo's personalized debrief — the "this tutor knows ME" moment. */}
         {(debrief || debriefBusy) && (
-          <div className="mt-8 mx-auto max-w-lg text-left bg-zinc-900 border border-orange-500/30 rounded-xl p-4">
+          <div className="mt-8 mx-auto max-w-lg text-left bg-rot-surface border border-rot-accent/30 rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
                 {persona === "bo" ? (
                   <Image src="/bo-avatar.png" alt="Bo" width={36} height={36} className="rounded-full border-2 border-orange-500" />
                 ) : (
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-fuchsia-400 bg-gradient-to-br from-fuchsia-500 to-purple-600 text-sm font-black text-white">F</div>
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-fuchsia-400 bg-gradient-to-br from-fuchsia-500 to-purple-600 text-sm font-black text-rot-fg">F</div>
                 )}
                 <div>
                   <div className="font-bold text-sm">{persona === "bo" ? "Bo Tech" : "Flo"}</div>
-                  <div className={`text-xs ${persona === "bo" ? "text-green-500" : "text-fuchsia-300"}`}>Your debrief</div>
+                  <div className={`text-xs ${persona === "bo" ? "text-emerald-600" : "text-fuchsia-300"}`}>Your debrief</div>
                 </div>
               </div>
               {debrief && (
                 <button onClick={() => (speakingIdx === -1 ? stopSpeak() : speak(debrief, -1))} title="Hear it"
-                  className="text-xs rounded px-2 py-1 border border-white/10 text-gray-400 hover:text-white">{speakingIdx === -1 ? "⏹" : "🔊"}</button>
+                  className="text-xs rounded px-2 py-1 border border-rot-line text-rot-muted hover:text-rot-fg">{speakingIdx === -1 ? "⏹" : "🔊"}</button>
               )}
             </div>
             {debriefBusy && !debrief
-              ? <div className="text-orange-400 text-xs animate-pulse">{persona === "bo" ? "Bo" : "Flo"}&apos;s reviewing your run…</div>
+              ? <div className="text-rot-accent text-xs animate-pulse">{persona === "bo" ? "Bo" : "Flo"}&apos;s reviewing your run…</div>
               : <Markdown text={debrief} />}
             {!debriefBusy && debrief && missedCount > 0 && (
               <button onClick={drillMissed} className="mt-3 px-4 py-2 bg-orange-500 text-black font-bold text-sm rounded-lg">🎯 Drill me on those {missedCount} →</button>
@@ -560,8 +560,8 @@ ${missedText}]
 
         <div className="flex gap-3 justify-center flex-wrap mt-6">
           <button onClick={() => start(domain)} className="px-6 py-3 bg-orange-500 text-black font-bold rounded-lg">Retry</button>
-          <button onClick={() => setDomain(null)} className="px-6 py-3 bg-zinc-800 text-white font-bold rounded-lg">Domains</button>
-          <button onClick={reset} className="px-6 py-3 border border-white/20 text-white font-bold rounded-lg">Home</button>
+          <button onClick={() => setDomain(null)} className="px-6 py-3 bg-rot-sunken text-rot-fg font-bold rounded-lg">Domains</button>
+          <button onClick={reset} className="px-6 py-3 border border-rot-line-strong text-rot-fg font-bold rounded-lg">Home</button>
         </div>
       </main>
     );
@@ -575,58 +575,58 @@ ${missedText}]
   return (
     <main className="max-w-7xl mx-auto px-6 py-12">
       <div className="flex items-center justify-between mb-4">
-        <button onClick={() => setDomain(null)} className="text-gray-500 text-sm hover:text-orange-500">← {track.name}</button>
-        <div className="text-xs font-mono text-gray-500">{qIdx+1} / {domain.questions.length} · {correctSoFar} correct</div>
+        <button onClick={() => setDomain(null)} className="text-rot-faint text-sm hover:text-rot-accent">← {track.name}</button>
+        <div className="text-xs font-mono text-rot-faint">{qIdx+1} / {domain.questions.length} · {correctSoFar} correct</div>
       </div>
       <h2 className="text-2xl font-bold mb-1">{domain.name}</h2>
-      {lesson && <button onClick={() => setShowLesson(s => !s)} className="text-orange-500 text-sm mb-6 hover:underline">{showLesson ? "Hide" : "📖 View"} lesson</button>}
-      {showLesson && lesson && <div className="bg-zinc-900 border border-orange-500/30 rounded-xl p-6 mb-6 prose prose-invert max-w-none text-sm" dangerouslySetInnerHTML={{ __html: lesson }} />}
+      {lesson && <button onClick={() => setShowLesson(s => !s)} className="text-rot-accent text-sm mb-6 hover:underline">{showLesson ? "Hide" : "📖 View"} lesson</button>}
+      {showLesson && lesson && <div className="bg-rot-surface border border-rot-accent/30 rounded-xl p-6 mb-6 prose prose-invert max-w-none text-sm" dangerouslySetInnerHTML={{ __html: lesson }} />}
       <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-zinc-900 border border-white/10 rounded-xl p-6">
+        <div className="lg:col-span-2 bg-rot-surface border border-rot-line rounded-xl p-6">
           <div className="text-lg font-bold mb-6">{q.q}</div>
           <div className="space-y-3">
             {q.options.map((opt, i) => {
               const isPicked = cur === i;
               const isCorrect = i === q.answer;
               const show = cur != null;
-              let cls = "border-white/10 hover:border-orange-500/50";
-              if (show && isCorrect) cls = "border-green-500 bg-green-500/10";
+              let cls = "border-rot-line hover:border-rot-accent/30";
+              if (show && isCorrect) cls = "border-green-500 bg-emerald-600/[0.07]";
               else if (show && isPicked && !isCorrect) cls = "border-red-500 bg-red-500/10";
-              else if (show) cls = "border-white/5 opacity-50";
+              else if (show) cls = "border-rot-line opacity-50";
               return (
                 <button key={i} onClick={() => cur == null && setAnswer(i)} disabled={cur != null} className={`w-full text-left p-4 border rounded-lg transition ${cls}`}>
-                  <span className="font-mono text-xs text-gray-500 mr-3">{String.fromCharCode(65+i)}.</span>
+                  <span className="font-mono text-xs text-rot-faint mr-3">{String.fromCharCode(65+i)}.</span>
                   {opt}
                 </button>
               );
             })}
           </div>
           {cur != null && (
-            <div className="mt-6 pt-6 border-t border-white/10 text-sm text-gray-300">{q.exp}</div>
+            <div className="mt-6 pt-6 border-t border-rot-line text-sm text-rot-muted">{q.exp}</div>
           )}
           <div className="mt-6 flex items-center gap-3 flex-wrap">
             {qIdx > 0 && (
-              <button onClick={() => setQIdx(qIdx - 1)} className="px-5 py-3 bg-zinc-800 text-white font-bold rounded-lg">← Prev</button>
+              <button onClick={() => setQIdx(qIdx - 1)} className="px-5 py-3 bg-rot-sunken text-rot-fg font-bold rounded-lg">← Prev</button>
             )}
             {cur == null ? (
-              <button onClick={() => setQIdx(qIdx + 1)} className="px-5 py-3 border border-orange-500/50 text-orange-400 font-bold rounded-lg">Skip →</button>
+              <button onClick={() => setQIdx(qIdx + 1)} className="px-5 py-3 border border-rot-accent/30 text-rot-accent font-bold rounded-lg">Skip →</button>
             ) : (
               <button onClick={() => setQIdx(qIdx + 1)} className="px-6 py-3 bg-orange-500 text-black font-bold rounded-lg">{isLast ? "See results →" : "Next →"}</button>
             )}
           </div>
         </div>
-        <div className="bg-zinc-900 border border-orange-500/30 rounded-xl p-4 h-fit sticky top-4">
+        <div className="bg-rot-surface border border-rot-accent/30 rounded-xl p-4 h-fit sticky top-4">
           <div className="mb-3">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-3">
                 {persona === "bo" ? (
                   <Image src="/bo-avatar.png" alt="Bo" width={40} height={40} className="rounded-full border-2 border-orange-500" />
                 ) : (
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-fuchsia-400 bg-gradient-to-br from-fuchsia-500 to-purple-600 text-sm font-black text-white">F</div>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-fuchsia-400 bg-gradient-to-br from-fuchsia-500 to-purple-600 text-sm font-black text-rot-fg">F</div>
                 )}
                 <div>
                   <div className="font-bold text-sm">{persona === "bo" ? "Bo Tech" : "Flo"}</div>
-                  <div className={`text-xs ${persona === "bo" ? "text-green-500" : "text-fuchsia-300"}`}>{persona === "bo" ? "Live · knows this question" : "Live · ServiceNow instructor"}</div>
+                  <div className={`text-xs ${persona === "bo" ? "text-emerald-600" : "text-fuchsia-300"}`}>{persona === "bo" ? "Live · knows this question" : "Live · ServiceNow instructor"}</div>
                 </div>
               </div>
               <div className="flex items-center gap-1">
@@ -635,23 +635,23 @@ ${missedText}]
                     className="text-xs rounded px-2 py-1 border border-red-500/40 bg-red-500/10 text-red-300">⏹ Stop</button>
                 )}
                 <button onClick={toggleAutoSpeak} title="Speak replies aloud"
-                  className={`text-xs rounded px-2 py-1 border ${autoSpeak ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300" : "border-white/10 text-gray-400 hover:text-white"}`}>
+                  className={`text-xs rounded px-2 py-1 border ${autoSpeak ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300" : "border-rot-line text-rot-muted hover:text-rot-fg"}`}>
                   {autoSpeak ? "🔊" : "🔈"}
                 </button>
                 <button onClick={clearChat} disabled={chatBusy} title="Start a new chat — your tutor keeps what they've learned about you"
-                  className="text-xs text-gray-400 hover:text-orange-400 border border-white/10 hover:border-orange-500/40 rounded px-2 py-1 disabled:opacity-40">
+                  className="text-xs text-rot-muted hover:text-rot-accent border border-rot-line hover:border-rot-accent/30 rounded px-2 py-1 disabled:opacity-40">
                   ↻ New
                 </button>
               </div>
             </div>
-            <div className="flex rounded-lg bg-zinc-800 p-0.5 text-xs">
-              <button onClick={() => switchPersona("bo")} disabled={chatBusy} className={`flex-1 rounded-md py-1 font-bold transition-colors disabled:opacity-50 ${persona === "bo" ? "bg-orange-500 text-black" : "text-gray-400 hover:text-white"}`}>Bo · plain talk</button>
-              <button onClick={() => switchPersona("flo")} disabled={chatBusy} className={`flex-1 rounded-md py-1 font-bold transition-colors disabled:opacity-50 ${persona === "flo" ? "bg-fuchsia-500 text-black" : "text-gray-400 hover:text-white"}`}>Flo · technical</button>
+            <div className="flex rounded-lg bg-rot-sunken p-0.5 text-xs">
+              <button onClick={() => switchPersona("bo")} disabled={chatBusy} className={`flex-1 rounded-md py-1 font-bold transition-colors disabled:opacity-50 ${persona === "bo" ? "bg-orange-500 text-black" : "text-rot-muted hover:text-rot-fg"}`}>Bo · plain talk</button>
+              <button onClick={() => switchPersona("flo")} disabled={chatBusy} className={`flex-1 rounded-md py-1 font-bold transition-colors disabled:opacity-50 ${persona === "flo" ? "bg-fuchsia-500 text-black" : "text-rot-muted hover:text-rot-fg"}`}>Flo · technical</button>
             </div>
           </div>
           <div ref={chatScrollRef} className="space-y-2 max-h-96 overflow-y-auto mb-3 text-sm">
             {chat.length === 0 && (
-              <div className="text-gray-500 text-xs space-y-2">
+              <div className="text-rot-faint text-xs space-y-2">
                 {persona === "bo" ? (
                   <>
                     <p>Yo {me.name.split(" ")[0]}. I see the question you on.</p>
@@ -666,11 +666,11 @@ ${missedText}]
               </div>
             )}
             {chat.map((m, i) => (
-              <div key={i} className={m.role === "user" ? "bg-zinc-800 rounded p-2 text-gray-300" : "bg-orange-500/10 border border-orange-500/20 rounded p-2 text-gray-200"}>
+              <div key={i} className={m.role === "user" ? "bg-rot-sunken rounded p-2 text-rot-muted" : "bg-rot-accent/10 border border-rot-accent/30 rounded p-2 text-gray-200"}>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-gray-500">{m.role === "user" ? "You" : (persona === "bo" ? "Bo" : "Flo")}</span>
+                  <span className="text-xs text-rot-faint">{m.role === "user" ? "You" : (persona === "bo" ? "Bo" : "Flo")}</span>
                   {m.role === "assistant" && m.content && (
-                    <button onClick={() => (speakingIdx === i ? stopSpeak() : speak(m.content, i))} title="Hear it" className="text-xs text-gray-500 hover:text-white">{speakingIdx === i ? "⏹" : "🔊"}</button>
+                    <button onClick={() => (speakingIdx === i ? stopSpeak() : speak(m.content, i))} title="Hear it" className="text-xs text-rot-faint hover:text-rot-fg">{speakingIdx === i ? "⏹" : "🔊"}</button>
                   )}
                 </div>
                 {m.role === "assistant"
@@ -678,7 +678,7 @@ ${missedText}]
                   : <div className="whitespace-pre-wrap">{m.content}</div>}
               </div>
             ))}
-            {chatBusy && <div className="text-orange-400 text-xs animate-pulse">{persona === "bo" ? "Bo" : "Flo"}&apos;s thinking...</div>}
+            {chatBusy && <div className="text-rot-accent text-xs animate-pulse">{persona === "bo" ? "Bo" : "Flo"}&apos;s thinking...</div>}
             <div ref={chatEndRef} />
           </div>
           <div className="flex gap-2">
@@ -688,9 +688,9 @@ ${missedText}]
               onKeyDown={e => e.key === "Enter" && askBo(chatInput)}
               placeholder={listening ? "Listening…" : `Ask ${persona === "bo" ? "Bo" : "Flo"}…`}
               disabled={chatBusy}
-              className="flex-1 bg-zinc-800 border border-white/10 rounded px-3 py-2 text-sm focus:outline-none focus:border-orange-500"
+              className="flex-1 bg-rot-sunken border border-rot-line rounded px-3 py-2 text-sm focus:outline-none focus:border-rot-accent"
             />
-            <button onClick={toggleMic} title="Talk to your tutor" className={`px-3 rounded font-bold ${listening ? "bg-red-500 text-white animate-pulse" : "bg-zinc-800 text-gray-300 hover:text-white border border-white/10"}`}>🎤</button>
+            <button onClick={toggleMic} title="Talk to your tutor" className={`px-3 rounded font-bold ${listening ? "bg-red-500 text-rot-fg animate-pulse" : "bg-rot-sunken text-rot-muted hover:text-rot-fg border border-rot-line"}`}>🎤</button>
             <button onClick={() => askBo(chatInput)} disabled={chatBusy || !chatInput.trim()} className="px-3 bg-orange-500 text-black font-bold rounded disabled:opacity-40">→</button>
           </div>
         </div>
@@ -715,12 +715,12 @@ function SidePanel({ domain, onStart, liveSession }: { domain: Domain; onStart: 
         <div className="bg-red-500/10 border border-red-500/40 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">
             <span className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />
-            <span className="text-red-400 font-bold text-xs tracking-widest uppercase">Live Now</span>
+            <span className="text-red-600 font-bold text-xs tracking-widest uppercase">Live Now</span>
           </div>
           <div className="font-bold text-sm mb-1">{LIVE.title || "Community Session"}</div>
-          {LIVE.host && <div className="text-xs text-gray-400 mb-3">with {LIVE.host}</div>}
+          {LIVE.host && <div className="text-xs text-rot-muted mb-3">with {LIVE.host}</div>}
           {liveYouTubeId ? (
-            <div className="aspect-video rounded-lg overflow-hidden bg-black">
+            <div className="aspect-video rounded-lg overflow-hidden bg-rot-bg">
               <iframe
                 src={`https://www.youtube.com/embed/${liveYouTubeId}?autoplay=0&rel=0`}
                 title={LIVE.title || "Live"}
@@ -730,24 +730,24 @@ function SidePanel({ domain, onStart, liveSession }: { domain: Domain; onStart: 
               />
             </div>
           ) : LIVE.url ? (
-            <a href={LIVE.url} target="_blank" rel="noopener noreferrer" className="block w-full text-center px-3 py-2 bg-red-500 text-white font-bold text-xs rounded uppercase tracking-wider">
+            <a href={LIVE.url} target="_blank" rel="noopener noreferrer" className="block w-full text-center px-3 py-2 bg-red-500 text-rot-fg font-bold text-xs rounded uppercase tracking-wider">
               Join Now ↗
             </a>
           ) : null}
         </div>
       )}
 
-      <div className="bg-zinc-900 border border-white/10 rounded-xl p-4">
-        <div className="text-orange-500 font-bold tracking-widest text-[10px] mb-3">🧪 LABS — {domain.id.toUpperCase()}</div>
+      <div className="bg-rot-surface border border-rot-line rounded-xl p-4">
+        <div className="text-rot-accent font-bold tracking-widest text-[10px] mb-3">🧪 LABS — {domain.id.toUpperCase()}</div>
         {labs.length === 0 ? (
-          <p className="text-gray-500 text-xs italic">No hands-on labs for this domain yet.</p>
+          <p className="text-rot-faint text-xs italic">No hands-on labs for this domain yet.</p>
         ) : (
           <ul className="space-y-2">
             {labs.map(l => (
               <li key={l.id}>
                 <a href={`/lab/${l.id}`} className="block rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/5 p-2.5 hover:border-fuchsia-500/60">
                   <span className="block text-sm font-bold text-fuchsia-300">🧪 {l.title}</span>
-                  <span className="block text-[11px] text-gray-400">{l.objective}</span>
+                  <span className="block text-[11px] text-rot-muted">{l.objective}</span>
                   <span className="mt-1 inline-block text-[11px] font-bold text-fuchsia-400">Start with Flo · {l.est} →</span>
                 </a>
               </li>
@@ -756,9 +756,9 @@ function SidePanel({ domain, onStart, liveSession }: { domain: Domain; onStart: 
         )}
       </div>
 
-      <div className="bg-zinc-900 border border-white/10 rounded-xl p-4">
-        <div className="text-orange-500 font-bold tracking-widest text-[10px] mb-3">READY?</div>
-        <p className="text-xs text-gray-400 mb-3">When you&apos;ve absorbed the lesson, take the quiz to lock it in.</p>
+      <div className="bg-rot-surface border border-rot-line rounded-xl p-4">
+        <div className="text-rot-accent font-bold tracking-widest text-[10px] mb-3">READY?</div>
+        <p className="text-xs text-rot-muted mb-3">When you&apos;ve absorbed the lesson, take the quiz to lock it in.</p>
         <button onClick={onStart} className="w-full px-4 py-2.5 bg-orange-500 text-black font-bold text-sm rounded">Start Quiz →</button>
       </div>
     </aside>

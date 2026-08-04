@@ -10,14 +10,14 @@ import LessonPlayer from "@/app/components/LessonPlayer";
 export default function LessonPage({ params }: { params: Promise<{ lessonId: string }> }) {
   const { lessonId } = use(params);
   return (
-    <main className="min-h-screen bg-black px-4 py-10 text-white">
+    <main className="min-h-screen bg-rot-bg px-4 py-10 text-rot-fg">
       <div className="mx-auto max-w-3xl">
-        <Link href="/quiz" className="text-sm text-gray-500 hover:text-orange-500">
+        <Link href="/quiz" className="text-sm text-rot-faint hover:text-rot-accent">
           ← Back to tracks
         </Link>
         <h1 className="mb-5 mt-3 text-2xl font-black">Lesson</h1>
         <LessonPlayer lessonId={lessonId} />
-        <p className="mt-4 text-xs text-gray-500">
+        <p className="mt-4 text-xs text-rot-faint">
           Signed, expiring playback · access tied to your ROT plan.
         </p>
       </div>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Reveal from "../components/Reveal";
 import FoundingSlot from "../components/FoundingSlot";
 import { DiscordAccessCard } from "../components/Offers";
 
@@ -14,21 +15,21 @@ export const metadata: Metadata = {
 export default function Membership() {
   return (
     <>
-      <FoundingSlot />
+      <Reveal><FoundingSlot /></Reveal>
 
-      <section className="bg-zinc-950 py-20 border-t border-white/5">
+      <section className="bg-rot-sunken py-20 border-t border-rot-line">
         <div className="max-w-3xl mx-auto px-6">
           <div className="text-center mb-8">
-            <div className="text-orange-500 font-bold tracking-widest text-sm mb-4">JUST THE ROOM</div>
+            <div className="text-rot-accent font-bold tracking-widest text-sm mb-4">JUST THE ROOM</div>
             <h2 className="text-3xl md:text-4xl font-black mb-3">Discord access on its own.</h2>
-            <p className="text-gray-400">
+            <p className="text-rot-muted">
               Want the community and the AI tutors without a cert track attached? This is that.
             </p>
           </div>
           <DiscordAccessCard />
-          <p className="text-gray-500 text-sm text-center mt-8">
+          <p className="text-rot-faint text-sm text-center mt-8">
             Looking for the full breakdown of what each tier includes?{" "}
-            <a href="/pricing" className="text-orange-400 underline underline-offset-2">See the pricing page →</a>
+            <a href="/pricing" className="text-rot-accent underline underline-offset-2">See the pricing page →</a>
           </p>
         </div>
       </section>
