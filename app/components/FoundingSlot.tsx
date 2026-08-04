@@ -19,17 +19,19 @@ export default function FoundingSlot() {
       .catch(() => setData(null));
   }, []);
 
-  const soldOut = !!data?.soldOut;
+  // Founding closed Jul 27 2026 and sold out (99 cap, 109 paid). Default to CLOSED
+  // rather than open: before this, a slow or failed /api/founding-count left the card
+  // rendering "Founding slots open" and "Final seat" directly above body copy saying
+  // founding is closed. Advertising seats that do not exist is the worse failure.
+  const soldOut = data ? !!data.soldOut : true;
   const left = typeof data?.spotsLeft === "number" ? data.spotsLeft : null;
-  // Founding is capped at 100 seats. The count still drives urgency copy, but it no
-  // longer switches the PRICE — $227/yr is the founding rate either way.
   const seatLine = soldOut
-    ? "Founding is full — join the waitlist for the next cohort."
-    : left === null
-    ? "Founding slots are open."
-    : left <= 1
+    ? "Founding is full — membership is open at the regular rate."
+    : left !== null && left <= 1
     ? "🔥 1 seat left — the very last founding member."
-    : `🔥 Only ${left} founding seats left before we close.`;
+    : left !== null
+    ? `🔥 Only ${left} founding seats left before we close.`
+    : "Founding slots are open.";
 
   return (
     <section id="founding" className="bg-black py-20 border-t border-white/5 scroll-mt-20">
@@ -38,7 +40,7 @@ export default function FoundingSlot() {
           <div className="inline-flex items-center gap-2 bg-orange-500/15 border border-orange-500/40 text-orange-400 text-sm font-bold px-4 py-1.5 rounded-full mb-4 uppercase tracking-wide">
             {soldOut ? "Founding full" : "Founding slots open"}
           </div>
-          <h2 className="text-4xl md:text-5xl font-black mb-3">Founding Membership</h2>
+          <h2 className="text-4xl md:text-5xl font-black mb-3">Founder Full Membership</h2>
           <p className="text-gray-400 text-lg">
             One year of full access — the community, the AI tutors, the quiz/study engine
             (Security+, ServiceNow CSA, AWS AI), weekly calls, and job drops.
@@ -47,7 +49,7 @@ export default function FoundingSlot() {
         </div>
 
         <div className="bg-zinc-900 border-2 border-orange-500/40 rounded-3xl p-8 md:p-10 text-center relative">
-          {!soldOut && (
+          {!soldOut && left !== null && left <= 1 && (
             <div className="absolute top-5 right-5 text-[11px] font-bold uppercase tracking-wider text-orange-400 bg-orange-500/10 border border-orange-500/30 px-3 py-1 rounded-full">
               Final seat
             </div>
