@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import CertRequest from "../components/CertRequest";
 import Offers from "../components/Offers";
 import { CERT_CATALOG } from "@/lib/pricing";
 
@@ -57,16 +58,19 @@ export default function Certifications() {
             ))}
           </div>
 
-          <div className="bg-zinc-900 border border-orange-500/30 rounded-2xl p-6 text-center">
-            <h3 className="text-xl font-bold mb-2">Don&apos;t see yours?</h3>
-            <p className="text-gray-400 text-sm mb-5 max-w-xl mx-auto">
-              Ask. If there&apos;s an online exam for it, we&apos;ll build you a track and quote
-              you a price. Pricing on these is per person — it depends on the voucher, the
-              timeline, and how much coaching you want.
-            </p>
-            <div className="flex flex-wrap gap-3 justify-center">
-              <a href="/help#agents" className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90">
-                Talk to the Cert Qualifier — free
+          <div className="bg-zinc-900 border border-orange-500/30 rounded-2xl p-6">
+            <div className="text-center mb-5">
+              <h3 className="text-xl font-bold mb-2">Don&apos;t see yours? Type it.</h3>
+              <p className="text-gray-400 text-sm max-w-xl mx-auto">
+                If there&apos;s an online exam for it, we&apos;ll build you a track and quote you
+                a price. Pricing on these is per person — it depends on the voucher, the
+                timeline, and how much coaching you want.
+              </p>
+            </div>
+            <CertRequest />
+            <div className="flex flex-wrap gap-3 justify-center mt-6 pt-6 border-t border-white/10">
+              <a href="/help#agents" className="px-6 py-3 border border-orange-500/40 text-orange-300 font-bold rounded-lg hover:bg-orange-500/10">
+                Or talk to the Cert Qualifier — free
               </a>
               <a href="/book" className="px-6 py-3 border border-white/20 rounded-lg hover:bg-white/5">
                 Book a coach

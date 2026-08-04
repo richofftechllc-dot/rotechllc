@@ -18,6 +18,7 @@ const SOURCES = [
   { collection: "interestedLeads", kind: "Interested", contact: "email" as const },
   { collection: "cohortWaitlist", kind: "Cohort waitlist", contact: "phone" as const },
   { collection: "aiWaitlist", kind: "AI waitlist", contact: "phone" as const },
+  { collection: "certRequests", kind: "Cert request", contact: "email" as const },
 ];
 
 export type Lead = {
@@ -27,6 +28,8 @@ export type Lead = {
   email: string;
   phone: string;
   cohort: string;
+  /** For certRequests: the cert they asked for. This is the demand signal. */
+  cert: string;
   createdAt: string;
   /** True once a customers doc exists for this email — they converted. */
   converted: boolean;
@@ -66,6 +69,7 @@ export async function GET(req: Request) {
           email,
           phone: String(v.phone || ""),
           cohort: String(v.cohort || ""),
+          cert: String(v.cert || ""),
           createdAt: String(v.createdAt || ""),
           converted: !!email && paidEmails.has(email),
         });
