@@ -72,6 +72,46 @@ export const CHECKOUT = {
   referralMonthly: "",
 } as const;
 
+// ─── CERTS ───────────────────────────────────────────────────────────────────
+// Price and URL together, for the same reason CHECKOUT above does it: they drift
+// the moment they live in different files. Aug 4 2026 — Square repriced the
+// catalog IN PLACE, so these URLs and their catalog item/variation ids are
+// unchanged and only the amounts moved.
+//
+// Square is the source of truth. If a number here and a number in Square
+// disagree, Square wins and this file is the bug.
+//
+// The bot mirrors these in prices.js SERVICES + AMOUNT_ROUTES. An amount that
+// exists here but not in AMOUNT_ROUTES takes the customer's money and provisions
+// nothing, so change them together.
+export const CERTS = {
+  securityPlus: { price: 1500, url: "https://square.link/u/0ChAU15t", name: "CompTIA Security+" },
+  csa: { price: 1600, url: "https://square.link/u/rdx2l5Vc", name: "ServiceNow CSA" },
+  discordAccess: { price: 375, url: "https://square.link/u/ThiCFqpM", name: "ROT Discord Access" },
+} as const;
+
+// ─── COACH INVOICE MENU ──────────────────────────────────────────────────────
+// FULL base prices a coach invoices from — they may apply a discount on top (the
+// bot enforces the $300 cap). Amounts are CENTS to match Square and the bot.
+//
+// This existed in THREE places that disagreed: app/admin/page.tsx said Security+
+// Essential was 150000, app/api/admin/assistant/route.ts said 85000, and the bot's
+// coachinvoice.js said 85000 — so which price a client got depended on whether the
+// coach clicked a button or asked Bo. One list now; the bot mirrors it in
+// prices.js SERVICES.
+//
+// HARD RULE: every amount here, AND that amount plus the 6% invoice surcharge,
+// must exist in the bot's AMOUNT_ROUTES. If it doesn't, the invoice is paid and
+// the buyer is provisioned nothing.
+export const COACH_SERVICES = [
+  { key: "sec-essential", label: "CompTIA Security+ — Essential (voucher + coaching)", amount: 150000 },
+  { key: "sec-selfguided", label: "CompTIA Security+ — Self-Guided (voucher + plan)", amount: 50000 },
+  { key: "csa-essential", label: "ServiceNow CSA — Essential", amount: 160000 },
+  { key: "csa-selfguided", label: "ServiceNow CSA — Self-Guided", amount: 60000 },
+  { key: "csa-accelerated", label: "ServiceNow CSA — Accelerated", amount: 280000 },
+  { key: "aws", label: "AWS Cloud Practitioner", amount: 100000 },
+] as const;
+
 export const CHECKOUT_LIVE = Boolean(CHECKOUT.yearly || CHECKOUT.monthly);
 export const REFERRAL_LIVE = Boolean(CHECKOUT.referralYearly || CHECKOUT.referralMonthly);
 
