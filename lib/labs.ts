@@ -390,6 +390,68 @@ export const LABS: Lab[] = [
       { title: "Write it as a finding", do: "Turn your weakest area into a five-part report finding: what it is, where (pick a realistic system), impact in business terms, proof concept, and the prioritized fix.", verify: "A non-technical reader could act on your finding." },
     ],
   },
+  // ── ACTIVE DIRECTORY: ATTACK & DEFENSE (ad) — own-lab domain ONLY.
+  // Every lab runs against the student's OWN isolated lab domain (built in the
+  // first lab) or a deliberately vulnerable practice range. NEVER a production or
+  // third-party domain. AD attacks against a domain you don't own are a serious
+  // crime — the authorization framing is deliberate and non-negotiable.
+  {
+    id: "ad-build-lab",
+    cert: "Active Directory",
+    domainId: "ad1",
+    coach: "flo",
+    title: "Stand up your own AD lab domain",
+    objective: "Build a tiny two-machine Active Directory domain in your isolated lab — the only place the rest of this track is allowed to run.",
+    est: "~45 min",
+    pdiUrl: "https://learn.microsoft.com/windows-server/identity/ad-ds/active-directory-domain-services",
+    envLabel: "AD DS overview (Microsoft docs)",
+    steps: [
+      { title: "Confirm isolation", do: "Work only inside your host-only lab from the Hacking track (or build one). Nothing here touches a network you don't own.", verify: "Your lab VMs cannot reach the public internet." },
+      { title: "Promote a Domain Controller", do: "Stand up a Windows Server VM and promote it to a Domain Controller for a new test domain (e.g. lab.local).", verify: "The DC role is installed and the domain exists." },
+      { title: "Join a client", do: "Join a Windows client VM to your test domain.", verify: "The client is a domain member and a domain user can log in on it." },
+      { title: "Create accounts", do: "Create two normal users and ONE service account. Give the service account a deliberately weak password — you'll attack and then fix it later.", verify: "Two users and one service account exist in the domain." },
+      { title: "Snapshot", do: "Snapshot both VMs clean so you can reset after each attack lab.", verify: "You have clean snapshots to roll back to." },
+      { title: "Write the scope", do: "Write a one-line RoE: in scope = these two VMs / this test domain; out of scope = everything else. Reaffirm you'll practise this on every future target.", verify: "You have a written scope, even for your own lab." },
+    ],
+  },
+  {
+    id: "ad-map-paths",
+    cert: "Active Directory",
+    domainId: "ad2",
+    coach: "bo",
+    title: "Map the attack paths in your lab domain",
+    objective: "From a low-privilege user, enumerate your OWN lab domain and graph at least one path toward a privileged account — the modern AD mindset, made visible.",
+    est: "~40 min",
+    pdiUrl: "https://attack.mitre.org/techniques/T1069/002/",
+    envLabel: "ATT&CK: Domain Group Discovery",
+    steps: [
+      { title: "Log in low", do: "From your attacker VM, authenticate as one of the NORMAL users you created — not an admin.", verify: "You're operating as a low-privilege domain user." },
+      { title: "Enumerate", do: "Enumerate the domain: users, groups (note who's privileged), computers, and the service account.", verify: "You have a list of users, groups and the service account." },
+      { title: "Read the ACLs", do: "Look at permissions — who can act on whom. Note anything where a low-priv account can affect a higher-priv one.", verify: "You've identified at least one interesting permission relationship." },
+      { title: "Graph it", do: "Run an attack-path mapping tool against your lab and generate the graph of routes toward privileged accounts.", verify: "You have a path graph of your lab domain." },
+      { title: "Find one path", do: "Identify at least one chain (even short) from a normal user toward a privileged account. Screenshot it.", verify: "You can describe a concrete path in 'A → B → C' terms." },
+      { title: "Write it up", do: "Describe the path in plain language and name which single link you'd break to kill it. That's a report finding.", verify: "A non-technical reader understands the path and the fix." },
+    ],
+  },
+  {
+    id: "ad-kerberoast-and-fix",
+    cert: "Active Directory",
+    domainId: "ad3",
+    coach: "bo",
+    title: "Kerberoast your lab — then defeat it",
+    objective: "Run the most important AD credential attack against your OWN service account, then apply the fix and prove it works. Attack and defense in one sitting.",
+    est: "~40 min",
+    pdiUrl: "https://attack.mitre.org/techniques/T1558/003/",
+    envLabel: "ATT&CK: Kerberoasting",
+    steps: [
+      { title: "Confirm the target is yours", do: "The only target is the service account YOU created in your lab domain. State it.", verify: "You can name the single in-scope service account." },
+      { title: "Request the ticket", do: "As a normal domain user, request the service ticket for your service account — normal, expected activity.", verify: "You've obtained the service ticket." },
+      { title: "Crack it offline", do: "Take the ticket to your attacker VM and crack the (deliberately weak) service-account password offline against a wordlist.", verify: "You recover the weak password — the attack works." },
+      { title: "Apply the fix", do: "Change the service account to a long random password, or convert it to a managed service account that rotates automatically.", verify: "The service account now has a strong/managed password." },
+      { title: "Prove the fix", do: "Repeat the request-and-crack against the new password and confirm it does NOT crack in any reasonable time.", verify: "The same attack now fails." },
+      { title: "Write both halves", do: "Document it as a finding: the attack (how, why it worked, business impact), then the fix and the proof it closed. Note the detection tell — a burst of service-ticket requests.", verify: "You have a complete attack-plus-remediation write-up." },
+    ],
+  },
 ];
 
 export function getLab(id: string | undefined): Lab | undefined {
