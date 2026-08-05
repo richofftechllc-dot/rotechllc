@@ -5261,6 +5261,482 @@ export const TRACKS: Track[] = [
         ]
       }
     ]
+  },
+  {
+    "id": "ad",
+    "name": "Active Directory",
+    "domains": [
+      {
+        "id": "ad1",
+        "name": "How AD Actually Works",
+        "questions": [
+          {
+            "q": "What is a Domain Controller?",
+            "options": [
+              "A firewall between domains",
+              "The server that runs the domain — holds the account database, checks logins, grants access",
+              "The most senior admin's workstation",
+              "A backup server for user files"
+            ],
+            "answer": 1,
+            "exp": "The DC runs the domain. It holds the database, authenticates users, and hands out access. Own a DC and you effectively own the domain — which is why they're the most protected machines in any network."
+          },
+          {
+            "q": "What is stored in the NTDS.dit file on a Domain Controller?",
+            "options": [
+              "Group Policy settings",
+              "Every account and every password hash in the domain",
+              "The Windows event logs",
+              "DNS records"
+            ],
+            "answer": 1,
+            "exp": "NTDS.dit is the crown jewel — every account and password hash in the domain. If an attacker reads it, the whole domain is compromised. Protecting the DCs that hold it is most of defending AD."
+          },
+          {
+            "q": "In Active Directory, what is the real security boundary?",
+            "options": [
+              "The domain",
+              "The forest",
+              "The organizational unit (OU)",
+              "The subnet"
+            ],
+            "answer": 1,
+            "exp": "The forest, not the domain, is the security boundary. Domains within a forest trust each other, so a compromise in one can often reach the others — a common surprise for people who assume the domain is the wall."
+          },
+          {
+            "q": "Almost every Active Directory attack ultimately aims to compromise which group?",
+            "options": [
+              "Remote Desktop Users",
+              "Domain Admins",
+              "Backup Operators",
+              "Authenticated Users"
+            ],
+            "answer": 1,
+            "exp": "Domain Admins control everything. Attackers don't try to 'hack the network' — they try to become Domain Admin, because that's effective ownership of every machine in the domain."
+          },
+          {
+            "q": "Why are service accounts a favorite target in AD attacks?",
+            "options": [
+              "They have MFA enabled",
+              "They're often over-privileged, rarely have MFA, and have weak passwords that never change",
+              "They cannot be enumerated",
+              "They only run on Domain Controllers"
+            ],
+            "answer": 1,
+            "exp": "Service accounts run software, not people. They tend to be over-privileged, exempt from MFA, and carry static weak passwords — the soft underbelly of the domain."
+          },
+          {
+            "q": "What does Kerberos issue that lets a user prove themselves once and reuse it?",
+            "options": [
+              "A password hash",
+              "A ticket (starting with a ticket-granting ticket, or TGT)",
+              "An NTLM challenge",
+              "A session cookie"
+            ],
+            "answer": 1,
+            "exp": "Kerberos is ticket-based: log in once, get a TGT, then use it to request tickets for specific services. Almost every AD attack is a clever abuse of how those tickets are issued, stored, or trusted."
+          },
+          {
+            "q": "Pass-the-hash attacks are possible because of which older authentication protocol?",
+            "options": [
+              "Kerberos",
+              "NTLM",
+              "LDAP",
+              "RADIUS"
+            ],
+            "answer": 1,
+            "exp": "NTLM authenticates with the password HASH, so an attacker never needs the plaintext — a stolen hash is enough to log in elsewhere. It survives for compatibility, and it's the reason pass-the-hash works."
+          },
+          {
+            "q": "An attacker gains control of a Domain Controller. What is the most accurate assessment?",
+            "options": [
+              "They can read one server's files",
+              "They effectively control the entire domain",
+              "They still need each user's password",
+              "They can only affect that DC"
+            ],
+            "answer": 1,
+            "exp": "The DC is the domain. Control it and you can read every hash, forge trust, and reach every joined machine. That's why 'protect the DCs and who can log into them' is the core of AD defense."
+          }
+        ]
+      },
+      {
+        "id": "ad2",
+        "name": "Domain Recon & Attack Paths",
+        "questions": [
+          {
+            "q": "After gaining one low-privilege domain user, what is the attacker's smartest FIRST move?",
+            "options": [
+              "Immediately attempt to become Domain Admin",
+              "Map the domain — users, groups, computers, service accounts, permissions",
+              "Delete the security logs",
+              "Install ransomware"
+            ],
+            "answer": 1,
+            "exp": "AD is generous with information to any authenticated user. Mapping before attacking reveals the paths — attacking blindly just makes noise and misses the route that was sitting right there."
+          },
+          {
+            "q": "Modern AD offense is described as finding a PATH rather than a vulnerability. What does that mean?",
+            "options": [
+              "Finding an unpatched CVE",
+              "Chaining permissions and access — e.g. reset a password → that account is admin on a server → a Domain Admin is logged into it",
+              "Scanning for open ports",
+              "Cracking the Administrator password directly"
+            ],
+            "answer": 1,
+            "exp": "Attack-path mapping graphs 'who can reach Domain Admin, and how.' A secure-looking domain often has a three-hop chain of legitimate permissions leading to full compromise. You find the path, not a bug."
+          },
+          {
+            "q": "Which piece of AD recon data is the 'hidden map' where many modern attacks live?",
+            "options": [
+              "Open ports",
+              "Permissions (ACLs) — who can do what to whom",
+              "DNS records",
+              "Patch levels"
+            ],
+            "answer": 1,
+            "exp": "ACLs are the quiet map. If a low-priv account can reset a privileged account's password or add itself to a group, that's a domination path with no exploit — just misconfigured trust that only shows up when you graph permissions."
+          },
+          {
+            "q": "Why should DEFENDERS run the same attack-path mapping tools attackers use?",
+            "options": [
+              "To attack other companies",
+              "The attacker's map and the defender's map are the same — see the path first and break a link",
+              "It's required for compliance",
+              "To generate more alerts"
+            ],
+            "answer": 1,
+            "exp": "If you can see the three-hop path to Domain Admin before the attacker does, you can cut one link and close it. Same tool, same graph — used to harden instead of exploit."
+          },
+          {
+            "q": "How much domain information can a typical authenticated low-privilege user read?",
+            "options": [
+              "Almost nothing",
+              "A large amount — users, groups, computers, service accounts, trusts",
+              "Only their own account",
+              "Only what an admin explicitly shares"
+            ],
+            "answer": 1,
+            "exp": "AD is designed to be queryable, so any authenticated user can enumerate huge amounts of structure. That's why a single low-priv foothold is so valuable — it unlocks the whole map."
+          },
+          {
+            "q": "What does 'enumerate the domain trusts' help an attacker understand?",
+            "options": [
+              "Which users trust each other",
+              "How this domain relates to others and whether a path leads across them",
+              "The password policy",
+              "The backup schedule"
+            ],
+            "answer": 1,
+            "exp": "Trusts define relationships between domains/forests. Since the forest is the real boundary, mapping trusts shows whether compromising one domain opens a route into another."
+          },
+          {
+            "q": "A path-mapping graph shows your low-priv user can reset a help-desk account's password, and that account is local admin on a server where a Domain Admin session exists. What is this?",
+            "options": [
+              "A false positive",
+              "A viable privilege-escalation path to Domain Admin",
+              "A normal, safe configuration",
+              "An NTLM relay"
+            ],
+            "answer": 1,
+            "exp": "That's a textbook chain: password reset → admin on the box → steal the Domain Admin's session/ticket. Three legitimate permissions combine into total compromise. Break any single link and the path dies."
+          },
+          {
+            "q": "What's the defender's takeaway from attack-path mapping their own domain?",
+            "options": [
+              "Buy more endpoint tools",
+              "Identify and break the shortest chains to privileged accounts, shrinking the graph",
+              "Disable all service accounts",
+              "Rotate the KRBTGT key daily"
+            ],
+            "answer": 1,
+            "exp": "The goal is fewer and longer paths to Domain Admin. Removing dangerous ACLs, fixing over-privileged accounts, and controlling where admins log in all cut links out of the graph."
+          }
+        ]
+      },
+      {
+        "id": "ad3",
+        "name": "Credential & Kerberos Attacks",
+        "questions": [
+          {
+            "q": "Kerberoasting works because:",
+            "options": [
+              "The DC stores plaintext passwords",
+              "Any user can request a service ticket that's partly encrypted with the service account's password hash",
+              "NTLM is disabled",
+              "MFA is bypassed"
+            ],
+            "answer": 1,
+            "exp": "It abuses a feature: any user can request a service ticket, and it's encrypted with the service account's hash. Take it offline, crack the (often weak, never-expiring) password, and you have real credentials — quietly."
+          },
+          {
+            "q": "What makes Kerberoasting especially hard to notice?",
+            "options": [
+              "It crashes the DC",
+              "The request looks like normal activity; the cracking happens offline on the attacker's hardware",
+              "It requires Domain Admin first",
+              "It triggers an MFA prompt"
+            ],
+            "answer": 1,
+            "exp": "Requesting a service ticket is completely normal behavior. The attack — cracking the hash — happens offline where nobody's watching. That's why strong service-account passwords matter so much."
+          },
+          {
+            "q": "AS-REP roasting targets accounts that have which setting?",
+            "options": [
+              "MFA enabled",
+              "Kerberos pre-authentication disabled",
+              "A weak lockout policy",
+              "Delegation enabled"
+            ],
+            "answer": 1,
+            "exp": "Accounts with pre-auth off hand out a crackable blob to anyone who asks — no foothold even required. Re-enabling pre-authentication is the direct fix."
+          },
+          {
+            "q": "In a pass-the-hash attack, what does the attacker use to authenticate?",
+            "options": [
+              "The plaintext password",
+              "The password hash itself, via NTLM",
+              "A Kerberos golden ticket",
+              "A smart card"
+            ],
+            "answer": 1,
+            "exp": "NTLM accepts the hash in place of the plaintext, so a stolen hash logs the attacker in as that user on other systems — no cracking required. Modern credential protections and reducing NTLM shut this down."
+          },
+          {
+            "q": "What is the single best defense against Kerberoasting?",
+            "options": [
+              "Disabling Kerberos",
+              "Long random service-account passwords, or managed accounts that rotate automatically",
+              "Blocking all service tickets",
+              "Enabling AS-REP"
+            ],
+            "answer": 1,
+            "exp": "If the service-account password is long and random (or auto-rotated by a managed service account), the offline crack fails in any realistic time. That directly defeats the attack."
+          },
+          {
+            "q": "Pass-the-ticket differs from pass-the-hash in that the attacker replays:",
+            "options": [
+              "A cracked password",
+              "A Kerberos ticket stolen from memory",
+              "An NTLM hash",
+              "A Group Policy object"
+            ],
+            "answer": 1,
+            "exp": "Pass-the-ticket steals an actual Kerberos ticket from a machine's memory and replays it — becoming whoever's ticket it was, with no password at all. Keeping privileged tickets off reachable machines is the counter."
+          },
+          {
+            "q": "Why are service accounts the 'soft underbelly' for these attacks?",
+            "options": [
+              "They're always Domain Admins",
+              "Weak passwords that rarely change + broad privileges make them ideal Kerberoasting targets",
+              "They can't be enumerated",
+              "They use MFA"
+            ],
+            "answer": 1,
+            "exp": "A weak, static service-account password is exactly what makes an offline crack succeed, and the account's broad rights make the payoff huge. Fix service accounts first in most domains."
+          },
+          {
+            "q": "A domain has many service accounts with weak passwords. As a defender, you should:",
+            "options": [
+              "Enable AS-REP roasting to test them",
+              "Prioritize rotating them to long random or managed passwords before other hardening",
+              "Delete all service accounts",
+              "Ignore it if MFA is on for users"
+            ],
+            "answer": 1,
+            "exp": "Weak service-account passwords are the highest-likelihood Kerberoasting win in the domain. Understanding the attack is exactly what tells you this is the first thing to fix, not the tenth."
+          }
+        ]
+      },
+      {
+        "id": "ad4",
+        "name": "Escalation & Domain Domination",
+        "questions": [
+          {
+            "q": "DCSync abuses which legitimate AD feature?",
+            "options": [
+              "Group Policy refresh",
+              "Domain replication — asking a DC for password data as if you were another DC",
+              "DNS zone transfer",
+              "Certificate enrollment"
+            ],
+            "answer": 1,
+            "exp": "With the right replication rights, an attacker asks a DC to hand over password hashes 'as if' they were a peer DC — pulling any account's hash without ever logging into the DC. The fix is tightly controlling who holds replication rights."
+          },
+          {
+            "q": "A golden ticket is possible when an attacker steals which account's key?",
+            "options": [
+              "The Administrator account",
+              "The KRBTGT account — the key that signs all Kerberos tickets",
+              "A Domain Admin's user password",
+              "The DNS service account"
+            ],
+            "answer": 1,
+            "exp": "The KRBTGT hash signs every Kerberos ticket. Steal it and you can forge tickets for anyone, with any privileges, that the domain will trust — the closest thing AD has to a skeleton key."
+          },
+          {
+            "q": "Why are golden-ticket compromises so hard to fully recover from?",
+            "options": [
+              "The DC must be rebuilt from scratch",
+              "Resetting user passwords doesn't help — you must rotate the KRBTGT key (twice), which few orgs have done",
+              "Kerberos must be disabled permanently",
+              "All users must re-enroll MFA"
+            ],
+            "answer": 1,
+            "exp": "Because the forged tickets are signed by the master key, only rotating KRBTGT (twice, correctly) evicts the attacker. Password resets alone don't touch it — which is why AD incidents are so brutal."
+          },
+          {
+            "q": "A silver ticket differs from a golden ticket in that it is:",
+            "options": [
+              "More powerful",
+              "Narrower — a forged ticket for one specific service, quieter and more targeted",
+              "Only usable by Domain Admins",
+              "Signed by the DNS server"
+            ],
+            "answer": 1,
+            "exp": "A silver ticket forges access to a single service rather than the whole domain. It's stealthier and more surgical — useful when an attacker wants to stay quiet on one target."
+          },
+          {
+            "q": "ACL abuse leads to domain domination with:",
+            "options": [
+              "A zero-day exploit",
+              "No exploit at all — just misconfigured permissions, e.g. a low-priv account that can reset a privileged one",
+              "A cracked KRBTGT key",
+              "A DDoS attack"
+            ],
+            "answer": 1,
+            "exp": "ACL abuse is pure misconfiguration. If permissions let a weak account reset a strong account's password or add itself to a group, that's a path to domination with nothing to 'exploit' — which is why auditing ACLs matters."
+          },
+          {
+            "q": "Kerberos delegation, when misconfigured, allows an attacker to:",
+            "options": [
+              "Disable Kerberos",
+              "Impersonate high-privilege users to reach systems they shouldn't",
+              "Read NTDS.dit directly",
+              "Reset the KRBTGT key"
+            ],
+            "answer": 1,
+            "exp": "Delegation lets a service act on a user's behalf. Misconfigured, it becomes an impersonation primitive — a well-known escalation path that defenders must specifically hunt for and lock down."
+          },
+          {
+            "q": "Most domination techniques share which prerequisite that defenders can attack?",
+            "options": [
+              "An open internet port",
+              "A highly privileged credential or a dangerous permission obtained first",
+              "A disabled firewall",
+              "An unpatched web server"
+            ],
+            "answer": 1,
+            "exp": "DCSync, golden tickets, delegation abuse — they nearly all need a privileged credential or dangerous right first. Deny that (tiering, least privilege, clean ACLs) and most of the endgame becomes unreachable."
+          },
+          {
+            "q": "An attacker has obtained the KRBTGT hash. The correct eviction step is:",
+            "options": [
+              "Reset the compromised user's password",
+              "Rotate the KRBTGT account password twice, following the proper procedure",
+              "Reboot all Domain Controllers",
+              "Disable NTLM"
+            ],
+            "answer": 1,
+            "exp": "Only a (double) KRBTGT rotation invalidates the forged golden tickets. It's a delicate procedure most orgs have never practiced — which is exactly why knowing it sets you apart on an IR team."
+          }
+        ]
+      },
+      {
+        "id": "ad5",
+        "name": "Defending Active Directory",
+        "questions": [
+          {
+            "q": "What is the single highest-value control for defending Active Directory?",
+            "options": [
+              "Antivirus on every host",
+              "Tiered administration — keeping Domain Admin credentials off regular workstations",
+              "A stronger perimeter firewall",
+              "Daily full backups"
+            ],
+            "answer": 1,
+            "exp": "Nearly every catastrophic AD breach ends with a Domain Admin credential sitting on a machine the attacker reached. If the powerful ticket is never on that machine, it can't be stolen. Tiering removes the most common path to total compromise."
+          },
+          {
+            "q": "Randomizing the LOCAL administrator password on every machine primarily stops:",
+            "options": [
+              "Kerberoasting",
+              "One cracked local-admin password unlocking every machine (a key lateral-movement path)",
+              "Golden tickets",
+              "AS-REP roasting"
+            ],
+            "answer": 1,
+            "exp": "When every machine shares a local-admin password, one crack owns them all. Randomizing per machine (with automatic management) kills that lateral-movement shortcut."
+          },
+          {
+            "q": "Which detection signal suggests a possible DCSync attack?",
+            "options": [
+              "A user logging in during business hours",
+              "Replication requests coming from a machine that is NOT a Domain Controller",
+              "A failed password attempt",
+              "A new file share being created"
+            ],
+            "answer": 1,
+            "exp": "Only DCs should replicate directory data. Replication requested by a non-DC is a strong DCSync indicator — a specific, monitorable tell that comes directly from understanding the attack."
+          },
+          {
+            "q": "A sudden flood of service-ticket requests from one user is a possible sign of:",
+            "options": [
+              "A golden ticket",
+              "Kerberoasting",
+              "Pass-the-hash",
+              "An ACL misconfiguration"
+            ],
+            "answer": 1,
+            "exp": "Kerberoasting means requesting service tickets to crack offline. An unusual burst of service-ticket requests from a single account is the behavioral tell — you can't detect it if you don't know the attack."
+          },
+          {
+            "q": "Managed service accounts (with automatic password rotation) primarily defend against:",
+            "options": [
+              "Golden tickets",
+              "Kerberoasting",
+              "DCSync",
+              "NTLM relay"
+            ],
+            "answer": 1,
+            "exp": "Automatic long random rotation makes the offline crack central to Kerberoasting fail. It's the cleanest fix for the service-account weakness that Kerberoasting depends on."
+          },
+          {
+            "q": "Why does studying AD ATTACKS make someone a better AD defender?",
+            "options": [
+              "It doesn't; defense is separate",
+              "Knowing what the attacker reaches for first tells you which controls to prioritize",
+              "It's only useful for red teams",
+              "Attacks and defenses are unrelated in AD"
+            ],
+            "answer": 1,
+            "exp": "Red-informs-blue is strongest in AD. Because you've seen the attacker go straight for weak service accounts and exposed Domain Admin tickets, you know to fix those first instead of working a generic checklist."
+          },
+          {
+            "q": "Least privilege and clean ACLs defend AD primarily by:",
+            "options": [
+              "Speeding up logins",
+              "Removing the permission-based paths attackers chain toward Domain Admin",
+              "Encrypting the NTDS.dit file",
+              "Disabling Kerberos"
+            ],
+            "answer": 1,
+            "exp": "Most escalation paths are chains of excessive permissions. Trimming rights and fixing dangerous ACLs deletes links out of the attack graph, so fewer (and longer) routes to domination remain."
+          },
+          {
+            "q": "You find a Domain Admin regularly logs into ordinary user workstations. The right guidance is:",
+            "options": [
+              "It's fine if the workstations have antivirus",
+              "Stop it — their ticket can be stolen from any machine they touch; restrict admin logons to hardened admin systems",
+              "Give the workstations more RAM",
+              "Enable AS-REP for those accounts"
+            ],
+            "answer": 1,
+            "exp": "A Domain Admin ticket on a regular workstation is exactly what pass-the-ticket and credential theft prey on. Restricting where privileged accounts log in (tiering) removes the single most exploited AD weakness."
+          }
+        ]
+      }
+    ]
   }
 ];
 
@@ -5292,4 +5768,9 @@ export const LESSONS: Record<string, string> = {
   "hk3": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>How access actually happens, and what an attacker does once inside. Forget exotic — initial access comes through a handful of boring doors, and the real danger is what comes after the first machine falls.</p><h3>🔑 KEY CONCEPTS IN BO &amp; FLO TERMS</h3><ul><li><strong>The boring doors</strong> (Bo) — weak/reused credentials, unpatched known flaws, misconfigurations, phishing, exposed secrets. Not zero-days.</li><li><strong>Privilege escalation</strong> (Bo) — low-privilege user → admin/root on the machine you're on. Usually a misconfig: root-level service you can influence, loose file permission, hijackable scheduled task, unpatched local flaw.</li><li><strong>Lateral movement</strong> (Bo) — using the box you own to reach the next one, usually with credentials found on the first.</li><li><strong>Persistence &amp; exfiltration</strong> (Flo) — keeping access and taking data. On an authorized test you usually PROVE you could, you don't actually do it.</li><li><strong>Flat network</strong> (Bo) — no segmentation, so one box reaches all boxes. The attacker's best friend.</li><li><strong>The defender's priority list</strong> (Flo) — every 'way in' maps to a control, and the top ones stop the most for the least money.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Believing intrusions need zero-days. They almost never do.</li><li>Thinking 'getting in' is the goal. It's step one; the objective is usually elsewhere.</li><li>On an engagement, actually exfiltrating or leaving backdoors instead of proving impact.</li><li>Defenders focusing all spend on the perimeter — once the attacker's inside, the perimeter is behind them.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Boring doors: creds, patches, misconfigs, phishing, exposed secrets</li><li>Privilege escalation = get bigger on this box</li><li>Lateral movement = reach the next box (usually with found creds)</li><li>Flat network = one box owns all boxes</li><li>Segmentation + least privilege contain the after-access game</li><li>On a test: prove you could, don't actually do it</li></ul><h3>💼 REAL WORLD</h3><p>You phish one low-level employee and land on their laptop — low privilege, one machine, seemingly nothing. But a local misconfiguration lets you escalate to admin, and in memory you find cached credentials for a service account. Those creds work on the file server, which isn't segmented from the domain controller. Twenty minutes after one click, you can reach everything. Every step was a control the blue team could have placed — and that's exactly what your report will say.</p>",
   "hk4": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>Credentials — the attacker's real prize. If you take one thing from this whole track: attacks run on credentials. A valid login is worth more than most exploits because it makes the attacker look like a legitimate user. This module is also the most important one for defenders.</p><h3>🔑 KEY CONCEPTS IN BO &amp; FLO TERMS</h3><ul><li><strong>Why creds win</strong> (Bo) — a stolen login walks the front door looking legitimate, which is exactly why it's hard to detect.</li><li><strong>Credential dumping</strong> (Bo) — reading cached credentials from the memory of a machine you have admin on. Defense: least privilege + detecting the dumping tools.</li><li><strong>Credential stuffing / reuse</strong> (Bo) — one breached password tried everywhere. Defense: unique passwords, a manager, MFA.</li><li><strong>Interception</strong> (Bo) — capturing credentials in transit on an unencrypted or poorly segmented network.</li><li><strong>Exposed secrets</strong> (Bo) — API keys and passwords in code, configs, shared docs. Credentials on the ground.</li><li><strong>MFA</strong> (Flo) — turns a stolen password into just a string. The single most effective control here.</li><li><strong>Least privilege</strong> (Flo) — so a dumped credential doesn't own the whole domain.</li><li><strong>Red informs blue</strong> (Flo) — understanding how theft works is what lets you rank the defenses.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Chasing exploits while ignoring that credentials are the actual currency.</li><li>Relying on password complexity alone. Length doesn't stop reuse, dumping, or interception.</li><li>Skipping MFA 'for convenience' on any account that matters.</li><li>Leaving secrets in code with no scanning or rotation.</li><li>Handing broad admin rights out freely — that's what makes dumping devastating.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Attacks run on credentials</li><li>Dumping = read cached creds (needs admin) → least privilege breaks it</li><li>Stuffing = reuse → unique passwords + MFA</li><li>Interception = weak encryption/segmentation</li><li>Exposed secrets = scan the pipeline + rotate keys</li><li>MFA turns a stolen password into a useless string</li></ul><h3>💼 REAL WORLD</h3><p>A breach report lands: attacker got one password from a phishing email, and because that account had admin on a shared server, they dumped a dozen more credentials from memory and spread across a flat network. Nothing exotic — one password and a series of missing controls. The fix list writes itself: MFA everywhere, least privilege so one account can't dump the rest, segmentation, and monitoring for the dumping behaviour. Studying the attack is what let you rank that list in the right order.</p>",
   "hk5": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>The tooling landscape and the report — the two things beginners get backwards. Tools are categories to understand, not names to memorize. And the report is the actual product: red exists to make blue better.</p><h3>🔑 KEY CONCEPTS IN BO &amp; FLO TERMS</h3><ul><li><strong>Categories over tools</strong> (Bo) — recon, scanners, vuln scanners, web proxies, exploitation frameworks, password/hash tools, post-exploitation/C2, reporting. The job is durable; the specific tool changes every couple of years.</li><li><strong>Vuln scanner vs port scanner</strong> (Bo) — port scanner finds doors and versions; vuln scanner matches versions against known-vuln databases at scale.</li><li><strong>The report is the product</strong> (Flo) — the client pays for what's wrong, how bad, and how to fix it — not for the fact you got in.</li><li><strong>Impact in business terms</strong> (Flo) — 'an attacker could read every customer record' beats 'CVSS 8.1' every time.</li><li><strong>The five-part finding</strong> (Flo) — what it is, where, impact, proof, the fix.</li><li><strong>Red informs blue</strong> (Flo) — blue teamers study red tooling so they can recognize the scan pattern, the cracking attempt, the C2 beacon in their logs.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Memorizing one tool by rote and freezing when the shop uses a different one.</li><li>Confusing a port scan with a vulnerability scan.</li><li>Skipping the report because the hack was the fun part. The report is the paid part.</li><li>Writing impact as a raw score instead of a business consequence.</li><li>Proof that doubles as a how-to for a criminal — show reproducibility, not a weaponized recipe.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Learn the category, then any tool in it</li><li>Port scanner = doors/versions | Vuln scanner = match vs known CVEs</li><li>The report IS the product</li><li>Impact in business terms, not a score</li><li>Finding = what · where · impact · proof · fix</li><li>Blue studies red tooling to detect it</li></ul><h3>💼 REAL WORLD</h3><p>Two testers find the same flaw. The first writes 'RCE, CVSS 9.8, exploit succeeded' and moves on. The second writes: here's the system, here's what an unauthenticated attacker could do to your customer data, here's proof we could reproduce it, and here's the specific prioritized fix your team can ship this sprint. Same finding. The second tester's client renews the contract — because the report, not the hack, was what they were paying for.</p>",
+  "ad1": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>The ground truth of Active Directory — the model every attack and defense depends on. Most people who 'know AD' can add a user and nothing more. This is the mental model that makes the rest click.</p><h3>🔑 KEY CONCEPTS IN BO &amp; FLO TERMS</h3><ul><li><strong>Domain</strong> (Bo) — users, computers and resources under one roof, sharing one identity database.</li><li><strong>Domain Controller (DC)</strong> (Bo) — the server that runs the domain. Own it, own everything.</li><li><strong>Forest</strong> (Flo) — one or more trusting domains. The forest, not the domain, is the real security boundary.</li><li><strong>NTDS.dit</strong> (Flo) — the DC's database of every account and password hash. The crown jewel. Read it and it's over.</li><li><strong>Kerberos</strong> (Bo) — ticket-based auth. Log in once, get a TGT, reuse it for services. Source of most AD attacks.</li><li><strong>NTLM</strong> (Bo) — the older, weaker protocol behind pass-the-hash. Authenticates with the hash, not the plaintext.</li><li><strong>Service accounts</strong> (Bo) — accounts that run software. Over-privileged, no MFA, weak static passwords. The favorite target.</li><li><strong>Domain Admin</strong> (Bo) — controls everything; the goal of nearly every attack.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Thinking the domain is the security boundary. The forest is.</li><li>Not knowing what NTDS.dit is — every 'how'd they own everything?' story ends there.</li><li>Treating service accounts like normal accounts. They're the soft underbelly.</li><li>Trying to 'hack the network' instead of aiming at Domain Admin.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>DC runs the domain · own it = own everything</li><li>NTDS.dit = all accounts + all hashes = crown jewel</li><li>Forest = the real security boundary</li><li>Kerberos = tickets (TGT then service tickets) · NTLM = hash-based, weaker</li><li>Service accounts = over-privileged, no MFA, weak passwords</li><li>The goal is always Domain Admin</li></ul><h3>💼 REAL WORLD</h3><p>An attacker phishes one employee and lands as a nobody user. Useless? No — because AD is one giant shared identity system, that foothold lets them read the whole map, hunt weak service accounts, and start chaining toward Domain Admin. Understanding that AD is ONE connected kingdom, not a pile of separate machines, is what turns 'I got a low-priv user' into 'I own the company.' Same understanding tells the defender why that one phished user matters so much.</p>",
+  "ad2": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>Recon inside the domain, and the modern AD mindset: you don't hunt vulnerabilities, you hunt PATHS. One low-priv foothold plus AD's generous readability equals a full map of how to reach Domain Admin.</p><h3>🔑 KEY CONCEPTS IN BO &amp; FLO TERMS</h3><ul><li><strong>Domain enumeration</strong> (Bo) — any authenticated user can read users, groups, computers, service accounts and trusts.</li><li><strong>ACLs — the hidden map</strong> (Bo) — who can do what to whom. Where modern AD attacks live.</li><li><strong>Attack-path mapping</strong> (Bo) — graph the domain into 'who can reach Domain Admin, and how.' Reveals chains a secure-looking domain hides.</li><li><strong>The path, not the bug</strong> (Bo) — reset a password → that account is admin on a server → a Domain Admin is logged in there. Three legit permissions = game over.</li><li><strong>Trusts</strong> (Bo) — how domains relate; whether a path crosses into another domain/forest.</li><li><strong>Defenders map too</strong> (Flo) — the attacker's map and yours are identical. See the path first, break a link, close it.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Attacking before mapping — noise, and you miss the easy path.</li><li>Thinking in single vulnerabilities instead of chained permissions.</li><li>Ignoring ACLs because they're not a 'vuln.' They're where domination hides.</li><li>Defenders never running path-mapping on their own domain.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>One foothold → map everything (AD is generous to authenticated users)</li><li>ACLs = the hidden map</li><li>Find the PATH to Domain Admin, not a bug</li><li>Classic chain: password reset → local admin → steal DA ticket</li><li>Defenders: run the same graph, break the shortest chains</li></ul><h3>💼 REAL WORLD</h3><p>A red teamer lands one help-desk account. Path mapping shows: this account can reset passwords for a group that's local admin on the finance server, and a Domain Admin logs into that server nightly. No exploit anywhere — just permissions nobody audited. Three hops to total compromise. The blue team, running the same tool the week before, could have seen the exact same chain and cut the middle link. Same graph, opposite outcomes.</p>",
+  "ad3": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>The heart of AD offense: credential and Kerberos attacks. Every one abuses something AD does BY DESIGN — that's what makes them so effective and so quiet. Service accounts are the recurring victim.</p><h3>🔑 KEY CONCEPTS IN BO &amp; FLO TERMS</h3><ul><li><strong>Kerberoasting</strong> (Bo) — any user requests a service ticket encrypted with the service account's hash, then cracks it OFFLINE. Weak, never-expiring service passwords make it lethal.</li><li><strong>AS-REP roasting</strong> (Bo) — accounts with pre-authentication OFF hand out a crackable blob to anyone. No foothold required.</li><li><strong>Pass-the-hash</strong> (Bo) — NTLM accepts the hash instead of the plaintext. A stolen hash logs you in elsewhere.</li><li><strong>Pass-the-ticket</strong> (Bo) — steal a Kerberos ticket from memory and replay it. Become someone with no password at all.</li><li><strong>Offline = invisible</strong> (Bo) — requesting a ticket looks normal; the cracking happens on the attacker's hardware where nobody watches.</li><li><strong>The fixes</strong> (Flo) — long random / managed service-account passwords, re-enable pre-auth, modern credential protections, reduce NTLM.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Assuming these are 'bugs' to patch. They're features being abused — you fix them with configuration, not updates.</li><li>Leaving service-account passwords weak and static. That's the Kerberoasting jackpot.</li><li>Leaving pre-authentication disabled on any account.</li><li>Relying on plaintext-password defenses when the attacks use hashes and tickets directly.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Kerberoast = crack service-account password offline (quiet)</li><li>AS-REP roast = pre-auth off = free crackable blob</li><li>Pass-the-hash = NTLM, use the hash not the password</li><li>Pass-the-ticket = steal + replay a Kerberos ticket</li><li>Fix service accounts FIRST: long random or managed passwords</li></ul><h3>💼 REAL WORLD</h3><p>A pentester, as a normal user, requests service tickets for every service account in the domain — totally routine traffic. They walk out with the tickets and crack them at home overnight. Three service accounts had weak passwords set years ago and never changed; one is a local admin everywhere. Monday morning they have powerful credentials and the domain never logged anything alarming. The fix the report leads with? Rotate those service accounts to managed, auto-rotating passwords — and the whole attack dies.</p>",
+  "ad4": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>The endgame — turning good credentials into total control of the domain. These are the marquee techniques, and the module that explains why AD breaches are so devastating to recover from.</p><h3>🔑 KEY CONCEPTS IN BO &amp; FLO TERMS</h3><ul><li><strong>DCSync</strong> (Bo) — abuse replication to ask a DC for password hashes AS IF you were another DC. Pull any account's hash without logging into the DC.</li><li><strong>Golden ticket</strong> (Bo) — steal the KRBTGT key (signs all tickets) and forge tickets for anyone, any privilege, that the domain trusts. AD's skeleton key.</li><li><strong>Silver ticket</strong> (Bo) — a narrower forgery for one specific service. Quieter, surgical.</li><li><strong>Delegation abuse</strong> (Bo) — misconfigured Kerberos delegation becomes an impersonation primitive for high-priv users.</li><li><strong>ACL abuse</strong> (Bo) — no exploit at all; a low-priv account that can reset a privileged one is a domination path.</li><li><strong>The KRBTGT recovery problem</strong> (Flo) — golden tickets survive password resets. Only a double KRBTGT rotation evicts the attacker, and most orgs have never done it.</li><li><strong>The shared prerequisite</strong> (Flo) — nearly all of these need a privileged credential or dangerous right FIRST. Deny that and the endgame is unreachable.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Believing a password reset evicts an attacker who has the KRBTGT key. It doesn't.</li><li>Ignoring ACL abuse because it isn't a 'real exploit.' It's the quietest path to Domain Admin.</li><li>Handing out replication rights or delegation without auditing them.</li><li>Not knowing the KRBTGT double-rotation procedure before you need it in an incident.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>DCSync = pull hashes by pretending to be a DC</li><li>Golden ticket = KRBTGT key stolen = forge any ticket</li><li>Silver ticket = forged access to one service (stealthy)</li><li>Delegation abuse = impersonate high-priv users</li><li>ACL abuse = domination with no exploit</li><li>Golden ticket recovery = rotate KRBTGT TWICE</li><li>Deny the first privileged credential and most of this dies</li></ul><h3>💼 REAL WORLD</h3><p>An incident responder walks into a company that 'reset all the passwords' after a breach and is still getting owned. The cause: months earlier the attacker grabbed the KRBTGT key and has been forging golden tickets ever since. Password resets never touched it. Real eviction means the delicate double KRBTGT rotation — a procedure the org had never practiced. This is why AD compromise is a nightmare, and why knowing that one recovery step makes you invaluable on an IR team.</p>",
+  "ad5": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>All of it, collapsed into a defensive priority list. This is the module that pays a blue-team salary — and it lands harder because you've now seen what the attacker reaches for first.</p><h3>🔑 KEY CONCEPTS IN BO &amp; FLO TERMS</h3><ul><li><strong>Tiered administration</strong> (Flo) — keep Domain Admin credentials off regular workstations. The single highest-value AD control. No powerful ticket on the reachable machine = nothing to steal.</li><li><strong>Least privilege + clean ACLs</strong> (Flo) — deletes the permission chains attackers graph toward Domain Admin.</li><li><strong>Managed service accounts</strong> (Flo) — auto-rotating long random passwords defeat Kerberoasting.</li><li><strong>Local admin password randomization</strong> (Flo) — stops one cracked local password owning every machine.</li><li><strong>Detection tells</strong> (Flo) — replication from a non-DC (DCSync), a burst of service-ticket requests (Kerberoasting), abnormal ticket use.</li><li><strong>Red informs blue</strong> (Bo) — you know which control matters most because you've seen the attack order.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Letting Domain Admins log into ordinary workstations. The most exploited weakness there is.</li><li>Working a generic hardening checklist instead of fixing what attackers hit first.</li><li>No logging for the specific tells — you can't detect what you don't know to watch for.</li><li>Sharing one local-admin password across the fleet.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Tiered admin = #1 control (keep DA tickets off normal machines)</li><li>Least privilege + clean ACLs = fewer paths</li><li>Managed service accounts = kills Kerberoasting</li><li>Randomize local admin passwords = kills that lateral path</li><li>Watch: non-DC replication, service-ticket floods, weird tickets</li><li>You prioritize better because you know the attack order</li></ul><h3>💼 REAL WORLD</h3><p>Two companies, same attacker. The first lets Domain Admins log in everywhere, has weak service accounts, and no unusual-ticket alerting — the attacker is Domain Admin within a day and stays for months. The second uses tiered admin (DA credentials never touch normal machines), managed service accounts, and alerts on non-DC replication — the attacker gets one low-priv foothold, can't find a ticket worth stealing, trips a DCSync alert on the first escalation attempt, and gets evicted the same afternoon. Same tradecraft. The difference was three controls, prioritized by understanding the offense.</p>",
 };

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Active Directory: Attack &amp; Defense — Rich Off Tech</title>
+<style>
+  :root{--ink:#151515;--muted:#5f5c58;--brown:#6b4226;--line:#e6e3df;--soft:#faf7f4;--gold:#b8862f;--warn:#a4530b}
+  *{box-sizing:border-box}body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);line-height:1.6}
+  .wrap{max-width:820px;margin:0 auto;padding:0 20px 60px}
+  header{border-bottom:3px solid var(--ink);padding:24px 0 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+  .logo{font-weight:800;letter-spacing:.04em;font-size:18px}.logo b{color:var(--brown)}
+  .updated{font-size:12px;color:var(--muted);font-family:monospace}
+  h1{font-size:clamp(26px,5vw,40px);margin:20px 0 6px;letter-spacing:-.02em}
+  .lede{color:var(--muted);font-size:16px;margin:0 0 8px}
+  h2{font-size:22px;margin:40px 0 8px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 6px}
+  table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:14.5px;margin:12px 0}
+  th,td{text-align:left;padding:10px 14px;border-top:1px solid var(--line);vertical-align:top}
+  thead th{background:var(--soft);border-top:none;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  ul,ol{margin:6px 0;padding-left:20px}li{margin-bottom:6px}
+  a{color:var(--brown)}b{color:var(--ink)}code{background:var(--soft);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:13px}
+  .tag{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--brown);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+  .card{border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;background:var(--soft)}
+  .card h3{margin-top:0}
+  .say{border-left:3px solid var(--brown);padding:6px 0 6px 14px;margin:14px 0;font-size:15.5px}
+  .say b{color:var(--brown)}
+  .flo{border-left:3px solid #7a5230}
+  .warnbox{border:2px solid var(--warn);border-radius:12px;padding:16px 18px;margin:16px 0;background:#fff}
+  .warnbox h3{margin-top:0;color:var(--warn)}
+  .toc{border:1px solid var(--line);border-radius:12px;padding:14px 18px;background:#fff}
+  .toc ol{margin:4px 0;padding-left:22px}
+  .drill{border:1px dashed var(--brown);border-radius:12px;padding:14px 18px;margin:16px 0;background:#fff}
+  .drill .tag{border-color:var(--brown)}
+  footer{margin-top:44px;border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:13px}
+  @media print{.drill,.card,.warnbox{break-inside:avoid}}
+
+  /* ── EBOOK COVER + DOWNLOAD (added v1.1) ─────────────────────────────────── */
+  .rot-cover{min-height:92vh;display:flex;flex-direction:column;justify-content:center;
+    padding:40px 0;border-bottom:1px solid var(--line);margin-bottom:8px}
+  .rot-cover .mark{width:64px;height:auto;margin-bottom:28px}
+  .rot-cover .series{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--brown);font-weight:700;margin-bottom:18px}
+  .rot-cover h1{font-size:clamp(34px,7vw,58px);line-height:1.02;margin:0 0 18px;border:0;padding:0}
+  .rot-cover .sub{font-size:18px;color:var(--muted);max-width:560px;line-height:1.5;margin:0 0 30px}
+  .rot-cover .meta{font-size:13px;color:var(--muted);font-family:monospace;border-top:1px solid var(--line);padding-top:16px}
+  .rot-cover .meta b{color:var(--ink)}
+  .dlbar{position:fixed;right:18px;bottom:18px;z-index:50}
+  .dlbtn{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:#fff;border:0;
+    border-radius:999px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;
+    box-shadow:0 10px 30px -8px rgba(0,0,0,.45);font-family:inherit}
+  .dlbtn:hover{background:var(--brown)}
+  @media print{
+    @page{margin:16mm 14mm}
+    .dlbar{display:none}
+    .rot-cover{min-height:auto;page-break-after:always;border:0}
+    h2{page-break-before:always}
+    h2:first-of-type{page-break-before:avoid}
+    .drill,.card,.warnbox,table,.say{page-break-inside:avoid}
+    a{color:var(--ink);text-decoration:none}
+    body{font-size:11.5pt}
+  }
+</style>
+</head>
+<body>
+<div class="dlbar"><button class="dlbtn" onclick="window.print()">⬇ Download / Print PDF</button></div>
+<div class="wrap">
+ <header><span class="logo">RICH OFF <b>TECH</b></span><span class="updated">v1.0 · Aug 2026</span></header>
+ <section class="rot-cover"><img src="/rot-mark-ink.png" alt="" class="mark"><div class="series">A Rich Off Tech Field Guide</div><h1>Active Directory: Attack &amp; Defense</h1><p class="sub">Roughly 9 in 10 enterprises run their entire network on Active Directory — which means it's the thing every attacker goes for and every blue team has to hold. Learn how it breaks and you become one of the most hireable people in security. Bo runs the attack, Flo runs the defense. Lab and authorized use only.</p><div class="meta">First edition &middot; <b>Rich Off Tech LLC</b> &middot; 2026 &middot; Cleared tech. No shortcuts.</div></section>
+
+ <div class="warnbox">
+ <h3>⚠️ Authorized environments only — this one especially</h3>
+ <p>Active Directory attacks are loud, powerful, and against a real corporate domain, career-ending and illegal. Everything here is for <b>your own lab domain</b>, deliberately vulnerable practice ranges, or an engagement with written authorization and a defined scope. Nothing else.</p>
+ <p style="margin-bottom:0">You will build your own tiny AD lab (Part 1's drill) and everything after runs against that. Same rule as always: the only line between a red teamer and a defendant is a signed scope. Learn it on a domain you own.</p>
+ </div>
+
+ <div class="card">
+ <h3>Why AD is the whole ballgame</h3>
+ <p>Active Directory is the identity system behind most corporate Windows networks. It decides who you are, what you can touch, and which machines trust each other. Get control of it — specifically the accounts that run it — and you effectively own the entire company's network: every server, every laptop, every file share.</p>
+ <p style="margin-bottom:0">That's why attackers don't try to "hack the network." They try to <b>become Domain Admin</b>. This guide is the map of how that happens, step by step — so you can either do it on an authorized test, or stop it as a defender. Same knowledge, both jobs.</p>
+ </div>
+
+ <div class="toc">
+ <b>What's inside</b>
+ <ol>
+ <li>How AD actually works — the ground truth</li>
+ <li>Recon inside the domain — mapping the kingdom</li>
+ <li>Credential attacks — Kerberos is the soft spot</li>
+ <li>Escalation &amp; domination — becoming Domain Admin</li>
+ <li>Defending AD — tiering, hardening, detection</li>
+ </ol>
+ </div>
+
+ <!-- 1 -->
+ <h2>1 · How AD actually works — the ground truth 🏛️</h2>
+ <p>You can't attack or defend what you don't understand, and most people who "know AD" only know how to add a user. Here's the model the attacks depend on:</p>
+ <table>
+ <thead><tr><th>Piece</th><th>What it is, in plain terms</th></tr></thead>
+ <tbody>
+ <tr><td><b>Domain</b></td><td>A group of users, computers and resources under one administrative roof, sharing one central identity database.</td></tr>
+ <tr><td><b>Domain Controller (DC)</b></td><td>The server that runs the domain — holds the database, checks logins, hands out access. Own a DC, own the domain.</td></tr>
+ <tr><td><b>Forest</b></td><td>One or more domains that trust each other. The forest — not the domain — is the real security boundary.</td></tr>
+ <tr><td><b>NTDS.dit</b></td><td>The database file on the DC that holds every account and every password hash in the domain. The crown jewel. If an attacker reads this, it's over.</td></tr>
+ <tr><td><b>Kerberos</b></td><td>The main way AD proves who you are. Ticket-based: you prove yourself once, get a ticket, and reuse it. Powerful, and the source of most AD attacks.</td></tr>
+ <tr><td><b>NTLM</b></td><td>The older authentication method, still around for compatibility. Weaker, and behind the "pass-the-hash" family of attacks.</td></tr>
+ <tr><td><b>Service accounts</b></td><td>Accounts that run software, not people. Often over-privileged, rarely have MFA, and frequently have weak passwords that never change. The attacker's favorite target.</td></tr>
+ <tr><td><b>Domain Admin</b></td><td>The group that controls everything. The goal of nearly every AD attack.</td></tr>
+ </tbody>
+ </table>
+ <div class="say"><b>Bo says:</b> Kerberos is where the money is, so learn its one-line version: you log in, the DC gives you a "ticket-granting ticket" (TGT), and you use that to request tickets for specific services. Almost every AD attack is a clever abuse of how those tickets are issued, stored, or trusted. Get comfortable with tickets and the rest clicks.</div>
+ <div class="say flo"><b>Flo says:</b> As a defender, memorize what NTDS.dit is and who can reach it. Every "how did they own the whole domain?" story ends with someone reading that file off a domain controller. Protecting the DCs and the accounts that can log into them is 80% of defending AD.</div>
+
+ <div class="drill">
+ <span class="tag">Drill 1</span>
+ <h3>Build a tiny AD lab</h3>
+ <p>In your isolated, host-only lab, stand up one Windows Server as a Domain Controller and join one Windows client to the domain. Create a couple of normal users and one service account. This little two-machine domain is where every other drill in this guide happens — and it's legal because it's entirely yours.</p>
+ <p style="margin-bottom:0"><b>Why:</b> You cannot learn AD attacks safely anywhere else. Employers also respect "I built my own lab domain to practice" far more than any certificate.</p>
+ </div>
+
+ <!-- 2 -->
+ <h2>2 · Recon inside the domain — mapping the kingdom 🗺️</h2>
+ <p>Once an attacker has any foothold — even one low-privilege user — the first move isn't to attack. It's to <b>map</b>. AD is generous with information: almost any authenticated user can read a huge amount about the domain's structure.</p>
+ <p>What recon pulls:</p>
+ <ul>
+ <li><b>Users and groups</b> — who exists, who's in Domain Admins, who's in privileged groups.</li>
+ <li><b>Computers</b> — every machine joined to the domain, and what they are.</li>
+ <li><b>Service accounts</b> — accounts tied to services, which are prime targets.</li>
+ <li><b>Trusts</b> — how this domain relates to others, and whether a path leads across them.</li>
+ <li><b>Permissions (ACLs)</b> — who can do what to whom. This is the hidden map, and it's where modern AD attacks live.</li>
+ </ul>
+ <div class="say"><b>Bo says:</b> The game-changer here is <b>attack-path mapping</b> — tools that take all that recon data and draw a graph of "who can reach Domain Admin, and how." Suddenly a domain that looked secure shows a chain: your low-priv user can reset a password → that account is admin on a server → that server has a Domain Admin logged in. Three hops, game over. You didn't find a vulnerability — you found a <em>path</em>. That's the modern AD mindset.</div>
+ <div class="say flo"><b>Flo says:</b> Defenders should run those exact same path-mapping tools on their OWN domain. The attacker's map and the defender's map are the same map. If you can see the three-hop path to Domain Admin before they do, you can break a link in the chain and close it.</div>
+
+ <div class="drill">
+ <span class="tag">Drill 2</span>
+ <h3>Map your lab domain's attack paths</h3>
+ <p>From the low-privilege user in your lab, enumerate the domain — users, groups, computers, service accounts — then run an attack-path mapping tool against it. Find at least one path (even a short one) from a normal user toward a privileged account. Screenshot the graph.</p>
+ <p style="margin-bottom:0"><b>Why:</b> Seeing your own lab as a graph of paths is the moment AD "clicks." It's also exactly what a red-team report and a blue-team hardening review both start with.</p>
+ </div>
+
+ <!-- 3 -->
+ <h2>3 · Credential attacks — Kerberos is the soft spot 🎫</h2>
+ <p>This is the heart of AD offense, and every technique here abuses something AD does <em>by design</em>. That's what makes them so effective — they're not exploiting bugs, they're exploiting features.</p>
+ <table>
+ <thead><tr><th>Attack (concept)</th><th>What it abuses</th><th>What it gets</th></tr></thead>
+ <tbody>
+ <tr><td><b>Kerberoasting</b></td><td>Any user can request a service ticket, and part of it is encrypted with the service account's password hash.</td><td>An offline crack at service-account passwords — which are often weak and never expire.</td></tr>
+ <tr><td><b>AS-REP roasting</b></td><td>Accounts with "pre-authentication" turned off hand out a crackable blob to anyone who asks.</td><td>An offline crack at those users' passwords, no foothold even required.</td></tr>
+ <tr><td><b>Pass-the-hash</b></td><td>NTLM lets you authenticate with the password <em>hash</em> — you never need the plaintext.</td><td>Reuse a stolen hash to log in as that user elsewhere.</td></tr>
+ <tr><td><b>Pass-the-ticket</b></td><td>Kerberos tickets can be stolen from memory and replayed.</td><td>Become whoever's ticket you stole, without their password at all.</td></tr>
+ </tbody>
+ </table>
+ <div class="say"><b>Bo says:</b> Kerberoasting is the one to understand cold, because it's so quiet. You're a normal user doing a completely normal thing — requesting a service ticket. Nothing looks wrong. But you take that ticket offline and grind at the service account's password on your own hardware, where nobody's watching. Weak service-account password + never expires = you've got real credentials and the domain never made a sound.</div>
+ <div class="say flo"><b>Flo says:</b> Every attack in that table has a specific, known defense, and they're not exotic: long random service-account passwords (or better, managed accounts that rotate automatically), turning pre-auth back on, and modern protections that stop hash and ticket reuse. Understanding the attack is what tells you which of these to prioritize — a domain full of weak service accounts should fix that <em>first</em>.</div>
+
+ <div class="drill">
+ <span class="tag">Drill 3</span>
+ <h3>Kerberoast your own lab</h3>
+ <p>Give your lab service account a deliberately weak password. From your low-priv user, request its service ticket and crack it offline. Then do the defense: change it to a long random password (or set up a managed service account) and confirm the crack now fails in reasonable time. Write both halves up.</p>
+ <p style="margin-bottom:0"><b>Why:</b> Doing the attack AND the fix on your own domain is the single most valuable AD exercise there is — and "I've Kerberoasted a lab and hardened against it" is a sentence that gets interviews.</p>
+ </div>
+
+ <!-- 4 -->
+ <h2>4 · Escalation &amp; domination — becoming Domain Admin 👑</h2>
+ <p>Once an attacker has better credentials, the endgame is total control of the domain. The marquee moves:</p>
+ <ul>
+ <li><b>DCSync</b> — abusing a legitimate replication feature to ask a Domain Controller for password hashes <em>as if you were another DC</em>. With the right rights, you can pull the hash of any account, including the domain's most powerful ones — without ever logging into the DC.</li>
+ <li><b>Golden ticket</b> — if you steal the master key that signs all Kerberos tickets (the KRBTGT account's hash), you can forge tickets for anyone, with any privileges, that the domain will trust. It's the closest thing to a skeleton key AD has.</li>
+ <li><b>Silver ticket</b> — a narrower forgery: a ticket for one specific service, quieter and more targeted than a golden ticket.</li>
+ <li><b>Delegation abuse</b> — Kerberos delegation lets a service act on a user's behalf. Misconfigured, it lets an attacker impersonate high-privilege users to reach systems they shouldn't.</li>
+ <li><b>ACL abuse</b> — the quiet one. If permissions are set so a low-priv account can reset a privileged account's password, or add itself to a group, that's a path to domination with no exploit at all — just misconfigured trust.</li>
+ </ul>
+ <div class="say"><b>Bo says:</b> The scary one to internalize is the golden ticket, because of what it means for cleanup. If an attacker got the KRBTGT key, resetting the compromised user's password doesn't help — they can forge tickets for anyone. Truly evicting them means rotating that master key (twice), and most orgs have never done it. That's why AD incidents are so brutal to recover from.</div>
+ <div class="say flo"><b>Flo says:</b> Notice how many of these need one thing first: a highly privileged credential or a dangerous permission. That's the defender's leverage. If Domain Admins never log into regular workstations (so their tickets can't be stolen), if service accounts aren't over-privileged, and if you audit who has dangerous ACLs, most of this table becomes impossible to reach. You defend the endgame by defending the setup.</div>
+
+ <!-- 5 -->
+ <h2>5 · Defending AD — tiering, hardening, detection 🛡️</h2>
+ <p>Everything above collapses into a defensive priority list. This is the part that pays a blue-team salary.</p>
+ <table>
+ <thead><tr><th>Defense</th><th>What it stops</th></tr></thead>
+ <tbody>
+ <tr><td><b>Tiered administration</b></td><td>Keeping Domain Admin credentials off regular workstations. If the powerful ticket is never on the machine the attacker lands on, they can't steal it. This is the highest-value AD control there is.</td></tr>
+ <tr><td><b>Least privilege + clean ACLs</b></td><td>Kills the ACL-abuse paths and shrinks the graph of routes to Domain Admin.</td></tr>
+ <tr><td><b>Strong/managed service accounts</b></td><td>Defeats Kerberoasting — long random passwords that rotate automatically can't be cracked offline.</td></tr>
+ <tr><td><b>Local admin password randomization</b></td><td>Stops one cracked local-admin password from unlocking every machine (a key lateral-movement path).</td></tr>
+ <tr><td><b>Protected accounts &amp; MFA</b></td><td>Reduces credential theft and makes stolen secrets less useful.</td></tr>
+ <tr><td><b>Logging &amp; detection</b></td><td>You won't stop everything, so you watch for the tells: unusual ticket requests, replication from a non-DC (DCSync), a flood of service-ticket requests (Kerberoasting).</td></tr>
+ </tbody>
+ </table>
+ <div class="say flo"><b>Flo says:</b> If you do ONE thing to defend AD, do tiered administration. Nearly every catastrophic AD breach comes down to a Domain Admin's credential sitting on a machine an attacker reached. Keep the powerful credentials on locked-down admin systems only, and you've removed the single most common path to total compromise.</div>
+ <div class="say"><b>Bo says:</b> And here's why studying the attacks makes you a better defender than someone who only read the hardening guide: you know <em>which</em> control matters most because you've seen what the attacker reaches for first. That's the whole point of red-informs-blue.</div>
+
+ <div class="drill">
+ <span class="tag">Drill 4</span>
+ <h3>Harden your lab and prove it</h3>
+ <p>Take the attack path you found in Drill 2 and break it: fix the weak service account, tighten one dangerous permission, and make sure your (pretend) Domain Admin isn't logged into the client machine. Re-run the path-mapping tool and show the path is gone.</p>
+ <p style="margin-bottom:0"><b>Why:</b> "Here's the path I found, here's the control I applied, here's proof it's closed" is a complete blue-team story and a complete red-team report finding — the exact thing both jobs are paid to produce.</p>
+ </div>
+
+ <div class="card">
+ <h3>The whole guide in seven lines</h3>
+ <ul style="margin-bottom:0">
+ <li>AD is identity for the whole company — attackers go for Domain Admin, not "the network."</li>
+ <li>Own a Domain Controller (or read NTDS.dit) and it's over.</li>
+ <li>Most AD attacks abuse Kerberos <em>features</em>, not bugs.</li>
+ <li>Modern AD offense finds <em>paths</em>, not single vulnerabilities.</li>
+ <li>Service accounts are the soft underbelly — weak, over-privileged, never rotated.</li>
+ <li>Golden tickets are why AD breaches are so hard to recover from.</li>
+ <li>Tiered administration is the single highest-value defense.</li>
+ </ul>
+ </div>
+
+ <div class="card">
+ <h3>Take it further</h3>
+ <p>Every part of this guide has graded scenario questions in the ROT quiz engine, plus labs where Bo and Flo walk you through building and attacking your own lab domain — safely, on infrastructure you own.</p>
+ <p style="margin-bottom:0">Members: it's on your dashboard at <b>rotechllc.com/quiz</b>. Not a member yet: <b>rotechllc.com/membership</b>, or talk to a free agent at <b>rotechllc.com/help</b> first.</p>
+ </div>
+
+ <footer>
+ <p><b>RICH OFF TECH</b> — Cleared tech. No shortcuts.</p>
+ <p>Original work, © 2026 Rich Off Tech LLC. Built on standard, publicly documented Active Directory security concepts and public frameworks (MITRE ATT&amp;CK). Written for education.</p>
+ <p style="margin-bottom:0"><b>Legal &amp; ethical use only.</b> Every technique here is for your own lab domain, deliberately vulnerable practice ranges, or engagements with written authorization. Attacking a domain you don't own or aren't authorized to test is a serious crime. This guide teaches defense through understanding offense — it is not permission to attack anyone.</p>
+ </footer>
+</div>
+</body>
+</html>
