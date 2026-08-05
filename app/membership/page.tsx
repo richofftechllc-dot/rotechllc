@@ -26,11 +26,12 @@ export default function Membership() {
               Want the community and the AI tutors without a cert track attached? This is that.
             </p>
           </div>
+          {/* No "see the pricing page" link under this. The Just the Room card
+              already states the price and what it does and does not include, so
+              the link only offered a second opinion on a question already
+              answered — and it sent people away from the buy button they were
+              sitting on. */}
           <DiscordAccessCard />
-          <p className="text-rot-faint text-sm text-center mt-8">
-            Looking for the full breakdown of what each tier includes?{" "}
-            <a href="/pricing" className="text-rot-accent underline underline-offset-2">See the pricing page →</a>
-          </p>
         </div>
       </section>
     </>
