@@ -287,7 +287,7 @@ export default function Bo30() {
             )}
           </div>
 
-          {camError && <p className="text-amber-400 text-sm mt-2">{camError}</p>}
+          {camError && <p className="text-rot-warn text-sm mt-2">{camError}</p>}
 
           <div className="flex flex-wrap gap-2 mt-3">
             {!camReady && !previewUrl && (
