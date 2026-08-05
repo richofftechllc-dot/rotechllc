@@ -54,6 +54,25 @@
   --rot-onyx-faint: #8d8377;
   --rot-onyx-line: rgba(255, 255, 255, 0.13);
 
+  /* SILVER — polished graphite marble, the Interested side's stone.
+     Partner to onyx, not a lighter black: steel card beside black card. Ground
+     is kept light enough that NEAR-BLACK type sits on it at ~7:1 — a mid-grey
+     that looked right as a swatch would have put body copy at 3:1 and put us
+     straight back to unreadable panels. */
+  --rot-silver: #b9b4ac;
+  --rot-silver-fg: #14100c;
+  --rot-silver-muted: #3a352f;
+  --rot-silver-faint: #554f47;
+  --rot-silver-line: rgba(28, 22, 16, 0.20);
+
+  /* WARN / GOLD — the two "not brand orange, not body copy" jobs.
+     Both replace raw yellow-500 / amber-400, which came from the dark theme:
+     #eab308 on white is about 1.9:1 and #fbbf24 about 1.6:1, so every warning
+     and every cert chip on the site was decorative rather than readable. These
+     clear 4.5:1 on both the marble and the pale tint the chips sit on. */
+  --rot-warn: #a4530b;
+  --rot-gold: #7d6118;
+
   /* CHAMPAGNE — the warm metal edge on the Interested side.
      A hairline of warm gold is enough to stop white-on-marble reading as
      unstyled default. It is deliberately NOT orange: orange means "this costs
@@ -86,6 +105,13 @@
   --color-rot-onyx-line: var(--rot-onyx-line);
   --color-rot-champagne: var(--rot-champagne);
   --color-rot-champagne-hi: var(--rot-champagne-hi);
+  --color-rot-warn: var(--rot-warn);
+  --color-rot-gold: var(--rot-gold);
+
+  --color-rot-silver: var(--rot-silver);
+  --color-rot-silver-fg: var(--rot-silver-fg);
+  --color-rot-silver-muted: var(--rot-silver-muted);
+  --color-rot-silver-line: var(--rot-silver-line);
 }
 
 html, body {
@@ -401,6 +427,99 @@ h1, h2, h3 {
   .rot-metal:hover { transform: none; }
 }
 
+/* ── HEADLINE WORDS ───────────────────────────────────────────────────────────
+   "Are you INTERESTED, or are you COMMITTED?" — the two words are the choice the
+   whole page is asking you to make, so they carry the two materials below them.
+
+   First attempt milled both from their literal panel colours: near-black onyx
+   and dark graphite, on a near-black headline. Technically correct, visually
+   invisible — both words vanished into the sentence. So the rule here is
+   CONTRAST, not literal material match: brushed steel for the free side, brand
+   orange for the one that costs money and is meant to pull the eye. */
+.rot-word-silver,
+.rot-word-onyx {
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Brushed steel. Mid-tone with hard light/dark banding — a flat grey reads as
+   disabled, the banding reads as metal. */
+.rot-word-silver {
+  background-image: linear-gradient(
+    122deg,
+    #6f6961 0%, #b9b3a9 16%, #4d483f 34%, #a49d92 52%, #565048 70%, #9a938a 86%, #4d483f 100%
+  );
+}
+
+/* The brand, as polished metal rather than flat fill. This is the word that has
+   to pull the eye down to the buy column. */
+.rot-word-onyx {
+  background-image: linear-gradient(
+    122deg,
+    #c2360f 0%, #e8451f 22%, #ff7a00 46%, #e8451f 68%, #ff9538 86%, #d63c14 100%
+  );
+}
+
+/* ── SILVER PANEL ─────────────────────────────────────────────────────────────
+   The Interested side: polished graphite marble. Same three-layer build as
+   .rot-onyx so both columns are visibly the same technique — steel card next to
+   black card, rather than one finished panel beside one unfinished one.
+
+   Inverted relative to onyx: veins go DARKER than the ground here, because on a
+   mid-grey stone a pale vein disappears. Type is near-black, and the ground is
+   deliberately light enough to carry it. */
+.rot-silver {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: var(--rot-silver);
+  color: var(--rot-silver-fg);
+}
+
+.rot-silver::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--rot-silver);
+  background-image:
+    radial-gradient(120% 100% at 12% 0%, rgba(255, 255, 255, 0.40), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1000' height='1200'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.006 0.021' numOctaves='6' seed='17' result='n'/%3E%3CfeDisplacementMap in='n' in2='n' scale='58' xChannelSelector='R' yChannelSelector='G' result='d'/%3E%3CfeColorMatrix in='d' type='matrix' values='0 0 0 0 0.42 0 0 0 0 0.40 0 0 0 0 0.37 0 0 0 -1.25 0.78'/%3E%3C/filter%3E%3Crect width='1000' height='1200' filter='url(%23s)'/%3E%3C/svg%3E");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.42;
+}
+
+.rot-silver::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(118deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.10) 24%, rgba(255,255,255,0) 44%, rgba(255,255,255,0.30) 62%, rgba(255,255,255,0) 76%),
+    radial-gradient(600px 420px at 88% 100%, rgba(28,22,16,0.10), transparent 68%);
+}
+
+.rot-silver-fg    { color: var(--rot-silver-fg); }
+.rot-silver-muted { color: var(--rot-silver-muted); }
+.rot-silver .rot-kicker { color: var(--rot-silver-faint); }
+
+/* Ghost button on silver — ink outline, since white would vanish. */
+.rot-btn-ghost-silver {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  background: rgba(255,255,255,0.30);
+  color: var(--rot-silver-fg);
+  font-weight: 500;
+  border: 1px solid var(--rot-silver-line);
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+.rot-btn-ghost-silver:hover { background: rgba(255,255,255,0.55); border-color: var(--rot-silver-fg); }
+
 /* Ivory panel — the light counterpart to onyx. Flat white next to polished black
    looks like paper next to stone, so the free side gets its own quiet warmth and
    a top-left sheen borrowed from the same light source. */
@@ -535,18 +654,43 @@ h1, h2, h3 {
 }
 
 /* ── ORBIT (app/components/Orbit.tsx) ─────────────────────────────────────────
-   Platform wordmarks circling Bo. Rings spin; each chip counter-spins at the
-   same duration so its text stays upright while it travels — that trick is the
-   whole effect, and it costs no JS per frame. */
+   Platform emblems circling Bo. Rings spin; each body counter-spins at the same
+   duration so it stays upright while it travels — that trick is the whole
+   effect, and it costs no JS per frame.
+
+   The counter-spin uses the CSS `rotate` PROPERTY, which composes independently
+   of `transform`. That is deliberate: the slot uses `transform` to place the
+   body on the ring, so the body is free to use `transform` for the static
+   counter-rotation that cancels its own slot angle. Without that second
+   correction every emblem sits permanently tilted by however far around the
+   ring it happens to be — which is exactly how they shipped, with ServiceNow on
+   its side and Claude upside down.
+
+   3D: these are milled discs, not flat chips. A radial highlight puts the light
+   source at upper-left, an inset bottom shadow gives the disc thickness, a
+   bevel ring gives it a machined edge, and a specular cap sells the polish. */
 .rot-orbit-core {
-  width: 132px;
-  height: 132px;
+  width: 158px;
+  height: 158px;
   border-radius: 9999px;
-  background: linear-gradient(180deg, #ffffff, #f4f1ec);
-  border: 1px solid var(--rot-line);
+  position: relative;
+  background-image:
+    radial-gradient(120% 120% at 30% 20%, #ffffff 0%, #faf8f5 34%, #e4ded4 72%, #c6bfb3 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.9),
-    0 18px 44px -18px rgba(28,22,16,0.35);
+    inset 0 3px 0 rgba(255,255,255,0.95),
+    inset 0 -14px 26px rgba(28,22,16,0.18),
+    inset 0 0 0 1px rgba(28,22,16,0.10),
+    0 30px 60px -22px rgba(28,22,16,0.55),
+    0 4px 10px -4px rgba(28,22,16,0.25);
+}
+/* specular cap — the highlight that makes a circle read as a sphere */
+.rot-orbit-core::after {
+  content: "";
+  position: absolute;
+  inset: 6% 18% 52% 12%;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0));
+  pointer-events: none;
 }
 
 .rot-orbit-ring {
@@ -572,23 +716,54 @@ h1, h2, h3 {
   transform-origin: 0 0;
 }
 
-.rot-orbit-chip {
+/* The disc itself. */
+.rot-orbit-body {
   position: absolute;
-  translate: -50% -50%;
-  white-space: nowrap;
-  padding: 0.4rem 0.75rem;
+  /* Centring is done in the inline `transform` alongside the static
+     counter-rotation. Do NOT also set the `translate` property here — the two
+     compose, and the disc gets shifted twice. */
+  width: 62px;
+  height: 62px;
   border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--rot-fg);
-  background: linear-gradient(180deg, #ffffff, #f7f5f1);
-  border: 1px solid var(--rot-line);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 8px 20px -12px rgba(28,22,16,0.35);
+  display: grid;
+  place-items: center;
+  background-image: radial-gradient(115% 115% at 32% 22%, #ffffff 0%, #fbfaf7 38%, #e7e1d8 76%, #cdc6ba 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.95),
+    inset 0 -6px 12px rgba(28,22,16,0.16),
+    inset 0 0 0 1px rgba(28,22,16,0.10),
+    0 12px 26px -10px rgba(28,22,16,0.50),
+    0 2px 5px -2px rgba(28,22,16,0.28);
   animation-name: rot-orbit-spin;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
   cursor: default;
+  color: var(--rot-fg);
+}
+.rot-orbit-body::after {
+  content: "";
+  position: absolute;
+  inset: 7% 20% 55% 14%;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0));
+  pointer-events: none;
+}
+.rot-orbit-body svg { width: 30px; height: 30px; position: relative; z-index: 1; }
+
+/* Name plate under each disc — the emblem carries recognition, the label
+   carries certainty. */
+.rot-orbit-name {
+  position: absolute;
+  top: 66px;
+  left: 50%;
+  translate: -50% 0;
+  white-space: nowrap;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rot-faint);
+  pointer-events: none;
 }
 
 @keyframes rot-orbit-spin {
@@ -597,10 +772,12 @@ h1, h2, h3 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rot-orbit-ring, .rot-orbit-chip { animation: none; }
+  .rot-orbit-ring, .rot-orbit-body { animation: none; }
 }
 
 @media (max-width: 640px) {
-  .rot-orbit-chip { font-size: 0.6875rem; padding: 0.3rem 0.6rem; }
-  .rot-orbit-core { width: 108px; height: 108px; }
+  .rot-orbit-body { width: 48px; height: 48px; }
+  .rot-orbit-body svg { width: 23px; height: 23px; }
+  .rot-orbit-name { top: 52px; font-size: 0.5625rem; }
+  .rot-orbit-core { width: 116px; height: 116px; }
 }

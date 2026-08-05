@@ -138,7 +138,7 @@ export default function Roster() {
 
       <div className="flex gap-3 mb-6 flex-wrap">
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search name, role, cert, location..." className="flex-1 min-w-0 sm:min-w-[260px] bg-rot-surface border border-rot-line rounded-full px-5 sm:px-6 py-3 outline-none focus:border-green-500" />
-        <button onClick={exportCSV} className="px-4 sm:px-5 py-3 border border-yellow-500 text-yellow-500 rounded-full font-bold hover:bg-yellow-500/10 text-sm sm:text-base whitespace-nowrap">⇩ CSV</button>
+        <button onClick={exportCSV} className="px-4 sm:px-5 py-3 border border-rot-gold/40 text-rot-gold rounded-full font-bold hover:bg-rot-gold/10 text-sm sm:text-base whitespace-nowrap">⇩ CSV</button>
       </div>
 
       <div className="flex flex-wrap gap-3 mb-10">
@@ -167,11 +167,14 @@ export default function Roster() {
                 <div className="text-rot-muted text-sm mb-3">{m.role}{m.location && ` · ${m.location}`}{m.years && ` · ${m.years} yrs`}</div>
                 {m.certs.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-3">
-                    {m.certs.map(c => <span key={c} className="text-xs px-2 py-1 bg-yellow-500/10 text-yellow-500 rounded">{c}</span>)}
+                    {m.certs.map(c => <span key={c} className="text-xs px-2 py-1 bg-rot-gold/10 text-rot-gold rounded">{c}</span>)}
                   </div>
                 )}
                 <div className="flex gap-3 text-xs text-rot-faint">
-                  {safeUrl(m.linkedin) && <a href={safeUrl(m.linkedin)} target="_blank" rel="noopener noreferrer" className="text-emerald-600 hover:text-emerald-600 font-bold">LinkedIn ↗</a>}
+                  {/* emerald-600 measured 3.0:1 on the card — the lowest-contrast
+                      text on the page, on a link. Near-black with an underline
+                      carries "link" without leaning on a colour that cannot. */}
+                  {safeUrl(m.linkedin) && <a href={safeUrl(m.linkedin)} target="_blank" rel="noopener noreferrer" className="text-rot-fg font-bold underline underline-offset-4 decoration-rot-line-strong hover:decoration-rot-fg">LinkedIn ↗</a>}
                   {m.discord && <span>@{m.discord}</span>}
                 </div>
               </div>

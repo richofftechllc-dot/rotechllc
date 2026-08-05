@@ -29,8 +29,8 @@ export default function Team() {
               </div>
             </div>
             <div className="flex flex-wrap gap-2 mb-4">
-              <span className="text-xs px-2 py-1 bg-yellow-500/10 text-yellow-500 rounded">Cert</span>
-              <span className="text-xs px-2 py-1 bg-yellow-500/10 text-yellow-500 rounded">ServiceNow</span>
+              <span className="text-xs px-2 py-1 bg-rot-gold/10 text-rot-gold rounded">Cert</span>
+              <span className="text-xs px-2 py-1 bg-rot-gold/10 text-rot-gold rounded">ServiceNow</span>
             </div>
             <p className="text-rot-muted text-sm leading-relaxed mb-5">
               Broke into tech in <span className="text-rot-muted">2024</span> and hasn&apos;t slowed down since — building her foundation on <span className="text-rot-muted">Linux</span> before excelling through the <span className="text-rot-muted">ServiceNow Rise Up</span> program. She specializes in <span className="text-rot-muted">business process</span> on the Now Platform and in guiding people through their <span className="text-rot-muted">certification</span> journeys. Equal parts technologist and coach — she maps the fastest line from stuck to certified and hired.
@@ -41,7 +41,7 @@ export default function Team() {
               handles={["Cert"]}
               accent="yellow"
               discordInvite={DISCORD_INVITE}
-              className="mt-auto inline-block w-full text-center px-4 py-2.5 border border-yellow-500/30 text-yellow-500 font-bold rounded-lg text-sm hover:bg-yellow-500/10"
+              className="mt-auto inline-block w-full text-center px-4 py-2.5 border border-rot-gold/40 text-rot-gold font-bold rounded-lg text-sm hover:bg-rot-gold/10"
             >
               Book a Consult →
             </ConsultButton>
@@ -60,7 +60,7 @@ export default function Team() {
             </div>
             <div className="flex flex-wrap gap-2 mb-4">
               <span className="text-xs px-2 py-1 bg-rot-sunken text-rot-muted border border-rot-line rounded">Intro</span>
-              <span className="text-xs px-2 py-1 bg-yellow-500/10 text-yellow-500 rounded">Cert</span>
+              <span className="text-xs px-2 py-1 bg-rot-gold/10 text-rot-gold rounded">Cert</span>
               <span className="text-xs px-2 py-1 bg-emerald-600/[0.07] text-emerald-600 rounded">Clearance</span>
             </div>
             <p className="text-rot-muted text-sm leading-relaxed mb-5">
@@ -91,7 +91,7 @@ export default function Team() {
             </div>
             <div className="flex flex-wrap gap-2 mb-5">
               <span className="text-xs px-2 py-1 bg-rot-sunken text-rot-muted border border-rot-line rounded">Intro</span>
-              <span className="text-xs px-2 py-1 bg-yellow-500/10 text-yellow-500 rounded">Cert</span>
+              <span className="text-xs px-2 py-1 bg-rot-gold/10 text-rot-gold rounded">Cert</span>
               <span className="text-xs px-2 py-1 bg-emerald-600/[0.07] text-emerald-600 rounded">Clearance</span>
               <span className="text-xs px-2 py-1 bg-blue-500/10 text-blue-500 rounded">Project Intake</span>
             </div>

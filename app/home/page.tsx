@@ -64,7 +64,7 @@ export default function MemberHome() {
   const accessColor = d.access.status === "expired" || d.access.status === "canceled"
     ? "text-red-600 border-red-500/30 bg-red-500/10"
     : d.access.daysLeft !== null && d.access.daysLeft <= 7
-    ? "text-amber-400 border-amber-500/30 bg-amber-500/10"
+    ? "text-rot-warn border-rot-warn/30 bg-rot-warn/10"
     : "text-emerald-600 border-emerald-600/25 bg-emerald-600/[0.07]";
 
   return (
@@ -112,7 +112,7 @@ export default function MemberHome() {
               <span className="text-rot-fg/50 text-sm">ready (avg score)</span>
             </div>
             {d.progress.strong.length > 0 && <p className="text-sm text-emerald-600 mt-3">💪 Strong: {d.progress.strong.slice(0, 3).join(", ")}</p>}
-            {d.progress.weak.length > 0 && <p className="text-sm text-amber-400 mt-1">🎯 Focus: {d.progress.weak.slice(0, 3).join(", ")}</p>}
+            {d.progress.weak.length > 0 && <p className="text-sm text-rot-warn mt-1">🎯 Focus: {d.progress.weak.slice(0, 3).join(", ")}</p>}
             {readiness === null && <p className="text-sm text-rot-fg/40 mt-3">Take a quiz and your readiness shows up here.</p>}
           </div>
           <div className="rounded-2xl border border-rot-line bg-rot-sunken p-6">

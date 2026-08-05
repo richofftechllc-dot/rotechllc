@@ -59,7 +59,7 @@ export default function PlanPage() {
       </div>
       <p className="text-rot-muted mb-6">
         {data.name ? `${data.name}, ` : ""}pick your pace and follow the roadmap in order — each block lines up with the quiz domain and its hands-on lab.
-        {!saved && <span className="text-yellow-500"> (Preview — sign in as a member to save your dates.)</span>}
+        {!saved && <span className="text-rot-warn"> (Preview — sign in as a member to save your dates.)</span>}
       </p>
 
       {/* TRACK PICKER */}

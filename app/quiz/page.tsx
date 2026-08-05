@@ -368,7 +368,7 @@ ${missedText}]
               <span className="text-emerald-600">✓ Synced ({progressMeta.rawKeys} raw → {progressMeta.normalizedKeys} domain entries)</span>
             )}
             {progressStatus === "empty" && (
-              <span className="text-yellow-500">⚠ No saved progress for <code className="text-yellow-300">{me.code}</code> in Firestore. If you completed domains on rotechllc.com/quiz, the data should appear here automatically — verify the doc exists at <code>quizProgress/{me.code}</code> in Firebase console.</span>
+              <span className="text-rot-warn">⚠ No saved progress for <code className="text-rot-warn">{me.code}</code> in Firestore. If you completed domains on rotechllc.com/quiz, the data should appear here automatically — verify the doc exists at <code>quizProgress/{me.code}</code> in Firebase console.</span>
             )}
             {progressStatus === "unauth" && <span className="text-red-600">✗ Progress endpoint returned 401. Session cookie may not be reaching the API.</span>}
             {progressStatus === "error" && <span className="text-red-600">✗ Progress fetch errored. Check /api/progress in the Network tab.</span>}
