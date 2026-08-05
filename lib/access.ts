@@ -1,14 +1,14 @@
 // lib/access.ts — pure access logic shared by the quiz UI AND the video-token API.
 // Single source of truth for "which track can this user reach". No Node-only imports
 // here, so it is safe to import from client components (e.g. app/quiz/page.tsx).
-//   sp = Security+ · csa = ServiceNow CSA · ai = AWS AI
+//   sp = Security+ · csa = ServiceNow CSA · ai = AWS AI · cd = Cyber Defense
 
 export type AccessOpts = { plan?: string | null; productType?: string | null; billingCycle?: string | null };
 
 // Map a customer's track string (+ tier context) → the set of track prefixes they can
 // access. This is the EXACT logic the quiz + video gate use — do not fork it.
 export function allowedPrefixes(trackStr: string | null, opts: AccessOpts = {}): Set<string> {
-  const all = new Set(["sp", "csa", "ai"]);
+  const all = new Set(["sp", "csa", "ai", "cd"]);
   const t = (trackStr || "").toLowerCase();
   // Admin / demo / all-access tracks see every track.
   if (t.includes("full") || t.includes("admin") || t.includes("all access") || t.includes("all-access")) return all;
@@ -26,6 +26,15 @@ export function allowedPrefixes(trackStr: string | null, opts: AccessOpts = {}):
   const isFounding = productType.includes("founding");
   if (!isMonthly && (isFounding || t.includes("aws") || t.includes("ai practitioner"))) out.add("ai");
 
+  // Cyber Defense is the companion track to the Cyber Defense Playbook. It is not
+  // a cert track — it is career/strategy material — so it comes with ANY paid
+  // membership rather than being sold separately, monthly included. Free and
+  // Discord-only members do not get it: the quiz engine is paid product.
+  const isPaidMember = isFounding || plan === "monthly" || billingCycle === "monthly"
+    || t.includes("security+") || t.includes("sec+") || t.includes("comptia security")
+    || t.includes("servicenow") || t.includes("csa") || t.includes("aws") || t.includes("ai practitioner");
+  if (isPaidMember || t.includes("cyber defense") || t.includes("cyber-defense")) out.add("cd");
+
   // Security+ and ServiceNow CSA are PAID add-on tracks — unlocked only when the
   // member's track string names them (e.g. "... + Security+" / "... + ServiceNow CSA").
   if (t.includes("security+") || t.includes("sec+") || t.includes("comptia security")) out.add("sp");
@@ -33,12 +42,13 @@ export function allowedPrefixes(trackStr: string | null, opts: AccessOpts = {}):
   return out;
 }
 
-// Normalize a lesson's requiredAccess into a prefix (sp | csa | ai), so docs can be
+// Normalize a lesson's requiredAccess into a prefix (sp | csa | ai | cd), so docs can be
 // authored with friendly values (secplus, csa, aws-ai) without messy matching later.
 export function normalizeRequired(requiredAccess: string): string {
   const r = (requiredAccess || "").toLowerCase().trim();
   if (r === "sp" || r === "secplus" || r.includes("security") || r.includes("sec+")) return "sp";
   if (r === "csa" || r.includes("servicenow") || r.includes("csa")) return "csa";
+  if (r === "cd" || r.includes("cyber defense") || r.includes("cyber-defense")) return "cd";
   if (r === "ai" || r.includes("aws") || r.includes("ai")) return "ai";
   return r;
 }
