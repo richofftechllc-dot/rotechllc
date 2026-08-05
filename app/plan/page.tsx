@@ -69,7 +69,7 @@ export default function PlanPage() {
           <div className="flex flex-wrap gap-2">
             {data.tracks?.map((t) => (
               <button key={t.id} onClick={() => choose({ trackId: t.id })} disabled={busy}
-                className={`px-4 py-2 rounded-lg text-sm font-bold border transition ${trackId === t.id ? "bg-orange-500 border-orange-500 text-rot-fg" : "bg-rot-surface border-rot-line text-rot-muted hover:border-rot-line-strong"}`}>
+                className={`px-4 py-2 rounded-lg text-sm font-bold border transition ${trackId === t.id ? "bg-rot-accent border-rot-accent text-rot-fg" : "bg-rot-surface border-rot-line text-rot-muted hover:border-rot-line-strong"}`}>
                 {t.name}
               </button>
             ))}
@@ -85,7 +85,7 @@ export default function PlanPage() {
         <div className="grid grid-cols-3 gap-2 max-w-md">
           {PACES.map((p) => (
             <button key={p} onClick={() => choose({ pace: p })} disabled={busy}
-              className={`py-3 rounded-xl font-black border transition ${pace === p ? "bg-gradient-to-r from-orange-500 to-red-500 border-orange-500 text-white" : "bg-rot-surface border-rot-line text-rot-muted hover:border-rot-line-strong"}`}>
+              className={`py-3 rounded-xl font-black border transition ${pace === p ? "bg-gradient-to-r from-rot-accent to-rot-accent-2 border-rot-accent text-white" : "bg-rot-surface border-rot-line text-rot-muted hover:border-rot-line-strong"}`}>
               {p}<span className="block text-[11px] font-medium opacity-80">days</span>
             </button>
           ))}
@@ -103,7 +103,7 @@ export default function PlanPage() {
           <ol className="relative border-l border-rot-line ml-3">
             {plan.milestones.map((m, i) => (
               <li key={m.domainId} className="mb-4 ml-5">
-                <span className="absolute -left-3 flex items-center justify-center w-6 h-6 bg-orange-500 rounded-full text-black text-xs font-black">{i + 1}</span>
+                <span className="absolute -left-3 flex items-center justify-center w-6 h-6 bg-rot-accent rounded-full text-black text-xs font-black">{i + 1}</span>
                 <div className="bg-rot-surface border border-rot-line rounded-xl px-4 py-3">
                   <div className="flex items-center justify-between gap-3">
                     <div className="font-bold">{m.name}</div>

@@ -43,13 +43,13 @@ export default async function Pricing() {
   const count = await getMemberCount();
   return (
     <main className="max-w-6xl mx-auto px-6 py-16">
-      <h1 className="text-5xl md:text-7xl font-black text-center mb-4">Everything You Get<br /><span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">Now $375 / Year.</span></h1>
+      <h1 className="text-5xl md:text-7xl font-black text-center mb-4">Everything You Get<br /><span className="bg-gradient-to-r from-rot-accent to-rot-accent-2 bg-clip-text text-transparent">Now $375 / Year.</span></h1>
       <p className="text-rot-muted text-center mb-16 max-w-2xl mx-auto">
         Founding is <b className="text-rot-fg">closed</b> — all 99 seats gone. Membership is <b className="text-rot-fg">$375/year</b> — full access for 12 months, one payment, no recurring surprises. Everyone who joined at a founding rate <b className="text-rot-fg">keeps it</b>.
       </p>
 
       <div className="border-2 border-rot-accent/30 rounded-2xl p-8 md:p-12 relative">
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-1 bg-gradient-to-r from-orange-500 to-red-500 rounded-full text-xs font-bold tracking-wider">VIP MEMBER ACCESS</div>
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-1 bg-gradient-to-r from-rot-accent to-rot-accent-2 rounded-full text-xs font-bold tracking-wider">VIP MEMBER ACCESS</div>
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <ul className="space-y-3">
             {benefits.map(b => <li key={b} className="flex gap-3 text-rot-muted"><span className="text-emerald-600">✓</span>{b}</li>)}
@@ -58,7 +58,7 @@ export default async function Pricing() {
             <div className="text-7xl font-black text-rot-accent">$375</div>
             <div className="text-rot-accent text-xs font-bold tracking-widest uppercase mt-1">Per year · 12 months full access</div>
             <div className="text-rot-faint text-xs mt-1 mb-6">Founding closed · one payment · 12 months</div>
-            <a href={CHECKOUT.yearly || COACH_FALLBACK} target="_blank" rel="noopener noreferrer" className="block w-full py-4 bg-gradient-to-r from-orange-500 to-red-500 font-bold rounded-lg">{CHECKOUT.yearly ? "Join — $375 / year" : "Talk to a coach to join"}</a>
+            <a href={CHECKOUT.yearly || COACH_FALLBACK} target="_blank" rel="noopener noreferrer" className="block w-full py-4 bg-gradient-to-r from-rot-accent to-rot-accent-2 font-bold rounded-lg">{CHECKOUT.yearly ? "Join — $375 / year" : "Talk to a coach to join"}</a>
             <div className="my-4 flex items-center gap-3 text-rot-faint text-xs"><span className="flex-1 h-px bg-rot-sunken" />or lock monthly<span className="flex-1 h-px bg-rot-sunken" /></div>
             <div className="text-3xl font-black text-rot-fg">$40<span className="text-base font-bold text-rot-muted"> / month</span></div>
             <div className="text-rot-faint text-xs mt-1 mb-3">$40/mo while active · cancel anytime</div>

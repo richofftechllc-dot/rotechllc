@@ -40,7 +40,7 @@ export default function ReferralLanding() {
           <>
             <h1 className="text-2xl font-bold mb-2">Join Rich Off Tech</h1>
             <p className="text-rot-muted mb-4">That referral link wasn&apos;t recognized, but you can still join.</p>
-            <a href="https://www.rotechllc.com" className="inline-block px-5 py-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg font-bold">See the deal →</a>
+            <a href="https://www.rotechllc.com" className="inline-block px-5 py-3 bg-gradient-to-r from-rot-accent to-rot-accent-2 rounded-lg font-bold">See the deal →</a>
           </>
         ) : (
           <>
@@ -58,7 +58,7 @@ export default function ReferralLanding() {
               className="w-full bg-rot-bg border border-rot-line rounded-lg px-4 py-3 mb-1 outline-none focus:border-rot-accent"
             />
             <p className="text-rot-faint text-xs mb-4">Use the same email you&apos;ll pay with — that&apos;s how {referrer || "your referrer"} gets credited automatically.</p>
-            <button onClick={go} disabled={busy} className="w-full py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg uppercase tracking-wider disabled:opacity-50">
+            <button onClick={go} disabled={busy} className="w-full py-3 bg-gradient-to-r from-rot-accent to-rot-accent-2 text-white font-bold rounded-lg uppercase tracking-wider disabled:opacity-50">
               {busy ? "…" : "Continue to checkout →"}
             </button>
             {err && <div className="text-red-400 text-sm text-center mt-3">{err}</div>}

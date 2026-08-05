@@ -61,7 +61,7 @@ export default function CohortWaitlist({ cohort = "july-2026" }: { cohort?: stri
       <button
         type="submit"
         disabled={status === "loading"}
-        className="w-full py-3.5 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90 disabled:opacity-60"
+        className="w-full py-3.5 bg-gradient-to-r from-rot-accent to-rot-accent-2 text-white font-bold rounded-lg hover:opacity-90 disabled:opacity-60"
       >
         {status === "loading" ? "Joining…" : "Get on the July waitlist →"}
       </button>

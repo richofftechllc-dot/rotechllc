@@ -406,7 +406,7 @@ ${missedText}]
                   <div className="flex items-center justify-between">
                     <span className="font-black text-lg text-rot-fg">{lc.price}</span>
                     {lc.buyUrl && (
-                      <a href={lc.buyUrl} className="text-xs font-bold px-3 py-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 text-white uppercase tracking-wide">Unlock →</a>
+                      <a href={lc.buyUrl} className="text-xs font-bold px-3 py-1.5 rounded-lg bg-gradient-to-r from-rot-accent to-rot-accent-2 text-white uppercase tracking-wide">Unlock →</a>
                     )}
                   </div>
                 </div>
@@ -430,7 +430,7 @@ ${missedText}]
             const completed = !!p?.completed;
             const hasLesson = !!content?.lessons?.[d.id];
             return (
-              <div key={d.id} className={`w-full bg-rot-surface border rounded-lg p-4 flex items-center justify-between transition ${completed ? "border-green-500/40" : "border-rot-line hover:border-orange-500"}`}>
+              <div key={d.id} className={`w-full bg-rot-surface border rounded-lg p-4 flex items-center justify-between transition ${completed ? "border-green-500/40" : "border-rot-line hover:border-rot-accent"}`}>
                 <div className="flex items-center gap-4">
                   <span className="text-2xl font-black text-gray-700">{String(i+1).padStart(2,"0")}</span>
                   <div>
@@ -449,7 +449,7 @@ ${missedText}]
                     <>
                       <button
                         onClick={() => { setDomain(d); setShowLesson(true); setQIdx(d.questions.length); setAnswers([]); }}
-                        className="px-3 py-1.5 text-xs bg-orange-500 text-black font-bold rounded"
+                        className="px-3 py-1.5 text-xs bg-rot-accent text-black font-bold rounded"
                       >
                         📖 Study {completed ? "→ Retake" : "→ Quiz"}
                       </button>
@@ -461,7 +461,7 @@ ${missedText}]
                       </button>
                     </>
                   ) : (
-                    <button onClick={() => start(d)} className="px-3 py-1.5 text-xs bg-orange-500 text-black font-bold rounded">{completed ? "Retake →" : "Quiz →"}</button>
+                    <button onClick={() => start(d)} className="px-3 py-1.5 text-xs bg-rot-accent text-black font-bold rounded">{completed ? "Retake →" : "Quiz →"}</button>
                   )}
                 </div>
               </div>
@@ -487,7 +487,7 @@ ${missedText}]
           <div className="lg:col-span-2">
             {domain.video_url && <LessonVideo url={domain.video_url} domainId={domain.id} domainName={domain.name} />}
             <InteractiveLesson html={lesson} />
-            <button onClick={() => start(domain)} className="px-6 py-3 bg-orange-500 text-black font-bold rounded-lg">Start Quiz →</button>
+            <button onClick={() => start(domain)} className="px-6 py-3 bg-rot-accent text-black font-bold rounded-lg">Start Quiz →</button>
           </div>
           <SidePanel domain={domain} onStart={() => start(domain)} liveSession={content?.liveSession} />
         </div>
@@ -507,7 +507,7 @@ ${missedText}]
           Question{unanswered.length > 1 ? "s" : ""}: {unanswered.map(i => i + 1).join(", ")}
         </p>
         <div className="flex gap-3 justify-center flex-wrap">
-          <button onClick={() => setQIdx(unanswered[0])} className="px-6 py-3 bg-orange-500 text-black font-bold rounded-lg">Answer them →</button>
+          <button onClick={() => setQIdx(unanswered[0])} className="px-6 py-3 bg-rot-accent text-black font-bold rounded-lg">Answer them →</button>
           <button onClick={() => setFinished(true)} className="px-6 py-3 bg-rot-sunken text-rot-fg font-bold rounded-lg">Finish anyway</button>
         </div>
       </main>
@@ -535,13 +535,13 @@ ${missedText}]
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
                 {persona === "bo" ? (
-                  <Image src="/bo-avatar.png" alt="Bo" width={36} height={36} className="rounded-full border-2 border-orange-500" />
+                  <Image src="/bo-avatar.png" alt="Bo" width={36} height={36} className="rounded-full border-2 border-rot-accent" />
                 ) : (
                   <div className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-fuchsia-400 bg-gradient-to-br from-fuchsia-500 to-purple-600 text-sm font-black text-rot-fg">F</div>
                 )}
                 <div>
                   <div className="font-bold text-sm">{persona === "bo" ? "Bo Tech" : "Flo"}</div>
-                  <div className={`text-xs ${persona === "bo" ? "text-emerald-600" : "text-fuchsia-300"}`}>Your debrief</div>
+                  <div className={`text-xs ${persona === "bo" ? "text-emerald-600" : "text-fuchsia-700"}`}>Your debrief</div>
                 </div>
               </div>
               {debrief && (
@@ -553,13 +553,13 @@ ${missedText}]
               ? <div className="text-rot-accent text-xs animate-pulse">{persona === "bo" ? "Bo" : "Flo"}&apos;s reviewing your run…</div>
               : <Markdown text={debrief} />}
             {!debriefBusy && debrief && missedCount > 0 && (
-              <button onClick={drillMissed} className="mt-3 px-4 py-2 bg-orange-500 text-black font-bold text-sm rounded-lg">🎯 Drill me on those {missedCount} →</button>
+              <button onClick={drillMissed} className="mt-3 px-4 py-2 bg-rot-accent text-black font-bold text-sm rounded-lg">🎯 Drill me on those {missedCount} →</button>
             )}
           </div>
         )}
 
         <div className="flex gap-3 justify-center flex-wrap mt-6">
-          <button onClick={() => start(domain)} className="px-6 py-3 bg-orange-500 text-black font-bold rounded-lg">Retry</button>
+          <button onClick={() => start(domain)} className="px-6 py-3 bg-rot-accent text-black font-bold rounded-lg">Retry</button>
           <button onClick={() => setDomain(null)} className="px-6 py-3 bg-rot-sunken text-rot-fg font-bold rounded-lg">Domains</button>
           <button onClick={reset} className="px-6 py-3 border border-rot-line-strong text-rot-fg font-bold rounded-lg">Home</button>
         </div>
@@ -611,7 +611,7 @@ ${missedText}]
             {cur == null ? (
               <button onClick={() => setQIdx(qIdx + 1)} className="px-5 py-3 border border-rot-accent/30 text-rot-accent font-bold rounded-lg">Skip →</button>
             ) : (
-              <button onClick={() => setQIdx(qIdx + 1)} className="px-6 py-3 bg-orange-500 text-black font-bold rounded-lg">{isLast ? "See results →" : "Next →"}</button>
+              <button onClick={() => setQIdx(qIdx + 1)} className="px-6 py-3 bg-rot-accent text-black font-bold rounded-lg">{isLast ? "See results →" : "Next →"}</button>
             )}
           </div>
         </div>
@@ -620,22 +620,22 @@ ${missedText}]
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-3">
                 {persona === "bo" ? (
-                  <Image src="/bo-avatar.png" alt="Bo" width={40} height={40} className="rounded-full border-2 border-orange-500" />
+                  <Image src="/bo-avatar.png" alt="Bo" width={40} height={40} className="rounded-full border-2 border-rot-accent" />
                 ) : (
                   <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-fuchsia-400 bg-gradient-to-br from-fuchsia-500 to-purple-600 text-sm font-black text-rot-fg">F</div>
                 )}
                 <div>
                   <div className="font-bold text-sm">{persona === "bo" ? "Bo Tech" : "Flo"}</div>
-                  <div className={`text-xs ${persona === "bo" ? "text-emerald-600" : "text-fuchsia-300"}`}>{persona === "bo" ? "Live · knows this question" : "Live · ServiceNow instructor"}</div>
+                  <div className={`text-xs ${persona === "bo" ? "text-emerald-600" : "text-fuchsia-700"}`}>{persona === "bo" ? "Live · knows this question" : "Live · ServiceNow instructor"}</div>
                 </div>
               </div>
               <div className="flex items-center gap-1">
                 {speakingIdx !== null && (
                   <button onClick={stopSpeak} title="Stop reading"
-                    className="text-xs rounded px-2 py-1 border border-red-500/40 bg-red-500/10 text-red-300">⏹ Stop</button>
+                    className="text-xs rounded px-2 py-1 border border-red-500/40 bg-red-500/10 text-red-700">⏹ Stop</button>
                 )}
                 <button onClick={toggleAutoSpeak} title="Speak replies aloud"
-                  className={`text-xs rounded px-2 py-1 border ${autoSpeak ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300" : "border-rot-line text-rot-muted hover:text-rot-fg"}`}>
+                  className={`text-xs rounded px-2 py-1 border ${autoSpeak ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700" : "border-rot-line text-rot-muted hover:text-rot-fg"}`}>
                   {autoSpeak ? "🔊" : "🔈"}
                 </button>
                 <button onClick={clearChat} disabled={chatBusy} title="Start a new chat — your tutor keeps what they've learned about you"
@@ -645,7 +645,7 @@ ${missedText}]
               </div>
             </div>
             <div className="flex rounded-lg bg-rot-sunken p-0.5 text-xs">
-              <button onClick={() => switchPersona("bo")} disabled={chatBusy} className={`flex-1 rounded-md py-1 font-bold transition-colors disabled:opacity-50 ${persona === "bo" ? "bg-orange-500 text-black" : "text-rot-muted hover:text-rot-fg"}`}>Bo · plain talk</button>
+              <button onClick={() => switchPersona("bo")} disabled={chatBusy} className={`flex-1 rounded-md py-1 font-bold transition-colors disabled:opacity-50 ${persona === "bo" ? "bg-rot-accent text-black" : "text-rot-muted hover:text-rot-fg"}`}>Bo · plain talk</button>
               <button onClick={() => switchPersona("flo")} disabled={chatBusy} className={`flex-1 rounded-md py-1 font-bold transition-colors disabled:opacity-50 ${persona === "flo" ? "bg-fuchsia-500 text-black" : "text-rot-muted hover:text-rot-fg"}`}>Flo · technical</button>
             </div>
           </div>
@@ -691,7 +691,7 @@ ${missedText}]
               className="flex-1 bg-rot-sunken border border-rot-line rounded px-3 py-2 text-sm focus:outline-none focus:border-rot-accent"
             />
             <button onClick={toggleMic} title="Talk to your tutor" className={`px-3 rounded font-bold ${listening ? "bg-red-500 text-rot-fg animate-pulse" : "bg-rot-sunken text-rot-muted hover:text-rot-fg border border-rot-line"}`}>🎤</button>
-            <button onClick={() => askBo(chatInput)} disabled={chatBusy || !chatInput.trim()} className="px-3 bg-orange-500 text-black font-bold rounded disabled:opacity-40">→</button>
+            <button onClick={() => askBo(chatInput)} disabled={chatBusy || !chatInput.trim()} className="px-3 bg-rot-accent text-black font-bold rounded disabled:opacity-40">→</button>
           </div>
         </div>
       </div>
@@ -746,9 +746,9 @@ function SidePanel({ domain, onStart, liveSession }: { domain: Domain; onStart: 
             {labs.map(l => (
               <li key={l.id}>
                 <a href={`/lab/${l.id}`} className="block rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/5 p-2.5 hover:border-fuchsia-500/60">
-                  <span className="block text-sm font-bold text-fuchsia-300">🧪 {l.title}</span>
+                  <span className="block text-sm font-bold text-fuchsia-700">🧪 {l.title}</span>
                   <span className="block text-[11px] text-rot-muted">{l.objective}</span>
-                  <span className="mt-1 inline-block text-[11px] font-bold text-fuchsia-400">Start with Flo · {l.est} →</span>
+                  <span className="mt-1 inline-block text-[11px] font-bold text-fuchsia-700">Start with Flo · {l.est} →</span>
                 </a>
               </li>
             ))}
@@ -759,7 +759,7 @@ function SidePanel({ domain, onStart, liveSession }: { domain: Domain; onStart: 
       <div className="bg-rot-surface border border-rot-line rounded-xl p-4">
         <div className="text-rot-accent font-bold tracking-widest text-[10px] mb-3">READY?</div>
         <p className="text-xs text-rot-muted mb-3">When you&apos;ve absorbed the lesson, take the quiz to lock it in.</p>
-        <button onClick={onStart} className="w-full px-4 py-2.5 bg-orange-500 text-black font-bold text-sm rounded">Start Quiz →</button>
+        <button onClick={onStart} className="w-full px-4 py-2.5 bg-rot-accent text-black font-bold text-sm rounded">Start Quiz →</button>
       </div>
     </aside>
   );

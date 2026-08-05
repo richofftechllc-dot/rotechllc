@@ -74,7 +74,7 @@ export default async function Welcome({
               href={CHECKOUT.yearly || COACH_FALLBACK}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 font-bold rounded-lg"
+              className="inline-block px-6 py-3 bg-gradient-to-r from-rot-accent to-rot-accent-2 font-bold rounded-lg"
             >
               {CHECKOUT.yearly ? "Lock In VIP Access — $375" : "Talk to a coach to join"}
             </a>

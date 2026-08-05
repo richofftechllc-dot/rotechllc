@@ -101,12 +101,12 @@ export default function Help() {
       </section>
 
       {/* CTA — value close, no price */}
-      <section className="bg-gradient-to-br from-orange-500/10 to-red-500/10 py-24 border-t border-rot-line">
+      <section className="bg-gradient-to-br from-rot-accent/10 to-red-500/10 py-24 border-t border-rot-line">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <h2 className="text-4xl md:text-5xl font-black mb-6">Still stuck? Come ask.</h2>
           <p className="text-rot-muted text-lg mb-8">Hop in the Discord — it&apos;s free. Bo Tech and the team map your cert track, exam voucher, clearance path, or AI build from there. No checkout here.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <a href="https://discord.gg/dtcYf8PTNa" target="_blank" rel="noopener noreferrer" className="inline-block px-8 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg text-lg hover:opacity-90">
+            <a href="https://discord.gg/dtcYf8PTNa" target="_blank" rel="noopener noreferrer" className="inline-block px-8 py-4 bg-gradient-to-r from-rot-accent to-rot-accent-2 text-white font-bold rounded-lg text-lg hover:opacity-90">
               Join the Discord — Free
             </a>
             <a href="/membership" className="inline-block px-8 py-4 border border-rot-line-strong rounded-lg text-lg hover:bg-rot-sunken">

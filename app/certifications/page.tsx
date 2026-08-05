@@ -123,7 +123,7 @@ export default function Certifications() {
             </div>
           </div>
           <div className="text-center mt-12">
-            <a href="/help#agents" className="inline-block px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90">Start with a quick AI call →</a>
+            <a href="/help#agents" className="inline-block px-6 py-3 bg-gradient-to-r from-rot-accent to-rot-accent-2 text-white font-bold rounded-lg hover:opacity-90">Start with a quick AI call →</a>
           </div>
           <p className="text-rot-faint text-xs text-center mt-6 max-w-2xl mx-auto">*Pass guarantee: complete your track and the coursework — if you don&apos;t pass, we keep coaching you (retake voucher included) until you do. Full terms shared at enrollment.</p>
         </div>

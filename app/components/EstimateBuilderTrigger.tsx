@@ -25,7 +25,7 @@ export default function EstimateBuilderTrigger() {
 
   return (
     <div className="max-w-3xl mx-auto px-6">
-      <div className="bg-gradient-to-br from-orange-500/10 via-zinc-950 to-zinc-950 border border-rot-accent/30 rounded-2xl p-8 md:p-10 text-center">
+      <div className="bg-gradient-to-br from-rot-accent/10 via-zinc-950 to-zinc-950 border border-rot-accent/30 rounded-2xl p-8 md:p-10 text-center">
         <div className="text-rot-accent font-bold tracking-widest text-xs mb-3">SELF-SERVE</div>
         <h2 className="text-3xl md:text-4xl font-black mb-3">Build your own estimate.</h2>
         <p className="text-rot-muted text-base md:text-lg max-w-xl mx-auto mb-6">
@@ -34,7 +34,7 @@ export default function EstimateBuilderTrigger() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="px-7 py-3.5 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg text-base hover:opacity-90 transition"
+          className="px-7 py-3.5 bg-gradient-to-r from-rot-accent to-rot-accent-2 text-white font-bold rounded-lg text-base hover:opacity-90 transition"
         >
           Open the Estimate Builder ↓
         </button>

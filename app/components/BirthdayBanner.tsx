@@ -55,7 +55,7 @@ export default function BirthdayBanner() {
   const btn = "inline-block px-4 py-2 rounded-lg font-bold text-sm";
 
   return (
-    <div className="mb-6 rounded-xl border border-rot-accent/30 bg-gradient-to-r from-orange-500/10 to-red-500/10 px-5 py-4">
+    <div className="mb-6 rounded-xl border border-rot-accent/30 bg-gradient-to-r from-rot-accent/10 to-red-500/10 px-5 py-4">
       <div className="text-rot-accent font-bold text-xs tracking-widest uppercase">🎂 Bo&apos;s 30th Birthday Drop · ends {endsOn}</div>
       <div className="text-rot-fg text-2xl md:text-3xl font-black mt-1 tabular-nums">
         {cd}

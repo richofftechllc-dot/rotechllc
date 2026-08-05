@@ -12,7 +12,7 @@ export default function BoAvatarFlip() {
       tabIndex={0}
       aria-label="Tap to flip avatar"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-500/30 to-red-500/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-rot-accent/30 to-red-500/20 rounded-full blur-3xl pointer-events-none" />
       <div
         className={`relative transform-3d transition-transform duration-700 ease-out group-hover:rotate-y-180 ${flipped ? "rotate-y-180" : ""}`}
       >

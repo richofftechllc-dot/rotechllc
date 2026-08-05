@@ -42,7 +42,7 @@ export default function Account() {
       </div>
 
       <div className="grid sm:grid-cols-2 gap-3 mb-6">
-        <Link href="/plan" className="bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-xl px-5 py-4 text-center">📅 My Plan / roadmap</Link>
+        <Link href="/plan" className="bg-gradient-to-r from-rot-accent to-rot-accent-2 text-white font-bold rounded-xl px-5 py-4 text-center">📅 My Plan / roadmap</Link>
         <Link href="/quiz" className="bg-rot-surface border border-rot-line rounded-xl px-5 py-4 text-center font-bold hover:border-rot-line-strong">📚 Quiz engine</Link>
         <a href="https://discord.gg/dtcYf8PTNa" target="_blank" rel="noopener" className="bg-rot-surface border border-rot-line rounded-xl px-5 py-4 text-center font-bold hover:border-rot-line-strong">💬 Discord</a>
         <Link href="/bo" className="bg-rot-surface border border-rot-line rounded-xl px-5 py-4 text-center font-bold hover:border-rot-line-strong">🤖 AI tutors</Link>
