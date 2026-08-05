@@ -68,7 +68,13 @@ export async function GET(req: NextRequest) {
     }
   } catch { /* fall through — no track */ }
 
-  const allowed = isCoach ? new Set(["sp", "csa", "ai"]) : allowedPrefixes(track, { plan, productType, billingCycle });
+  // Coaches see everything, including the free ROT tracks — this used to be
+  // hardcoded to the three cert prefixes, which meant a coach (and the owner) was
+  // shown ONLY sp/csa/ai and the free cd/hk/ad tracks appeared LOCKED to the very
+  // people who should see them all. Members get the free tracks via allowedPrefixes.
+  const allowed = isCoach
+    ? new Set(["sp", "csa", "ai", "cd", "hk", "ad"])
+    : allowedPrefixes(track, { plan, productType, billingCycle });
 
   // Full content for allowed tracks; metadata-only cards for locked ones.
   const tracks = TRACKS.filter((t) => allowed.has(t.id));
@@ -78,10 +84,13 @@ export async function GET(req: NextRequest) {
     buyUrl: LOCKED_META[t.id]?.buyUrl || "",
   }));
 
-  // Lessons only for allowed domain prefixes (keys look like ai1, csa3, sp2).
+  // Lessons only for allowed domain prefixes (keys look like ai1, csa3, sp2, cd4,
+  // hk1, ad5). Strip the trailing number to get the track prefix — the old
+  // hardcoded sp/csa/ai chain silently dropped every cd/hk/ad lesson, so an
+  // unlocked free track would have shown its questions with no lesson material.
   const lessons: Record<string, string> = {};
   for (const [k, v] of Object.entries(LESSONS)) {
-    const prefix = k.startsWith("sp") ? "sp" : k.startsWith("csa") ? "csa" : k.startsWith("ai") ? "ai" : "";
+    const prefix = k.replace(/\d+$/, "");
     if (allowed.has(prefix)) lessons[k] = v;
   }
 
