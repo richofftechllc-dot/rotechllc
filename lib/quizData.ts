@@ -4785,6 +4785,482 @@ export const TRACKS: Track[] = [
         ]
       }
     ]
+  },
+  {
+    "id": "hk",
+    "name": "Hacking with Bo & Flo",
+    "domains": [
+      {
+        "id": "hk1",
+        "name": "Mindset & Rules of Engagement",
+        "questions": [
+          {
+            "q": "You find a login page on a company's public website and notice it uses a weak default password. You do not work there and have no contract. What is the correct action?",
+            "options": [
+              "Log in to confirm the vulnerability, then report it",
+              "Do nothing to the system; report it responsibly without accessing it",
+              "Test it quietly since it's for their benefit",
+              "Use it once to prove impact, then stop"
+            ],
+            "answer": 1,
+            "exp": "Any access without authorization is a crime, even to 'prove' a real flaw and even with good intent. Responsible disclosure means reporting WITHOUT accessing. The line is authorization, not intention."
+          },
+          {
+            "q": "What is the single factor that separates a penetration tester from a criminal doing the exact same commands?",
+            "options": [
+              "The tools they use",
+              "Written authorization and a defined scope",
+              "A relevant certification",
+              "Whether they cause damage"
+            ],
+            "answer": 1,
+            "exp": "Identical commands, identical tools. One has a signed scope document, the other has a case number. Authorization is the whole difference."
+          },
+          {
+            "q": "Before a real engagement begins, what document defines what you can test, when, and who to call if something breaks?",
+            "options": [
+              "The vulnerability report",
+              "The rules of engagement (RoE)",
+              "The service-level agreement",
+              "The CVE list"
+            ],
+            "answer": 1,
+            "exp": "The RoE is step zero. Scope, timing, off-limits systems, emergency contacts, and whether you may exploit or only demonstrate. No signed RoE, no testing."
+          },
+          {
+            "q": "Which best captures the attacker's actual approach to getting in?",
+            "options": [
+              "Find and use the most sophisticated exploit available",
+              "Take the cheapest path of least resistance",
+              "Always start with a zero-day",
+              "Attack the most heavily defended system first"
+            ],
+            "answer": 1,
+            "exp": "Attackers are economically rational. A valid password beats a zero-day. Defenders and testers should check the easy doors before reaching for the exotic ones."
+          },
+          {
+            "q": "Experienced testers say enumeration is 'the whole game.' What does that mean in practice?",
+            "options": [
+              "Running the most scans possible",
+              "Carefully reading what you find, because the finding is usually in plain sight",
+              "Exploiting every open port immediately",
+              "Automating everything end to end"
+            ],
+            "answer": 1,
+            "exp": "The skill is looking, not exploiting. The misconfigured service with the default password was visible the whole time — the pro is the one who actually read it."
+          },
+          {
+            "q": "Why should offensive-security practice happen on an isolated, host-only lab network?",
+            "options": [
+              "It runs faster than a routed network",
+              "It guarantees your practice can never reach systems you don't own",
+              "It is required for certification",
+              "It hides your traffic from your ISP"
+            ],
+            "answer": 1,
+            "exp": "Host-only networking is the technical guarantee that a mistake in your lab stays in your lab. It's how you keep 'practice' from becoming 'unauthorized access to someone else's network.'"
+          },
+          {
+            "q": "A client's RoE says 'demonstrate access, do not exfiltrate data.' You gain admin and can read the customer database. What do you do?",
+            "options": [
+              "Download a sample as proof",
+              "Prove you could read it without copying it out, and document that",
+              "Exfiltrate everything to show worst case",
+              "Ask forgiveness later"
+            ],
+            "answer": 1,
+            "exp": "Proving impact WITHOUT causing it is a core professional skill and exactly what the RoE demanded. Exceeding scope, even to be thorough, breaks the engagement and possibly the law."
+          },
+          {
+            "q": "What is the standard methodology loop an attacker or tester follows?",
+            "options": [
+              "Exploit, escalate, exit",
+              "Recon → scan/enumerate → gain access → escalate/move → prove/document → clean up",
+              "Scan, report, patch",
+              "Phish, dump, sell"
+            ],
+            "answer": 1,
+            "exp": "The same repeatable sequence every time, whether it's a CTF box or an enterprise engagement. Learning the loop means no target is ever a blank page."
+          }
+        ]
+      },
+      {
+        "id": "hk2",
+        "name": "Recon & Enumeration",
+        "questions": [
+          {
+            "q": "What is the difference between passive and active reconnaissance?",
+            "options": [
+              "Passive is legal, active is not",
+              "Passive never touches the target; active interacts with it and leaves traces",
+              "Passive uses tools, active is manual",
+              "There is no meaningful difference"
+            ],
+            "answer": 1,
+            "exp": "Passive recon reads what's already public — you're invisible to the target. Active recon interacts directly, so it can be logged. Passive first, always."
+          },
+          {
+            "q": "A company's job posting lists the exact software and versions their team supports. To an attacker, this is:",
+            "options": [
+              "Irrelevant marketing",
+              "Free reconnaissance about their technology stack",
+              "A legal safe harbor",
+              "Proof the company is secure"
+            ],
+            "answer": 1,
+            "exp": "OSINT gold. Job posts, employee profiles and public docs hand attackers the tech stack, the org chart, and who to phish — all without touching the target."
+          },
+          {
+            "q": "Why do experienced testers say a service VERSION NUMBER is the pivot point of an engagement?",
+            "options": [
+              "It proves the scan worked",
+              "You match it against known-vulnerability databases to find a way in",
+              "It identifies the vendor for the report",
+              "It determines the port number"
+            ],
+            "answer": 1,
+            "exp": "'Service X version 2.1.3' → search CVE and exploit archives → is there a known issue for exactly that version? That loop turns a scan result into an entry point."
+          },
+          {
+            "q": "You scan a target and find three open ports. A beginner fires exploits immediately. What does a professional do first?",
+            "options": [
+              "Report the open ports",
+              "Deeply enumerate the services behind them before touching anything",
+              "Close the ports",
+              "Rescan from a different IP"
+            ],
+            "answer": 1,
+            "exp": "The open port isn't the finding — the misconfigured service behind it is. Enumeration before exploitation is what separates results from noise."
+          },
+          {
+            "q": "Which activity is genuinely PASSIVE reconnaissance?",
+            "options": [
+              "Port-scanning the target's servers",
+              "Reading the target's certificate transparency logs and breach-database exposure",
+              "Connecting to their SSH service to grab a banner",
+              "Pinging their host range"
+            ],
+            "answer": 1,
+            "exp": "Certificate transparency logs and breach data are public — you never touch the target to read them. Port scans, banner grabs and pings all interact with the target directly."
+          },
+          {
+            "q": "The defensive discipline that mirrors an attacker's recon — running recon on your OWN organization to see what leaks — is called:",
+            "options": [
+              "Penetration testing",
+              "Attack surface management",
+              "Incident response",
+              "Threat hunting"
+            ],
+            "answer": 1,
+            "exp": "The best blue teams recon themselves regularly. Anything an attacker can find about you in passive recon is something you can find first and lock down."
+          },
+          {
+            "q": "Enumeration of a target reveals a file share requiring no authentication. What has actually been found?",
+            "options": [
+              "An open port",
+              "A misconfiguration that may expose data or a foothold",
+              "A false positive",
+              "A honeypot, definitely"
+            ],
+            "answer": 1,
+            "exp": "An unauthenticated share is a classic misconfiguration finding — potential data exposure and a possible way in. This is exactly the kind of thing enumeration surfaces that a shallow scan misses."
+          },
+          {
+            "q": "Why is OSINT on employees a serious risk even though it never touches company systems?",
+            "options": [
+              "It violates the CFAA",
+              "It hands attackers the org chart, reused usernames and phishing targets",
+              "It sets off intrusion detection",
+              "It only works against small companies"
+            ],
+            "answer": 1,
+            "exp": "People are attack surface. A reused username across sites, a role in a profile, an email in a breach dump — none of it touches a server, and all of it fuels the next step."
+          }
+        ]
+      },
+      {
+        "id": "hk3",
+        "name": "Getting In & Moving",
+        "questions": [
+          {
+            "q": "Statistically, how does initial access to a target most commonly happen?",
+            "options": [
+              "Novel zero-day exploits",
+              "Boring doors: weak/reused credentials, unpatched known flaws, misconfigurations, phishing",
+              "Physical break-ins",
+              "Supply-chain implants"
+            ],
+            "answer": 1,
+            "exp": "Zero-days are rare and expensive. The overwhelming majority of real intrusions start with a credential, an unpatched CVE, a misconfig, or a phish. The boring doors are the doors."
+          },
+          {
+            "q": "What is privilege escalation?",
+            "options": [
+              "Moving from one machine to another",
+              "Going from a low-privilege user to admin/root on the machine you're on",
+              "Stealing a password",
+              "Exfiltrating data"
+            ],
+            "answer": 1,
+            "exp": "Escalation is getting bigger on the box you already have — usually via a misconfiguration, a loose file permission, a hijackable scheduled task, or an unpatched local flaw."
+          },
+          {
+            "q": "What is lateral movement?",
+            "options": [
+              "Escalating to root",
+              "Using a machine you control to reach the next machine, often with found credentials",
+              "Scanning a subnet",
+              "Deleting logs"
+            ],
+            "answer": 1,
+            "exp": "Lateral movement is spreading. You landed on one box; the target is elsewhere. Credentials found on the first machine are the usual vehicle — which is why credential hygiene is everything."
+          },
+          {
+            "q": "Why is a flat network (no segmentation) considered the attacker's best friend?",
+            "options": [
+              "It's faster to scan",
+              "Compromising one machine gives reach to every machine",
+              "It has no firewalls",
+              "It uses weak encryption"
+            ],
+            "answer": 1,
+            "exp": "If one box reaches all boxes, the game ends at step one. This is the NotPetya lesson — and why segmentation is the control defenders lose sleep over."
+          },
+          {
+            "q": "On an authorized engagement, you achieve persistence and could exfiltrate data. What is the professional default?",
+            "options": [
+              "Exfiltrate to demonstrate worst case",
+              "Prove you could, document it, but don't actually take the data unless scope allows",
+              "Establish permanent access for re-testing",
+              "Leave a backdoor for the client"
+            ],
+            "answer": 1,
+            "exp": "Demonstrating impact without causing it is the mature deliverable. Actually exfiltrating or leaving backdoors exceeds normal scope and creates real risk."
+          },
+          {
+            "q": "A service is running as root and its configuration can be influenced by a low-privilege user. This is a setup for:",
+            "options": [
+              "Lateral movement",
+              "Privilege escalation",
+              "Data exfiltration",
+              "Passive recon"
+            ],
+            "answer": 1,
+            "exp": "A root-level service you can influence is a classic local privilege-escalation path — you leverage the service's high privilege to elevate your own on that machine."
+          },
+          {
+            "q": "Which control most directly limits the damage of lateral movement after one machine is compromised?",
+            "options": [
+              "Antivirus",
+              "Network segmentation and least privilege",
+              "A stronger firewall at the perimeter",
+              "Longer passwords"
+            ],
+            "answer": 1,
+            "exp": "Once the attacker is inside, the perimeter is behind them. Segmentation contains where they can go and least privilege limits what stolen credentials can do."
+          },
+          {
+            "q": "Why do defenders study the attacker's post-access playbook (escalation, movement, persistence)?",
+            "options": [
+              "To become attackers",
+              "So they can detect and contain an intrusion in progress, not just prevent the first step",
+              "It's required for compliance",
+              "To write better firewall rules only"
+            ],
+            "answer": 1,
+            "exp": "Prevention fails sometimes. Knowing what an attacker does AFTER getting in is what lets a blue team spot the escalation attempt or the lateral move and cut it off before it becomes a breach."
+          }
+        ]
+      },
+      {
+        "id": "hk4",
+        "name": "Credentials — The Real Prize",
+        "questions": [
+          {
+            "q": "Why are valid credentials often worth more to an attacker than an exploit?",
+            "options": [
+              "They never expire",
+              "They let the attacker act like a legitimate user, which is hard to detect",
+              "They work on every system",
+              "They can be sold for more money"
+            ],
+            "answer": 1,
+            "exp": "A stolen credential walks through the front door looking exactly like a real user. That legitimacy is precisely what makes credential-based attacks so effective and so hard to catch."
+          },
+          {
+            "q": "An attacker with admin on a machine reads cached credentials from its memory. What single control most reduces this risk?",
+            "options": [
+              "Longer passwords",
+              "Limiting who has admin/local-admin rights (least privilege)",
+              "A faster antivirus",
+              "Disabling the network card"
+            ],
+            "answer": 1,
+            "exp": "Credential dumping requires admin on the box. Least privilege shrinks how many machines an attacker can do this on — and detection of the dumping tools covers the rest."
+          },
+          {
+            "q": "'Credential stuffing' works because of which user behavior?",
+            "options": [
+              "Weak password complexity rules",
+              "Reusing the same password across multiple sites",
+              "Writing passwords down",
+              "Sharing accounts"
+            ],
+            "answer": 1,
+            "exp": "One password breached elsewhere, tried everywhere. Unique passwords and a password manager break it; MFA makes a stolen password insufficient on its own."
+          },
+          {
+            "q": "What is the single most effective control against stolen or dumped passwords?",
+            "options": [
+              "Password rotation every 30 days",
+              "Multi-factor authentication everywhere",
+              "Longer minimum length",
+              "Account lockout after 3 tries"
+            ],
+            "answer": 1,
+            "exp": "MFA turns a stolen password into just a string — it's not enough by itself. If you learn one defensive lesson from studying credential attacks, this is it."
+          },
+          {
+            "q": "A developer commits an API key to a public code repository. This is an example of:",
+            "options": [
+              "Credential dumping",
+              "Exposed secrets — credentials leaked into the ground",
+              "Credential stuffing",
+              "A man-in-the-middle attack"
+            ],
+            "answer": 1,
+            "exp": "Secrets in code, config files, or shared docs are credentials lying on the ground. The defense is automated secret scanning in the pipeline plus fast key rotation when one leaks."
+          },
+          {
+            "q": "Why does capturing credentials 'in transit' succeed on some networks?",
+            "options": [
+              "The passwords are too short",
+              "Traffic isn't properly encrypted or the network isn't segmented",
+              "The attacker has admin rights",
+              "MFA is enabled"
+            ],
+            "answer": 1,
+            "exp": "Interception exploits unencrypted or poorly segmented networks. Proper encryption in transit and segmentation close this path — it's a network-hygiene problem, not a password-strength one."
+          },
+          {
+            "q": "You're a defender who just learned how credential dumping works. What is the MOST valuable thing that knowledge gives you?",
+            "options": [
+              "The ability to dump credentials yourself",
+              "The ability to prioritize the exact controls and detections that break it",
+              "A certification",
+              "A reason to buy more tools"
+            ],
+            "answer": 1,
+            "exp": "Understanding the attack is what lets you rank the defense: least privilege, MFA, and detection of the specific tools. Red knowledge directly sharpens blue prioritization."
+          },
+          {
+            "q": "Which combination best defends the credential attack surface overall?",
+            "options": [
+              "Antivirus plus a firewall",
+              "MFA + least privilege + credential monitoring + secret scanning + network encryption",
+              "Longer passwords plus rotation",
+              "A single sign-on portal"
+            ],
+            "answer": 1,
+            "exp": "Credentials get taken many ways, so the defense is layered — each control breaks a different theft path. No single setting covers memory-dumping, reuse, interception, and leaked secrets at once."
+          }
+        ]
+      },
+      {
+        "id": "hk5",
+        "name": "Tooling & The Report",
+        "questions": [
+          {
+            "q": "Why does this guide teach tool CATEGORIES rather than specific tools?",
+            "options": [
+              "Specific tools are illegal to name",
+              "Tools change every couple of years; the category (the job it does) is durable",
+              "Categories are easier to test",
+              "It avoids vendor bias only"
+            ],
+            "answer": 1,
+            "exp": "Understand 'a thing that intercepts web traffic' and you can pick up any web proxy in an afternoon. Memorize one tool by rote and you're stuck the moment the shop uses a different one."
+          },
+          {
+            "q": "What is the job of a vulnerability scanner, as distinct from a port scanner?",
+            "options": [
+              "It cracks passwords",
+              "It matches discovered software against known-vulnerability databases at scale",
+              "It intercepts web traffic",
+              "It manages exploits"
+            ],
+            "answer": 1,
+            "exp": "A port scanner finds open doors and versions. A vulnerability scanner takes that further — cross-referencing versions against known CVEs across many hosts quickly."
+          },
+          {
+            "q": "On a penetration testing engagement, what is the actual PRODUCT the client pays for?",
+            "options": [
+              "Proof that you got in",
+              "The report — what's wrong, how bad, and exactly how to fix it",
+              "A list of exploits used",
+              "Access credentials to their systems"
+            ],
+            "answer": 1,
+            "exp": "Getting in is how you learn what to write. The report is the deliverable. A brilliant hack with a lazy write-up is a failed engagement."
+          },
+          {
+            "q": "Which is the strongest way to express IMPACT in a report finding?",
+            "options": [
+              "CVSS score of 8.1",
+              "An unauthenticated attacker could read every customer record",
+              "The port was open",
+              "The exploit succeeded on the first try"
+            ],
+            "answer": 1,
+            "exp": "Impact in business terms lands with the people who fund the fix. A raw score means nothing to a decision-maker; 'an attacker could read every customer record' means everything."
+          },
+          {
+            "q": "A good report finding has five parts. Which set?",
+            "options": [
+              "Tool, command, output, screenshot, date",
+              "What it is, where, impact, proof, the fix",
+              "Severity, CVE, vendor, version, patch",
+              "Who, what, when, where, why"
+            ],
+            "answer": 1,
+            "exp": "What it is (plain language), where (the specific system), impact (in business terms), proof (reproducible, not a how-to for criminals), and the fix (specific and prioritized — the part they'll actually read)."
+          },
+          {
+            "q": "Why is the reporting phase the part beginners most often skip, and why is that a mistake?",
+            "options": [
+              "It's optional on most engagements",
+              "It's less exciting than exploitation, but it's the entire value to the client",
+              "Automated tools handle it",
+              "Clients rarely read it"
+            ],
+            "answer": 1,
+            "exp": "The hack is the fun part; the report is the paid part. A modest finding with a clear, actionable write-up beats a spectacular one nobody can act on."
+          },
+          {
+            "q": "A blue teamer studies offensive tooling primarily so they can:",
+            "options": [
+              "Run the tools against production",
+              "Recognize what those tools look like in their logs — the scan pattern, the cracking attempt, the C2 beacon",
+              "Replace their detection products",
+              "Pass a pentest certification"
+            ],
+            "answer": 1,
+            "exp": "You can't recognize what you've never seen described. Knowing how red tooling behaves on the wire and in logs is what makes detection possible."
+          },
+          {
+            "q": "Why do offense and defense belong in the same training track?",
+            "options": [
+              "To make the course longer",
+              "Because the entire point of the attack is to make the defense better — red informs blue",
+              "They don't; they're unrelated skills",
+              "To satisfy compliance"
+            ],
+            "answer": 1,
+            "exp": "Every technique on the red side has a control and a detection on the blue side. A report a blue team can act on Monday morning is the whole job — the offense was how you learned what to write."
+          }
+        ]
+      }
+    ]
   }
 ];
 
@@ -4811,4 +5287,9 @@ export const LESSONS: Record<string, string> = {
   "cd3": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>Threat intelligence without the marketing. Sold as a glowing world map with red arrows, usually delivered as a feed of IPs nobody reads. Intel is only intelligence if it changes a decision — otherwise it's an expensive newsletter.</p><p>This module also covers the attacker mindset, and the two boundaries that are not optional: authorisation and scope.</p><h3>🔑 KEY CONCEPTS IN BO TERMS</h3><ul><li><strong>Strategic intel</strong> — for leadership. Sector trends. Changes budget and priorities.</li><li><strong>Operational intel</strong> — for defenders. \"This group is exploiting this product, this way, right now.\" Changes what you hunt this week.</li><li><strong>Tactical intel</strong> — for machines. Hashes, domains, IPs. Shortest shelf life by far.</li><li><strong>The intel test</strong> — what will we do differently on Monday because of this? No answer = you're buying anxiety.</li><li><strong>Attacker economics</strong> — they want the cheapest path to the goal. That's why phishing never dies.</li><li><strong>Pyramid of pain</strong> — blocking a hash costs the attacker nothing; forcing them to rebuild tradecraft costs them real money. Defend where it hurts them.</li><li><strong>Authorisation</strong> — written permission to test. Without it, testing is a crime regardless of skill or intent.</li><li><strong>Scope</strong> — exactly which systems, which techniques, which hours. Stepping outside it ends careers.</li><li><strong>Responsible disclosure</strong> — report privately, allow a reasonable fix window, then coordinate publication.</li><li><strong>Threat hunting</strong> — proactively looking for what your alerts didn't catch, starting from a hypothesis rather than an alert.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Buying five feeds and reading none. Aggregating unread feeds just makes a more expensive unread feed.</li><li>Building detections only on indicators. They expire in seconds.</li><li>Practising offensive techniques against systems you don't own. \"I was only learning\" is not a legal defence.</li><li>Confusing intel levels — handing the board a list of file hashes, or handing the SOC a sector trend report.</li><li>Chasing the scariest scenario instead of the cheapest path in.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Strategic = leadership/budget | Operational = defenders/hunting | Tactical = machines/blocklists</li><li>Test any feed: what changes on Monday?</li><li>Indicators expire fast · behaviour is durable</li><li>Attackers optimise for cost, not drama</li><li>No written authorisation = no testing. Ever.</li><li>Responsible disclosure: private report → fix window → coordinated publication</li></ul><h3>💼 REAL WORLD</h3><p>A CISA advisory drops on a VPN product. Tactical answer: block the listed IPs — useful for about a day. Operational answer: check whether you run that product, patch it, and hunt for the described post-exploitation behaviour in your logs going back 90 days, because the advisory tells you what to look for. Strategic answer: this is the third external-access advisory this quarter, so bring a proposal to accelerate MFA and access review funding.</p><p>Same advisory, three different jobs. Knowing which one you're doing — and which audience needs which — is the difference between an analyst and a lead.</p>",
   "cd4": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>Measuring where you actually stand, in numbers people believe. \"Security posture\" means: given what you've got, how well would you hold up? Technology, process and people — and the third is the one that gets underfunded.</p><p>This module is what GRC and security-engineer interviews probe hardest, because it's where security meets money.</p><h3>🔑 KEY CONCEPTS IN BO TERMS</h3><ul><li><strong>Posture</strong> — technology + process + people. A tool nobody watches is a receipt, not a control.</li><li><strong>MTTD</strong> — mean time to detect. How long before you noticed.</li><li><strong>MTTR</strong> — mean time to respond. Detection without response is just knowing you're on fire.</li><li><strong>Activity metric</strong> — goes up when you do more work. \"We blocked 4 million attacks.\" Vanity.</li><li><strong>Outcome metric</strong> — moves when you actually get safer. MTTD, MTTR, % critical vulns closed in SLA.</li><li><strong>Control coverage</strong> — % of KNOWN assets a control reaches. The gaps are where incidents live.</li><li><strong>Phishing report rate</strong> — measures behaviour. Completion rate only measures attendance.</li><li><strong>Maturity model</strong> — roughly ad hoc → repeatable → defined → managed → optimising.</li><li><strong>NIST CSF functions</strong> — Govern, Identify, Protect, Detect, Respond, Recover. Free to read, and leadership can follow it.</li><li><strong>Crown-jewel coverage</strong> — controls measured against the systems that actually matter, not averaged across the estate.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Reporting event volume to a board. It's unactionable and invites the wrong question.</li><li>Averaging control coverage across everything, hiding a gap on the crown jewels.</li><li>Chasing level 5 maturity everywhere. Every organisation is uneven — spend where you're thin.</li><li>Measuring vulnerabilities FOUND rather than CLOSED. Discovery is the input, closure is the outcome.</li><li>Claiming a capability because the licence exists. Deployed, configured and monitored are three different things.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Posture = technology + process + people</li><li>MTTD = time to notice | MTTR = time to fix</li><li>Vanity metric = rises with effort, flat with safety</li><li>Report rate &gt; click rate | closed &gt; found | coverage % &gt; \"we have it\"</li><li>NIST CSF: Govern · Identify · Protect · Detect · Respond · Recover</li><li>Uneven maturity is normal — be honest and spend accordingly</li></ul><h3>💼 REAL WORLD</h3><p>The board asks \"are we secure?\" — a question with no answer. You reframe it: here's our mean time to detect over four quarters, trending down from 19 days to 6. Here's critical vulnerability closure inside SLA, at 71% and rising. Here's EDR coverage on crown-jewel systems at 94%, with the 6% named and dated.</p><p>You didn't say \"yes\" or \"no.\" You gave them three trends and a gap with an owner — and they funded the gap. That's the job.</p>",
   "cd5": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>Turning all of it into a plan that gets funded, and spending money well when you do. A strategy is not a tool list — it's a written answer to four questions: what are we protecting, from whom, to what standard, and what do we do first.</p><p>This module is where careers accelerate, because it's the translation layer: tech to money, money to tech.</p><h3>🔑 KEY CONCEPTS IN BO TERMS</h3><ul><li><strong>NIST CSF</strong> — Govern, Identify, Protect, Detect, Respond, Recover. Best shared language with leadership.</li><li><strong>CIS Controls</strong> — prioritised and opinionated. Tells you what to do FIRST. Best when you have nothing.</li><li><strong>ISO 27001</strong> — a certifiable management system. Best when customers want proof.</li><li><strong>Zero trust</strong> — not a product. Verify explicitly, least privilege, assume breach. Stop trusting things for sitting on the right network.</li><li><strong>Defence in depth</strong> — layered CONTROLS, not duplicate products in monitor-only mode.</li><li><strong>Business case</strong> — the risk in their terms, the consequence, the fix, the cost, what changes after.</li><li><strong>Coverage / configuration / consumption / overlap</strong> — the four questions to ask about tools you already own, before buying more.</li><li><strong>POC</strong> — your environment, your data, success criteria written BEFORE the trial starts.</li><li><strong>TCO</strong> — year three cost, not year one. And what's the exit if it disappoints.</li><li><strong>First 90 days</strong> — learn, assess, act. Ship something visible early; credibility compounds.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Presenting a tool list as a strategy. No assets, no adversaries, no sequence — no funding.</li><li>Asking for budget in security language. \"We need PAM for best practice\" loses to \"fourteen accounts can change production unreviewed, two belong to ex-contractors.\"</li><li>Buying before auditing what's already owned and switched off. Most common finding in the industry.</li><li>Running a POC on the vendor's demo data. Everything works on their laptop.</li><li>Deploying a tool the team hasn't the headcount to run. An unmonitored console is a liability with a licence fee.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Strategy answers: what · from whom · to what standard · what first</li><li>CIS = what to do first | NIST CSF = shared language | ISO 27001 = certifiable proof</li><li>Zero trust = principle, not product</li><li>Fund it in THEIR risk, not your tooling</li><li>Before buying: coverage, configuration, consumption, overlap</li><li>Write POC success criteria before the trial starts</li><li>90 days: learn → assess → act, and ship something visible</li></ul><h3>💼 REAL WORLD</h3><p>You're the first security hire at a 300-person company. No budget approved yet. Month one you build the asset list and find 40 systems nobody claimed. Month two you score against CIS Controls and find MFA missing on two external apps, 11 dormant privileged accounts, and an EDR licence deployed on a third of the estate.</p><p>Month three you turn on MFA, kill the dormant accounts, and finish the EDR rollout — total spend: zero. THEN you take the roadmap to leadership, and it gets approved, because the free wins already landed and you have receipts.</p><p>Same person, same company. The order is what made it work.</p>",
+  "hk1": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>The mindset and the rules before any tool. Hacking isn't magic or fast typing — it's a repeatable methodology, plus one non-negotiable: authorization. This module is where you learn the line that keeps you a professional instead of a defendant.</p><h3>🔑 KEY CONCEPTS IN BO &amp; FLO TERMS</h3><ul><li><strong>Authorization</strong> (Flo) — the ONLY thing separating a tester from a criminal. Same commands, same tools; one has a signed scope, the other has a case number.</li><li><strong>Rules of Engagement (RoE)</strong> (Flo) — step zero on any real job. Scope, timing, off-limits systems, who to call, and whether you may exploit or only demonstrate.</li><li><strong>The methodology loop</strong> (Bo) — recon → scan/enumerate → gain access → escalate/move → prove/document → clean up. Same sequence every time.</li><li><strong>Path of least resistance</strong> (Bo) — attackers are cheap. A valid password beats a zero-day. Check the easy doors first.</li><li><strong>Enumeration is the whole game</strong> (Bo) — the skill is looking, not exploiting. The finding is usually in plain sight.</li><li><strong>Prove, don't cause</strong> (Flo) — demonstrating you COULD read the database, without copying it out, is the mature deliverable.</li><li><strong>The isolated lab</strong> (Bo) — host-only networking is the guarantee your practice never leaks onto a network you don't own.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Accessing a system to 'prove' a real flaw without authorization. Still a crime. Report responsibly instead.</li><li>Testing before the RoE is signed. No paperwork, no testing.</li><li>Reaching for the exotic exploit before checking for the default password.</li><li>Scanning once and firing exploits instead of enumerating first.</li><li>Practising on live targets 'just to learn.' That sentence has never worked as a legal defence.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Authorization = the whole line. Same commands, different paperwork.</li><li>Loop: recon → scan → access → escalate/move → prove → clean up</li><li>RoE before anything: scope, timing, off-limits, contacts</li><li>Cheapest path in, not coolest</li><li>Enumerate before you exploit</li><li>Prove impact without causing it</li><li>Isolated, host-only lab or nothing</li></ul><h3>💼 REAL WORLD</h3><p>You're on your first engagement. Day one, before a single scan, you and the client sign the RoE: these IP ranges only, business hours, the payment system is off-limits entirely, exploit allowed but no data exfiltration, and here's the emergency contact if something falls over. That document is boring and it is the most important thing you'll touch all week — it's what turns everything you do next from a felony into a paid profession.</p>",
+  "hk2": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>Recon and enumeration — knowing before touching, then looking harder than everyone else. Good recon means less poking later, and poking is what gets you noticed. Enumeration is where engagements are actually won.</p><h3>🔑 KEY CONCEPTS IN BO &amp; FLO TERMS</h3><ul><li><strong>Passive recon</strong> (Bo) — you never touch the target; you read what's already public. Invisible.</li><li><strong>Active recon</strong> (Bo) — you interact directly, so you leave traces and can be logged.</li><li><strong>OSINT</strong> (Bo) — open-source intel on people and orgs. Job posts = tech stack. Profiles = org chart + phishing targets. Reused usernames unravel a footprint.</li><li><strong>Host discovery / port scan / version detection</strong> (Bo) — what's alive, what doors are open, what's running behind them.</li><li><strong>The version pivot</strong> (Bo) — a version number matched against CVE and exploit databases is how a scan result becomes a way in.</li><li><strong>Enumeration</strong> (Bo) — the deep read: users, shares, directories, configs, banners. The open port isn't the finding; the misconfigured service behind it is.</li><li><strong>Attack surface management</strong> (Flo) — the defensive mirror: run recon on YOURSELF, regularly, to see what leaks.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Jumping to active recon and skipping the free, invisible passive phase.</li><li>Treating open ports as the finding instead of enumerating what's behind them.</li><li>Ignoring OSINT because 'it doesn't touch a server' — people are attack surface.</li><li>Not reading the enumeration output carefully. The answer is usually right there.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Passive = never touch (public data) | Active = interact (leaves traces)</li><li>OSINT: job posts, profiles, breach dumps, reused usernames</li><li>Alive? → ports open? → versions? → enumerate</li><li>Version number = pivot to known vulns</li><li>Enumerate the hell out of everything before touching it</li><li>Defenders: recon yourself first</li></ul><h3>💼 REAL WORLD</h3><p>Before touching a client's systems, you spend a day on passive recon: their job posts name the exact software they run, employee profiles map the org chart, and a breach database shows three staff emails with reused passwords. You haven't sent them a single packet — and you already know the tech stack, who to phish, and where the weak credentials probably are. That's why recon comes first.</p>",
+  "hk3": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>How access actually happens, and what an attacker does once inside. Forget exotic — initial access comes through a handful of boring doors, and the real danger is what comes after the first machine falls.</p><h3>🔑 KEY CONCEPTS IN BO &amp; FLO TERMS</h3><ul><li><strong>The boring doors</strong> (Bo) — weak/reused credentials, unpatched known flaws, misconfigurations, phishing, exposed secrets. Not zero-days.</li><li><strong>Privilege escalation</strong> (Bo) — low-privilege user → admin/root on the machine you're on. Usually a misconfig: root-level service you can influence, loose file permission, hijackable scheduled task, unpatched local flaw.</li><li><strong>Lateral movement</strong> (Bo) — using the box you own to reach the next one, usually with credentials found on the first.</li><li><strong>Persistence &amp; exfiltration</strong> (Flo) — keeping access and taking data. On an authorized test you usually PROVE you could, you don't actually do it.</li><li><strong>Flat network</strong> (Bo) — no segmentation, so one box reaches all boxes. The attacker's best friend.</li><li><strong>The defender's priority list</strong> (Flo) — every 'way in' maps to a control, and the top ones stop the most for the least money.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Believing intrusions need zero-days. They almost never do.</li><li>Thinking 'getting in' is the goal. It's step one; the objective is usually elsewhere.</li><li>On an engagement, actually exfiltrating or leaving backdoors instead of proving impact.</li><li>Defenders focusing all spend on the perimeter — once the attacker's inside, the perimeter is behind them.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Boring doors: creds, patches, misconfigs, phishing, exposed secrets</li><li>Privilege escalation = get bigger on this box</li><li>Lateral movement = reach the next box (usually with found creds)</li><li>Flat network = one box owns all boxes</li><li>Segmentation + least privilege contain the after-access game</li><li>On a test: prove you could, don't actually do it</li></ul><h3>💼 REAL WORLD</h3><p>You phish one low-level employee and land on their laptop — low privilege, one machine, seemingly nothing. But a local misconfiguration lets you escalate to admin, and in memory you find cached credentials for a service account. Those creds work on the file server, which isn't segmented from the domain controller. Twenty minutes after one click, you can reach everything. Every step was a control the blue team could have placed — and that's exactly what your report will say.</p>",
+  "hk4": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>Credentials — the attacker's real prize. If you take one thing from this whole track: attacks run on credentials. A valid login is worth more than most exploits because it makes the attacker look like a legitimate user. This module is also the most important one for defenders.</p><h3>🔑 KEY CONCEPTS IN BO &amp; FLO TERMS</h3><ul><li><strong>Why creds win</strong> (Bo) — a stolen login walks the front door looking legitimate, which is exactly why it's hard to detect.</li><li><strong>Credential dumping</strong> (Bo) — reading cached credentials from the memory of a machine you have admin on. Defense: least privilege + detecting the dumping tools.</li><li><strong>Credential stuffing / reuse</strong> (Bo) — one breached password tried everywhere. Defense: unique passwords, a manager, MFA.</li><li><strong>Interception</strong> (Bo) — capturing credentials in transit on an unencrypted or poorly segmented network.</li><li><strong>Exposed secrets</strong> (Bo) — API keys and passwords in code, configs, shared docs. Credentials on the ground.</li><li><strong>MFA</strong> (Flo) — turns a stolen password into just a string. The single most effective control here.</li><li><strong>Least privilege</strong> (Flo) — so a dumped credential doesn't own the whole domain.</li><li><strong>Red informs blue</strong> (Flo) — understanding how theft works is what lets you rank the defenses.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Chasing exploits while ignoring that credentials are the actual currency.</li><li>Relying on password complexity alone. Length doesn't stop reuse, dumping, or interception.</li><li>Skipping MFA 'for convenience' on any account that matters.</li><li>Leaving secrets in code with no scanning or rotation.</li><li>Handing broad admin rights out freely — that's what makes dumping devastating.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Attacks run on credentials</li><li>Dumping = read cached creds (needs admin) → least privilege breaks it</li><li>Stuffing = reuse → unique passwords + MFA</li><li>Interception = weak encryption/segmentation</li><li>Exposed secrets = scan the pipeline + rotate keys</li><li>MFA turns a stolen password into a useless string</li></ul><h3>💼 REAL WORLD</h3><p>A breach report lands: attacker got one password from a phishing email, and because that account had admin on a shared server, they dumped a dozen more credentials from memory and spread across a flat network. Nothing exotic — one password and a series of missing controls. The fix list writes itself: MFA everywhere, least privilege so one account can't dump the rest, segmentation, and monitoring for the dumping behaviour. Studying the attack is what let you rank that list in the right order.</p>",
+  "hk5": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>The tooling landscape and the report — the two things beginners get backwards. Tools are categories to understand, not names to memorize. And the report is the actual product: red exists to make blue better.</p><h3>🔑 KEY CONCEPTS IN BO &amp; FLO TERMS</h3><ul><li><strong>Categories over tools</strong> (Bo) — recon, scanners, vuln scanners, web proxies, exploitation frameworks, password/hash tools, post-exploitation/C2, reporting. The job is durable; the specific tool changes every couple of years.</li><li><strong>Vuln scanner vs port scanner</strong> (Bo) — port scanner finds doors and versions; vuln scanner matches versions against known-vuln databases at scale.</li><li><strong>The report is the product</strong> (Flo) — the client pays for what's wrong, how bad, and how to fix it — not for the fact you got in.</li><li><strong>Impact in business terms</strong> (Flo) — 'an attacker could read every customer record' beats 'CVSS 8.1' every time.</li><li><strong>The five-part finding</strong> (Flo) — what it is, where, impact, proof, the fix.</li><li><strong>Red informs blue</strong> (Flo) — blue teamers study red tooling so they can recognize the scan pattern, the cracking attempt, the C2 beacon in their logs.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Memorizing one tool by rote and freezing when the shop uses a different one.</li><li>Confusing a port scan with a vulnerability scan.</li><li>Skipping the report because the hack was the fun part. The report is the paid part.</li><li>Writing impact as a raw score instead of a business consequence.</li><li>Proof that doubles as a how-to for a criminal — show reproducibility, not a weaponized recipe.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Learn the category, then any tool in it</li><li>Port scanner = doors/versions | Vuln scanner = match vs known CVEs</li><li>The report IS the product</li><li>Impact in business terms, not a score</li><li>Finding = what · where · impact · proof · fix</li><li>Blue studies red tooling to detect it</li></ul><h3>💼 REAL WORLD</h3><p>Two testers find the same flaw. The first writes 'RCE, CVSS 9.8, exploit succeeded' and moves on. The second writes: here's the system, here's what an unauthenticated attacker could do to your customer data, here's proof we could reproduce it, and here's the specific prioritized fix your team can ship this sprint. Same finding. The second tester's client renews the contract — because the report, not the hack, was what they were paying for.</p>",
 };
