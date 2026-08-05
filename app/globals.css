@@ -442,6 +442,27 @@ h1, h2, h3 {
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
+
+  /* The gradient is only painted inside the element's own box, and an italic
+     glyph leans PAST that box — so the last letter of "committed" had its right
+     edge sliced off and the word read "committea".
+     inline-block + padding widens the paint box; the matching negative margin
+     takes the space back, so the fix is invisible in the layout. padding-bottom
+     does the same job for descenders. */
+  display: inline-block;
+  /* The headline runs at leading-[0.95], so an inline-block box is SHORTER than
+     the glyphs it contains and the paint box clips ascenders — which is what ate
+     the stem of the final "d" and left the word reading "committea". Vertical
+     padding matters more than horizontal here; the italic lean needs the right
+     side too. Every pad is cancelled by an equal negative margin, so layout is
+     untouched. No left padding: a negative left margin would pull the word into
+     the space before it. */
+  padding-top: 0.24em;
+  margin-top: -0.24em;
+  padding-right: 0.14em;
+  margin-right: -0.14em;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
 }
 
 /* Brushed steel. Mid-tone with hard light/dark banding — a flat grey reads as
