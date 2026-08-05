@@ -308,7 +308,13 @@ export default function AdminCRM() {
     if (!confirm(`Record ${method === "credit" ? "$" + amount + " store credit" : "$" + amount + " cash"} paid to ${referrer}?`)) return;
     const r = await fetch("/api/admin/referral-payout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ referrer, amount, method }) });
     const d = await r.json();
-    if (d.ok) loadPayouts();
+    if (d.ok) { loadPayouts(); return; }
+    // The server enforces the cap and rejects (409) rather than clamping. That
+    // rejection HAS to be visible: this used to be `if (d.ok) loadPayouts();`
+    // with no else, so a blocked payout looked identical to nothing happening —
+    // which invites a second click on a button that moves real money.
+    alert(d.error || "Couldn't record that payout — try again.");
+    loadPayouts();
   }
   async function sendChat() {
     const text = chatInput.trim();
