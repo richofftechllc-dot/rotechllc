@@ -78,16 +78,16 @@ export default function ResumePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0a0a0b] text-gray-100">
+    <main className="min-h-screen">
       <div className="max-w-3xl mx-auto px-5 py-12">
         <div className="text-rot-accent text-xs font-bold tracking-[0.2em] uppercase mb-2">ROT Resume Builder</div>
         <h1 className="text-4xl font-extrabold tracking-tight">Paste it. Pick the job. Done.</h1>
         <p className="text-rot-muted mt-3 max-w-xl">Drop your current resume, optionally paste the job you want, and Bo Tech rewrites it ATS-safe in the Rich Off Tech format — using only your real facts. No long forms.</p>
 
         {me?.ok && (
-          <div className="mt-6 flex items-center justify-between gap-3 bg-[#141416] border border-[#262629] rounded-xl px-4 py-3">
+          <div className="mt-6 flex items-center justify-between gap-3 bg-rot-surface border border-rot-line rounded-xl px-4 py-3">
             <div className="text-sm"><span className="font-semibold">Signed in as {me.name}</span><span className="text-rot-faint ml-2">{me.code}</span></div>
-            <button onClick={pullFromRoster} disabled={pulling} className="text-sm px-3 py-1.5 rounded-lg bg-orange-600 text-rot-fg font-medium hover:bg-orange-700 disabled:opacity-50">{pulling ? "Pulling…" : "↓ Pull from roster"}</button>
+            <button onClick={pullFromRoster} disabled={pulling} className="rot-btn-accent text-sm px-3 py-1.5 rounded-lg font-medium disabled:opacity-50">{pulling ? "Pulling…" : "↓ Pull from roster"}</button>
           </div>
         )}
 
@@ -96,22 +96,22 @@ export default function ResumePage() {
           <label className="block text-sm font-semibold mb-2"><span className="text-rot-accent mr-2">1</span>Your resume</label>
           <textarea value={resumeText} onChange={e => setResumeText(e.target.value)} rows={10}
             placeholder="Paste your current resume here — or your work history, bullet points, whatever you've got. Bo cleans it up."
-            className="w-full bg-[#141416] border border-[#262629] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-rot-accent resize-y" />
+            className="w-full bg-rot-surface border border-rot-line rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-rot-accent resize-y" />
         </div>
 
         {/* Step 2 */}
         <div className="mt-5">
           <label className="block text-sm font-semibold mb-2"><span className="text-rot-accent mr-2">2</span>Target job <span className="text-rot-faint font-normal">(optional — makes it sharper)</span></label>
           <input value={role} onChange={e => setRole(e.target.value)} placeholder="Job title (e.g. ServiceNow Administrator)"
-            className="w-full bg-[#141416] border border-[#262629] rounded-xl px-4 py-2.5 text-sm mb-2 focus:outline-none focus:border-rot-accent" />
+            className="w-full bg-rot-surface border border-rot-line rounded-xl px-4 py-2.5 text-sm mb-2 focus:outline-none focus:border-rot-accent" />
           <textarea value={jobText} onChange={e => setJobText(e.target.value)} rows={3}
             placeholder="Paste the job description (optional) — Bo mirrors its keywords where they're true."
-            className="w-full bg-[#141416] border border-[#262629] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-rot-accent resize-y" />
+            className="w-full bg-rot-surface border border-rot-line rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-rot-accent resize-y" />
         </div>
 
         {err && <div className="mt-4 text-sm text-red-600">{err}</div>}
 
-        <button onClick={build} disabled={busy} className="mt-6 w-full py-4 rounded-xl bg-orange-600 text-rot-fg font-bold text-lg hover:bg-orange-700 disabled:opacity-60">
+        <button onClick={build} disabled={busy} className="rot-btn-accent mt-6 w-full py-4 rounded-xl font-bold text-lg disabled:opacity-60">
           {busy ? "Bo is building it…" : "✦ Build my resume"}
         </button>
 
@@ -121,12 +121,12 @@ export default function ResumePage() {
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-xl font-bold">Your resume</h2>
               <div className="flex gap-2">
-                <button onClick={copy} className="text-sm px-3 py-1.5 rounded-lg border border-[#262629] hover:bg-[#141416]">{copied ? "Copied ✓" : "Copy"}</button>
-                <button onClick={printResume} className="text-sm px-3 py-1.5 rounded-lg border border-[#262629] hover:bg-[#141416]">Print / PDF</button>
-                <button onClick={build} disabled={busy} className="text-sm px-3 py-1.5 rounded-lg bg-orange-600 text-rot-fg hover:bg-orange-700 disabled:opacity-50">Regenerate</button>
+                <button onClick={copy} className="text-sm px-3 py-1.5 rounded-lg border border-rot-line hover:bg-rot-sunken">{copied ? "Copied ✓" : "Copy"}</button>
+                <button onClick={printResume} className="text-sm px-3 py-1.5 rounded-lg border border-rot-line hover:bg-rot-sunken">Print / PDF</button>
+                <button onClick={build} disabled={busy} className="rot-btn-accent text-sm px-3 py-1.5 rounded-lg disabled:opacity-50">Regenerate</button>
               </div>
             </div>
-            <div className="bg-rot-fg text-white rounded-xl p-8 overflow-x-auto" dangerouslySetInnerHTML={{ __html: renderMarkdownToHtml(out) }} />
+            <div className="bg-white text-rot-fg border border-rot-line rounded-xl p-8 overflow-x-auto" dangerouslySetInnerHTML={{ __html: renderMarkdownToHtml(out) }} />
           </div>
         )}
       </div>
