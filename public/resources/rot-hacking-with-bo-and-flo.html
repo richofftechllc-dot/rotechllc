@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hacking with Bo &amp; Flo — Rich Off Tech</title>
+<style>
+  :root{--ink:#151515;--muted:#5f5c58;--brown:#6b4226;--line:#e6e3df;--soft:#faf7f4;--gold:#b8862f;--warn:#a4530b}
+  *{box-sizing:border-box}body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);line-height:1.6}
+  .wrap{max-width:820px;margin:0 auto;padding:0 20px 60px}
+  header{border-bottom:3px solid var(--ink);padding:24px 0 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+  .logo{font-weight:800;letter-spacing:.04em;font-size:18px}.logo b{color:var(--brown)}
+  .updated{font-size:12px;color:var(--muted);font-family:monospace}
+  h1{font-size:clamp(26px,5vw,40px);margin:20px 0 6px;letter-spacing:-.02em}
+  .lede{color:var(--muted);font-size:16px;margin:0 0 8px}
+  h2{font-size:22px;margin:40px 0 8px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 6px}
+  table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:14.5px;margin:12px 0}
+  th,td{text-align:left;padding:10px 14px;border-top:1px solid var(--line);vertical-align:top}
+  thead th{background:var(--soft);border-top:none;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  ul,ol{margin:6px 0;padding-left:20px}li{margin-bottom:6px}
+  a{color:var(--brown)}b{color:var(--ink)}code{background:var(--soft);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:13px}
+  .tag{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--brown);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+  .card{border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;background:var(--soft)}
+  .card h3{margin-top:0}
+  .say{border-left:3px solid var(--brown);padding:6px 0 6px 14px;margin:14px 0;font-size:15.5px}
+  .say b{color:var(--brown)}
+  .flo{border-left:3px solid #7a5230}
+  .warnbox{border:2px solid var(--warn);border-radius:12px;padding:16px 18px;margin:16px 0;background:#fff}
+  .warnbox h3{margin-top:0;color:var(--warn)}
+  .toc{border:1px solid var(--line);border-radius:12px;padding:14px 18px;background:#fff}
+  .toc ol{margin:4px 0;padding-left:22px}
+  .drill{border:1px dashed var(--brown);border-radius:12px;padding:14px 18px;margin:16px 0;background:#fff}
+  .drill .tag{border-color:var(--brown)}
+  footer{margin-top:44px;border-top:1px solid var(--line);padding-top:14px;color:var(--muted);font-size:13px}
+  @media print{.drill,.card,.warnbox{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><span class="logo">RICH OFF <b>TECH</b></span><span class="updated">v1.0 · Aug 2026</span></header>
+  <span class="tag">Offensive Security · Field Guide</span>
+  <h1>Hacking with Bo &amp; Flo 🤎</h1>
+  <p class="lede">The attacker's playbook, taught by the two coaches — so you understand how systems really get broken into, and become the person who can find it first and shut it down. For lab work, CTFs, and authorized testing only.</p>
+
+  <div class="warnbox">
+    <h3>⚠️ Read this before anything else — it's the whole job</h3>
+    <p>Everything in this guide is for <b>systems you own, deliberately vulnerable practice targets, CTF platforms, and engagements where you have written permission and a defined scope.</b> Nothing else. Ever.</p>
+    <p>Running any of this against a system you don't own or aren't contracted to test is a crime in most countries — the CFAA in the US, the Computer Misuse Act in the UK, equivalents everywhere else. Your skill level is irrelevant. Your good intentions are irrelevant. "I was just learning" is not a defense that has ever worked.</p>
+    <p style="margin-bottom:0"><b>The single thing that separates a security professional from a criminal is authorization.</b> Same commands, same tools — one has a signed scope document, the other has a case number. Build the habit now, in your own lab, where the only thing you can break is yours.</p>
+  </div>
+
+  <div class="card">
+    <h3>Meet your coaches</h3>
+    <p><b>Bo</b> runs the offense — recon, the way in, the tools, the mindset. Bo thinks like the person trying to get in, because you can't defend a door you've never tried to open.</p>
+    <p style="margin-bottom:0"><b>Flo</b> runs the defense and the ethics — what the attack looks like from the blue team's side, what it leaves behind, and where the legal and professional lines are. Every technique Bo shows you, Flo tells you how it gets caught. That pairing <em>is</em> the value: red skills, blue judgment.</p>
+  </div>
+
+  <div class="toc">
+    <b>What's inside</b>
+    <ol>
+      <li>The mindset &amp; the rules of engagement</li>
+      <li>Recon — knowing before touching</li>
+      <li>Scanning &amp; enumeration — mapping the target</li>
+      <li>Getting in — how access actually happens</li>
+      <li>After the door opens — privilege &amp; movement</li>
+      <li>Credentials — the attacker's real prize</li>
+      <li>The tooling landscape — a pentester's kit</li>
+      <li>The report — where the money actually is</li>
+    </ol>
+  </div>
+
+  <!-- 1 -->
+  <h2>1 · The mindset &amp; the rules of engagement 🎯</h2>
+  <p>Hacking isn't magic and it isn't fast typing on a black screen. It's a <b>methodology</b> — the same repeatable sequence every time, whether it's a CTF box or a Fortune 500 engagement. Learn the sequence and no target is ever a blank page.</p>
+  <p>The loop:</p>
+  <ol>
+    <li><b>Recon</b> — learn everything you can without touching the target.</li>
+    <li><b>Scan &amp; enumerate</b> — map what's actually there and what it's running.</li>
+    <li><b>Gain access</b> — find and use the cheapest way in.</li>
+    <li><b>Escalate &amp; move</b> — get bigger, get wider.</li>
+    <li><b>Prove &amp; document</b> — show the impact, write it up.</li>
+    <li><b>Clean up</b> — leave it as you found it.</li>
+  </ol>
+  <div class="say flo"><b>Flo says:</b> On a real engagement, step 0 comes before all of these — the <b>rules of engagement</b> document. What's in scope, what's off-limits, what hours you can test, who to call if something breaks, and whether you're allowed to actually exploit or just prove you could. No signed RoE, no testing. This is not bureaucracy — it's the paperwork that keeps you employed instead of charged.</div>
+  <p>Two more mindset pieces that matter more than any tool:</p>
+  <ul>
+    <li><b>Attackers are cheap.</b> They take the path of least resistance, not the coolest exploit. A valid password beats a zero-day every time. So do you — check for the easy way in before you reach for the exotic one.</li>
+    <li><b>Enumeration is the whole game.</b> The people who are good at this aren't good at exploits — they're good at <em>looking</em>. The finding is almost always sitting in plain sight in something you didn't read carefully enough.</li>
+  </ul>
+
+  <div class="drill">
+    <span class="tag">Drill 1</span>
+    <h3>Stand up your lab</h3>
+    <p>Before you touch anything, build the place where touching things is legal. Install a virtualization tool, spin up an attacker VM (a security-focused Linux distro) and a deliberately vulnerable practice target on an isolated host-only network. Confirm the two can reach each other and <b>nothing else</b>.</p>
+    <p style="margin-bottom:0"><b>Why:</b> An isolated lab is where every skill in this guide gets practiced. Host-only networking is what guarantees your practice never leaks onto a network you don't own.</p>
+  </div>
+
+  <!-- 2 -->
+  <h2>2 · Recon — knowing before touching 🔍</h2>
+  <p>Reconnaissance is gathering information about a target. The better your recon, the less you have to poke at the target later — and poking is what gets you noticed.</p>
+  <table>
+    <thead><tr><th>Type</th><th>What it means</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><b>Passive</b></td><td>You never touch the target. You read what's already public.</td><td>Public records, search engines, employee profiles, leaked-credential databases, certificate transparency logs</td></tr>
+      <tr><td><b>Active</b></td><td>You interact with the target directly, so you leave traces.</td><td>Pinging hosts, resolving DNS against their servers, connecting to services</td></tr>
+    </tbody>
+  </table>
+  <p><b>OSINT</b> — open-source intelligence — is passive recon on people and organizations. Job postings tell you what technology a company runs. Employee profiles tell you the org chart and who to phish. A single reused username across sites can unravel someone's whole footprint. None of it touches the target, and all of it is gold.</p>
+  <div class="say flo"><b>Flo says:</b> Everything you find in recon about your own company is something an attacker can find too. The defensive version of this chapter is called <em>attack surface management</em> — and the best blue teamers run recon on themselves, regularly, to see what's leaking.</div>
+
+  <div class="drill">
+    <span class="tag">Drill 2</span>
+    <h3>OSINT yourself</h3>
+    <p>Run passive recon on <b>your own name and your own domain</b> — nobody else's. What's publicly discoverable: old accounts, reused usernames, email addresses in breach databases, exposed services. Write down what you find and, more importantly, what you'll now remove or lock down.</p>
+    <p style="margin-bottom:0"><b>Why:</b> You learn the technique and you shrink your own footprint. Recon on yourself is always in scope.</p>
+  </div>
+
+  <!-- 3 -->
+  <h2>3 · Scanning &amp; enumeration — mapping the target 🗺️</h2>
+  <p>Now you interact — <em>on a target you own or are authorized to test.</em> Scanning answers three questions in order: what hosts are alive, what ports are open, and what's running behind those ports.</p>
+  <ul>
+    <li><b>Host discovery</b> — which addresses respond at all.</li>
+    <li><b>Port scanning</b> — which doors are open. An open port is a running service, and a running service is a potential way in.</li>
+    <li><b>Service &amp; version detection</b> — what software, what version. This is the pivot point: a version number is what you match against known vulnerabilities.</li>
+    <li><b>Enumeration</b> — the deep read. Pulling usernames, shares, directories, configs, banners. This is where engagements are won.</li>
+  </ul>
+  <div class="say"><b>Bo says:</b> Beginners scan once, see open ports, and start firing exploits. Pros scan, then <em>enumerate the hell out of what they found</em> before touching anything. The open port isn't the finding. The misconfigured service behind it, with the default password, is the finding — and you only see it if you look.</div>
+  <p>A version number is the hinge of the whole methodology. "Service X version 2.1.3" → search the public vulnerability databases (CVE, exploit archives) → is there a known issue for exactly that version? That's the loop that turns a scan result into a way in.</p>
+
+  <div class="drill">
+    <span class="tag">Drill 3</span>
+    <h3>Full map of your lab target</h3>
+    <p>Against the vulnerable VM in your lab: discover it, scan all ports, detect service versions, and enumerate every service you find. Produce a one-page map — host, every open port, the service and version on each, and anything enumeration revealed. Do not exploit anything yet.</p>
+    <p style="margin-bottom:0"><b>Why:</b> This map is what a real engagement's early hours produce, and a good one makes the rest of the work obvious.</p>
+  </div>
+
+  <!-- 4 -->
+  <h2>4 · Getting in — how access actually happens 🚪</h2>
+  <p>People imagine exploitation as exotic. In reality, initial access almost always comes through one of a handful of unglamorous doors:</p>
+  <table>
+    <thead><tr><th>The way in</th><th>What it really is</th><th>How Flo catches it</th></tr></thead>
+    <tbody>
+      <tr><td><b>Weak / default / reused credentials</b></td><td>The admin panel still has the factory password; someone reused their breached personal password at work.</td><td>MFA, credential monitoring, blocking known-breached passwords</td></tr>
+      <tr><td><b>Unpatched known vulnerability</b></td><td>A public exploit for the exact version you found in your scan.</td><td>Patch management, version inventory</td></tr>
+      <tr><td><b>Misconfiguration</b></td><td>An exposed database with no auth, an open file share, a verbose error leaking internals.</td><td>Config baselines, hardening, external attack-surface scans</td></tr>
+      <tr><td><b>Social engineering</b></td><td>A convincing email; someone just tells you the answer.</td><td>Report-rate training, verification procedures</td></tr>
+      <tr><td><b>Exposed secrets</b></td><td>An API key or password committed to a public code repo.</td><td>Secret scanning in the pipeline, key rotation</td></tr>
+    </tbody>
+  </table>
+  <p>Notice what's <em>not</em> on that list: novel zero-days. They exist, but they're rare, expensive, and not how most real intrusions start. The boring doors are the doors.</p>
+  <div class="say flo"><b>Flo says:</b> Read that table as a defender and you have your priority list. Every column three is a control, and the ones at the top stop the most attacks for the least money. That's not a coincidence — it's the whole reason red teams exist: to show the blue team which doors are actually open.</div>
+
+  <!-- 5 -->
+  <h2>5 · After the door opens — privilege &amp; movement 🪜</h2>
+  <p>Getting in is rarely the goal. You usually land as a low-privilege user on one machine, and the objective is somewhere else. Two moves get you there:</p>
+  <ul>
+    <li><b>Privilege escalation</b> — going from a normal user to admin/root on the machine you're on. Usually through a misconfiguration: a service running as root you can influence, a file permission that's too loose, a scheduled task you can hijack, an unpatched local flaw.</li>
+    <li><b>Lateral movement</b> — using the machine you own to reach the next one. Often with credentials you found on the first box — which is why the next chapter is the one that matters most.</li>
+  </ul>
+  <p><b>Persistence</b> (keeping access) and <b>exfiltration</b> (taking data out) come after — but on an authorized test you usually just <em>prove</em> you could, you don't actually do it. Proving impact without causing it is a real skill, and it's what a mature client is paying for.</p>
+  <div class="say"><b>Bo says:</b> The flat network is the attacker's best friend. If getting one box means you can reach every box, the whole game is over after step one. That's the NotPetya story in one sentence — and it's why segmentation is the control defenders lose sleep over.</div>
+
+  <!-- 6 -->
+  <h2>6 · Credentials — the attacker's real prize 🔑</h2>
+  <p>If there's one thing to take from this whole guide: <b>attacks run on credentials.</b> A valid username and password (or token, or hash, or key) is worth more than almost any exploit, because it lets an attacker walk through the front door looking exactly like a legitimate user — which is also why it's so hard to detect.</p>
+  <p>How credentials get taken, at a concept level:</p>
+  <ul>
+    <li><b>From memory of a compromised machine</b> — operating systems cache credentials so users don't retype them; an attacker with admin on a box can read that cache. This is the "credential dumping" family — and the defense is limiting who has admin, and detecting the tools that read the cache.</li>
+    <li><b>From reuse</b> — one password breached somewhere else, tried everywhere. This is why unique passwords and a manager matter, and why "credential stuffing" works at scale.</li>
+    <li><b>From interception</b> — capturing credentials in transit on a network that isn't properly encrypted or segmented.</li>
+    <li><b>From the ground</b> — sticky notes, shared spreadsheets, secrets committed to code, plaintext in config files.</li>
+    <li><b>From the person</b> — phishing a login page, or simply asking convincingly.</li>
+  </ul>
+  <div class="say flo"><b>Flo says:</b> This is the chapter defenders should tattoo somewhere. Every item above has a specific control — MFA so a stolen password isn't enough, least privilege so a dumped credential doesn't own the domain, credential monitoring, network encryption, secret scanning. Understanding how the theft works is exactly what lets you prioritize the defense. That's the entire red-informs-blue argument.</div>
+  <div class="say"><b>Bo says:</b> And here's the honest bit — MFA breaks most of this. A password without the second factor is just a string. If you learn one defensive thing from studying offense, let it be why MFA everywhere is non-negotiable.</div>
+
+  <div class="drill">
+    <span class="tag">Drill 4</span>
+    <h3>Trace one credential path, both sides</h3>
+    <p>Pick one credential-theft method above. Write the attacker's version (how it works, what conditions it needs) and directly beneath it the defender's version (the two controls that break it, and how you'd detect it if it happened anyway). One page, two columns.</p>
+    <p style="margin-bottom:0"><b>Why:</b> This exact "here's the attack, here's the control, here's the detection" structure is what a strong security interview answer sounds like — and what a good pentest report finding looks like.</p>
+  </div>
+
+  <!-- 7 -->
+  <h2>7 · The tooling landscape — a pentester's kit 🧰</h2>
+  <p>Tools are not the skill. A tool in the hands of someone who doesn't understand the methodology is just a faster way to make noise and miss the finding. But knowing the <em>categories</em> — what job each kind of tool does — is how you stop being lost. Specific tools change every couple of years; the categories don't.</p>
+  <table>
+    <thead><tr><th>Category</th><th>The job it does</th></tr></thead>
+    <tbody>
+      <tr><td><b>Recon / OSINT</b></td><td>Gather public information about targets and people</td></tr>
+      <tr><td><b>Scanners</b></td><td>Discover hosts, ports, services and versions</td></tr>
+      <tr><td><b>Vulnerability scanners</b></td><td>Match what's running against known-vulnerability databases at scale</td></tr>
+      <tr><td><b>Web app proxies</b></td><td>Intercept and modify web traffic to test applications</td></tr>
+      <tr><td><b>Exploitation frameworks</b></td><td>Organized libraries of exploits and payloads for authorized use</td></tr>
+      <tr><td><b>Password / hash tools</b></td><td>Test password strength and crack hashes <em>you are authorized to test</em></td></tr>
+      <tr><td><b>Post-exploitation / C2</b></td><td>Manage access and simulate an adversary's foothold during an engagement</td></tr>
+      <tr><td><b>Reporting</b></td><td>Turn findings into something a client can act on — the part beginners skip</td></tr>
+    </tbody>
+  </table>
+  <div class="say"><b>Bo says:</b> Learn the category before the tool. When you understand that you need "a thing that intercepts web traffic," you can pick up any web proxy in an afternoon. When you only know one tool by rote, you're helpless the moment the shop uses a different one.</div>
+  <div class="say flo"><b>Flo says:</b> Every one of those categories has a detection story on the blue side. A good defender knows what these tools <em>look like</em> in their logs — the scan pattern, the credential-cracking attempt, the C2 beacon. You can't recognize what you've never seen described. That's why blue teamers study red tooling.</div>
+
+  <!-- 8 -->
+  <h2>8 · The report — where the money actually is 💼</h2>
+  <p>Here's the thing nobody tells beginners: <b>the report is the product.</b> The client isn't paying for you to get in — they're paying for a document that tells them what's wrong, how bad it is, and exactly how to fix it. A brilliant hack with a lazy write-up is a failed engagement. A modest finding with a crystal-clear, actionable report is a client who renews.</p>
+  <p>A finding that actually helps has five parts:</p>
+  <ol>
+    <li><b>What it is</b> — the vulnerability, in plain language.</li>
+    <li><b>Where</b> — the specific system, so they can find it.</li>
+    <li><b>Impact</b> — what an attacker could <em>actually do</em>, in business terms. Not "CVSS 8.1" — "an unauthenticated attacker could read every customer record."</li>
+    <li><b>Proof</b> — evidence you could reproduce it, without being a how-to for a criminal.</li>
+    <li><b>The fix</b> — specific, prioritized, doable. This is the part they'll actually read.</li>
+  </ol>
+  <div class="say flo"><b>Flo says:</b> The reason offense and defense belong in the same book is right here. The whole point of the attack was to make the defense better. A report that a blue team can act on Monday morning is the entire job — everything before it was just how you learned what to write.</div>
+
+  <div class="drill">
+    <span class="tag">Drill 5</span>
+    <h3>Write one real finding</h3>
+    <p>Take the single most interesting thing you found enumerating your lab target in Drill 3. Write it up as a proper finding with all five parts. Then hand it to someone non-technical and ask them to tell you, in their words, what's wrong and what to do about it.</p>
+    <p style="margin-bottom:0"><b>Why:</b> If they can repeat it back, it's a good finding. If they can't, no amount of technical brilliance behind it will land. This is the deliverable that gets you hired.</p>
+  </div>
+
+  <div class="card">
+    <h3>The whole guide in eight lines</h3>
+    <ul style="margin-bottom:0">
+      <li>Authorization is the only line between professional and criminal. Same commands, different paperwork.</li>
+      <li>It's a methodology, not magic — the same loop every time.</li>
+      <li>Recon before touching. Enumeration is the whole game.</li>
+      <li>The boring doors — creds, patches, misconfigs — are the doors.</li>
+      <li>Getting in is step one; credentials get you everywhere else.</li>
+      <li>MFA and least privilege break most of what you just learned.</li>
+      <li>Learn tool <em>categories</em>, not tools.</li>
+      <li>The report is the product. Red exists to make blue better.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Take it further 🏾</h3>
+    <p>Every part of this guide has graded scenario questions in the ROT quiz engine, and hands-on labs where Bo and Flo walk you through it step by step — all against your own lab or free CTF targets, never anything you don't own.</p>
+    <p style="margin-bottom:0">Members: it's on your dashboard at <b>rotechllc.com/quiz</b>. Not a member yet: <b>rotechllc.com/membership</b>, or talk to a free agent at <b>rotechllc.com/help</b> first.</p>
+  </div>
+
+  <footer>
+    <p><b>RICH OFF TECH</b> — Cleared tech. No shortcuts. 🤎</p>
+    <p>Original work, © 2026 Rich Off Tech LLC. Built on standard, publicly documented offensive-security methodology and public frameworks (MITRE ATT&amp;CK, OWASP). Written for education.</p>
+    <p style="margin-bottom:0"><b>Legal &amp; ethical use only.</b> Every technique here is for systems you own, deliberately vulnerable practice targets, CTF platforms, or engagements with written authorization and a defined scope. Testing systems you don't own or aren't authorized to test is a crime. This guide teaches defense through understanding offense — it is not permission to attack anyone.</p>
+  </footer>
+</div>
+</body>
+</html>

@@ -327,6 +327,69 @@ export const LABS: Lab[] = [
       { title: "Write the three gaps", do: "List the three biggest gaps this exercise exposed, each with an owner and a date. That list IS the deliverable — a tabletop that finds nothing was run wrong.", verify: "Three gaps, three owners, three dates." },
     ],
   },
+  // ── HACKING WITH BO & FLO (hk) — offensive-security fundamentals, taught safe.
+  // Every lab runs against the student's OWN isolated lab VMs, free intentionally-
+  // vulnerable practice targets, or public CTF platforms — NEVER a system they do
+  // not own or are not authorized to test. Authorization framing is built into
+  // each one on purpose.
+  {
+    id: "hk-build-lab",
+    cert: "Hacking with Bo & Flo",
+    domainId: "hk1",
+    coach: "bo",
+    title: "Build your legal hacking lab",
+    objective: "Stand up an isolated, host-only lab with an attacker VM and a deliberately vulnerable target — the only place the rest of this track is allowed to happen.",
+    est: "~30 min",
+    pdiUrl: "https://www.vulnhub.com/",
+    envLabel: "Browse free vulnerable VMs",
+    steps: [
+      { title: "Install virtualization", do: "Install a free hypervisor (VirtualBox or similar). This is the sandbox everything lives in.", verify: "The hypervisor launches and can create a VM." },
+      { title: "Attacker VM", do: "Download and boot a security-focused Linux distribution as your attacker box. Snapshot it clean so you can always roll back.", verify: "The attacker VM boots and you have a clean snapshot." },
+      { title: "Target VM", do: "Download ONE deliberately vulnerable practice VM (from a free, reputable source made for this) and boot it. This is your legal punching bag.", verify: "The target VM boots." },
+      { title: "Isolate the network", do: "Set BOTH VMs to a host-only or internal network — not bridged, not NAT to the internet. This is the step that keeps your practice legal.", verify: "The two VMs can ping each other and CANNOT reach the public internet." },
+      { title: "Prove isolation", do: "From the attacker VM, confirm you can reach the target and confirm you canNOT reach any external address. Screenshot both results.", verify: "You have evidence the lab is sealed." },
+      { title: "Write your own RoE", do: "Write a one-paragraph rules-of-engagement for your lab: what's in scope (your two VMs), what's off-limits (everything else on earth), and a note that you'll practise this discipline on every future target.", verify: "You have a written scope, even for your own lab. The habit is the point." },
+    ],
+  },
+  {
+    id: "hk-recon-enum",
+    cert: "Hacking with Bo & Flo",
+    domainId: "hk2",
+    coach: "bo",
+    title: "Recon and enumerate your lab target",
+    objective: "Run the full discovery loop against your OWN lab VM — host discovery, port scan, version detection, deep enumeration — and produce the map a real engagement's early hours produce.",
+    est: "~40 min",
+    pdiUrl: "https://www.vulnhub.com/",
+    envLabel: "Lab target",
+    steps: [
+      { title: "Confirm scope", do: "Confirm the ONLY target is your own lab VM's address. Say it out loud. Everything here is authorized because you own it.", verify: "You can state the single in-scope IP." },
+      { title: "Host discovery", do: "Confirm the target is alive from your attacker VM.", verify: "The host responds." },
+      { title: "Port scan", do: "Scan the full port range. Record every open port.", verify: "You have a complete list of open ports." },
+      { title: "Version detection", do: "For each open port, identify the service and its version.", verify: "Every open port has a service + version noted." },
+      { title: "Enumerate deeply", do: "For each service, enumerate: users, shares, directories, banners, default pages, anything it will tell you. Do NOT exploit anything.", verify: "You've recorded details beyond just 'the port is open'." },
+      { title: "The version pivot", do: "Take one interesting service version and search public vulnerability databases for known issues affecting exactly that version. Note what you find — reading only.", verify: "You've connected a version number to known-vuln research without touching the target further." },
+      { title: "Draw the map", do: "Produce a one-page map: host, every open port, service and version, and what enumeration revealed. This is your engagement artifact.", verify: "A stranger could read your map and know the target's shape." },
+    ],
+  },
+  {
+    id: "hk-cred-defense",
+    cert: "Hacking with Bo & Flo",
+    domainId: "hk4",
+    coach: "flo",
+    title: "Map credential attacks to their defenses",
+    objective: "For each way credentials get stolen, write the attacker's method and the defender's counter side by side — the exact structure of a strong interview answer and a real report finding.",
+    est: "~35 min",
+    pdiUrl: "https://attack.mitre.org/tactics/TA0006/",
+    envLabel: "Open MITRE ATT&CK: Credential Access",
+    steps: [
+      { title: "List the theft methods", do: "From the guide, list the five credential-theft families: dumping from memory, reuse/stuffing, interception in transit, exposed secrets, and phishing the person.", verify: "All five are written down." },
+      { title: "Attacker column", do: "For each, write one honest sentence on how it works and what condition it needs (e.g. dumping needs admin on the box).", verify: "Each method has its precondition stated." },
+      { title: "Defender column", do: "Next to each, write the two controls that break it and how you'd DETECT it if it happened anyway.", verify: "Each method has two controls and a detection." },
+      { title: "Find the MVP control", do: "Identify the single control that appears against the most methods. Explain in one line why MFA does so much work here.", verify: "You've named the highest-leverage control and justified it." },
+      { title: "Cross-check against ATT&CK", do: "Open the MITRE ATT&CK Credential Access tactic (reading only) and confirm your five families line up with the real technique categories.", verify: "Your list maps to ATT&CK's Credential Access techniques." },
+      { title: "Write it as a finding", do: "Turn your weakest area into a five-part report finding: what it is, where (pick a realistic system), impact in business terms, proof concept, and the prioritized fix.", verify: "A non-technical reader could act on your finding." },
+    ],
+  },
 ];
 
 export function getLab(id: string | undefined): Lab | undefined {
