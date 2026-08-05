@@ -73,14 +73,12 @@ export default function AdminCRM() {
   const [sops, setSops] = useState<{ id: string; title: string; body: string; updatedBy?: string }[]>([]);
   const [sopDraft, setSopDraft] = useState<Record<string, string>>({});
   const [newSop, setNewSop] = useState({ title: "", body: "" });
-  const [referralPayout, setReferralPayoutState] = useState(20);
   // Live promo deadline (crmConfig/settings.dealDeadline). The public site reads the same
   // value through /api/deal, so extending here moves the homepage countdown and every
   // "ends <date>" line with no deploy.
   const [dealDeadline, setDealDeadline] = useState<string>("");
   const [dealEndLabel, setDealEndLabel] = useState<string>("");
   const [dealMsg, setDealMsg] = useState("");
-  const [payoutDraft, setPayoutDraft] = useState("");
   const [payouts, setPayouts] = useState<{ referrer: string; amount: number; method: string; at: string }[]>([]);
   const [vouchers, setVouchers] = useState<{ id: string; code: string; cert: string; expiry?: string; assignedTo?: string; forClient?: string; status: string; source?: string; sentAt?: string; confirmedByCoach?: boolean; confirmedAt?: string; confirmedBy?: string }[]>([]);
   const [vForm, setVForm] = useState({ code: "", cert: "CompTIA Security+ (SY0-701)", expiry: "", assignedTo: "", source: "" });
@@ -203,7 +201,6 @@ export default function AdminCRM() {
     if (!r.ok) return;
     const d = await r.json();
     if (d.ok) {
-      setReferralPayoutState(d.referralPayout);
       if (d.dealDeadline) setDealDeadline(d.dealDeadline);
       if (d.dealEndLabel) setDealEndLabel(d.dealEndLabel);
     }
@@ -304,13 +301,6 @@ export default function AdminCRM() {
     }
   }
 
-  async function savePayout() {
-    const v = Number(payoutDraft);
-    if (isNaN(v)) return;
-    const r = await fetch("/api/admin/config", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ referralPayout: v }) });
-    const d = await r.json();
-    if (d.ok) { setReferralPayoutState(d.referralPayout); setPayoutDraft(""); }
-  }
   // Record a payout against a referrer (cash or store credit). Enforces the cap by
   // logging what was actually paid — the rollup then shows owed minus paid.
   async function markPaid(referrer: string, amount: number, method: "cash" | "credit") {
@@ -1666,15 +1656,26 @@ export default function AdminCRM() {
             </div>
             <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="text-gray-500 text-sm mr-auto">Auto-captured from referral links. <b>${referralPayout}</b>/cleared referral, <b>capped at $500/person</b> (or $1,000 store credit). Only active (non-refunded) referrals count — pay out after 5 business days. <b>Program runs until 200 members</b> {(stats?.total ?? members.length) >= 200 ? <span className="text-red-600 font-semibold">— ENDED (200 reached)</span> : <span className="text-gray-600">(currently {stats?.total ?? members.length}/200)</span>}.</p>
-                <input value={payoutDraft} onChange={e => setPayoutDraft(e.target.value)} placeholder={`${referralPayout}`} type="number" className="w-24 text-xs border border-[#dadce0] rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:border-orange-500" />
-                <button onClick={savePayout} className="text-xs px-3 py-1.5 rounded-lg bg-[#202124] text-white hover:bg-black">Set payout</button>
+                {/* The rate is TIERED and set in code — Tier 1 (the first 100
+                    founders) $50, Tier 2 (joined after 2026-07-06) $25 — which is
+                    what the rollup below computes and exactly what the bot DMs
+                    referrers.
+
+                    There used to be a "Set payout" box here backed by the
+                    `referralPayout` config. It drove NOTHING: the owed column has
+                    always used the tiered rate, so the box printed a number
+                    (defaulting to $20) that matched neither tier and changed
+                    nothing when you edited it. A control that lies about the money
+                    owed to real people is worse than no control, so it is gone.
+                    To change the rates, edit `rate` in the rollup above and the
+                    bot's notifyReferrer() together — they must agree. */}
+                <p className="text-gray-500 text-sm mr-auto">Auto-captured from referral links. <b>$50</b>/cleared referral for Founding Tier 1, <b>$25</b> for Tier 2 — <b>capped at $500/person</b> (or $1,000 store credit). Only active (non-refunded) referrals count — pay out after 5 business days. <b>Program runs until 200 members</b> {(stats?.total ?? members.length) >= 200 ? <span className="text-red-600 font-semibold">— ENDED (200 reached)</span> : <span className="text-gray-600">(currently {stats?.total ?? members.length}/200)</span>}.</p>
               </div>
               <span className="text-sm font-semibold">Still owed: ${totalOwed}</span>
             </div>
             {referrers.length === 0 ? (
               <div className="bg-white border border-[#dadce0] rounded-xl p-6 text-sm text-gray-500">
-                No referrals yet. This fills <b>automatically</b> — anyone who buys through a member&apos;s <b>$200 referral link</b> (rotechllc.com/r/[code]) and types who referred them shows up here, and the referrer gets DM&apos;d that their $50 is coming.
+                No referrals yet. This fills <b>automatically</b> — anyone who buys through a member&apos;s <b>$200 referral link</b> (rotechllc.com/r/[code]) and types who referred them shows up here, and the referrer gets DM&apos;d a running tally at their tier rate ($50 Tier 1 / $25 Tier 2).
               </div>
             ) : (
               <div className="bg-white border border-[#dadce0] rounded-xl overflow-x-auto">
