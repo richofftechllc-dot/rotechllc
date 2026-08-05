@@ -110,7 +110,7 @@ export default function ConsultButton({
                       href={discordInvite}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block text-center px-5 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg text-sm hover:opacity-90"
+                      className="block text-center px-5 py-3 bg-gradient-to-r from-rot-accent to-rot-accent-2 text-white font-bold rounded-lg text-sm hover:opacity-90"
                     >
                       Join the Discord — Free
                     </a>

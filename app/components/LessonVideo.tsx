@@ -136,7 +136,7 @@ export default function LessonVideo({ url, domainId, domainName }: { url: string
           <div className="text-rot-accent font-bold tracking-widest text-[10px] mb-1">📍 BO NOTICED</div>
           <p className="text-sm text-rot-fg mb-3 leading-snug">Caught you stopping. What&apos;s the question? I&apos;ll answer in your sidebar.</p>
           <div className="flex gap-2">
-            <button onClick={openBoTech} className="flex-1 px-3 py-2 bg-orange-500 text-black font-bold text-xs rounded">Ask Bo Tech →</button>
+            <button onClick={openBoTech} className="flex-1 px-3 py-2 bg-rot-accent text-black font-bold text-xs rounded">Ask Bo Tech →</button>
             <button onClick={() => setPausePromptOpen(false)} className="px-3 py-2 text-xs text-rot-muted hover:text-rot-fg">Dismiss</button>
           </div>
         </div>

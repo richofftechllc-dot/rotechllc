@@ -6,7 +6,7 @@ const DISCORD_INVITE = "https://discord.gg/dtcYf8PTNa";
 
 export default function Team() {
   return (
-    <section className="bg-gradient-to-br from-orange-500/10 to-black py-24 border-t border-rot-line">
+    <section className="bg-gradient-to-br from-rot-accent/10 to-black py-24 border-t border-rot-line">
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center mb-12">
           <div className="text-rot-accent font-bold tracking-widest text-sm mb-4">THE TEAM</div>
@@ -104,7 +104,7 @@ export default function Team() {
               handles={["Cert", "Clearance", "Project Intake"]}
               accent="orange"
               discordInvite={DISCORD_INVITE}
-              className="mt-auto inline-block w-full text-center px-4 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg text-sm hover:opacity-90"
+              className="mt-auto inline-block w-full text-center px-4 py-2.5 bg-gradient-to-r from-rot-accent to-rot-accent-2 text-white font-bold rounded-lg text-sm hover:opacity-90"
             >
               Book a Consult →
             </ConsultButton>

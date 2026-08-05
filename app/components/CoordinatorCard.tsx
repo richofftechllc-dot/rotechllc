@@ -20,10 +20,10 @@ const ACCENT: Record<Accent, { border: string; chip: string; eyebrow: string; ri
     cta: "border-green-500/40 text-emerald-600 hover:bg-emerald-600/[0.07]",
   },
   orange: {
-    border: "border-rot-accent/30 hover:border-orange-500/70",
+    border: "border-rot-accent/30 hover:border-rot-accent/70",
     chip:   "text-rot-accent border-rot-accent/30",
     eyebrow:"text-rot-accent",
-    ringGlow:"from-orange-500/10",
+    ringGlow:"from-rot-accent/10",
     cta: "border-rot-accent/30 text-rot-accent hover:bg-rot-accent/10",
   },
 };
@@ -92,7 +92,7 @@ export default function CoordinatorCard({
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/70 pointer-events-none" />
 
         <div className="absolute top-4 left-4 right-4 flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-black text-sm shadow-lg">R</div>
+          <div className="w-8 h-8 bg-gradient-to-br from-rot-accent to-rot-accent-2 rounded-full flex items-center justify-center text-white font-black text-sm shadow-lg">R</div>
           <div className="text-rot-fg font-bold tracking-[0.18em] text-[10px]">RICH OFF TECH</div>
         </div>
 
@@ -169,7 +169,7 @@ export default function CoordinatorCard({
                       href={ctaHref}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block text-center px-5 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg text-sm hover:opacity-90"
+                      className="block text-center px-5 py-3 bg-gradient-to-r from-rot-accent to-rot-accent-2 text-white font-bold rounded-lg text-sm hover:opacity-90"
                     >
                       Join the Discord — Free
                     </a>

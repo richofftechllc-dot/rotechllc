@@ -73,7 +73,7 @@ export default function Login() {
           placeholder="FIRSTNAME2026" autoCapitalize="characters" disabled={loading}
           className="w-full bg-rot-bg border border-rot-line rounded-lg px-4 py-3 mb-4 outline-none focus:border-rot-accent disabled:opacity-50" />
         <button onClick={signIn} disabled={loading}
-          className="w-full py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg uppercase tracking-wider disabled:opacity-50">
+          className="w-full py-3 bg-gradient-to-r from-rot-accent to-rot-accent-2 text-white font-bold rounded-lg uppercase tracking-wider disabled:opacity-50">
           {loading ? "Signing in..." : "Sign In"}
         </button>
 

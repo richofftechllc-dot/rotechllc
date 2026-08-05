@@ -43,7 +43,7 @@ export default async function Calls() {
       </p>
 
       {/* THIS SUNDAY — live from the calendar */}
-      <div className="border border-rot-accent/30 rounded-2xl p-6 md:p-10 max-w-4xl mx-auto bg-gradient-to-br from-orange-500/5 to-red-500/5">
+      <div className="border border-rot-accent/30 rounded-2xl p-6 md:p-10 max-w-4xl mx-auto bg-gradient-to-br from-rot-accent/5 to-red-500/5">
         <div className="text-rot-accent text-sm font-bold tracking-widest text-center mb-3">THIS SUNDAY</div>
         {ev ? (
           <>
@@ -54,7 +54,7 @@ export default async function Calls() {
             )}
             <div className="flex flex-col items-center gap-3">
               {ev.meetUrl && (
-                <a href={ev.meetUrl} target="_blank" rel="noopener noreferrer" className="px-7 py-3.5 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90 text-base">
+                <a href={ev.meetUrl} target="_blank" rel="noopener noreferrer" className="px-7 py-3.5 bg-gradient-to-r from-rot-accent to-rot-accent-2 text-white font-bold rounded-lg hover:opacity-90 text-base">
                   Join the Google Meet
                 </a>
               )}
@@ -68,7 +68,7 @@ export default async function Calls() {
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-3">No community call this week</h2>
             <p className="text-rot-muted text-center max-w-2xl mx-auto mb-8 leading-relaxed">{AWAY_NOTE}</p>
             <div className="flex justify-center">
-              <a href={DISCORD_LINK} target="_blank" rel="noopener noreferrer" className="px-7 py-3.5 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90 text-base">
+              <a href={DISCORD_LINK} target="_blank" rel="noopener noreferrer" className="px-7 py-3.5 bg-gradient-to-r from-rot-accent to-rot-accent-2 text-white font-bold rounded-lg hover:opacity-90 text-base">
                 Join the Discord — Free
               </a>
             </div>

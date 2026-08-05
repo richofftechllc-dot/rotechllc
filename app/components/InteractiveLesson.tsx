@@ -108,12 +108,12 @@ function ServiceNowMock() {
     <div className="mb-5 rounded-xl border border-rot-line bg-gradient-to-b from-zinc-950 to-black p-3">
       <p className="mb-2 text-[11px] uppercase tracking-wide text-rot-faint">This is what an instance actually looks like ↓</p>
       {/* Banner */}
-      <div className="flex items-center gap-2 rounded-t-lg bg-rot-sunken px-3 py-2 text-rot-fg ring-1 ring-orange-500/30">
+      <div className="flex items-center gap-2 rounded-t-lg bg-rot-sunken px-3 py-2 text-rot-fg ring-1 ring-rot-accent/30">
         <UIcon name="menu" className="w-4 h-4 text-rot-accent" />
         <span className="text-sm font-bold text-rot-fg">now<span className="text-rot-accent">.</span></span>
         <div className="ml-2 flex flex-1 items-center gap-1 rounded bg-rot-surface px-2 py-1 text-[11px] text-rot-faint"><UIcon name="search" className="w-3 h-3" />Search</div>
         <UIcon name="gear" className="w-4 h-4 text-rot-accent" />
-        <div className="h-5 w-5 rounded-full bg-orange-500/80" />
+        <div className="h-5 w-5 rounded-full bg-rot-accent/80" />
       </div>
       <div className="flex">
         {/* Navigator */}
@@ -179,7 +179,7 @@ export default function InteractiveLesson({ html }: { html: string }) {
   return (
     <div className="bg-rot-surface border border-rot-accent/30 rounded-xl overflow-hidden mb-6">
       <div className="h-1.5 bg-rot-sunken">
-        <div className="h-full bg-orange-500 transition-all duration-300" style={{ width: `${((step + 1) / n) * 100}%` }} />
+        <div className="h-full bg-rot-accent transition-all duration-300" style={{ width: `${((step + 1) / n) * 100}%` }} />
       </div>
 
       <div className="p-6">
@@ -187,7 +187,7 @@ export default function InteractiveLesson({ html }: { html: string }) {
           <div className="flex gap-1.5">
             {sections.map((_, i) => (
               <button key={i} onClick={() => go(i)} aria-label={`Section ${i + 1}`}
-                className={`h-2 rounded-full transition-all ${i === step ? "w-6 bg-orange-500" : "w-2 bg-white/20 hover:bg-white/40"}`} />
+                className={`h-2 rounded-full transition-all ${i === step ? "w-6 bg-rot-accent" : "w-2 bg-white/20 hover:bg-white/40"}`} />
             ))}
           </div>
           <span className="text-xs font-mono text-rot-faint">{step + 1} / {n} · ← → keys</span>
@@ -222,7 +222,7 @@ export default function InteractiveLesson({ html }: { html: string }) {
                           <span className="text-center text-base font-bold text-rot-accent">{term}</span>
                           <span className="text-[11px] uppercase tracking-wide text-rot-faint">tap to reveal</span>
                         </div>
-                        <div className="absolute inset-0 overflow-y-auto rounded-xl border border-rot-accent/30 bg-orange-500/5 p-4" style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}>
+                        <div className="absolute inset-0 overflow-y-auto rounded-xl border border-rot-accent/30 bg-rot-accent/5 p-4" style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}>
                           <div className="mb-1 flex items-center gap-1.5 text-rot-accent">
                             {icon && <UIcon name={icon} className="w-4 h-4" />}
                             <span className="text-xs font-bold">{term}</span>
@@ -282,7 +282,7 @@ export default function InteractiveLesson({ html }: { html: string }) {
                   }
                   // Recall card: prompt on front, answer revealed on tap.
                   return (
-                    <button key={i} onClick={() => toggle(`${step}-${i}`)} className={`rounded-xl border p-4 text-left transition-all ${open ? "border-rot-accent/30 bg-orange-500/5" : "border-rot-line bg-rot-sunken hover:border-rot-accent/30"}`}>
+                    <button key={i} onClick={() => toggle(`${step}-${i}`)} className={`rounded-xl border p-4 text-left transition-all ${open ? "border-rot-accent/30 bg-rot-accent/5" : "border-rot-line bg-rot-sunken hover:border-rot-accent/30"}`}>
                       <div className="flex items-center gap-2 text-sm font-bold text-rot-fg">{icon && <UIcon name={icon} className="w-5 h-5 text-rot-accent" />}{key}</div>
                       {open
                         ? <div className="mt-1 text-sm text-rot-accent">{val}</div>
@@ -303,7 +303,7 @@ export default function InteractiveLesson({ html }: { html: string }) {
           <button onClick={() => go(step - 1)} disabled={step === 0}
             className="rounded-lg bg-rot-sunken px-4 py-2 text-sm font-bold text-rot-fg hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-30">← Back</button>
           {step < n - 1
-            ? <button onClick={() => go(step + 1)} className="rounded-lg bg-orange-500 px-5 py-2 text-sm font-bold text-black hover:bg-orange-400">Next →</button>
+            ? <button onClick={() => go(step + 1)} className="rounded-lg bg-rot-accent px-5 py-2 text-sm font-bold text-black hover:bg-orange-400">Next →</button>
             : <span className="text-sm font-semibold text-emerald-600">✓ Lesson complete — start the quiz below ↓</span>}
         </div>
       </div>

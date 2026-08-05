@@ -193,7 +193,7 @@ export default function Bo30() {
         </p>
         <button
           onClick={() => { setStep("pick"); setPrompt(null); setBlob(null); setPreviewUrl(null); setText(""); setSeconds(0); setConsent(false); }}
-          className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:opacity-90"
+          className="px-6 py-3 bg-gradient-to-r from-rot-accent to-rot-accent-2 text-white font-bold rounded-lg hover:opacity-90"
         >
           Send another
         </button>
@@ -219,7 +219,7 @@ export default function Bo30() {
             <button
               key={p.id}
               onClick={() => { setPrompt(p); setStep("make"); if (mode === "video") openCamera(); }}
-              className="text-left bg-rot-surface border border-rot-line rounded-2xl p-5 hover:border-orange-500/60 transition"
+              className="text-left bg-rot-surface border border-rot-line rounded-2xl p-5 hover:border-rot-accent/60 transition"
             >
               <div className="font-bold mb-1">{p.label}</div>
               <div className="text-rot-faint text-xs">{p.teleprompter}</div>
@@ -296,7 +296,7 @@ export default function Bo30() {
               </button>
             )}
             {camReady && !recording && !previewUrl && (
-              <button onClick={startRec} className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold text-sm">
+              <button onClick={startRec} className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-rot-accent to-rot-accent-2 text-white font-bold text-sm">
                 Start recording
               </button>
             )}
@@ -345,7 +345,7 @@ export default function Bo30() {
       {/* Explicit consent. These clips may end up in a public edit or a documentary, so it
           has to be a deliberate tick — never a default or a buried line. */}
       <label className="flex gap-3 items-start text-sm text-rot-muted mb-6 cursor-pointer">
-        <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 accent-orange-500 w-4 h-4" />
+        <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 accent-rot-accent w-4 h-4" />
         <span>
           Bo can share this — post it, play it at the party, or use it in a video or
           documentary about ROT.
@@ -357,7 +357,7 @@ export default function Bo30() {
       {busy && progress > 0 && progress < 100 && (
         <div className="mb-4">
           <div className="h-2 bg-rot-sunken rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-orange-500 to-red-500 transition-[width]" style={{ width: `${progress}%` }} />
+            <div className="h-full bg-gradient-to-r from-rot-accent to-rot-accent-2 transition-[width]" style={{ width: `${progress}%` }} />
           </div>
           <p className="text-rot-faint text-xs mt-1">Uploading… {progress}% — keep this page open.</p>
         </div>
@@ -366,7 +366,7 @@ export default function Bo30() {
       <button
         onClick={submit}
         disabled={busy}
-        className="w-full px-6 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white font-black rounded-xl hover:opacity-90 disabled:opacity-50 uppercase tracking-wide"
+        className="w-full px-6 py-4 bg-gradient-to-r from-rot-accent to-rot-accent-2 text-white font-black rounded-xl hover:opacity-90 disabled:opacity-50 uppercase tracking-wide"
       >
         {busy ? "Sending…" : "Send it to Bo"}
       </button>

@@ -84,7 +84,7 @@ export default function MemberHome() {
         </div>
 
         {/* Continue where you left off */}
-        <Link href="/quiz" className="block rounded-2xl border border-rot-accent/30 bg-gradient-to-br from-orange-500/10 to-transparent p-6 mb-5 hover:border-orange-500/60 transition">
+        <Link href="/quiz" className="block rounded-2xl border border-rot-accent/30 bg-gradient-to-br from-rot-accent/10 to-transparent p-6 mb-5 hover:border-rot-accent/60 transition">
           <p className="text-xs uppercase tracking-wider text-rot-accent font-bold mb-2">Continue where you left off</p>
           <div className="flex items-end justify-between gap-4">
             <div>
@@ -94,11 +94,11 @@ export default function MemberHome() {
                 {readiness !== null ? ` · ${readiness}% avg` : ""}
               </p>
             </div>
-            <span className="shrink-0 px-4 py-2 rounded-lg bg-orange-500 text-black font-bold text-sm">Resume →</span>
+            <span className="shrink-0 px-4 py-2 rounded-lg bg-rot-accent text-black font-bold text-sm">Resume →</span>
           </div>
           {d.progress.total > 0 && (
             <div className="mt-4 h-2 rounded-full bg-rot-sunken overflow-hidden">
-              <div className="h-full bg-orange-500 transition-all" style={{ width: `${pct}%` }} />
+              <div className="h-full bg-rot-accent transition-all" style={{ width: `${pct}%` }} />
             </div>
           )}
         </Link>
@@ -129,7 +129,7 @@ export default function MemberHome() {
             ) : (
               <p className="text-sm text-rot-fg/40">No sessions booked yet.</p>
             )}
-            <Link href="/book" className="inline-block mt-4 px-3 py-1.5 rounded-lg bg-orange-500 text-black font-semibold text-sm hover:bg-orange-400 transition">Book a 1-on-1 →</Link>
+            <Link href="/book" className="inline-block mt-4 px-3 py-1.5 rounded-lg bg-rot-accent text-black font-semibold text-sm hover:bg-orange-400 transition">Book a 1-on-1 →</Link>
           </div>
         </div>
 
