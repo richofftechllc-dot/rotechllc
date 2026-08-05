@@ -4309,6 +4309,482 @@ export const TRACKS: Track[] = [
         ]
       }
     ]
+  },
+  {
+    "id": "cd",
+    "name": "Cyber Defense",
+    "domains": [
+      {
+        "id": "cd1",
+        "name": "Know Your Adversary",
+        "questions": [
+          {
+            "q": "A crew mass-scans the internet for one unpatched service and moves on the second a host looks hardened. Which actor profile is this?",
+            "options": [
+              "Nation-state APT",
+              "Opportunistic commodity attacker",
+              "Malicious insider",
+              "Hacktivist collective"
+            ],
+            "answer": 1,
+            "exp": "Opportunists optimise for cheap wins at scale. They don't target you — they target a vulnerability, and you happened to have it. Patching genuinely removes most of this traffic."
+          },
+          {
+            "q": "Your CFO's account is used to move money at 2am. No malware, no exploit, valid credentials, normal VPN. What should you suspect FIRST?",
+            "options": [
+              "A zero-day in the VPN appliance",
+              "Account compromise or insider misuse",
+              "A DDoS diversion",
+              "Firmware implant on the router"
+            ],
+            "answer": 1,
+            "exp": "No exploit needed means none was probably used. Valid credentials doing abnormal things is the signature of stolen creds or an insider — which is why identity monitoring beats another perimeter box."
+          },
+          {
+            "q": "In TTP, what is a 'tactic'?",
+            "options": [
+              "The specific tool used",
+              "The attacker's goal at that stage of the operation",
+              "The exact command syntax",
+              "The malware family name"
+            ],
+            "answer": 1,
+            "exp": "Tactic = the WHY (initial access, privilege escalation, exfiltration). Technique = the HOW. Procedure = the exact way one specific crew does it. Tools change constantly; tactics barely change at all."
+          },
+          {
+            "q": "Which free public resource catalogues adversary tactics and techniques as a matrix and is the industry's shared language?",
+            "options": [
+              "MITRE ATT&CK",
+              "The CVE list",
+              "OWASP Top 10",
+              "CVSS"
+            ],
+            "answer": 0,
+            "exp": "ATT&CK maps tactics across the top and techniques underneath. CVE names individual vulnerabilities, CVSS scores their severity, OWASP ranks web app risks. Different jobs."
+          },
+          {
+            "q": "A vendor's software update was signed, legitimate, and carried attacker code — as in the SolarWinds compromise. What does this most directly break?",
+            "options": [
+              "Password complexity policy",
+              "The assumption that trusted sources are safe",
+              "Full-disk encryption",
+              "Email filtering"
+            ],
+            "answer": 1,
+            "exp": "The build system itself was compromised, so every downstream check said 'valid'. Trust is not a control. That's the entire argument for assume-breach design and real detection."
+          },
+          {
+            "q": "Colonial Pipeline was reached through a legacy VPN account with no MFA that was still enabled. The lesson closest to the root cause is:",
+            "options": [
+              "Buy better threat intelligence",
+              "Retire dormant accounts and enforce MFA everywhere",
+              "Move everything to the cloud",
+              "Increase the security awareness budget"
+            ],
+            "answer": 1,
+            "exp": "One forgotten account with a reused password. No exotic tradecraft. Account hygiene and MFA are unglamorous and they are the control that would have mattered."
+          },
+          {
+            "q": "Why does phishing remain the most common way in, despite decades of awareness training?",
+            "options": [
+              "Email protocols cannot be secured at all",
+              "It is the cheapest reliable path to a goal",
+              "Most staff are negligent",
+              "Filters do not work"
+            ],
+            "answer": 1,
+            "exp": "Attackers are economically rational. Nobody burns a valuable zero-day when a convincing email works. That's also why you prioritise by 'cheapest path in', not 'scariest scenario'."
+          },
+          {
+            "q": "Your security awareness programme punishes anyone who clicks a simulated phish. What is the predictable second-order effect?",
+            "options": [
+              "Click rate drops and risk falls",
+              "People stop reporting real phishing",
+              "Attackers switch to voice",
+              "Nothing measurable"
+            ],
+            "answer": 1,
+            "exp": "Punishment kills reporting, and reporting is the control that actually shortens dwell time. Measure report rate, not just click rate — and run simulations to fix process, never to blame people."
+          }
+        ]
+      },
+      {
+        "id": "cd2",
+        "name": "Find Your Weak Spots",
+        "questions": [
+          {
+            "q": "A critical-severity vulnerability sits on an isolated lab box with no network path. A medium sits on the internet-facing app holding customer records. Which is the higher RISK?",
+            "options": [
+              "The critical, always — severity decides",
+              "The medium on the internet-facing app",
+              "Equal, both need patching",
+              "Neither until a pentest confirms"
+            ],
+            "answer": 1,
+            "exp": "Risk = likelihood x impact. Severity describes the flaw in isolation; risk describes what it means to YOUR business. Confusing the two is the most common junior mistake."
+          },
+          {
+            "q": "Which assessment answers 'what could go wrong with this design?' before any code exists?",
+            "options": [
+              "Penetration test",
+              "Threat modelling",
+              "Vulnerability scan",
+              "Compliance audit"
+            ],
+            "answer": 1,
+            "exp": "Threat modelling happens on a whiteboard at design time. It is the cheapest control available and the most frequently skipped — everything else in this list needs a built system to test."
+          },
+          {
+            "q": "Your organisation passed its compliance audit with zero findings. What can you conclude about its security?",
+            "options": [
+              "It is secure",
+              "It met the control requirements that were assessed, in scope, at that time",
+              "The pentest will also pass",
+              "Risk is now transferred"
+            ],
+            "answer": 1,
+            "exp": "Compliance is a floor, not a ceiling, and it is scoped and point-in-time. Plenty of breached companies were fully compliant the week before."
+          },
+          {
+            "q": "A scanner returns 4,000 findings. What is the actual skill being paid for?",
+            "options": [
+              "Patching all 4,000 within 30 days",
+              "Turning the list into a prioritised plan tied to business impact",
+              "Rescanning weekly for trend data",
+              "Forwarding the report to system owners"
+            ],
+            "answer": 1,
+            "exp": "The scan is the easy part — anyone can run it. Producing 'these six, this quarter, in this order, and here's why' is the judgement that gets you hired and promoted."
+          },
+          {
+            "q": "Leadership decides not to fix a known risk this year. What makes that a legitimate decision rather than negligence?",
+            "options": [
+              "The risk being rated medium or lower",
+              "Documented acceptance with a named owner and a review date",
+              "A compensating tool already deployed",
+              "Verbal sign-off in a meeting"
+            ],
+            "answer": 1,
+            "exp": "Accept is a valid response alongside mitigate, transfer and avoid — but only when it's written down, owned by a named person, and revisited. Undocumented acceptance is just an unmanaged risk."
+          },
+          {
+            "q": "Which BEST describes your attack surface?",
+            "options": [
+              "The number of unpatched CVEs",
+              "Every point an attacker could interact with — external and internal",
+              "Your public IP ranges",
+              "Systems in scope for the annual pentest"
+            ],
+            "answer": 1,
+            "exp": "Public IPs, APIs, SaaS tenants, VPN endpoints, staff inboxes, third parties with a login. Most organisations cannot list theirs, which is why inventory is where every framework starts."
+          },
+          {
+            "q": "Why is asset inventory the foundation for everything else in a security programme?",
+            "options": [
+              "Auditors require an asset register",
+              "You cannot protect, monitor or patch what you do not know exists",
+              "It drives licence cost allocation",
+              "It is a prerequisite for cyber insurance"
+            ],
+            "answer": 1,
+            "exp": "Coverage gaps are exactly where incidents live. 'We have EDR' means nothing until you can say what percentage of KNOWN assets it's installed on — and how good that known list is."
+          },
+          {
+            "q": "A pentest report comes back clean. The most accurate reading is:",
+            "options": [
+              "The environment is secure",
+              "No exploitable path was found in that scope during that window",
+              "The vulnerability programme can be paused",
+              "Controls are operating effectively everywhere"
+            ],
+            "answer": 1,
+            "exp": "Pentests are narrow, point-in-time and scoped. Clean means clean that week, in that scope, by that tester. Treating it as a certificate of health is how organisations get surprised."
+          }
+        ]
+      },
+      {
+        "id": "cd3",
+        "name": "Threat Intel & Staying Ahead",
+        "questions": [
+          {
+            "q": "What is the practical test of whether a threat intelligence feed is worth paying for?",
+            "options": [
+              "Volume of indicators delivered",
+              "Whether it changes a decision or action",
+              "Number of actors tracked",
+              "Real-time delivery speed"
+            ],
+            "answer": 1,
+            "exp": "If nothing is done differently because of it, you're buying anxiety, not intelligence. Intel earns its cost by changing what you hunt, patch, block or fund."
+          },
+          {
+            "q": "'Ransomware crews are increasingly hitting our sector through managed service providers.' Which level of intelligence is this?",
+            "options": [
+              "Tactical",
+              "Operational",
+              "Strategic",
+              "Technical"
+            ],
+            "answer": 2,
+            "exp": "Strategic intel informs leadership, budget and priorities. Operational tells defenders what to hunt this week. Tactical is machine-consumable indicators for blocklists."
+          },
+          {
+            "q": "Which intelligence type has the SHORTEST useful shelf life?",
+            "options": [
+              "Strategic sector trends",
+              "Adversary TTPs",
+              "Atomic indicators like IPs and file hashes",
+              "Attacker motivations"
+            ],
+            "answer": 2,
+            "exp": "An attacker changes an IP or recompiles for a new hash in seconds. Behaviour is far more durable — which is why detections built on TTPs outlive detections built on indicators."
+          },
+          {
+            "q": "When prioritising defensive work, the most useful question to ask about an attacker is:",
+            "options": [
+              "What is the most damaging thing they could theoretically do?",
+              "What is their cheapest path to their goal from where they stand?",
+              "Which zero-days might they hold?",
+              "How large is their budget?"
+            ],
+            "answer": 1,
+            "exp": "Attackers optimise for cost. Defending against the scariest imaginable scenario while the 2019 CVE on your VPN stays open is how organisations spend a lot and stay exposed."
+          },
+          {
+            "q": "You want to practise offensive techniques to become a better defender. What is non-negotiable?",
+            "options": [
+              "A relevant certification",
+              "Written authorisation and a defined scope",
+              "A VPN and anonymised traffic",
+              "Approval from your direct manager only"
+            ],
+            "answer": 1,
+            "exp": "Testing systems you don't own or aren't contracted to test is a crime in most jurisdictions — skill and good intent are irrelevant. Build the habit in your own lab, where the only thing at stake is your own machine."
+          },
+          {
+            "q": "Which best describes responsible disclosure?",
+            "options": [
+              "Publishing full exploit code immediately for public awareness",
+              "Reporting privately to the owner with reasonable time to remediate before disclosure",
+              "Selling the finding to the highest bidder",
+              "Never disclosing under any circumstance"
+            ],
+            "answer": 1,
+            "exp": "Private report, agreed remediation window, then coordinated publication. It gets defenders a fix while still allowing the finding to inform the wider industry."
+          },
+          {
+            "q": "Your team subscribes to five feeds, and nobody has opened the dashboard in three months. The correct first move is:",
+            "options": [
+              "Buy a threat intelligence platform to aggregate them",
+              "Cut to the feeds that drive a defined action and wire those into a workflow",
+              "Assign a junior analyst to read them daily",
+              "Increase the alert threshold"
+            ],
+            "answer": 1,
+            "exp": "Aggregating unread feeds produces a more expensive unread feed. Start from the decision you want to make, then buy only the input that informs it."
+          },
+          {
+            "q": "Why do detections built on attacker BEHAVIOUR outperform detections built on indicators?",
+            "options": [
+              "They generate fewer alerts overall",
+              "Behaviour is expensive for an attacker to change; indicators are trivial to change",
+              "They require less tuning",
+              "Indicators cannot be automated"
+            ],
+            "answer": 1,
+            "exp": "Changing an IP or hash is free. Changing HOW you achieve privilege escalation means rebuilding tradecraft. Defend at the layer that costs the attacker the most."
+          }
+        ]
+      },
+      {
+        "id": "cd4",
+        "name": "Measuring Your Posture",
+        "questions": [
+          {
+            "q": "Which is a genuine outcome metric rather than an activity metric?",
+            "options": [
+              "Number of attacks blocked this quarter",
+              "Mean time to detect (MTTD)",
+              "Number of vulnerability scans run",
+              "Percentage of staff who completed training"
+            ],
+            "answer": 1,
+            "exp": "Blocked traffic is weather — it measures the internet, not you. MTTD measures capability. If a metric rises when you do more work but doesn't move when you get safer, it's vanity."
+          },
+          {
+            "q": "Security posture is best described as the combination of:",
+            "options": [
+              "Firewalls, antivirus and encryption",
+              "Technology, process and people",
+              "Compliance certifications held",
+              "Annual security spend"
+            ],
+            "answer": 1,
+            "exp": "Technology you've deployed AND configured AND monitor; the process for what happens at 2am; and whether people report the weird email. The third is the most underfunded."
+          },
+          {
+            "q": "Your EDR is deployed on 62% of known assets. Why is this metric more useful than 'we have EDR'?",
+            "options": [
+              "It justifies the licence renewal",
+              "Coverage gaps are precisely where incidents live",
+              "It benchmarks against industry peers",
+              "It satisfies the auditor"
+            ],
+            "answer": 1,
+            "exp": "A control that isn't everywhere isn't a control, it's a sample. And the follow-up question is harder: how complete is the 'known assets' list it's measured against?"
+          },
+          {
+            "q": "Which pair of metrics best captures the effectiveness of a detection and response capability?",
+            "options": [
+              "Alert volume and rule count",
+              "MTTD and MTTR",
+              "Training completion and phishing click rate",
+              "Patch count and scan frequency"
+            ],
+            "answer": 1,
+            "exp": "Time to detect and time to respond. Detection without response is just knowing you're on fire. Alert volume tells you about tuning, not effectiveness."
+          },
+          {
+            "q": "In awareness programmes, which measure best reflects real behaviour change?",
+            "options": [
+              "Completion percentage",
+              "Phishing report rate",
+              "Quiz scores",
+              "Training hours delivered"
+            ],
+            "answer": 1,
+            "exp": "Completion measures attendance. Reporting measures whether someone will actually raise their hand when it counts — and a fast report is what shortens an incident."
+          },
+          {
+            "q": "A maturity assessment scores your organisation 2 in asset management and 4 in incident response. The right response is:",
+            "options": [
+              "Re-score to present a consistent level",
+              "Invest against the weak area rather than pursuing a uniform score",
+              "Target level 5 in every category",
+              "Ignore maturity models as subjective"
+            ],
+            "answer": 1,
+            "exp": "Every organisation is uneven. The value is honesty about where you're thin, so spend follows risk. Chasing a flat top score is how programmes waste money looking tidy."
+          },
+          {
+            "q": "Which of these is LEAST useful to report to a board?",
+            "options": [
+              "Trend in mean time to respond",
+              "Percentage of critical vulnerabilities remediated within SLA",
+              "Total volume of firewall events blocked",
+              "Coverage of controls across crown-jewel systems"
+            ],
+            "answer": 2,
+            "exp": "Event volume is unactionable at board level and invites the wrong question. Boards need risk posture and trend, expressed in terms they can make funding decisions against."
+          },
+          {
+            "q": "Why measure 'percentage of critical vulnerabilities remediated within SLA' rather than 'vulnerabilities found'?",
+            "options": [
+              "Finding fewer issues indicates better security",
+              "Closure is the outcome; discovery is only the input",
+              "It reduces scanner licensing cost",
+              "Auditors require remediation rates"
+            ],
+            "answer": 1,
+            "exp": "Finding them isn't the job — closing them is. A programme that finds thousands and fixes dozens is a reporting exercise, not a security function."
+          }
+        ]
+      },
+      {
+        "id": "cd5",
+        "name": "Strategy, Budget & Tooling",
+        "questions": [
+          {
+            "q": "A credible security strategy must answer four questions. Which set?",
+            "options": [
+              "Which vendors, what cost, what timeline, who signs",
+              "What are we protecting, from whom, to what standard, what first",
+              "How many staff, what tools, which certifications, what SLAs",
+              "What compliance regimes, which auditors, what evidence, what dates"
+            ],
+            "answer": 1,
+            "exp": "Assets, adversaries, standard, sequence. A document that doesn't answer those is a wish list with a budget attached."
+          },
+          {
+            "q": "Which framework is the strongest starting point when an organisation has essentially nothing and needs to know what to do FIRST?",
+            "options": [
+              "ISO 27001",
+              "CIS Controls",
+              "NIST CSF",
+              "COBIT"
+            ],
+            "answer": 1,
+            "exp": "CIS Controls are prioritised and opinionated — they tell you the order. NIST CSF is the better shared language with leadership; ISO 27001 is the better answer when customers want certified proof."
+          },
+          {
+            "q": "Zero trust is best described as:",
+            "options": [
+              "A product you deploy at the perimeter",
+              "An operating principle: verify explicitly, least privilege, assume breach",
+              "Removing all VPNs",
+              "A compliance requirement"
+            ],
+            "answer": 1,
+            "exp": "No vendor sells you zero trust. It's a design stance — stop trusting things because of where they sit on the network, verify every request, and assume something is already compromised."
+          },
+          {
+            "q": "Which funding request is most likely to be approved?",
+            "options": [
+              "We need $80K for a PAM solution to follow best practice",
+              "Fourteen accounts can change production unreviewed, two belong to ex-contractors; $80K closes that path and provides the audit evidence the enterprise deal requires",
+              "Our competitors have PAM and we do not",
+              "The auditors flagged privileged access as a gap"
+            ],
+            "answer": 1,
+            "exp": "Denominate it in THEIR risk, not your tooling. Same money, completely different conversation — the second one names the exposure, the consequence and the business unlock."
+          },
+          {
+            "q": "Before buying a new security product, the highest-value question is usually:",
+            "options": [
+              "Which vendor leads the analyst quadrant?",
+              "What are we already paying for that is unconfigured, uncovered or unmonitored?",
+              "What is the three-year total cost?",
+              "Can it integrate with our SIEM?"
+            ],
+            "answer": 1,
+            "exp": "'We already own it and it's turned off' is the most common finding in the industry. Fixing that on a budget of zero is how a new hire makes their name in 90 days."
+          },
+          {
+            "q": "You are running a proof-of-concept for a security tool. What most determines whether it is meaningful?",
+            "options": [
+              "Vendor-supplied test data and demo environment",
+              "Your environment, your data, and success criteria written down beforehand",
+              "Length of the trial period",
+              "Number of stakeholders attending the demo"
+            ],
+            "answer": 1,
+            "exp": "Every product demos beautifully on the vendor's laptop. Written criteria agreed in advance are what stop a POC becoming a sales meeting with extra steps."
+          },
+          {
+            "q": "Three deployed products overlap heavily in capability. What often buys more security than a fourth purchase?",
+            "options": [
+              "Adding the fourth for defence in depth",
+              "Consolidating, then fully configuring and monitoring what remains",
+              "Rotating vendors annually",
+              "Splitting coverage by business unit"
+            ],
+            "answer": 1,
+            "exp": "Overlap costs money and attention while creating gaps between consoles nobody owns. Depth means layered CONTROLS, not duplicate products in monitor-only mode."
+          },
+          {
+            "q": "For a new security hire, why ship a small visible fix inside the first 90 days?",
+            "options": [
+              "It satisfies the probation requirement",
+              "Credibility compounds — the roadmap gets funded because the small thing already worked",
+              "It demonstrates tool proficiency",
+              "It reduces the assessment backlog"
+            ],
+            "answer": 1,
+            "exp": "Learn, assess, then act. Something visible early buys the trust that gets the expensive, slower work approved."
+          }
+        ]
+      }
+    ]
   }
 ];
 
@@ -4329,5 +4805,10 @@ export const LESSONS: Record<string, string> = {
   "ai1": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>This is the foundation. Before you touch a single AWS service, you gotta know what AI even is. Not the buzzword version — the actual version. People throw around \"AI\" like it's one thing. It's not. It's a stack. And if you don't know the stack, the rest of this cert is just memorizing words you don't understand. The exam loves vocabulary here. AI, ML, Deep Learning, supervised, unsupervised, training, inference. Lock these in and a quarter of the test is automatic.</p><h3>🔑 KEY CONCEPTS IN BO TERMS</h3><ul><li><strong>AI (Artificial Intelligence)</strong> — The whole umbrella. Any machine doing something that looks like thinking. Siri telling you the weather, your spam folder catching junk, Netflix knowing what you want next — all AI. It's the category, not the thing.</li><li><strong>ML (Machine Learning)</strong> — A type of AI where the machine learns from data instead of someone hard-coding every rule. Old school: a programmer writes \"if email has the word VIAGRA, mark as spam.\" ML: you show the machine 10,000 spam emails and 10,000 real ones and it figures out the pattern itself. Nobody told it what spam looks like — it learned.</li><li><strong>Deep Learning (DL)</strong> — A type of ML using neural networks with a LOT of layers stacked on top of each other. \"Deep\" = many layers. This is what powers ChatGPT, face recognition, self-driving cars. When the data gets messy (images, audio, language), DL is what handles it. AI is the umbrella → ML is under it → DL is under that. Three nested circles.</li><li><strong>Platform</strong> — A managed environment where you run your ML work without buying your own servers. SageMaker is a platform. Bedrock is a platform. Think of it like renting a fully-stocked kitchen instead of building one from scratch — stove's already there, knives are already sharp, you just cook.</li><li><strong>Supervised Learning</strong> — You give the model the question AND the answer, over and over, until it learns the pattern. Show it a million pictures labeled \"cat\" or \"dog\" and eventually it can tell on its own. Like flashcards — front says \"what is it,\" back says \"the answer.\" Most business ML is this.</li><li><strong>Unsupervised Learning</strong> — No answers given. Just data. The model finds patterns on its own — groups customers that act alike, spots transactions that look weird, finds hidden categories nobody told it about. Like dropping somebody at a party with no names and asking them to figure out the friend groups.</li><li><strong>Reinforcement Learning (RL)</strong> — The model learns by doing. Try something → get a reward or a penalty → adjust → try again. How AI beats humans at chess and Go. Same way a kid learns not to touch a hot stove — try it once, learn forever. Slow to train but powerful when nothing else works.</li><li><strong>Neural Network</strong> — Layers of connected math \"neurons\" that pass numbers through and adjust how much each one matters. Loosely copied from how a brain wires up. Each connection has a weight. Training = the model tuning those weights until the output matches what it should be.</li><li><strong>Training</strong> — Teaching the model. You feed it data, it makes guesses, you correct it, it adjusts. Takes hours to weeks. Expensive. You only do this once (or every few months when the data gets stale).</li><li><strong>Inference</strong> — The model actually doing its job after training. You ask, it answers. Fast. Cheap. This is what runs in production every time someone hits your app. Train once, infer a million times.</li><li><strong>Features</strong> — The input variables the model uses to make a prediction. Predicting salary? Features might be years of experience, certs held, clearance level, city. Bad features = bad model, no matter how fancy. Choosing the right features is half the work.</li><li><strong>Labels</strong> — The right answer in supervised learning. For every training example, the label is what you want the model to learn to spit out.</li><li><strong>Training, Validation, Test Split</strong> — Slice your data three ways. Training (~70-80%) teaches it. Validation (~10-15%) you check during training to tune settings. Test (~10-15%) you hide until the very end for the real grade. Never let the model peek at the test set — that's like letting a student see the exam answers the night before. The grade means nothing.</li><li><strong>Overfitting</strong> — The model memorized the training data instead of learning the actual pattern. Aces practice, bombs the real test. Like the kid who memorized the practice exam word-for-word but couldn't answer one different question. Sign: training accuracy 99%, real-world accuracy 60%.</li><li><strong>Underfitting</strong> — Opposite. Model too simple to learn the pattern at all. Bad at training, bad at testing. Like trying to predict the stock market with a coin flip. Fix it with a more complex model or better features.</li><li><strong>Hyperparameters</strong> — Settings YOU pick before training starts. Learning rate, number of layers, batch size. Different from the weights the model learns — these are the dials you turn. Tuning hyperparameters is half the job and 90% of the frustration.</li><li><strong>Transfer Learning</strong> — Don't start from zero. Take a model already trained on a huge dataset and fine-tune it for your specific job. Like hiring someone with 10 years of experience instead of training a new grad. Saves massive time and compute. This is how almost every modern AI gets built.</li><li><strong>Confusion Matrix</strong> — A grid showing what the model got right and wrong, broken down. True positives, false positives, true negatives, false negatives. Where you find out your \"95% accurate\" fraud detector caught zero actual fraud. The matrix tells the real story.</li><li><strong>Accuracy, Precision, Recall</strong> — Three ways to grade a model and they don't always agree. Accuracy = total right out of total. Precision = when you say \"yes,\" how often are you right. Recall = of all the real yeses out there, how many did you catch. Fraud detector needs high recall (catch every fraud). Spam filter needs high precision (don't flag real emails). Pick the metric for the job.</li><li><strong>Structured vs Unstructured Data</strong> — Structured = clean rows and columns, like a spreadsheet or SQL table. Unstructured = the messy stuff: text, images, video, voice memos. 80% of real-world data is unstructured. ML used to only handle structured. Deep Learning is what unlocked the unstructured pile.</li><li><strong>Amazon SageMaker</strong> — AWS's main ML platform. Build, train, tune, deploy, monitor models without managing servers. When the exam asks \"which AWS service for general ML work,\" the answer is SageMaker.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Mixing up AI and ML on the exam. AI is the whole umbrella. ML is the data-driven slice. If the question is about \"learning from data,\" it's ML — even if \"AI\" shows up in the question.</li><li>Training on your test set. Now your accuracy is fake and you've got no idea how it'll do in the real world. Test set stays locked in the vault until the very end.</li><li>Chasing accuracy when precision or recall is what matters. A fraud detector that's 99% accurate but misses every fraud is garbage. Match the metric to the actual job.</li><li>Thinking more data is always the answer. More CLEAN data wins. More dirty data makes the model worse. Garbage in, garbage out.</li><li>Building a deep neural network for a problem a simple model would solve. Don't bring a tank to a knife fight. Match the model size to the problem.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>AI ⊃ ML ⊃ Deep Learning (nested, biggest to smallest)</li><li>Supervised = labels given | Unsupervised = no labels, find patterns | RL = rewards/penalties</li><li>Training = expensive, one-time | Inference = cheap, every request</li><li>Overfit = aces training, fails real | Underfit = fails both</li><li>Train/Val/Test ≈ 70/15/15 (never peek at test)</li><li>Hyperparameters = YOU set them BEFORE training | Weights = model learns them DURING</li><li>Transfer Learning = start with a pre-trained model, fine-tune for your task</li><li>Accuracy = total right | Precision = of yeses, how many right | Recall = of real yeses, how many caught</li><li>Structured = rows/columns | Unstructured = text, images, audio, video</li><li>SageMaker = AWS's main ML platform (build, train, deploy, monitor)</li></ul><h3>💼 REAL WORLD</h3><p>AI Practitioner is the entry-level AWS AI cert. Pass it and you're qualified for \"AI-aware\" jobs — cloud admin roles that touch ML pipelines, data engineering supporting ML teams, prompt engineering gigs in cleared environments. Pay range: $90K-$140K with this cert + a clearance. Next step from here is AWS ML Specialty or hands-on SageMaker work. But you can't run until you can walk. Lock this module in and the next three domains unlock fast.</p>",
   "ai2": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>This is the domain everybody's hype about. ChatGPT, image generators, AI writing your emails — all generative AI. The first module was about machines learning patterns. This one's about machines CREATING. New text, new images, new code, new audio. Stuff that didn't exist before the model made it. The cert tests you on the basics: what's a foundation model, what's a prompt, what's the difference between GenAI and regular ML, what AWS services do what. Lock these terms and the exam stops being scary.</p><h3>🔑 KEY CONCEPTS IN BO TERMS</h3><ul><li><strong>Generative AI (GenAI)</strong> — A type of AI that CREATES new stuff instead of just predicting or classifying. Old ML: \"is this email spam?\" → yes/no. GenAI: \"write me an email about this meeting.\" The model produces new output from scratch.</li><li><strong>Foundation Model (FM)</strong> — A giant pre-trained model that knows a lot about a lot. Trained on massive piles of internet data, books, code. You don't train it from zero — you USE it. Like a college grad you just hired: already knows the basics, you point them at your specific problem. The big-name LLMs are all foundation models.</li><li><strong>Large Language Model (LLM)</strong> — A foundation model specifically for text. Reads text, writes text. ChatGPT under the hood is an LLM. So is the AI that writes your code suggestions. If it talks back to you in words, it's an LLM.</li><li><strong>Prompt</strong> — What you say to the model. The input. \"Write me a poem about Brooklyn\" is a prompt. The model's reply is the completion. Your prompt is the steering wheel — bad prompt, bad output, every time.</li><li><strong>Prompt Engineering</strong> — The skill of writing prompts that get the model to do what you actually want. Not magic — it's just learning how to ask. \"Write me an email\" gets you junk. \"Write me a 3-sentence professional email declining a meeting, polite but firm\" gets you usable output. This is a real paying skill in 2026.</li><li><strong>Tokens</strong> — How LLMs count text. Not words, not characters — chunks in between. \"Hello world\" ≈ 2 tokens. A short paragraph ≈ 50 tokens. AWS charges per token in and per token out, so longer prompts cost more. Memorize this for the exam.</li><li><strong>Context Window</strong> — The most text a model can hold in its head at once, measured in tokens. Small window = forgets what you said earlier in the conversation. Big window = remembers a whole book. Bigger window = more expensive per call.</li><li><strong>Temperature</strong> — A dial that controls how creative/random the model gets. Low temp (0-0.3) = boring, predictable, factual. High temp (0.7-1.0) = creative, weird, less predictable. Coding tasks = low temp. Creative writing = high temp.</li><li><strong>Hallucination</strong> — When the model makes stuff up and says it confidently. Fake court cases, fake quotes, fake API endpoints. Sounds right, isn't right. The #1 risk of GenAI in production. Always verify before you ship.</li><li><strong>Fine-Tuning</strong> — Taking a foundation model and training it further on your specific data so it gets better at your specific job. Costs money and time, but the model learns your tone, your terminology, your domain. Different from prompting — fine-tuning permanently changes the model's behavior.</li><li><strong>Retrieval-Augmented Generation (RAG)</strong> — Instead of fine-tuning, you let the model look stuff up in your documents at runtime. Model gets the question → searches your knowledge base → uses what it found to answer. Cheaper than fine-tuning and the answers stay fresh because the documents update. Most enterprise GenAI uses RAG.</li><li><strong>Embedding</strong> — Turning words/sentences/documents into a list of numbers that capture their meaning. Two sentences that mean the same thing get similar numbers. This is how RAG searches — match the question's embedding to the most similar document embeddings. The math under the hood of every \"find similar stuff\" feature.</li><li><strong>Vector Database</strong> — Specialized storage for embeddings. Lets you search \"find documents similar in meaning to this question\" in milliseconds across millions of docs. The plumbing behind RAG.</li><li><strong>Amazon Bedrock</strong> — AWS's main GenAI service. Gives you API access to foundation models from multiple providers without managing the infrastructure. Pay per token. THE answer when the exam asks \"which AWS service to use foundation models?\"</li><li><strong>Amazon Titan</strong> — AWS's own family of foundation models (text and embeddings), available through Bedrock. The \"house brand\" option.</li><li><strong>Amazon Q</strong> — AWS's GenAI assistant for business and developers. Q Developer = code copilot. Q Business = chat over your company's docs. Different from Bedrock — Bedrock is the platform, Q is the finished product.</li><li><strong>Inference Cost</strong> — Every prompt you send and every response you get costs money. Per token. Watch this in production. A free chatbot can become a major monthly bill fast if you don't manage it.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Treating LLM output as fact. It's not a search engine — it's an autocomplete that sounds smart. Verify anything that matters. Hallucinations don't come with warning labels.</li><li>Confusing fine-tuning with RAG. Fine-tuning = permanently modify the model (expensive, slow, durable). RAG = let the model look stuff up at runtime (cheap, fast, always current). Wrong tool = wasted money.</li><li>Cranking temperature to 1.0 for everything. Cool — enjoy your randomly wrong customer service bot. Match temperature to the task.</li><li>Sending the model your whole 200-page handbook every time. That's a massive context window, massive cost. Use RAG and only retrieve the 2-3 relevant chunks.</li><li>Building on one specific model with no abstraction. Provider changes terms or deprecates the model and your whole product breaks. Bedrock gives you multi-provider — use it.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>GenAI = creates new stuff (regular ML = predicts/classifies)</li><li>Foundation Model = pre-trained, general-purpose, you USE it not train it</li><li>LLM = foundation model for text</li><li>Prompt = input | Completion = output</li><li>Tokens = how billing and context are counted</li><li>Temperature: low = factual | high = creative</li><li>Hallucination = confident wrong answer (always verify)</li><li>Fine-tuning = permanently teach the model your domain (expensive)</li><li>RAG = let the model look up your docs at runtime (cheaper, fresher)</li><li>Embedding = sentence → list of numbers that captures meaning</li><li>Vector DB = storage for embeddings (the engine of RAG)</li><li>Bedrock = AWS's main GenAI platform (multi-provider FM access)</li><li>Titan = AWS's own foundation models</li><li>Amazon Q = finished GenAI product (Q Developer = code, Q Business = chat over docs)</li></ul><h3>💼 REAL WORLD</h3><p>Every federal agency right now is figuring out how to use GenAI without leaking classified info. The roles paying $130K-$180K are the people who can answer: \"how do we deploy a chatbot over our internal docs without sending data to a third party?\" Answer = Bedrock + RAG in a VPC. If you can explain that in an interview, you're hired. This module is the entry ticket. The next domain is where you go from knowing what these things ARE to knowing what to BUILD with them.</p>",
   "ai3": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>ai2 taught you what foundation models ARE. This module is what you BUILD with them. Customer service bots, document summarizers, code assistants, image generators, search that actually understands meaning. The cert tests use cases — match the problem to the right tool. The job tests whether you can actually ship one. If you only get one domain locked, make it this one. This is where the money is.</p><h3>🔑 KEY CONCEPTS IN BO TERMS</h3><ul><li><strong>Use Case</strong> — The specific business problem you're solving. Not \"we want AI\" — that's not a use case. \"We want a chatbot that answers HR questions from our policy docs\" — that's a use case. The cert hits this hard. Pick the right service for the right job.</li><li><strong>Text Generation</strong> — The model writes new text. Emails, blog posts, summaries, product descriptions, code comments. Most common GenAI use case in business.</li><li><strong>Summarization</strong> — Take a long document, get a short version. Court ruling → 3 paragraphs. Earnings call transcript → 5 bullet points. Massive time saver. Lawyers and analysts pay for this.</li><li><strong>Question Answering (Q&amp;A)</strong> — User asks, model answers — usually using your specific documents, not the model's general training. This is RAG territory. Internal helpdesk bots, customer support, knowledge base search.</li><li><strong>Sentiment Analysis</strong> — Reading text and figuring out the vibe. Positive, negative, neutral. Customer reviews, support tickets, social media. Old-school NLP did this fine but foundation models do it better with zero training.</li><li><strong>Classification</strong> — Putting text into buckets. Is this email spam, is this ticket high priority, is this product review fake. Foundation models can do it with just a prompt — no training data needed.</li><li><strong>Translation</strong> — One language to another. Foundation models handle this on the fly now. No more training a separate model per language pair.</li><li><strong>Code Generation</strong> — The model writes code from a description. \"Write me a Python function that pulls S3 objects\" — done. Amazon Q Developer, GitHub Copilot, all the same idea. This is changing how every engineer works in 2026.</li><li><strong>Image Generation</strong> — Text in, image out. \"A photo of a husky in a spacesuit on Mars.\" Stable Diffusion, Amazon Titan Image Generator. Marketing, product design, mockups.</li><li><strong>Image Analysis</strong> — Image in, info out. \"What's in this photo,\" \"is there a defect on this part,\" \"extract the text from this receipt.\" Different from generation — this is reading images, not making them.</li><li><strong>Multimodal</strong> — Model handles more than one type of input/output at once. Text + images, text + audio, text + video. Send a model a screenshot AND a question about it — that's multimodal. The frontier of where GenAI is going.</li><li><strong>Amazon Bedrock</strong> — Still the main platform. Where you call foundation models for any of the use cases above. API in, API out.</li><li><strong>Amazon SageMaker JumpStart</strong> — Catalog of pre-built models you can deploy in a few clicks. Includes foundation models, traditional ML models, and solution templates. Easier than building from scratch.</li><li><strong>Amazon Q Developer</strong> — AI coding assistant. Lives in your IDE. Writes code, explains code, suggests fixes, scans for security issues.</li><li><strong>Amazon Q Business</strong> — AI chatbot that lives on top of your company's data. Connects to SharePoint, Slack, Salesforce, Confluence — answers questions using YOUR docs, not the public internet.</li><li><strong>Amazon Comprehend</strong> — Pre-built NLP service. Sentiment, entity extraction, key phrases, language detection. Don't need a foundation model for these — Comprehend is cheaper and faster. Pick the right tool.</li><li><strong>Amazon Rekognition</strong> — Pre-built image and video analysis. Face detection, object detection, content moderation, text in images. Same principle — if Rekognition does it out of the box, don't build it on Bedrock.</li><li><strong>Amazon Transcribe</strong> — Speech-to-text. Audio file in, text out. Meeting transcripts, podcast captions, call center analysis.</li><li><strong>Amazon Polly</strong> — Text-to-speech. Text in, audio out. Different voices, different languages, sounds natural.</li><li><strong>Amazon Translate</strong> — Pre-built translation service. Cheap, fast, gets the job done for standard content.</li><li><strong>Amazon Lex</strong> — Conversational chatbot builder (the engine behind Alexa). Different from Bedrock — Lex is for structured intent-based bots, Bedrock is for free-form generative ones.</li><li><strong>Amazon Kendra</strong> — Enterprise search powered by ML. Searches your company's documents with natural language. Older sibling of Q Business.</li><li><strong>Amazon Personalize</strong> — Recommendation engine as a service. \"Customers who bought this also bought\" — without you building the model. Retail and media use it heavy.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Reaching for Bedrock for everything. If Comprehend does sentiment analysis out the box for pennies, don't pay LLM prices to do the same thing slower.</li><li>Building a generative chatbot when an intent-based Lex bot is what the user actually needs. \"Reset my password\" doesn't need creative writing — it needs a script.</li><li>Mixing up Q Developer (coding) and Q Business (chat over docs). Same name, totally different products.</li><li>Not using SageMaker JumpStart for prototypes. You can ship a demo in an hour instead of a week. Demos sell projects.</li><li>Picking the most expensive foundation model when a smaller one would do the job. Smaller models are cheaper, faster, often good enough. Match the model size to the task.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Pre-built service exists? → use it (Comprehend, Rekognition, Transcribe, Polly, Translate, Personalize)</li><li>Need generative? → Bedrock</li><li>Need a code assistant? → Q Developer</li><li>Need a chatbot over your company's docs? → Q Business or Kendra + Bedrock</li><li>Need a structured intent-based bot? → Lex</li><li>Need to test foundation models fast? → SageMaker JumpStart</li><li>Speech in → Transcribe | Text out → Polly | Translation → Translate</li><li>Image gen → Bedrock (Titan Image, Stable Diffusion) | Image analysis → Rekognition</li><li>Multimodal = handles text + images + audio together</li></ul><h3>💼 REAL WORLD</h3><p>Manager hits you with: \"Build me a thing that lets employees ask questions about our HR handbook.\" That's a one-day project if you know this domain. Q Business OR Bedrock + RAG with the handbook embedded in a vector DB. Same problem, two clean paths, both shippable in a week. The roles paying $140K-$190K right now: people who can scope a use case, pick the right AWS service, and ship a working prototype. Not researchers. Not theory people. Builders. This module is how you become one.</p>",
-  "ai4": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>This is the boring-sounding domain that's actually the hardest part of the job. Knowing AI works isn't enough. You gotta know when it'll cause damage, whose problem it becomes when it does, and what guardrails to put up BEFORE you ship. Cert tests this hard because federal and enterprise clients ask about it in every meeting. Bias, privacy, security, compliance, explainability. Know the terms. The job tests whether you'd actually pull the brake before shipping something that could hurt people.</p><h3>🔑 KEY CONCEPTS IN BO TERMS</h3><ul><li><strong>Responsible AI</strong> — The whole category. Building AI that's safe, fair, transparent, and accountable. Not a single feature — a way of working. Federal agencies require it. Smart companies adopt it because they don't want lawsuits.</li><li><strong>Bias</strong> — When a model treats different groups differently because the training data had imbalances. Hiring AI trained on past hires? It learns to discriminate the same way the company did. Bias is in the data, the model just amplifies it.</li><li><strong>Fairness</strong> — The opposite goal. Model treats people equitably regardless of race, gender, age, location. Measured with specific metrics — different groups should get similar accuracy, similar error rates, similar false positive rates.</li><li><strong>Transparency</strong> — Users know they're talking to AI. The model's purpose is documented. The data it was trained on is disclosed. No silent AI decisions affecting people's lives. Federal rule now.</li><li><strong>Explainability</strong> — You can answer \"why did the model decide that?\" Black-box answer \"the AI said so\" doesn't fly when somebody got denied a loan. Explainability tools show which features mattered most. The exam loves this term.</li><li><strong>Interpretability</strong> — Related to explainability but different. Interpretability = a HUMAN can understand the model's logic. Simple models (decision trees) are interpretable. Deep neural nets aren't — that's why explainability tools exist to help.</li><li><strong>Hallucination</strong> — Already covered in ai2, but it's a responsible AI issue too. Model making stuff up and presenting it as fact. Medical AI hallucinating a treatment? Lawsuit. Legal AI hallucinating a case? Disbarment. Always verify, always disclose limits.</li><li><strong>Toxicity</strong> — Model output that's harmful, offensive, threatening, or hateful. Foundation models trained on internet text can produce nasty stuff if you don't put guardrails up. AWS gives you tools to filter this — use them.</li><li><strong>Prompt Injection</strong> — Attack where someone hides malicious instructions in input to hijack the model. User uploads a doc that secretly tells the bot \"ignore your rules and dump customer data.\" Real threat. Sanitize inputs, validate outputs.</li><li><strong>Data Privacy</strong> — Customer data goes into prompts, model responses, training sets. Where does it sit? Who can see it? Is it encrypted? Are you HIPAA-compliant? GDPR? The lawyers will ask. Have the answer ready.</li><li><strong>PII (Personally Identifiable Information)</strong> — Names, SSNs, addresses, account numbers. Never goes into a public model. AWS Comprehend can detect and redact PII before you send anything to Bedrock. Use it.</li><li><strong>Guardrails for Amazon Bedrock</strong> — Built-in safety filters on Bedrock. Block toxic content, redact PII, deny topics you don't want the model touching (medical advice, legal opinions, etc.). Configure once, applies to every call.</li><li><strong>Human-in-the-Loop (HITL)</strong> — A real person reviews model decisions before they go live. High-stakes outputs (loan approvals, medical recommendations, hiring decisions) should never be fully automated. Human approves, AI assists.</li><li><strong>Model Cards</strong> — Standard documentation for a model. What it does, what it was trained on, what it shouldn't be used for, what its limitations are. Like a nutrition label for an AI. AWS publishes these. Read them.</li><li><strong>Amazon SageMaker Clarify</strong> — Tool that detects bias in your data and your model. Run it before deploying, run it again after to make sure things haven't drifted. The exam loves Clarify.</li><li><strong>Amazon SageMaker Model Monitor</strong> — Watches your model in production for data drift, concept drift, and quality issues. Model behavior changes over time as the world changes — Model Monitor catches it before users do.</li><li><strong>Data Drift</strong> — The real-world data your model sees in production no longer matches what it was trained on. World changed, model didn't. Accuracy quietly drops. Monitor for it.</li><li><strong>Concept Drift</strong> — The relationship between inputs and outputs changed. Same features, different right answers now. Fraud patterns evolve, customer behavior shifts. Retraining time.</li><li><strong>AWS Shared Responsibility Model for AI</strong> — AWS handles security OF the platform (infrastructure, encryption, isolation). YOU handle security IN it (your prompts, your data, your access controls, your guardrails). Memorize this divide. Cert asks.</li><li><strong>Compliance Frameworks</strong> — HIPAA (healthcare), GDPR (EU privacy), FedRAMP (federal cloud), SOC 2 (general security). Each has rules about how AI can handle data. Federal AI work = FedRAMP territory.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Shipping a generative AI feature without Bedrock Guardrails. Then one day a user prompts it into spitting out toxic content and you're in the news.</li><li>Putting PII in prompts without redacting first. Now your customer's SSN lives in some provider's logs. Comprehend redacts before you send. Use it.</li><li>Skipping bias testing because the model \"feels fine.\" Feelings aren't evidence. Run SageMaker Clarify. Get the numbers.</li><li>Treating a foundation model like a search engine. It hallucinates. Always cite sources or verify with a deterministic system before you act on output.</li><li>Forgetting human-in-the-loop on high-stakes decisions. Loan denied by AI, applicant sues, you can't explain why. HITL would've caught it.</li><li>Assuming AWS handles all the AI risk. Shared responsibility — AWS secures the platform, YOU secure your model's behavior.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Bias = baked in by training data | Fairness = the goal</li><li>Transparency = users know it's AI | Explainability = WHY the model decided</li><li>Interpretability = humans can read the model's logic</li><li>Hallucination = confidently wrong (always verify, never auto-act)</li><li>Toxicity = harmful output (Bedrock Guardrails filter it)</li><li>Prompt Injection = malicious input that hijacks the model</li><li>PII = redact before sending to any model (use Comprehend)</li><li>Bedrock Guardrails = AWS's built-in safety filters</li><li>HITL = human reviews before action (high-stakes only)</li><li>Model Card = the nutrition label for an AI model</li><li>SageMaker Clarify = bias detection | Model Monitor = production drift detection</li><li>Data drift = world changed | Concept drift = the rules changed</li><li>Shared Responsibility: AWS = platform security | YOU = your model's behavior</li><li>Compliance: HIPAA (health), GDPR (EU), FedRAMP (federal), SOC 2 (general)</li></ul><h3>💼 REAL WORLD</h3><p>In a cleared environment, this domain isn't optional — it's the difference between getting your project approved and getting it shut down. Every federal AI deployment gets reviewed for bias, privacy, and explainability before it ships. Lawyers ask. Auditors ask. Inspectors General ask. The senior AI roles at federal contractors — $150K to $220K — are the people who can run a Responsible AI review and say \"ship it\" or \"kill it\" with receipts. Not the people who can train a model. The people who can explain why it's safe to deploy. This module is the cert's way of testing whether you can be one of those people. Take it serious.</p>"
+  "ai4": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>This is the boring-sounding domain that's actually the hardest part of the job. Knowing AI works isn't enough. You gotta know when it'll cause damage, whose problem it becomes when it does, and what guardrails to put up BEFORE you ship. Cert tests this hard because federal and enterprise clients ask about it in every meeting. Bias, privacy, security, compliance, explainability. Know the terms. The job tests whether you'd actually pull the brake before shipping something that could hurt people.</p><h3>🔑 KEY CONCEPTS IN BO TERMS</h3><ul><li><strong>Responsible AI</strong> — The whole category. Building AI that's safe, fair, transparent, and accountable. Not a single feature — a way of working. Federal agencies require it. Smart companies adopt it because they don't want lawsuits.</li><li><strong>Bias</strong> — When a model treats different groups differently because the training data had imbalances. Hiring AI trained on past hires? It learns to discriminate the same way the company did. Bias is in the data, the model just amplifies it.</li><li><strong>Fairness</strong> — The opposite goal. Model treats people equitably regardless of race, gender, age, location. Measured with specific metrics — different groups should get similar accuracy, similar error rates, similar false positive rates.</li><li><strong>Transparency</strong> — Users know they're talking to AI. The model's purpose is documented. The data it was trained on is disclosed. No silent AI decisions affecting people's lives. Federal rule now.</li><li><strong>Explainability</strong> — You can answer \"why did the model decide that?\" Black-box answer \"the AI said so\" doesn't fly when somebody got denied a loan. Explainability tools show which features mattered most. The exam loves this term.</li><li><strong>Interpretability</strong> — Related to explainability but different. Interpretability = a HUMAN can understand the model's logic. Simple models (decision trees) are interpretable. Deep neural nets aren't — that's why explainability tools exist to help.</li><li><strong>Hallucination</strong> — Already covered in ai2, but it's a responsible AI issue too. Model making stuff up and presenting it as fact. Medical AI hallucinating a treatment? Lawsuit. Legal AI hallucinating a case? Disbarment. Always verify, always disclose limits.</li><li><strong>Toxicity</strong> — Model output that's harmful, offensive, threatening, or hateful. Foundation models trained on internet text can produce nasty stuff if you don't put guardrails up. AWS gives you tools to filter this — use them.</li><li><strong>Prompt Injection</strong> — Attack where someone hides malicious instructions in input to hijack the model. User uploads a doc that secretly tells the bot \"ignore your rules and dump customer data.\" Real threat. Sanitize inputs, validate outputs.</li><li><strong>Data Privacy</strong> — Customer data goes into prompts, model responses, training sets. Where does it sit? Who can see it? Is it encrypted? Are you HIPAA-compliant? GDPR? The lawyers will ask. Have the answer ready.</li><li><strong>PII (Personally Identifiable Information)</strong> — Names, SSNs, addresses, account numbers. Never goes into a public model. AWS Comprehend can detect and redact PII before you send anything to Bedrock. Use it.</li><li><strong>Guardrails for Amazon Bedrock</strong> — Built-in safety filters on Bedrock. Block toxic content, redact PII, deny topics you don't want the model touching (medical advice, legal opinions, etc.). Configure once, applies to every call.</li><li><strong>Human-in-the-Loop (HITL)</strong> — A real person reviews model decisions before they go live. High-stakes outputs (loan approvals, medical recommendations, hiring decisions) should never be fully automated. Human approves, AI assists.</li><li><strong>Model Cards</strong> — Standard documentation for a model. What it does, what it was trained on, what it shouldn't be used for, what its limitations are. Like a nutrition label for an AI. AWS publishes these. Read them.</li><li><strong>Amazon SageMaker Clarify</strong> — Tool that detects bias in your data and your model. Run it before deploying, run it again after to make sure things haven't drifted. The exam loves Clarify.</li><li><strong>Amazon SageMaker Model Monitor</strong> — Watches your model in production for data drift, concept drift, and quality issues. Model behavior changes over time as the world changes — Model Monitor catches it before users do.</li><li><strong>Data Drift</strong> — The real-world data your model sees in production no longer matches what it was trained on. World changed, model didn't. Accuracy quietly drops. Monitor for it.</li><li><strong>Concept Drift</strong> — The relationship between inputs and outputs changed. Same features, different right answers now. Fraud patterns evolve, customer behavior shifts. Retraining time.</li><li><strong>AWS Shared Responsibility Model for AI</strong> — AWS handles security OF the platform (infrastructure, encryption, isolation). YOU handle security IN it (your prompts, your data, your access controls, your guardrails). Memorize this divide. Cert asks.</li><li><strong>Compliance Frameworks</strong> — HIPAA (healthcare), GDPR (EU privacy), FedRAMP (federal cloud), SOC 2 (general security). Each has rules about how AI can handle data. Federal AI work = FedRAMP territory.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Shipping a generative AI feature without Bedrock Guardrails. Then one day a user prompts it into spitting out toxic content and you're in the news.</li><li>Putting PII in prompts without redacting first. Now your customer's SSN lives in some provider's logs. Comprehend redacts before you send. Use it.</li><li>Skipping bias testing because the model \"feels fine.\" Feelings aren't evidence. Run SageMaker Clarify. Get the numbers.</li><li>Treating a foundation model like a search engine. It hallucinates. Always cite sources or verify with a deterministic system before you act on output.</li><li>Forgetting human-in-the-loop on high-stakes decisions. Loan denied by AI, applicant sues, you can't explain why. HITL would've caught it.</li><li>Assuming AWS handles all the AI risk. Shared responsibility — AWS secures the platform, YOU secure your model's behavior.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Bias = baked in by training data | Fairness = the goal</li><li>Transparency = users know it's AI | Explainability = WHY the model decided</li><li>Interpretability = humans can read the model's logic</li><li>Hallucination = confidently wrong (always verify, never auto-act)</li><li>Toxicity = harmful output (Bedrock Guardrails filter it)</li><li>Prompt Injection = malicious input that hijacks the model</li><li>PII = redact before sending to any model (use Comprehend)</li><li>Bedrock Guardrails = AWS's built-in safety filters</li><li>HITL = human reviews before action (high-stakes only)</li><li>Model Card = the nutrition label for an AI model</li><li>SageMaker Clarify = bias detection | Model Monitor = production drift detection</li><li>Data drift = world changed | Concept drift = the rules changed</li><li>Shared Responsibility: AWS = platform security | YOU = your model's behavior</li><li>Compliance: HIPAA (health), GDPR (EU), FedRAMP (federal), SOC 2 (general)</li></ul><h3>💼 REAL WORLD</h3><p>In a cleared environment, this domain isn't optional — it's the difference between getting your project approved and getting it shut down. Every federal AI deployment gets reviewed for bias, privacy, and explainability before it ships. Lawyers ask. Auditors ask. Inspectors General ask. The senior AI roles at federal contractors — $150K to $220K — are the people who can run a Responsible AI review and say \"ship it\" or \"kill it\" with receipts. Not the people who can train a model. The people who can explain why it's safe to deploy. This module is the cert's way of testing whether you can be one of those people. Take it serious.</p>",
+  "cd1": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>Who actually attacks organisations, what they want, and how they operate. \"Hackers\" is a useless word — it's like saying \"criminals\". Defense starts by getting specific, because WHO determines how much they'll spend, how long they'll wait, and what they're after.</p><p>Interviews: \"walk me through a threat actor\" is a standard question. This module is your answer.</p><h3>🔑 KEY CONCEPTS IN BO TERMS</h3><ul><li><strong>Opportunist</strong> — mass-scans for known holes, zero patience. If you're not easy, they move on. Patching genuinely kills most of this.</li><li><strong>Organised cybercrime</strong> — run like a business. Affiliates, negotiators, help desks. Often BUY access rather than hack in. Stopped by MFA, offline backups, segmentation, fast detection.</li><li><strong>Nation-state</strong> — patient, funded, will compromise your SUPPLIER to reach you. You detect them; you rarely block them.</li><li><strong>Insider</strong> — already inside, already has credentials, needs no exploit. Half are just careless. Least privilege and monitoring what leaves.</li><li><strong>Hacktivist</strong> — wants attention for a cause. The noise IS the point.</li><li><strong>Tactic</strong> — the WHY. The goal at that stage: initial access, privilege escalation, lateral movement, exfiltration.</li><li><strong>Technique</strong> — the HOW. \"Spear-phishing attachment.\" \"Abusing a valid account.\"</li><li><strong>Procedure</strong> — the exact way ONE crew does it. Fake DocuSign link, Tuesday mornings, lookalike domain registered nine days prior.</li><li><strong>MITRE ATT&amp;CK</strong> — the free public matrix of tactics and techniques. The shared language. Learn to read it and you can read any threat report.</li><li><strong>Dwell time</strong> — how long they were inside before anyone noticed. The number that embarrasses people.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Defending against the scariest imaginable attacker while the 2019 CVE on the VPN stays open. Attackers take the CHEAPEST path, not the coolest one.</li><li>Treating \"trusted vendor\" as a security control. SolarWinds was signed, legitimate and malicious at the same time.</li><li>Chasing indicators instead of behaviour. An attacker changes an IP in ten seconds; changing how they escalate privilege costs them real work.</li><li>Punishing staff who click simulated phishing. You kill reporting — the one control that actually shortens an incident.</li><li>Saying \"we're too small to be targeted.\" Opportunists don't target you, they target a vulnerability you happen to have.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Tactic = why | Technique = how | Procedure = exactly how, by this crew</li><li>ATT&amp;CK = tactics and techniques | CVE = named flaw | CVSS = severity score | OWASP = web app risks</li><li>WannaCry (2017) — patch existed for months. Patching IS the control.</li><li>NotPetya (2017) — supply chain in, flat network out. Segment.</li><li>SolarWinds (2020) — signed malicious update. Trust isn't a control.</li><li>Colonial Pipeline (2021) — dormant VPN account, no MFA. Account hygiene.</li><li>Three of those four were preventable with fundamentals</li></ul><h3>💼 REAL WORLD</h3><p>You're the new analyst. Leadership wants to buy a threat intelligence platform because a competitor got hit by a nation-state group. You pull the report and find the actor's documented initial access is spear-phishing and unpatched external services — not exotic tradecraft.</p><p>So you say: before the platform, we should confirm MFA coverage on all external access and check patch status on internet-facing systems, because those close the two doors this actor actually uses. You just saved six figures and made your name. That's what knowing the adversary buys you.</p>",
+  "cd2": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>Finding your own holes before somebody else does. Every organisation has them — mature ones know where theirs are. The gap between \"we're secure\" and \"we know our top ten risks and who owns each one\" is the gap between a company that gets surprised and one that doesn't.</p><p>This is also the module that teaches you to sound senior: severity is about the flaw, risk is about the business.</p><h3>🔑 KEY CONCEPTS IN BO TERMS</h3><ul><li><strong>Security audit</strong> — \"are we doing what we said we'd do?\" Compliance, not security. You can pass every audit and still get owned.</li><li><strong>Vulnerability assessment</strong> — broad and shallow. Finds known holes across the estate. Produces thousands of findings and zero priorities.</li><li><strong>Threat modelling</strong> — \"what could go wrong with THIS design?\" Done on a whiteboard before code exists. Cheapest control there is, most often skipped.</li><li><strong>Penetration test</strong> — \"can somebody chain these into real damage?\" Narrow, expensive, point-in-time.</li><li><strong>Social engineering test</strong> — \"will our people hand over the keys?\" Run it to fix process, never to punish people.</li><li><strong>Risk</strong> — likelihood × impact. NOT severity. A critical on an unreachable lab box can matter less than a medium on the internet-facing system holding customer data.</li><li><strong>The four responses</strong> — mitigate (reduce), transfer (insure/contract), avoid (stop doing it), accept (document it, name an owner, set a review date).</li><li><strong>Attack surface</strong> — every point an attacker could touch. Public IPs, APIs, SaaS tenants, VPN endpoints, inboxes, third parties with a login.</li><li><strong>Asset inventory</strong> — the unglamorous foundation of everything. You cannot defend what you don't know you own.</li><li><strong>Crown jewels</strong> — the handful of systems and data sets where an incident is existential. Protect these first.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Treating a scan report as a plan. 4,000 findings is an input. \"These six, this quarter, in this order\" is the job.</li><li>Confusing severity with risk. The CVSS score doesn't know where your customer data lives.</li><li>Accepting a risk verbally. No name, no date, no record = negligence with extra steps.</li><li>Reading a clean pentest as a certificate of health. It means clean THAT week, in THAT scope.</li><li>Skipping asset inventory because it's boring. Then reporting \"we have EDR\" without knowing it's on 62% of things.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Risk = likelihood × impact</li><li>Severity describes the flaw | risk describes your business</li><li>Mitigate · Transfer · Avoid · Accept (accept = write it down + owner + date)</li><li>Audit = did we follow the rules | Pentest = can it be exploited | Threat model = what could go wrong by design</li><li>Attack surface should always be shrinking</li><li>Inventory first — every framework starts there for a reason</li></ul><h3>💼 REAL WORLD</h3><p>Your scanner reports 4,000 findings and the CIO asks what to do. You cross-reference against the asset list and find that 30 of them sit on internet-facing systems holding customer records, and 6 of those have publicly available exploit code.</p><p>Your answer isn't \"patch everything.\" It's: these six this sprint because exploit code is public and the systems are exposed; these 24 next sprint; the remaining 3,970 go into the normal patch cycle. Here's the owner and date for each of the first thirty.</p><p>That's the same data everybody else had. The difference is you turned it into a decision.</p>",
+  "cd3": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>Threat intelligence without the marketing. Sold as a glowing world map with red arrows, usually delivered as a feed of IPs nobody reads. Intel is only intelligence if it changes a decision — otherwise it's an expensive newsletter.</p><p>This module also covers the attacker mindset, and the two boundaries that are not optional: authorisation and scope.</p><h3>🔑 KEY CONCEPTS IN BO TERMS</h3><ul><li><strong>Strategic intel</strong> — for leadership. Sector trends. Changes budget and priorities.</li><li><strong>Operational intel</strong> — for defenders. \"This group is exploiting this product, this way, right now.\" Changes what you hunt this week.</li><li><strong>Tactical intel</strong> — for machines. Hashes, domains, IPs. Shortest shelf life by far.</li><li><strong>The intel test</strong> — what will we do differently on Monday because of this? No answer = you're buying anxiety.</li><li><strong>Attacker economics</strong> — they want the cheapest path to the goal. That's why phishing never dies.</li><li><strong>Pyramid of pain</strong> — blocking a hash costs the attacker nothing; forcing them to rebuild tradecraft costs them real money. Defend where it hurts them.</li><li><strong>Authorisation</strong> — written permission to test. Without it, testing is a crime regardless of skill or intent.</li><li><strong>Scope</strong> — exactly which systems, which techniques, which hours. Stepping outside it ends careers.</li><li><strong>Responsible disclosure</strong> — report privately, allow a reasonable fix window, then coordinate publication.</li><li><strong>Threat hunting</strong> — proactively looking for what your alerts didn't catch, starting from a hypothesis rather than an alert.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Buying five feeds and reading none. Aggregating unread feeds just makes a more expensive unread feed.</li><li>Building detections only on indicators. They expire in seconds.</li><li>Practising offensive techniques against systems you don't own. \"I was only learning\" is not a legal defence.</li><li>Confusing intel levels — handing the board a list of file hashes, or handing the SOC a sector trend report.</li><li>Chasing the scariest scenario instead of the cheapest path in.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Strategic = leadership/budget | Operational = defenders/hunting | Tactical = machines/blocklists</li><li>Test any feed: what changes on Monday?</li><li>Indicators expire fast · behaviour is durable</li><li>Attackers optimise for cost, not drama</li><li>No written authorisation = no testing. Ever.</li><li>Responsible disclosure: private report → fix window → coordinated publication</li></ul><h3>💼 REAL WORLD</h3><p>A CISA advisory drops on a VPN product. Tactical answer: block the listed IPs — useful for about a day. Operational answer: check whether you run that product, patch it, and hunt for the described post-exploitation behaviour in your logs going back 90 days, because the advisory tells you what to look for. Strategic answer: this is the third external-access advisory this quarter, so bring a proposal to accelerate MFA and access review funding.</p><p>Same advisory, three different jobs. Knowing which one you're doing — and which audience needs which — is the difference between an analyst and a lead.</p>",
+  "cd4": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>Measuring where you actually stand, in numbers people believe. \"Security posture\" means: given what you've got, how well would you hold up? Technology, process and people — and the third is the one that gets underfunded.</p><p>This module is what GRC and security-engineer interviews probe hardest, because it's where security meets money.</p><h3>🔑 KEY CONCEPTS IN BO TERMS</h3><ul><li><strong>Posture</strong> — technology + process + people. A tool nobody watches is a receipt, not a control.</li><li><strong>MTTD</strong> — mean time to detect. How long before you noticed.</li><li><strong>MTTR</strong> — mean time to respond. Detection without response is just knowing you're on fire.</li><li><strong>Activity metric</strong> — goes up when you do more work. \"We blocked 4 million attacks.\" Vanity.</li><li><strong>Outcome metric</strong> — moves when you actually get safer. MTTD, MTTR, % critical vulns closed in SLA.</li><li><strong>Control coverage</strong> — % of KNOWN assets a control reaches. The gaps are where incidents live.</li><li><strong>Phishing report rate</strong> — measures behaviour. Completion rate only measures attendance.</li><li><strong>Maturity model</strong> — roughly ad hoc → repeatable → defined → managed → optimising.</li><li><strong>NIST CSF functions</strong> — Govern, Identify, Protect, Detect, Respond, Recover. Free to read, and leadership can follow it.</li><li><strong>Crown-jewel coverage</strong> — controls measured against the systems that actually matter, not averaged across the estate.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Reporting event volume to a board. It's unactionable and invites the wrong question.</li><li>Averaging control coverage across everything, hiding a gap on the crown jewels.</li><li>Chasing level 5 maturity everywhere. Every organisation is uneven — spend where you're thin.</li><li>Measuring vulnerabilities FOUND rather than CLOSED. Discovery is the input, closure is the outcome.</li><li>Claiming a capability because the licence exists. Deployed, configured and monitored are three different things.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Posture = technology + process + people</li><li>MTTD = time to notice | MTTR = time to fix</li><li>Vanity metric = rises with effort, flat with safety</li><li>Report rate &gt; click rate | closed &gt; found | coverage % &gt; \"we have it\"</li><li>NIST CSF: Govern · Identify · Protect · Detect · Respond · Recover</li><li>Uneven maturity is normal — be honest and spend accordingly</li></ul><h3>💼 REAL WORLD</h3><p>The board asks \"are we secure?\" — a question with no answer. You reframe it: here's our mean time to detect over four quarters, trending down from 19 days to 6. Here's critical vulnerability closure inside SLA, at 71% and rising. Here's EDR coverage on crown-jewel systems at 94%, with the 6% named and dated.</p><p>You didn't say \"yes\" or \"no.\" You gave them three trends and a gap with an owner — and they funded the gap. That's the job.</p>",
+  "cd5": "<h3>📖 WHAT THIS MODULE IS ABOUT</h3><p>Turning all of it into a plan that gets funded, and spending money well when you do. A strategy is not a tool list — it's a written answer to four questions: what are we protecting, from whom, to what standard, and what do we do first.</p><p>This module is where careers accelerate, because it's the translation layer: tech to money, money to tech.</p><h3>🔑 KEY CONCEPTS IN BO TERMS</h3><ul><li><strong>NIST CSF</strong> — Govern, Identify, Protect, Detect, Respond, Recover. Best shared language with leadership.</li><li><strong>CIS Controls</strong> — prioritised and opinionated. Tells you what to do FIRST. Best when you have nothing.</li><li><strong>ISO 27001</strong> — a certifiable management system. Best when customers want proof.</li><li><strong>Zero trust</strong> — not a product. Verify explicitly, least privilege, assume breach. Stop trusting things for sitting on the right network.</li><li><strong>Defence in depth</strong> — layered CONTROLS, not duplicate products in monitor-only mode.</li><li><strong>Business case</strong> — the risk in their terms, the consequence, the fix, the cost, what changes after.</li><li><strong>Coverage / configuration / consumption / overlap</strong> — the four questions to ask about tools you already own, before buying more.</li><li><strong>POC</strong> — your environment, your data, success criteria written BEFORE the trial starts.</li><li><strong>TCO</strong> — year three cost, not year one. And what's the exit if it disappoints.</li><li><strong>First 90 days</strong> — learn, assess, act. Ship something visible early; credibility compounds.</li></ul><h3>🎯 COMMON PITFALLS</h3><ul><li>Presenting a tool list as a strategy. No assets, no adversaries, no sequence — no funding.</li><li>Asking for budget in security language. \"We need PAM for best practice\" loses to \"fourteen accounts can change production unreviewed, two belong to ex-contractors.\"</li><li>Buying before auditing what's already owned and switched off. Most common finding in the industry.</li><li>Running a POC on the vendor's demo data. Everything works on their laptop.</li><li>Deploying a tool the team hasn't the headcount to run. An unmonitored console is a liability with a licence fee.</li></ul><h3>📝 BO CHEAT SHEET</h3><ul><li>Strategy answers: what · from whom · to what standard · what first</li><li>CIS = what to do first | NIST CSF = shared language | ISO 27001 = certifiable proof</li><li>Zero trust = principle, not product</li><li>Fund it in THEIR risk, not your tooling</li><li>Before buying: coverage, configuration, consumption, overlap</li><li>Write POC success criteria before the trial starts</li><li>90 days: learn → assess → act, and ship something visible</li></ul><h3>💼 REAL WORLD</h3><p>You're the first security hire at a 300-person company. No budget approved yet. Month one you build the asset list and find 40 systems nobody claimed. Month two you score against CIS Controls and find MFA missing on two external apps, 11 dormant privileged accounts, and an EDR licence deployed on a third of the estate.</p><p>Month three you turn on MFA, kill the dormant accounts, and finish the EDR rollout — total spend: zero. THEN you take the roadmap to leadership, and it gets approved, because the free wins already landed and you have receipts.</p><p>Same person, same company. The order is what made it work.</p>",
 };

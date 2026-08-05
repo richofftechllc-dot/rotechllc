@@ -267,6 +267,66 @@ export const LABS: Lab[] = [
       { title: "Test it", do: "Use the guardrail's test panel: ask for the denied topic and watch it get blocked.", verify: "The guardrail blocked the denied request — responsible AI enforced." },
     ],
   },
+  // ── CYBER DEFENSE (cd) — the graded companion to the Cyber Defense Playbook.
+  // These run against the student's OWN environment or public/free resources; no
+  // ROT-hosted targets and nothing that touches a third party's systems.
+  {
+    id: "cd-threat-model",
+    cert: "Cyber Defense",
+    domainId: "cd2",
+    coach: "bo",
+    title: "Threat model an app you already use",
+    objective: "Draw a real data-flow diagram, mark the trust boundary, and walk every crossing to produce a ranked list of what could go wrong — the cheapest security control there is.",
+    est: "~35 min",
+    pdiUrl: "https://owasp.org/www-community/Threat_Modeling",
+    envLabel: "Open OWASP threat modelling",
+    steps: [
+      { title: "Pick a target you control", do: "Choose an application you personally use or own — a side project, a home server, your password manager. It must be something you can reason about honestly. Write one sentence on what it does and who uses it.", verify: "You can name the app, its users, and what data it holds." },
+      { title: "Draw the pieces", do: "Sketch it: users, front end, back end, database, any third-party service it calls. Boxes and arrows on paper is fine — no tooling required.", verify: "Every component that stores or moves data appears on the diagram." },
+      { title: "Mark the trust boundary", do: "Draw one line around everything YOU control. Anything crossing that line is where attacks live — user input, API calls out, third-party callbacks.", verify: "You can point at each arrow crossing the line and say what data rides on it." },
+      { title: "Walk each crossing", do: "For every crossing ask four questions: can someone pretend to be someone else, can they change something they shouldn't, can they see something they shouldn't, can they take the whole thing down? Write the answer even when it's 'no, because...'.", verify: "Each crossing has four answers, with the reason recorded." },
+      { title: "Rank by risk, not severity", do: "Score each finding on likelihood and impact. Reorder the list so the top item is the one most likely to actually hurt — not the one that sounds worst.", verify: "Your top three would survive someone asking 'why that order?'" },
+      { title: "Name the first fix", do: "Pick ONE finding and write what you'd change, roughly what it costs, and what improves once it's done. Two sentences.", verify: "A non-technical person could read it and understand the trade." },
+    ],
+  },
+  {
+    id: "cd-attack-surface",
+    cert: "Cyber Defense",
+    domainId: "cd2",
+    coach: "bo",
+    title: "Inventory your own attack surface",
+    objective: "Build the asset list everything else depends on — for something you actually own — and find at least one thing you forgot existed.",
+    est: "~30 min",
+    pdiUrl: "https://www.cisa.gov/cybersecurity-best-practices",
+    envLabel: "Start the inventory",
+    steps: [
+      { title: "Set the scope, in writing", do: "Choose ONLY things you own or administer: your home network, your own domains, your own cloud account. Write the scope down before you start. Nothing outside it gets touched.", verify: "Your scope statement names specific assets and excludes everything else." },
+      { title: "List what you think you have", do: "From memory, list every device, domain, cloud service, SaaS account and repo you believe you own. Don't look anything up yet.", verify: "You have a written list made from memory alone." },
+      { title: "Now actually look", do: "Check your router's device list, your cloud console, your domain registrar, and your password manager. Add everything the memory list missed.", verify: "The real list is longer than the memory list — it almost always is." },
+      { title: "Mark what's exposed", do: "For each asset note whether it is reachable from the internet, and what it would cost you if it were compromised. Flag anything you no longer use.", verify: "Every asset has an exposure note and an impact note." },
+      { title: "Kill something", do: "Find at least one dormant account, unused service or forgotten box — and shut it down or delete it. That is attack surface reduction, done for real.", verify: "One thing that existed at the start of this lab no longer exists." },
+      { title: "Write the finding", do: "Three sentences: what you found, what surprised you, and what you removed. This is exactly the shape of a real inventory finding.", verify: "You could paste it into a report without editing." },
+    ],
+  },
+  {
+    id: "cd-tabletop",
+    cert: "Cyber Defense",
+    domainId: "cd4",
+    coach: "bo",
+    title: "Run a ransomware tabletop on yourself",
+    objective: "Walk a realistic incident end to end on paper and find the decisions nobody had made yet — which is the entire point of a tabletop.",
+    est: "~40 min",
+    pdiUrl: "https://www.cisa.gov/stopransomware",
+    envLabel: "Open the ransomware resources",
+    steps: [
+      { title: "Set the scene", do: "Write the scenario: Monday 06:40, a file server is encrypted, a ransom note is on three desktops, and one backup job has been failing silently for eleven days. Use your own environment or a realistic imagined one.", verify: "The scenario names specific systems and a specific time." },
+      { title: "First hour: decide and record", do: "Write what you do in the first 60 minutes, in order. Who is called, what gets isolated, what evidence gets preserved BEFORE anything is rebuilt.", verify: "Your timeline shows containment and evidence preservation, not just cleanup." },
+      { title: "Find the decision nobody owns", do: "Answer these out loud: who authorises taking production offline, who talks to customers, who talks to press, and who decides on paying. Write the NAME of the role for each.", verify: "Every question has a role attached, or you have found a real gap." },
+      { title: "Test the backup assumption", do: "Answer honestly: when was a restore last actually tested — not the backup job succeeding, an actual restore? If never, that is your finding.", verify: "You have a date, or you have written 'never tested' without flinching." },
+      { title: "Follow it to recovery", do: "Write how you get back to normal: restore order, how you verify systems are clean before reconnecting, and how you know the attacker is out.", verify: "Your plan says how you'd know they were gone, not just that systems are running." },
+      { title: "Write the three gaps", do: "List the three biggest gaps this exercise exposed, each with an owner and a date. That list IS the deliverable — a tabletop that finds nothing was run wrong.", verify: "Three gaps, three owners, three dates." },
+    ],
+  },
 ];
 
 export function getLab(id: string | undefined): Lab | undefined {
