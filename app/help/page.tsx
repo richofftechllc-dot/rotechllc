@@ -46,13 +46,27 @@ export default function Help() {
       </section>
 
       {/* TALK TO AGENTS — primary conversion mechanism */}
-      <section id="agents" className="bg-gradient-to-br from-green-950/30 to-black py-24 border-t border-rot-line scroll-mt-20">
+      {/* Was bg-gradient-to-br from-green-950/30 to-black — a near-black section
+          left over from the dark theme, carrying text-rot-muted (dark ink) and a
+          default-dark h2. The entire pitch for the agents was black on black.
+          On the marble now, like the rest of the site. */}
+      <section id="agents" className="bg-rot-bg py-24 border-t border-rot-line scroll-mt-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
-            <div className="text-emerald-600 font-bold tracking-widest text-sm mb-4">TALK TO THE AGENTS</div>
+            <div className="rot-kicker mb-4">Talk to the agents</div>
             <h2 className="text-4xl md:text-5xl font-black mb-6">Talk to the AI agents live.</h2>
+            {/* Randy: say plainly that these are conversational, not robotic.
+                It is the single most common objection to an "AI agent" call —
+                people assume a phone tree — and the agents are the primary
+                conversion path for anyone who is not ready to buy yet. */}
             <p className="text-rot-muted text-lg max-w-2xl mx-auto">
-              Click any agent below to connect for a real qualification call. No phone number, no waiting — you talk to the agent directly in your browser.
+              A real conversation, not a phone tree. You talk, it talks back — it listens,
+              follows what you actually say, and asks about your situation like a person
+              would. No scripts to sit through, no menu options, no robot voice.
+            </p>
+            <p className="text-rot-muted text-lg max-w-2xl mx-auto mt-4">
+              Click any agent below to connect. No phone number, no waiting — you talk to
+              the agent directly in your browser.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">

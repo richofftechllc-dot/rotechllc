@@ -60,7 +60,7 @@ export default async function Home() {
                 Join the Discord — Free
               </a>
               <a href="/help#agents" className="rot-btn-ghost px-6 py-3.5 text-sm">
-                Talk to an AI agent
+                Talk to an AI agent — a real conversation
               </a>
               <a href="#founding" className="rot-btn-ghost px-6 py-3.5 text-sm">
                 See membership →
