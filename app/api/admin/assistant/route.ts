@@ -199,17 +199,28 @@ export async function POST(req: Request) {
         const startDate = typeof inp.startDate === "string" && inp.startDate ? inp.startDate : iso(new Date());
 
         if (inp.endDate && typeof inp.endDate === "string") {
-          // Build monthly due dates from startDate through endDate (inclusive of both).
           const start = new Date(startDate + "T00:00:00Z");
           const end = new Date(inp.endDate + "T00:00:00Z");
-          const dueDates: string[] = [iso(start)];
-          const cursor = new Date(start);
-          while (true) {
-            cursor.setUTCMonth(cursor.getUTCMonth() + 1);
-            if (cursor >= end) break;
-            dueDates.push(iso(cursor));
+          const wantCount = Math.floor(Number(inp.payments) || 0);
+          let dueDates: string[] = [];
+          if (wantCount >= 2) {
+            // Exactly `wantCount` payments, evenly spaced from startDate to endDate
+            // (first = start, last = end). This is "4 payments, done by Oct 1".
+            const spanMs = end.getTime() - start.getTime();
+            for (let i = 0; i < wantCount; i++) {
+              dueDates.push(iso(new Date(start.getTime() + Math.round((spanMs * i) / (wantCount - 1)))));
+            }
+          } else {
+            // No count given → one payment per month from startDate through endDate.
+            dueDates = [iso(start)];
+            const cursor = new Date(start);
+            while (true) {
+              cursor.setUTCMonth(cursor.getUTCMonth() + 1);
+              if (cursor >= end) break;
+              dueDates.push(iso(cursor));
+            }
+            if (iso(end) !== dueDates[dueDates.length - 1]) dueDates.push(iso(end));
           }
-          if (iso(end) !== dueDates[dueDates.length - 1]) dueDates.push(iso(end));
           const n = dueDates.length;
           if (n >= 2) {
             // amounts for the first n-1 payments; last is the bot's BALANCE sweep
