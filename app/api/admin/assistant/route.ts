@@ -119,8 +119,9 @@ export async function POST(req: Request) {
         properties: {
           memberEmail: { type: "string", description: "the member's email address (from lookup_member or the roster)" },
           memberName: { type: "string", description: "the member's name" },
-          service: { type: "string", enum: COACH_SERVICES.map((s) => s.key), description: "which cert service to invoice for" },
+          service: { type: "string", enum: COACH_SERVICES.map((s) => s.key), description: "which service to invoice for (includes ts-clearance = TS Clearance Guidance)" },
           discountDollars: { type: "number", description: "discount in whole dollars (0 if none). Coaches max 300." },
+          payments: { type: "number", description: "OPTIONAL payment plan: number of installments (e.g. 4). Omit or 1 = pay in full. First payment due today, the rest every 30 days; the last sweeps the remainder. Use when the coach asks to split it into N payments." },
         },
         required: ["memberEmail", "service"],
       },
@@ -180,22 +181,27 @@ export async function POST(req: Request) {
           continue;
         }
         const discountCents = Math.max(0, Math.round((Number(inp.discountDollars) || 0) * 100));
+        // Optional payment plan: N installments (first today, rest every 30 days, last
+        // sweeps the remainder). Omit or 1 = pay in full.
+        const payCount = Math.floor(Number(inp.payments) || 0);
+        const plan = payCount >= 2 ? { type: "installments", count: Math.min(payCount, 13) } : undefined;
         // Over $300 from a coach is NOT refused — the bot routes it to Randy for approval
         // (he gets a Discord ping; `!approveinvoice` sends it). Randy himself bypasses.
         const needsApproval = discountCents > 30000 && !isOwner;
         try {
           await coll("botCommands").add({
             type: "invoice",
-            payload: { clientName: String(inp.memberName || email), clientEmail: email, service: svc.key, discountCents },
+            payload: { clientName: String(inp.memberName || email), clientEmail: email, service: svc.key, discountCents, ...(plan ? { plan } : {}) },
             status: "pending",
             requestedBy: admin.discordId,
             requestedByName: admin.name,
             createdAt: new Date().toISOString(),
           });
           const off = discountCents > 0 ? ` (−$${(discountCents / 100).toFixed(0)} off)` : "";
+          const planNote = plan ? ` — ${plan.count} payments, first due today` : "";
           invoiceNote = needsApproval
-            ? `🔔 ${svc.label}${off} → ${inp.memberName || email}: that discount is over the $300 coach cap, so it's been sent to Randy for approval. He gets a Discord ping now — the invoice goes out the moment he approves it.`
-            : `✅ Invoice queued: ${svc.label}${off} → ${inp.memberName || email}. Square is emailing it now; it'll show in follow-ups for payment tracking.`;
+            ? `🔔 ${svc.label}${off}${planNote} → ${inp.memberName || email}: that discount is over the $300 coach cap, so it's been sent to Randy for approval. He gets a Discord ping now — the invoice goes out the moment he approves it.`
+            : `✅ Invoice queued: ${svc.label}${off}${planNote} → ${inp.memberName || email}. Square is emailing it now; it'll show in follow-ups for payment tracking.`;
           toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: invoiceNote });
         } catch {
           toolResults.push({ type: "tool_result", tool_use_id: tu.id, content: "Failed to queue the invoice — tell the coach to use the 🧾 Send invoice button on the member card." });
