@@ -121,7 +121,10 @@ export async function POST(req: Request) {
           memberName: { type: "string", description: "the member's name" },
           service: { type: "string", enum: COACH_SERVICES.map((s) => s.key), description: "which service to invoice for (includes ts-clearance = TS Clearance Guidance)" },
           discountDollars: { type: "number", description: "discount in whole dollars (0 if none). Coaches max 300." },
-          payments: { type: "number", description: "OPTIONAL payment plan: number of installments (e.g. 4). Omit or 1 = pay in full. First payment due today, the rest every 30 days; the last sweeps the remainder. Use when the coach asks to split it into N payments." },
+          payments: { type: "number", description: "OPTIONAL payment plan: number of installments (e.g. 4). Omit or 1 = pay in full. Even split, first due today, rest every 30 days; last sweeps the remainder." },
+          firstPaymentDollars: { type: "number", description: "OPTIONAL custom plan: the first payment's dollar amount (e.g. 1500). The rest of the balance is split across the remaining payments." },
+          startDate: { type: "string", description: "OPTIONAL custom plan: ISO date (YYYY-MM-DD) the FIRST payment is due. Defaults to today." },
+          endDate: { type: "string", description: "OPTIONAL custom plan: ISO date (YYYY-MM-DD) the LAST payment must be paid by. The balance after the first payment is spread monthly from startDate to endDate. Use with firstPaymentDollars for 'X now, split the rest until <date>'." },
         },
         required: ["memberEmail", "service"],
       },
@@ -181,10 +184,55 @@ export async function POST(req: Request) {
           continue;
         }
         const discountCents = Math.max(0, Math.round((Number(inp.discountDollars) || 0) * 100));
-        // Optional payment plan: N installments (first today, rest every 30 days, last
-        // sweeps the remainder). Omit or 1 = pay in full.
-        const payCount = Math.floor(Number(inp.payments) || 0);
-        const plan = payCount >= 2 ? { type: "installments", count: Math.min(payCount, 13) } : undefined;
+        // ── Payment plan ────────────────────────────────────────────────────────
+        // Two ways to plan:
+        //  (a) `payments` = N → even split, one every 30 days from today.
+        //  (b) custom: `firstPaymentDollars` + `startDate`/`endDate` → "$X on <start>,
+        //      split the rest through <end>". Monthly dates from start to end; the
+        //      first payment is the given amount, the remainder is split evenly, and
+        //      the bot's last request sweeps any rounding.
+        const iso = (d: Date) => d.toISOString().slice(0, 10);
+        const netCents = Math.max(0, svc.amount - discountCents);
+        const totalCents = netCents + Math.round(netCents * 0.06); // mirrors the bot's 6% fee
+        let plan: Record<string, unknown> | undefined;
+        const firstCents = Math.round((Number(inp.firstPaymentDollars) || 0) * 100);
+        const startDate = typeof inp.startDate === "string" && inp.startDate ? inp.startDate : iso(new Date());
+
+        if (inp.endDate && typeof inp.endDate === "string") {
+          // Build monthly due dates from startDate through endDate (inclusive of both).
+          const start = new Date(startDate + "T00:00:00Z");
+          const end = new Date(inp.endDate + "T00:00:00Z");
+          const dueDates: string[] = [iso(start)];
+          const cursor = new Date(start);
+          while (true) {
+            cursor.setUTCMonth(cursor.getUTCMonth() + 1);
+            if (cursor >= end) break;
+            dueDates.push(iso(cursor));
+          }
+          if (iso(end) !== dueDates[dueDates.length - 1]) dueDates.push(iso(end));
+          const n = dueDates.length;
+          if (n >= 2) {
+            // amounts for the first n-1 payments; last is the bot's BALANCE sweep
+            const amountsCents: number[] = [];
+            const first = firstCents > 0 && firstCents < totalCents ? firstCents : Math.floor(totalCents / n);
+            amountsCents.push(first);
+            const rest = totalCents - first;
+            const restEach = Math.floor(rest / (n - 1)); // n-1 remaining slots incl. the balance
+            for (let i = 1; i < n - 1; i++) amountsCents.push(restEach);
+            plan = { type: "installments", dueDates, amountsCents };
+          }
+        } else {
+          const payCount = Math.floor(Number(inp.payments) || 0);
+          if (payCount >= 2) {
+            const n = Math.min(payCount, 13);
+            if (firstCents > 0 && firstCents < totalCents) {
+              const restEach = Math.floor((totalCents - firstCents) / (n - 1));
+              plan = { type: "installments", count: n, amountsCents: [firstCents, ...Array(n - 2).fill(restEach)] };
+            } else {
+              plan = { type: "installments", count: n };
+            }
+          }
+        }
         // Over $300 from a coach is NOT refused — the bot routes it to Randy for approval
         // (he gets a Discord ping; `!approveinvoice` sends it). Randy himself bypasses.
         const needsApproval = discountCents > 30000 && !isOwner;
@@ -198,7 +246,10 @@ export async function POST(req: Request) {
             createdAt: new Date().toISOString(),
           });
           const off = discountCents > 0 ? ` (−$${(discountCents / 100).toFixed(0)} off)` : "";
-          const planNote = plan ? ` — ${plan.count} payments, first due today` : "";
+          const planCount = plan ? (Array.isArray(plan.dueDates) ? (plan.dueDates as string[]).length : Number(plan.count)) : 0;
+          const planNote = plan
+            ? ` — ${planCount} payments${Array.isArray(plan.dueDates) ? ` (${(plan.dueDates as string[])[0]} → ${(plan.dueDates as string[])[planCount - 1]})` : ", first today"}`
+            : "";
           invoiceNote = needsApproval
             ? `🔔 ${svc.label}${off}${planNote} → ${inp.memberName || email}: that discount is over the $300 coach cap, so it's been sent to Randy for approval. He gets a Discord ping now — the invoice goes out the moment he approves it.`
             : `✅ Invoice queued: ${svc.label}${off}${planNote} → ${inp.memberName || email}. Square is emailing it now; it'll show in follow-ups for payment tracking.`;
