@@ -141,6 +141,7 @@ export const COACH_SERVICES = [
   // bot. Clearance is a manual, high-touch service — the invoice just collects; access
   // is handled by hand. Secret/TS-SCI omitted until their current prices are confirmed.
   { key: "ts-clearance", label: "TS Clearance Guidance", amount: 475000 },
+  { key: "tssci-clearance", label: "TS/SCI Clearance Guidance", amount: 550000 },
 ] as const;
 
 export const CHECKOUT_LIVE = Boolean(CHECKOUT.yearly || CHECKOUT.monthly);
