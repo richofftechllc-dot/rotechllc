@@ -136,6 +136,11 @@ export const COACH_SERVICES = [
   { key: "csa-selfguided", label: "ServiceNow CSA — Self-Guided", amount: 60000 },
   { key: "csa-accelerated", label: "ServiceNow CSA — Accelerated", amount: 280000 },
   { key: "aws", label: "AWS Cloud Practitioner", amount: 100000 },
+  // Clearance guidance. amount = NET; the bot's coachinvoice.breakdown() adds the 6%
+  // fee on top ($4,750 net → $5,035 charged). Mirrors coachinvoice.SERVICES in the
+  // bot. Clearance is a manual, high-touch service — the invoice just collects; access
+  // is handled by hand. Secret/TS-SCI omitted until their current prices are confirmed.
+  { key: "ts-clearance", label: "TS Clearance Guidance", amount: 475000 },
 ] as const;
 
 export const CHECKOUT_LIVE = Boolean(CHECKOUT.yearly || CHECKOUT.monthly);
