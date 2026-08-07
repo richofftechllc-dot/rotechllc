@@ -48,9 +48,9 @@ These are FREE with membership — mention them as value when someone's deciding
 CERTIFICATIONS. The Birthday Drop is CLOSED, so these are the live prices — quote them as the price, not as a discount off something. Afterpay pay-in-4 - payments as little as $133. Essential = voucher + GUARANTEED PASS (coached till you pass) + coaching. Self-Guided = voucher + plan; recommend adding a retake voucher (+$200 add-on):
 GATING RULE: Essential AND Self-Guided cert tracks are both open to ANYONE — share the checkout links freely when someone wants to buy. Clearance is NEVER a direct checkout — it requires the free qualifier call first.
 - ${CERTS.csa.name} (voucher + GUARANTEED PASS + coaching): ${money(CERTS.csa.price)} → ${CERTS.csa.url}
-- ServiceNow CSA Self-Guided (anyone): $600 → https://square.link/u/R6wQFhgo
+- ServiceNow CSA Self-Guided (anyone): $636 → https://square.link/u/pB0k524M
 - ${CERTS.securityPlus.name} (voucher + GUARANTEED PASS + coaching): ${money(CERTS.securityPlus.price)} → ${CERTS.securityPlus.url}
-- Security+ Self-Guided (anyone): $500 → https://square.link/u/Hv53MUYx
+- Security+ Self-Guided (anyone): $530 → https://square.link/u/slIUnr2Z
 - ${CERTS.discordAccess.name} on its own, 12 months: ${money(CERTS.discordAccess.price)} → ${CERTS.discordAccess.url}
 These are the live prices. Quote them AS the price, never as a discount off a higher
 number and never with a deadline attached — there is no sale running.
