@@ -142,6 +142,73 @@ function ServiceNowMock() {
   );
 }
 
+// ─── Labeled mock of Active Directory Users and Computers (ROT's own art) ──
+// Not Microsoft's screenshot — our own drawing, and deliberately over-labeled
+// because a student may never have seen an OU before. Shows the domain tree on
+// the left, the objects pane on the right, and a plain-English legend that
+// answers "what even is an OU?" without assuming any Windows-admin background.
+function ADUCMock() {
+  const tree = [
+    { label: "rotech.local", tag: "domain root", depth: 0, kind: "root" },
+    { label: "Builtin", tag: "container", depth: 1, kind: "container" },
+    { label: "Computers", tag: "container", depth: 1, kind: "container" },
+    { label: "Domain Controllers", tag: "OU", depth: 1, kind: "ou" },
+    { label: "Users", tag: "container", depth: 1, kind: "container" },
+    { label: "Sales", tag: "OU", depth: 1, kind: "ou-hi" },
+    { label: "East", tag: "OU", depth: 2, kind: "ou" },
+    { label: "West", tag: "OU", depth: 2, kind: "ou" },
+  ];
+  const objects = [
+    { name: "Leo", type: "User" },
+    { name: "Virgo", type: "User" },
+    { name: "Aquarius", type: "User" },
+    { name: "All Sales Personnel", type: "Security Group · Global" },
+    { name: "WKS-01", type: "Computer" },
+  ];
+  const glyph = (kind: string) => (kind === "root" ? "🏛" : kind.startsWith("ou") ? "📂" : "📁");
+  const objGlyph = (type: string) => (type.startsWith("Security") ? "👥" : type === "Computer" ? "🖥" : "👤");
+  return (
+    <div className="mb-5 rounded-xl border border-rot-line bg-gradient-to-b from-zinc-950 to-black p-3">
+      <p className="mb-2 text-[11px] uppercase tracking-wide text-rot-faint">What Active Directory actually looks like ↓</p>
+      {/* Title bar */}
+      <div className="flex items-center gap-2 rounded-t-lg bg-rot-sunken px-3 py-2 ring-1 ring-rot-accent/30">
+        <span className="flex gap-1"><span className="h-2.5 w-2.5 rounded-full bg-rot-line" /><span className="h-2.5 w-2.5 rounded-full bg-rot-line" /><span className="h-2.5 w-2.5 rounded-full bg-rot-line" /></span>
+        <span className="text-[11px] font-bold text-rot-fg">Active Directory Users and Computers</span>
+      </div>
+      <div className="flex">
+        {/* Console tree */}
+        <div className="w-1/2 rounded-bl-lg bg-rot-surface p-2 ring-1 ring-white/5">
+          <div className="mb-1 text-[10px] uppercase tracking-wide text-rot-faint">Console tree</div>
+          {tree.map((t) => (
+            <div key={t.label} className="flex items-center gap-1 py-0.5 text-[11px]" style={{ paddingLeft: t.depth * 12 }}>
+              <span>{glyph(t.kind)}</span>
+              <span className={t.kind === "ou-hi" ? "font-bold text-rot-accent" : t.kind === "root" ? "font-semibold text-rot-fg" : "text-rot-muted"}>{t.label}</span>
+              <span className={`ml-1 rounded px-1 text-[9px] ${t.tag === "OU" ? "bg-rot-accent/15 text-rot-accent" : "bg-rot-line/40 text-rot-faint"}`}>{t.tag}</span>
+            </div>
+          ))}
+        </div>
+        {/* Objects pane */}
+        <div className="w-1/2 rounded-br-lg bg-rot-sunken p-2 ring-1 ring-white/5">
+          <div className="mb-1 text-[10px] uppercase tracking-wide text-rot-faint">Objects in Sales \ East</div>
+          <div className="flex justify-between border-b border-rot-line pb-0.5 text-[9px] uppercase tracking-wide text-rot-faint"><span>Name</span><span>Type</span></div>
+          {objects.map((o) => (
+            <div key={o.name} className="flex items-center justify-between gap-2 border-b border-rot-line/50 py-1 text-[11px]">
+              <span className="flex items-center gap-1 truncate text-rot-muted"><span>{objGlyph(o.type)}</span>{o.name}</span>
+              <span className="shrink-0 text-[10px] text-rot-faint">{o.type}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Plain-English legend — this is the "what's an OU?" answer */}
+      <div className="mt-2 space-y-1 text-[10px] leading-snug text-rot-faint">
+        <p><span className="text-rot-accent">📂 OU (Organizational Unit)</span> = a folder <span className="text-rot-fg">you</span> make. Organize accounts, apply rules (Group Policy), hand out who can manage them.</p>
+        <p><span className="text-rot-muted">📁 Container</span> = a built-in folder (Users, Computers). You <span className="text-rot-fg">can&apos;t</span> attach Group Policy to it — that&apos;s why admins move accounts into OUs.</p>
+        <p><span>👥 Group</span> = grants access to things. Different job than an OU, which just organizes.</p>
+      </div>
+    </div>
+  );
+}
+
 export default function InteractiveLesson({ html }: { html: string }) {
   const sections = useMemo(() => parseLesson(html), [html]);
   const [step, setStep] = useState(0);
@@ -175,6 +242,9 @@ export default function InteractiveLesson({ html }: { html: string }) {
   const revealedCount = sec.items.filter((_, i) => revealed.has(`${step}-${i}`)).length;
   const allRevealed = sec.items.length > 0 && revealedCount === sec.items.length;
   const showMock = sec.kind === "concepts" && sec.items.some((li) => /navigator|banner|content frame|gear/i.test(li));
+  // AD map mock: shows on the Active Directory "reading the map" concepts slide.
+  // Scoped to map-specific terms so it never fires on other tracks' concept slides.
+  const showADUC = sec.kind === "concepts" && sec.items.some((li) => /domain root|organizational unit|default container/i.test(li));
 
   return (
     <div className="bg-rot-surface border border-rot-accent/30 rounded-xl overflow-hidden mb-6">
@@ -205,6 +275,7 @@ export default function InteractiveLesson({ html }: { html: string }) {
           {sec.kind === "concepts" && (
             <>
               {showMock && <ServiceNowMock />}
+              {showADUC && <ADUCMock />}
               <div className="mb-3 flex items-center justify-between">
                 <p className="text-xs text-rot-accent/80">Tap a card to flip it · {revealedCount}/{sec.items.length}</p>
                 {!allRevealed && <button onClick={revealAll} className="text-[11px] text-rot-muted hover:text-rot-accent underline">reveal all</button>}
