@@ -20,7 +20,40 @@ const TRACK_COLORS: Record<string, string> = {
   csa: "border-yellow-400/40 hover:border-yellow-400",
   ai: "border-blue-400/40 hover:border-blue-400",
 };
-const TRACK_TEXT: Record<string, string> = { sp: "text-emerald-600", csa: "text-amber-600", ai: "text-blue-600" };
+const TRACK_TEXT: Record<string, string> = {
+  sp: "text-emerald-600", csa: "text-amber-600", ai: "text-blue-600",
+  cd: "text-cyan-600", hk: "text-rose-600", ad: "text-indigo-600",
+};
+
+// Flo is the "technical" tutor on EVERY track, but her copy used to be hardcoded to
+// ServiceNow ("Live · ServiceNow instructor", "Let's do it the ServiceNow way"). On a
+// Security+, Active Directory or Hacking quiz that made the whole page read as CSA even
+// though the questions underneath were correct. Her subtitle and opener now follow the
+// track being studied. Keep these keys in lockstep with lib/access.ts prefixes.
+const FLO_ROLE: Record<string, string> = {
+  sp: "Security+ instructor",
+  csa: "ServiceNow instructor",
+  ai: "AWS AI instructor",
+  cd: "Cyber defense instructor",
+  hk: "Offensive security instructor",
+  ad: "Active Directory instructor",
+};
+const FLO_OPENER: Record<string, string> = {
+  sp: "Let's do it the Security+ way.",
+  csa: "Let's do it the ServiceNow way.",
+  ai: "Let's do it the AWS way.",
+  cd: "Let's do it the defender's way.",
+  hk: "Let's do it the attacker's way — legally.",
+  ad: "Let's do it the domain-admin way.",
+};
+const FLO_ASK: Record<string, string> = {
+  sp: "Ask me the exact term, the control, or “what’s the exam trick here?”",
+  csa: "Ask me the term, the click-path, or “what’s the exam trick here?”",
+  ai: "Ask me the service, the parameter, or “what’s the exam trick here?”",
+  cd: "Ask me the control, the framework mapping, or “what would a real SOC do?”",
+  hk: "Ask me the technique, the tool, or “what’s the defense for this?”",
+  ad: "Ask me the attack path, the Kerberos detail, or “how do I defend this?”",
+};
 
 // Old quiz schema uses prefixed keys: secplus_sp1, csa_csa1, ai_ai1
 function progKey(domainId: string): string {
@@ -626,7 +659,7 @@ ${missedText}]
                 )}
                 <div>
                   <div className="font-bold text-sm">{persona === "bo" ? "Bo Tech" : "Flo"}</div>
-                  <div className={`text-xs ${persona === "bo" ? "text-emerald-600" : "text-fuchsia-700"}`}>{persona === "bo" ? "Live · knows this question" : "Live · ServiceNow instructor"}</div>
+                  <div className={`text-xs ${persona === "bo" ? "text-emerald-600" : "text-fuchsia-700"}`}>{persona === "bo" ? "Live · knows this question" : `Live · ${FLO_ROLE[track.id] || "technical instructor"}`}</div>
                 </div>
               </div>
               <div className="flex items-center gap-1">
@@ -659,8 +692,8 @@ ${missedText}]
                   </>
                 ) : (
                   <>
-                    <p>Hey {me.name.split(" ")[0]} — Flo here. Let&apos;s do it the ServiceNow way.</p>
-                    <p>Ask me the term, the click-path, or &quot;what&apos;s the exam trick here?&quot;</p>
+                    <p>Hey {me.name.split(" ")[0]} — Flo here. {FLO_OPENER[track.id] || "Let's take it step by step."}</p>
+                    <p>{FLO_ASK[track.id] || "Ask me the exact term, the step, or “what’s the exam trick here?”"}</p>
                   </>
                 )}
               </div>
