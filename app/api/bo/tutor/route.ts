@@ -10,7 +10,20 @@ export const dynamic = "force-dynamic";
 type Msg = { role: "user" | "assistant"; content: string };
 
 const SESSION_SECRET = process.env.SESSION_SECRET || "";
-const TRACK_NAMES: Record<string, string> = { sp: "Security+", csa: "ServiceNow CSA", ai: "AWS AI Practitioner" };
+// EVERY prefix allowedPrefixes() can return must have a name here. A prefix missing from
+// this map resolves to undefined, gets dropped by the .filter(Boolean) below, and — if it
+// was the member's ONLY track — collapses `owned` to "" and falls back to "AWS AI
+// Practitioner". That is how cd/hk/ad members were being told they didn't own the very
+// track they were sitting in, and the tutor then refused to teach it. Keep in lockstep
+// with lib/access.ts.
+const TRACK_NAMES: Record<string, string> = {
+  sp: "Security+",
+  csa: "ServiceNow CSA",
+  ai: "AWS AI Practitioner",
+  cd: "Cyber Defense",
+  hk: "Hacking with Bo & Flo",
+  ad: "Active Directory",
+};
 
 // Resolve the member's OWNED tracks from their session server-side — never trust a
 // client-sent track. Returns the scope instruction appended to the tutor's system prompt.

@@ -78,9 +78,7 @@ export const CHECKOUT = {
 
 // ─── CERTS ───────────────────────────────────────────────────────────────────
 // Price and URL together, for the same reason CHECKOUT above does it: they drift
-// the moment they live in different files. Aug 4 2026 — Square repriced the
-// catalog IN PLACE, so these URLs and their catalog item/variation ids are
-// unchanged and only the amounts moved.
+// the moment they live in different files.
 //
 // Square is the source of truth. If a number here and a number in Square
 // disagree, Square wins and this file is the bug.
@@ -88,10 +86,37 @@ export const CHECKOUT = {
 // The bot mirrors these in prices.js SERVICES + AMOUNT_ROUTES. An amount that
 // exists here but not in AMOUNT_ROUTES takes the customer's money and provisions
 // nothing, so change them together.
+//
+// ── Aug 7 2026: all three links replaced. Read this before touching them. ──
+// The previous three URLs (0ChAU15t, rdx2l5Vc, ThiCFqpM) were `order` links —
+// single-use checkouts built on Jul 26 from the July Birthday Drop catalog
+// items. Two things were wrong with them at once:
+//
+//   1. WRONG PRICE. An order link snapshots its amount at creation time, so the
+//      "repriced the catalog in place" note that used to sit here was never
+//      true of these links — repricing a catalog item does not move an order
+//      that already exists. Sec+ charged $777.89 and CSA charged $777.89 against
+//      the $1,500/$1,600 shown on the page; Discord charged $100 against $375.
+//   2. SINGLE USE. The first person to pay CONSUMES the order. Every click after
+//      that lands on the first buyer's "payment confirmed" receipt instead of a
+//      checkout, so the button silently stops selling. That is exactly what the
+//      comment in api/checkout/monthly/route.ts warns about, and Sec+ died this
+//      way on Aug 7 after one buyer paid the $777.89.
+//
+// The replacements below are durable REUSABLE quick_pay links, verified on their
+// live checkout pages: correct amount, no tax line, subtotal == order total.
+//
+// How to tell the two apart, because it is NOT obvious: every Square link has an
+// `/order/<id>` in its long_url, quick_pay included, so the URL tells you nothing.
+// The tell is what happens to that order. A quick_pay link's order is a template
+// that stays DRAFT forever and is CLONED per buyer. An `order` link's order IS the
+// checkout — retrieve it and you will find it OPEN/COMPLETED with a real tender
+// attached, which means it has already been spent. Before putting any link here,
+// pull its order: if it has ever held a payment, it is single-use. Do not use it.
 export const CERTS = {
-  securityPlus: { price: 1500, url: "https://square.link/u/0ChAU15t", name: "CompTIA Security+" },
-  csa: { price: 1600, url: "https://square.link/u/rdx2l5Vc", name: "ServiceNow CSA" },
-  discordAccess: { price: 375, url: "https://square.link/u/ThiCFqpM", name: "ROT Discord Access" },
+  securityPlus: { price: 1500, url: "https://square.link/u/uuFOu9k5", name: "CompTIA Security+" },
+  csa: { price: 1600, url: "https://square.link/u/pITRzlG9", name: "ServiceNow CSA" },
+  discordAccess: { price: 375, url: "https://square.link/u/g3UzaLOH", name: "ROT Discord Access" },
 } as const;
 
 // ─── THE REST OF THE CATALOG ─────────────────────────────────────────────────
